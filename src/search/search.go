@@ -3,8 +3,6 @@ package search
 import (
 	"context"
 	"fmt"
-	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/gocolly/colly/v2"
@@ -89,19 +87,21 @@ func Search(ctx context.Context, seUrl string, query string, dom Dom, opts ...Op
 
 	})
 
-	c.OnHTML(dom.NextPage, func(e *colly.HTMLElement) {
+	/*
+		c.OnHTML(dom.NextPage, func(e *colly.HTMLElement) {
 
-		sel := e.DOM
+			sel := e.DOM
 
-		// check if there is a next button at the end.
-		if nextPageHref, exists := sel.Attr("href"); exists {
-			start := getStart(strings.TrimSpace(nextPageHref))
-			nextPageLink = buildUrl(seUrl, query, limit, start)
-			q.AddURL(nextPageLink)
-		} else {
-			nextPageLink = ""
-		}
-	})
+			// check if there is a next button at the end.
+			if nextPageHref, exists := sel.Attr("href"); exists {
+				start := getStart(strings.TrimSpace(nextPageHref))
+				nextPageLink = buildUrl(seUrl, query, limit, start)
+				q.AddURL(nextPageLink)
+			} else {
+				nextPageLink = ""
+			}
+		})
+	*/
 
 	url := buildUrl(seUrl, query, limit, 0)
 
@@ -129,17 +129,6 @@ func Search(ctx context.Context, seUrl string, query string, dom Dom, opts ...Op
 	}
 
 	return results, nil
-}
-
-func getStart(uri string) int {
-	u, err := url.Parse(uri)
-	if err != nil {
-		fmt.Println(err)
-	}
-	q := u.Query()
-	ss := q.Get("start")
-	si, _ := strconv.Atoi(ss)
-	return si
 }
 
 func buildUrl(seUrl string, query string, limit int, start int) string {
