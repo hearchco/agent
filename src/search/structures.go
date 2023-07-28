@@ -18,18 +18,8 @@ type Options struct {
 }
 
 type Result struct {
-	Rank        int    `json:"rank"`
-	URL         string `json:"url"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
+	Rank        int
+	URL         string
+	Title       string
+	Description string
 }
-
-func (r Result) Hash() string {
-	return r.URL
-}
-
-type ByRank []Result
-
-func (r ByRank) Len() int           { return len(r) }
-func (r ByRank) Swap(i, j int)      { r[i], r[j] = r[j], r[i] }
-func (r ByRank) Less(i, j int) bool { return r[i].Rank < r[j].Rank }

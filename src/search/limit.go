@@ -6,9 +6,9 @@ import (
 	"golang.org/x/time/rate"
 )
 
-// ErrBlocked indicates that you have been detected of scraping and temporarily blocked.
+// ErrRateLimited indicates that you have been detected of scraping and temporarily blocked.
 // The duration of the block is unspecified.
-var ErrBlocked = errors.New("block")
+var ErrRateLimited = errors.New("ratelimited")
 
 // RateLimit sets a global limit to how many requests can be made in a given time interval.
 // The default is unlimited (but obviously you will get blocked temporarily if you do too many
