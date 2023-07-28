@@ -8,10 +8,11 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/proxy"
 	"github.com/gocolly/colly/v2/queue"
+	"github.com/tminaorg/brzaguza/src/search/useragent"
 )
 
 // Search returns a list of search results.
-func Search(ctx context.Context, seUrl string, query string, dom Dom, opts Options) ([]Result, error) {
+func Search(ctx context.Context, seUrl string, query string, dom DomPaths, opts Options) ([]Result, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -26,7 +27,7 @@ func Search(ctx context.Context, seUrl string, query string, dom Dom, opts Optio
 	}
 
 	if options[0].UserAgent == "" {
-		c.UserAgent = DefaultUserAgent()
+		c.UserAgent = useragent.DefaultUserAgent()
 	} else {
 		c.UserAgent = options[0].UserAgent
 	}

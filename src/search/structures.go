@@ -1,13 +1,11 @@
 package search
 
-const DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"
-
-type DomQuery struct {
-	Result      string
-	Link        string
-	Title       string
-	Description string
-	NextPage    string
+type DomPaths struct {
+	Result      string // div
+	Link        string // a href
+	Title       string // heading
+	Description string // paragraph
+	NextPage    string // button
 }
 
 type Options struct {
