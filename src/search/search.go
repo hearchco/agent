@@ -12,7 +12,7 @@ import (
 )
 
 // Search returns a list of search results.
-func Search(ctx context.Context, searchEngineBase string, queryString string, htmlDom HtmlDomFields, options ...Options) ([]Result, error) {
+func Search(ctx context.Context, searchEngineBase string, queryString string, htmlDom DomPaths, options ...Options) ([]Result, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}

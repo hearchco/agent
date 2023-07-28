@@ -1,6 +1,6 @@
 package search
 
-type HtmlDomFields struct {
+type DomPaths struct {
 	Result      string // div
 	Link        string // a href
 	Title       string // heading
