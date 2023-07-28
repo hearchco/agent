@@ -1,4 +1,4 @@
-package search
+package useragent
 
 import (
 	"math/rand"
@@ -21,6 +21,7 @@ var defaultUserAgentList = []string{
 }
 
 func DefaultUserAgent() string {
-	rand.Seed(time.Now().UnixNano())
-	return defaultUserAgentList[rand.Intn(len(defaultUserAgentList))]
+	randSrc := rand.NewSource(time.Now().UnixNano())
+	randGen := rand.New(randSrc)
+	return defaultUserAgentList[randGen.Intn(len(defaultUserAgentList))]
 }
