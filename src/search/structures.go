@@ -1,6 +1,6 @@
 package search
 
-type DomPaths struct {
+type DOMPaths struct {
 	Result      string // div
 	Link        string // a href
 	Title       string // heading

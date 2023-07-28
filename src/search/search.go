@@ -12,7 +12,7 @@ import (
 )
 
 // Search returns a list of search results.
-func Search(ctx context.Context, searchEngineBase string, queryString string, htmlDom DomPaths, options ...Options) ([]Result, error) {
+func Search(ctx context.Context, searchEngineURL string, query string, dom DOMPaths, options ...Options) ([]Result, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -21,18 +21,18 @@ func Search(ctx context.Context, searchEngineBase string, queryString string, ht
 		return nil, err
 	}
 
-	c := colly.NewCollector(colly.MaxDepth(1))
+	collector := colly.NewCollector(colly.MaxDepth(1))
 	if len(options) == 0 {
 		options = append(options, Options{})
 	}
 
 	if options[0].UserAgent == "" {
-		c.UserAgent = useragent.DefaultUserAgent()
+		collector.UserAgent = useragent.DefaultUserAgent()
 	} else {
-		c.UserAgent = options[0].UserAgent
+		collector.UserAgent = options[0].UserAgent
 	}
 
-	q, _ := queue.New(1, &queue.InMemoryQueueStorage{MaxSize: 10000})
+	requestQueue, _ := queue.New(1, &queue.InMemoryQueueStorage{MaxSize: 10000})
 
 	limit := options[0].Limit
 
@@ -42,35 +42,36 @@ func Search(ctx context.Context, searchEngineBase string, queryString string, ht
 	filteredRank := 1
 	rank := 1
 
-	c.OnRequest(func(r *colly.Request) {
+	collector.OnRequest(func(r *colly.Request) {
 		if err := ctx.Err(); err != nil {
 			r.Abort()
 			rErr = err
 			return
 		}
+
 		/*
-			if opts[0].FollowNextPage && nextPageLink != "" {
+			if options[0].FollowNextPage && nextPageLink != "" {
 				req, err := r.New("GET", nextPageLink, nil)
 				if err == nil {
-					q.AddRequest(req)
+					requestQueue.AddRequest(req)
 				}
 			}
 		*/
 	})
 
-	c.OnError(func(r *colly.Response, err error) {
+	collector.OnError(func(r *colly.Response, err error) {
 		rErr = err
 	})
 
 	// https://www.w3schools.com/cssref/css_selectors.asp
-	c.OnHTML(htmlDom.Result, func(e *colly.HTMLElement) {
+	collector.OnHTML(dom.Result, func(e *colly.HTMLElement) {
 
 		sel := e.DOM
 
-		linkHref, _ := sel.Find(htmlDom.Link).Attr("href")
+		linkHref, _ := sel.Find(dom.Link).Attr("href")
 		linkText := strings.TrimSpace(linkHref)
-		titleText := strings.TrimSpace(sel.Find(htmlDom.Title).Text())
-		descText := strings.TrimSpace(sel.Find(htmlDom.Description).Text())
+		titleText := strings.TrimSpace(sel.Find(dom.Title).Text())
+		descText := strings.TrimSpace(sel.Find(dom.Description).Text())
 
 		rank += 1
 		if linkText != "" && linkText != "#" && titleText != "" {
@@ -93,33 +94,33 @@ func Search(ctx context.Context, searchEngineBase string, queryString string, ht
 	})
 
 	/*
-		c.OnHTML(dom.NextPage, func(e *colly.HTMLElement) {
+		collector.OnHTML(dom.NextPage, func(e *colly.HTMLElement) {
 
 			sel := e.DOM
 
 			// check if there is a next button at the end.
 			if nextPageHref, exists := sel.Attr("href"); exists {
 				start := getStart(strings.TrimSpace(nextPageHref))
-				nextPageLink = buildUrl(seUrl, query, limit, start)
-				q.AddURL(nextPageLink)
+				nextPageLink = buildUrl(searchEngineURL, query, limit, start)
+				requestQueue.AddURL(nextPageLink)
 			} else {
 				nextPageLink = ""
 			}
 		})
 	*/
 
-	url := buildUrl(searchEngineBase, queryString, limit, 0)
+	url := buildUrl(searchEngineURL, query, limit, 0)
 
 	if options[0].ProxyAddr != "" {
 		rp, err := proxy.RoundRobinProxySwitcher(options[0].ProxyAddr)
 		if err != nil {
 			return nil, err
 		}
-		c.SetProxyFunc(rp)
+		collector.SetProxyFunc(rp)
 	}
 
-	q.AddURL(url)
-	q.Run(c)
+	requestQueue.AddURL(url)
+	requestQueue.Run(collector)
 
 	if rErr != nil {
 		if strings.Contains(rErr.Error(), "Too Many Requests") {
@@ -136,16 +137,16 @@ func Search(ctx context.Context, searchEngineBase string, queryString string, ht
 	return results, nil
 }
 
-func buildUrl(searchEngineBase string, queryString string, limit int, start int) string {
-	queryString = strings.Trim(queryString, " ")
-	queryString = strings.Replace(queryString, " ", "+", -1)
+func buildUrl(searchEngineUrl string, query string, limit int, start int) string {
+	query = strings.Trim(query, " ")
+	query = strings.Replace(query, " ", "+", -1)
 
 	var url string
 
 	if start == 0 {
-		url = fmt.Sprintf("%s%s", searchEngineBase, queryString)
+		url = fmt.Sprintf("%s%s", searchEngineUrl, query)
 	} else {
-		url = fmt.Sprintf("%s%s&start=%d", searchEngineBase, queryString, start)
+		url = fmt.Sprintf("%s%s&start=%d", searchEngineUrl, query, start)
 	}
 
 	if limit != 0 {
