@@ -11,7 +11,7 @@ import (
 )
 
 // Search returns a list of search results.
-func Search(ctx context.Context, seUrl string, query string, dom Dom, opts ...Options) ([]Result, error) {
+func Search(ctx context.Context, seUrl string, query string, dom Dom, opts Options) ([]Result, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
