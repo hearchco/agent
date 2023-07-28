@@ -15,4 +15,10 @@ var ErrRateLimited = errors.New("ratelimited")
 // calls too quickly).
 //
 // See: https://godoc.org/golang.org/x/time/rate#NewLimiter
-var RateLimit = rate.NewLimiter(rate.Inf, 0)
+func CreateRateLimit(limit float64) *rate.Limiter {
+	if limit == 0 {
+		return rate.NewLimiter(rate.Inf, 0)
+	} else {
+		return rate.NewLimiter(rate.Limit(limit), 0)
+	}
+}

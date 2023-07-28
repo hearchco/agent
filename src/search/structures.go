@@ -13,6 +13,7 @@ type Options struct {
 	Limit          int
 	ProxyAddr      string
 	FollowNextPage bool
+	RateLimit      float64
 }
 
 type Result struct {

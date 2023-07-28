@@ -17,7 +17,8 @@ func Search(ctx context.Context, searchEngineURL string, query string, dom DOMPa
 		ctx = context.Background()
 	}
 
-	if err := RateLimit.Wait(ctx); err != nil {
+	rateLimit := CreateRateLimit(options.RateLimit)
+	if err := rateLimit.Wait(ctx); err != nil {
 		return nil, err
 	}
 
