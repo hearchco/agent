@@ -12,7 +12,7 @@ import (
 )
 
 // Search returns a list of search results.
-func Search(ctx context.Context, searchEngineURL string, query string, dom DOMPaths, options ...Options) ([]Result, error) {
+func Search(ctx context.Context, searchEngineURL string, query string, dom DOMPaths, options Options) ([]Result, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -22,19 +22,16 @@ func Search(ctx context.Context, searchEngineURL string, query string, dom DOMPa
 	}
 
 	collector := colly.NewCollector(colly.MaxDepth(1))
-	if len(options) == 0 {
-		options = append(options, Options{})
-	}
 
-	if options[0].UserAgent == "" {
+	if options.UserAgent == "" {
 		collector.UserAgent = useragent.DefaultUserAgent()
 	} else {
-		collector.UserAgent = options[0].UserAgent
+		collector.UserAgent = options.UserAgent
 	}
 
 	requestQueue, _ := queue.New(1, &queue.InMemoryQueueStorage{MaxSize: 10000})
 
-	limit := options[0].Limit
+	limit := options.Limit
 
 	results := []Result{}
 	//nextPageLink := ""
@@ -50,7 +47,7 @@ func Search(ctx context.Context, searchEngineURL string, query string, dom DOMPa
 		}
 
 		/*
-			if options[0].FollowNextPage && nextPageLink != "" {
+			if options.FollowNextPage && nextPageLink != "" {
 				req, err := r.New("GET", nextPageLink, nil)
 				if err == nil {
 					requestQueue.AddRequest(req)
@@ -111,8 +108,8 @@ func Search(ctx context.Context, searchEngineURL string, query string, dom DOMPa
 
 	url := buildUrl(searchEngineURL, query, limit, 0)
 
-	if options[0].ProxyAddr != "" {
-		rp, err := proxy.RoundRobinProxySwitcher(options[0].ProxyAddr)
+	if options.ProxyAddr != "" {
+		rp, err := proxy.RoundRobinProxySwitcher(options.ProxyAddr)
 		if err != nil {
 			return nil, err
 		}
@@ -130,8 +127,8 @@ func Search(ctx context.Context, searchEngineURL string, query string, dom DOMPa
 	}
 
 	// Reduce results to max limit
-	if options[0].Limit != 0 && len(results) > options[0].Limit {
-		return results[:options[0].Limit], nil
+	if options.Limit != 0 && len(results) > options.Limit {
+		return results[:options.Limit], nil
 	}
 
 	return results, nil
