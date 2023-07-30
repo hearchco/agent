@@ -1,8 +1,10 @@
 package structures
 
+import "github.com/gocolly/colly/v2"
+
 type Relay struct {
 	ResultChannel     chan Result
-	RankChannel       chan ResultRank
+	ResponseChannel   chan ResultResponse
 	EngineDoneChannel chan bool
 	ResultMap         map[string]*Result
 }
@@ -25,20 +27,25 @@ type Options struct {
 }
 
 type Result struct {
-	Rank        int
 	URL         string
+	Rank        int
+	SEPageRank  int
+	SEPage      int
 	Title       string
 	Description string
+	Response    *colly.Response
 }
 
-type ResultRank struct {
-	URL  string
-	Rank int
+type ResultResponse struct {
+	URL      string
+	Response *colly.Response
 }
 
+/*
 func (r Result) Hash() string {
 	return r.URL
 }
+*/
 
 type ByRank []Result
 

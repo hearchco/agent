@@ -2,18 +2,20 @@ package google
 
 import (
 	"context"
+	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
-	"github.com/tminaorg/brzaguza/src/rank"
 	"github.com/tminaorg/brzaguza/src/search"
 	"github.com/tminaorg/brzaguza/src/search/useragent"
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-const url string = "https://www.google.com/search?q="
+const seURL string = "https://www.google.com/search?q="
+const resPerPage int = 10
 
 func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
 	if ctx == nil {
@@ -53,10 +55,11 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	pagesCol.OnResponse(func(r *colly.Response) {
-		rnk := rank.RankPage(r)
-		relay.RankChannel <- structures.ResultRank{
-			URL:  r.Request.URL.String(),
-			Rank: rnk,
+		urll := r.Request.URL.String()
+
+		relay.ResponseChannel <- structures.ResultResponse{
+			URL:      urll,
+			Response: r,
 		}
 	})
 
@@ -72,6 +75,8 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		retError = err
 	})
 
+	var pageRankCounter []int = make([]int, options.MaxPages*resPerPage)
+
 	col.OnHTML("div.g", func(e *colly.HTMLElement) {
 		dom := e.DOM
 
@@ -81,12 +86,16 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		descText := strings.TrimSpace(dom.Find("div > div > div > div:first-child > span:first-child").Text())
 
 		if linkText != "" && linkText != "#" && titleText != "" {
+			pageNum := getPageNum(e.Request.URL.String())
 			res := structures.Result{
 				Rank:        -1,
+				SEPageRank:  pageRankCounter[pageNum],
+				SEPage:      pageNum,
 				URL:         linkText,
 				Title:       titleText,
 				Description: descText,
 			}
+			pageRankCounter[pageNum]++
 
 			_, exists := relay.ResultMap[res.URL]
 
@@ -100,9 +109,9 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		}
 	})
 
-	col.Visit(url + query)
+	col.Visit(seURL + query + "&start=0")
 	for i := 1; i < options.MaxPages; i++ {
-		col.Visit(url + query + "&start=" + strconv.Itoa(i*10))
+		col.Visit(seURL + query + "&start=" + strconv.Itoa(i*10))
 	}
 
 	col.Wait() //order should be irrelevant, right? \/
@@ -111,4 +120,15 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	relay.EngineDoneChannel <- true
 
 	return retError
+}
+
+func getPageNum(uri string) int {
+	urll, err := url.Parse(uri)
+	if err != nil {
+		fmt.Println(err)
+	}
+	qry := urll.Query()
+	startString := qry.Get("start")
+	startInt, _ := strconv.Atoi(startString)
+	return startInt / 10
 }

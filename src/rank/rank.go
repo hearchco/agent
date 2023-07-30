@@ -1,8 +1,12 @@
 package rank
 
-import "github.com/gocolly/colly/v2"
+import (
+	"github.com/rs/zerolog/log"
+	"github.com/tminaorg/brzaguza/src/structures"
+)
 
-func RankPage(response *colly.Response) int {
-	return 17
-	//return int(response.Body[12]) //something random (hopefully not OOB)
+func SetRank(result *structures.Result) {
+	result.Rank = result.SEPage*100 + result.SEPageRank
+
+	log.Debug().Msgf("Set rank to %d for %s: %s", result.Rank, result.Title, result.URL)
 }
