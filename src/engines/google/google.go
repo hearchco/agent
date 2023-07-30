@@ -107,8 +107,6 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	col.Wait()
 	pagesCol.Wait()
 
-	relay.EngineDoneChannel <- true
-
 	return retError
 }
 

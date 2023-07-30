@@ -39,11 +39,6 @@ type Result struct {
 	Response    *colly.Response
 }
 
-type ResultResponse struct {
-	URL      string
-	Response *colly.Response
-}
-
 /*
 func (r Result) Hash() string {
 	return r.URL
