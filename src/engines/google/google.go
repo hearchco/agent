@@ -29,7 +29,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	if options.UserAgent == "" {
 		options.UserAgent = useragent.RandomUserAgent()
 	}
-	log.Trace().Msgf("%v\n", options.UserAgent)
+	log.Trace().Msgf("%v", options.UserAgent)
 
 	var col *colly.Collector
 	if options.MaxPages == 1 {
@@ -42,7 +42,6 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	var retError error
 
 	pagesCol.OnRequest(func(r *colly.Request) {
-		r.Headers.Set("User-Agent", useragent.RandomUserAgent())
 		if err := ctx.Err(); err != nil { // dont fully understand this
 			r.Abort()
 			retError = err
@@ -64,7 +63,6 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	col.OnRequest(func(r *colly.Request) {
-		r.Headers.Set("User-Agent", useragent.RandomUserAgent())
 		if err := ctx.Err(); err != nil { // dont fully understand this
 			r.Abort()
 			retError = err
