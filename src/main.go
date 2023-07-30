@@ -21,6 +21,8 @@ func main() {
 
 	log.Info().
 		Str("query", cli.Query).
+		Str("max-pages", fmt.Sprintf("%v", cli.MaxPages)).
+		Str("visit", fmt.Sprintf("%v", cli.Visit)).
 		Msg("Started searching")
 
 	start := time.Now()
