@@ -9,7 +9,7 @@ import (
 
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
-	"github.com/tminaorg/brzaguza/src/search"
+	"github.com/tminaorg/brzaguza/src/search/limit"
 	"github.com/tminaorg/brzaguza/src/search/useragent"
 	"github.com/tminaorg/brzaguza/src/structures"
 )
@@ -22,27 +22,27 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		ctx = context.Background()
 	} //^ not necessary as ctx is always passed in search.go, branch predictor will skip this if
 
-	if err := search.RateLimit.Wait(ctx); err != nil {
+	if err := limit.RateLimit.Wait(ctx); err != nil {
 		return err
 	}
 
 	if options.UserAgent == "" {
-		options.UserAgent = useragent.DefaultUserAgent()
+		options.UserAgent = useragent.RandomUserAgent()
 	}
 	log.Trace().Msgf("%v\n", options.UserAgent)
 
-	var col *colly.Collector
-
-	if options.MaxPages == 1 {
-		col = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) // so there is no thread creation overhead
-	} else {
+	//if options.MaxPages == 1 {
+	col := colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) // so there is no thread creation overhead
+	/*} else {
 		col = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async(true))
-	}
+	}*/
 	pagesCol := colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async(true))
 
 	var retError error
 
 	pagesCol.OnRequest(func(r *colly.Request) {
+		//r.Headers.Set("User-Agent", useragent.RandomUserAgent())
+		//log.Trace().Msgf("%v\n", options.UserAgent)
 		if err := ctx.Err(); err != nil { // dont fully understand this
 			r.Abort()
 			retError = err
@@ -64,6 +64,8 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	col.OnRequest(func(r *colly.Request) {
+		//r.Headers.Set("User-Agent", useragent.RandomUserAgent())
+		//log.Trace().Msgf("%v\n", options.UserAgent)
 		if err := ctx.Err(); err != nil { // dont fully understand this
 			r.Abort()
 			retError = err
@@ -114,7 +116,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		col.Visit(seURL + query + "&start=" + strconv.Itoa(i*10))
 	}
 
-	col.Wait() //order should be irrelevant, right? \/
+	col.Wait()
 	pagesCol.Wait()
 
 	relay.EngineDoneChannel <- true

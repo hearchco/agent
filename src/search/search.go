@@ -1,4 +1,4 @@
-package main
+package search
 
 import (
 	"context"
@@ -12,23 +12,21 @@ import (
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-var googleOptions structures.Options = structures.Options{
-	UserAgent:  "",
-	MaxPages:   3,
-	ProxyAddr:  "",
-	VisitPages: true,
-}
-
 func cleanQuery(query string) string {
 	return strings.Replace(strings.Trim(query, " "), " ", "+", -1)
 }
 
-func performSearch(query string) []structures.Result {
+func PerformSearch(query string, maxPages int, visitPages bool) []structures.Result {
 	relay := structures.Relay{
 		ResultChannel:     make(chan structures.Result),
 		ResponseChannel:   make(chan structures.ResultResponse),
 		EngineDoneChannel: make(chan bool),
 		ResultMap:         make(map[string]*structures.Result),
+	}
+
+	options := structures.Options{
+		MaxPages:   maxPages,
+		VisitPages: visitPages,
 	}
 
 	query = cleanQuery(query)
@@ -38,7 +36,7 @@ func performSearch(query string) []structures.Result {
 	var worker conc.WaitGroup
 
 	worker.Go(func() {
-		err := google.Search(context.Background(), query, &relay, &googleOptions)
+		err := google.Search(context.Background(), query, &relay, &options)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed searching google.com")
 		}
@@ -47,7 +45,7 @@ func performSearch(query string) []structures.Result {
 	for receivedEngines < numberOfEngines {
 		select {
 		case result := <-relay.ResultChannel:
-			log.Debug().Msgf("Got URL: %s", result.URL)
+			log.Trace().Msgf("Got URL: %s", result.URL)
 
 			mapRes, exists := relay.ResultMap[result.URL]
 			if exists {
@@ -62,7 +60,7 @@ func performSearch(query string) []structures.Result {
 				relay.ResultMap[result.URL] = &result
 			}
 		case resRes := <-relay.ResponseChannel:
-			log.Debug().Msgf("Got response for %s", resRes.URL)
+			log.Trace().Msgf("Got response for %s", resRes.URL)
 
 			mapRes, exists := relay.ResultMap[resRes.URL]
 			if exists {

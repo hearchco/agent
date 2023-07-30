@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/rs/zerolog/log"
+	"github.com/tminaorg/brzaguza/src/search"
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
@@ -20,7 +21,7 @@ func main() {
 	log.Info().
 		Str("query", cli.Query).
 		Msg("Started searching")
-	results := performSearch(cli.Query)
+	results := search.PerformSearch(cli.Query, cli.MaxPages, cli.Visit)
 	log.Info().
 		Msg(fmt.Sprintf("Found %d results", len(results)))
 
