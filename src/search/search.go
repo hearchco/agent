@@ -45,7 +45,7 @@ func PerformSearch(query string, maxPages int, visitPages bool) []structures.Res
 	for receivedEngines < numberOfEngines {
 		select {
 		case result := <-relay.ResultChannel:
-			log.Trace().Msgf("Got URL: %s", result.URL)
+			log.Trace().Msgf("Got URL: %v", result.URL)
 
 			mapRes, exists := relay.ResultMap[result.URL]
 			if exists {
@@ -60,7 +60,7 @@ func PerformSearch(query string, maxPages int, visitPages bool) []structures.Res
 				relay.ResultMap[result.URL] = &result
 			}
 		case resRes := <-relay.ResponseChannel:
-			log.Trace().Msgf("Got response for %s", resRes.URL)
+			log.Trace().Msgf("Got response for %v", resRes.URL)
 
 			mapRes, exists := relay.ResultMap[resRes.URL]
 			if exists {

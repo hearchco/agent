@@ -50,7 +50,7 @@ func setupCli() {
 			Compact: true,
 		}),
 		kong.Vars{
-			"version":      fmt.Sprintf("%s (%s@%s)", Version, GitCommit, Timestamp),
+			"version":      fmt.Sprintf("%v (%v@%v)", Version, GitCommit, Timestamp),
 			"log_file":     "brzaguza.log",
 			"query_string": "cars for sale in Toronto, Canada",
 		},

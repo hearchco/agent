@@ -11,7 +11,7 @@ import (
 
 func printResults(results []structures.Result) {
 	for _, r := range results {
-		fmt.Printf("%v -----\n\t\"%s\"\n\t\"%s\"\n\t\"%s\"\n", r.Rank, r.Title, r.URL, r.Description)
+		fmt.Printf("%v -----\n\t\"%v\"\n\t\"%v\"\n\t\"%v\"\n", r.Rank, r.Title, r.URL, r.Description)
 	}
 }
 
