@@ -31,18 +31,18 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	}
 	log.Trace().Msgf("%v\n", options.UserAgent)
 
-	//if options.MaxPages == 1 {
-	col := colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) // so there is no thread creation overhead
-	/*} else {
+	var col *colly.Collector
+	if options.MaxPages == 1 {
+		col = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) // so there is no thread creation overhead
+	} else {
 		col = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async(true))
-	}*/
+	}
 	pagesCol := colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async(true))
 
 	var retError error
 
 	pagesCol.OnRequest(func(r *colly.Request) {
-		//r.Headers.Set("User-Agent", useragent.RandomUserAgent())
-		//log.Trace().Msgf("%v\n", options.UserAgent)
+		r.Headers.Set("User-Agent", useragent.RandomUserAgent())
 		if err := ctx.Err(); err != nil { // dont fully understand this
 			r.Abort()
 			retError = err
@@ -64,8 +64,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	col.OnRequest(func(r *colly.Request) {
-		//r.Headers.Set("User-Agent", useragent.RandomUserAgent())
-		//log.Trace().Msgf("%v\n", options.UserAgent)
+		r.Headers.Set("User-Agent", useragent.RandomUserAgent())
 		if err := ctx.Err(); err != nil { // dont fully understand this
 			r.Abort()
 			retError = err
@@ -99,13 +98,19 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			}
 			pageRankCounter[pageNum]++
 
-			_, exists := relay.ResultMap[res.URL]
+			//unsafe: concurrent map read and map write
+			/*_, exists := relay.ResultMap[res.URL]
 
 			if !exists || len(relay.ResultMap[res.URL].Description) < len(descText) {
 				relay.ResultChannel <- res
 			}
 
 			if !exists && options.VisitPages {
+				pagesCol.Visit(linkText)
+			}*/
+
+			relay.ResultChannel <- res
+			if options.VisitPages {
 				pagesCol.Visit(linkText)
 			}
 		}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/search"
@@ -21,9 +22,12 @@ func main() {
 	log.Info().
 		Str("query", cli.Query).
 		Msg("Started searching")
+
+	start := time.Now()
 	results := search.PerformSearch(cli.Query, cli.MaxPages, cli.Visit)
-	log.Info().
-		Msg(fmt.Sprintf("Found %d results", len(results)))
+	duration := time.Since(start)
 
 	printResults(results)
+	log.Info().
+		Msg(fmt.Sprintf("Found %v results in %vms", len(results), duration.Milliseconds()))
 }
