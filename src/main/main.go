@@ -25,4 +25,5 @@ func main() {
 		Msg(fmt.Sprintf("Found %d results", len(results)))
 
 	printResults(results)
+
 }

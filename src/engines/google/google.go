@@ -6,9 +6,8 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/sourcegraph/conc"
+	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/rank"
-	"github.com/tminaorg/brzaguza/src/relay"
 	"github.com/tminaorg/brzaguza/src/search"
 	"github.com/tminaorg/brzaguza/src/search/useragent"
 	"github.com/tminaorg/brzaguza/src/structures"
@@ -16,9 +15,7 @@ import (
 
 const url string = "https://www.google.com/search?q="
 
-const avgResultsPerRequest int = 10 // cant be zero - divide by zero error
-
-func Search(ctx context.Context, query string, options *structures.Options, worker *conc.WaitGroup) error {
+func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
 	if ctx == nil {
 		ctx = context.Background()
 	} //^ not necessary as ctx is always passed in search.go, branch predictor will skip this if
@@ -30,17 +27,11 @@ func Search(ctx context.Context, query string, options *structures.Options, work
 	if options.UserAgent == "" {
 		options.UserAgent = useragent.DefaultUserAgent()
 	}
-
-	var numPages int
-	if options.JustFirstPage {
-		numPages = 1
-	} else {
-		numPages = options.Limit / avgResultsPerRequest
-	}
+	log.Trace().Msgf("%v\n", options.UserAgent)
 
 	var col *colly.Collector
 
-	if numPages == 1 {
+	if options.MaxPages == 1 {
 		col = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) // so there is no thread creation overhead
 	} else {
 		col = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async(true))
@@ -90,25 +81,31 @@ func Search(ctx context.Context, query string, options *structures.Options, work
 		descText := strings.TrimSpace(dom.Find("div > div > div > div:first-child > span:first-child").Text())
 
 		if linkText != "" && linkText != "#" && titleText != "" {
-			var res structures.Result = structures.Result{
+			res := structures.Result{
 				Rank:        -1,
 				URL:         linkText,
 				Title:       titleText,
 				Description: descText,
 			}
-			relay.ResultChannel <- res
-			pagesCol.Visit(linkText)
+
+			_, exists := relay.ResultMap[res.URL]
+
+			if !exists || len(relay.ResultMap[res.URL].Description) < len(descText) {
+				relay.ResultChannel <- res
+			}
+
+			if !exists && options.VisitPages {
+				pagesCol.Visit(linkText)
+			}
 		}
 	})
 
 	col.Visit(url + query)
-	for i := 2; i <= numPages; i++ {
+	for i := 1; i < options.MaxPages; i++ {
 		col.Visit(url + query + "&start=" + strconv.Itoa(i*10))
 	}
 
-	if numPages != 1 { //order should be irrelevant, right? \/
-		col.Wait()
-	}
+	col.Wait() //order should be irrelevant, right? \/
 	pagesCol.Wait()
 
 	relay.EngineDoneChannel <- true
