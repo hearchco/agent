@@ -9,6 +9,7 @@ import (
 
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
+	"github.com/tminaorg/brzaguza/src/rank"
 	"github.com/tminaorg/brzaguza/src/search/limit"
 	"github.com/tminaorg/brzaguza/src/search/useragent"
 	"github.com/tminaorg/brzaguza/src/structures"
@@ -54,12 +55,9 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	pagesCol.OnResponse(func(r *colly.Response) {
-		urll := r.Request.URL.String()
+		urll := strings.ToLower(r.Request.URL.String()) //temporary hack, read comment in col.OnHTML
 
-		relay.ResponseChannel <- structures.ResultResponse{
-			URL:      urll,
-			Response: r,
-		}
+		setResultResponse(urll, r, relay)
 	})
 
 	col.OnRequest(func(r *colly.Request) {
@@ -81,6 +79,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 		linkHref, _ := dom.Find("a").Attr("href")
 		linkText := strings.TrimSpace(linkHref)
+		linkText = strings.ToLower(linkText) // r.Request.URL.String() in pageCol is SOMETIMES lowercase, making this lowercase as well to compensate - temporary fix until better solution is found, since urls are case sensitive https://stackoverflow.com/questions/7996919/should-url-be-case-sensitive
 		titleText := strings.TrimSpace(dom.Find("div > div > div > a > h3").Text())
 		descText := strings.TrimSpace(dom.Find("div > div > div > div:first-child > span:first-child").Text())
 
@@ -96,21 +95,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			}
 			pageRankCounter[pageNum]++
 
-			//unsafe: concurrent map read and map write
-			/*_, exists := relay.ResultMap[res.URL]
-
-			if !exists || len(relay.ResultMap[res.URL].Description) < len(descText) {
-				relay.ResultChannel <- res
-			}
-
-			if !exists && options.VisitPages {
-				pagesCol.Visit(linkText)
-			}*/
-
-			relay.ResultChannel <- res
-			if options.VisitPages {
-				pagesCol.Visit(linkText)
-			}
+			setResult(&res, relay, options, pagesCol)
 		}
 	})
 
@@ -125,6 +110,42 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	relay.EngineDoneChannel <- true
 
 	return retError
+}
+
+func setResult(result *structures.Result, relay *structures.Relay, options *structures.Options, pagesCol *colly.Collector) {
+	log.Trace().Msgf("Got Result %v: %v", result.Title, result.URL)
+
+	relay.Mutex.Lock()
+	defer relay.Mutex.Unlock()
+
+	mapRes, exists := relay.ResultMap[result.URL]
+
+	if !exists {
+		relay.ResultMap[result.URL] = result
+
+		if options.VisitPages {
+			pagesCol.Visit(result.URL)
+		}
+	} else if len(mapRes.Description) < len(result.Description) {
+		mapRes.Description = result.Description
+	}
+}
+
+func setResultResponse(link string, response *colly.Response, relay *structures.Relay) {
+	log.Trace().Msgf("Got Response %v", link)
+
+	relay.Mutex.Lock()
+	defer relay.Mutex.Unlock()
+
+	mapRes, exists := relay.ResultMap[link]
+
+	if !exists {
+		log.Error().Msgf("URL not in map when adding response! Should not be possible. URL: %v", link)
+		return
+	}
+
+	mapRes.Response = response
+	rank.SetRank(mapRes) //IF I PASS COPY HERE, THAN I CAN UNLOCK EARLIER (MAYBE)
 }
 
 func getPageNum(uri string) int {

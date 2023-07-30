@@ -1,12 +1,15 @@
 package structures
 
-import "github.com/gocolly/colly/v2"
+import (
+	"sync"
+
+	"github.com/gocolly/colly/v2"
+)
 
 type Relay struct {
-	ResultChannel     chan Result
-	ResponseChannel   chan ResultResponse
-	EngineDoneChannel chan bool
 	ResultMap         map[string]*Result
+	Mutex             sync.RWMutex
+	EngineDoneChannel chan bool
 }
 
 type DOMPaths struct {
