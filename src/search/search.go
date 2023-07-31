@@ -7,6 +7,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/sourcegraph/conc"
+	"github.com/tminaorg/brzaguza/src/engines/duckduckgo"
 	"github.com/tminaorg/brzaguza/src/engines/google"
 	"github.com/tminaorg/brzaguza/src/structures"
 )
@@ -34,6 +35,13 @@ func PerformSearch(query string, maxPages int, visitPages bool) []structures.Res
 		err := google.Search(context.Background(), query, &relay, &options)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed searching google.com")
+		}
+	})
+
+	worker.Go(func() {
+		err := duckduckgo.Search(context.Background(), query, &relay, &options)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed searching lite.duckduckgo.com")
 		}
 	})
 
