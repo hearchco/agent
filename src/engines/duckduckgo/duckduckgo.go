@@ -15,11 +15,6 @@ import (
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-/*
-	This module uses POST requests. GET requests could be used like
-	https://lite.duckduckgo.com/lite/?q=<query>&dc=<rank of first result on page>
-*/
-
 const seName string = "DuckDuckGo"
 const seURL string = "https://lite.duckduckgo.com/lite/"
 
