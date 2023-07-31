@@ -13,6 +13,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/search/limit"
 	"github.com/tminaorg/brzaguza/src/search/useragent"
 	"github.com/tminaorg/brzaguza/src/structures"
+	"github.com/tminaorg/brzaguza/src/utility"
 )
 
 const seName string = "DuckDuckGo"
@@ -59,7 +60,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	pagesCol.OnResponse(func(r *colly.Response) {
-		urll := r.Ctx.Get("originalURL")
+		urll := r.Ctx.Get("originalURL") //because i may have followed redirects
 
 		bucket.SetResultResponse(urll, r, relay, seName)
 	})
@@ -71,9 +72,14 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			retError = err
 			return
 		}
-		var reqBody []byte
-		r.Body.Read(reqBody)
-		r.Ctx.Put("body", string(reqBody))
+		if r.Body == nil {
+			//This is the first page, so this isnt a POST request
+			r.Ctx.Put("body", "q="+query+"&dc=1")
+		} else {
+			var reqBody []byte
+			r.Body.Read(reqBody)
+			r.Ctx.Put("body", string(reqBody))
+		}
 	})
 
 	col.OnError(func(r *colly.Response, err error) {
@@ -84,6 +90,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 	col.OnHTML("div.filters > table > tbody", func(e *colly.HTMLElement) {
 		var linkText string
+		var linkScheme string
 		var titleText string
 		var descText string
 		var rrank int
@@ -98,13 +105,18 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			case 0:
 				rankText := strings.TrimSpace(row.Children().First().Text())
 				fmt.Sscanf(rankText, "%d", &rrank)
-
-				linkElement := row.Find("td > a.result-link")
-				linkHref, _ := linkElement.Attr("href")
-				linkText = strings.TrimSpace(linkHref)
-				titleText = strings.TrimSpace(linkElement.Text())
+				linkHref, _ := row.Find("a.result-link").Attr("href")
+				if strings.Contains(linkHref, "https") {
+					linkScheme = "https://"
+				} else {
+					linkScheme = "http://"
+				}
+				titleText = strings.TrimSpace(row.Find("td > a.result-link").Text())
 			case 1:
 				descText = strings.TrimSpace(row.Find("td.result-snippet").Text())
+			case 2:
+				rawURL := linkScheme + row.Find("td > span.link-text").Text()
+				linkText = utility.ParseURL(rawURL)
 			case 3:
 				if linkText != "" && linkText != "#" && titleText != "" {
 					res := structures.Result{
@@ -113,7 +125,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 						SERank:       rrank,
 						SEPage:       page,
 						SEOnPageRank: (i/4 + 1),
-						Title:        titleText,
+						Title:        titleText, //URL NOT IN MAP
 						Description:  descText,
 						SearchEngine: seName,
 					}
@@ -124,7 +136,8 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		})
 	})
 
-	col.PostRaw(seURL, []byte("q="+query+"&dc=1"))
+	col.Visit(seURL + "?q=" + query)
+	//col.PostRaw(seURL, []byte("q="+query+"&dc=1"))
 	for i := 1; i < options.MaxPages; i++ {
 		col.PostRaw(seURL, []byte("q="+query+"&dc="+strconv.Itoa(i*20)))
 	}
