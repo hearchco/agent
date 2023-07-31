@@ -114,18 +114,17 @@ func setResult(result *structures.Result, relay *structures.Relay, options *stru
 	log.Trace().Msgf("Got Result %v: %v", result.Title, result.URL)
 
 	relay.Mutex.Lock()
-	defer relay.Mutex.Unlock()
-
 	mapRes, exists := relay.ResultMap[result.URL]
 
 	if !exists {
 		relay.ResultMap[result.URL] = result
-
-		if options.VisitPages {
-			pagesCol.Visit(result.URL)
-		}
 	} else if len(mapRes.Description) < len(result.Description) {
 		mapRes.Description = result.Description
+	}
+	relay.Mutex.Unlock()
+
+	if !exists && options.VisitPages {
+		pagesCol.Visit(result.URL)
 	}
 }
 
