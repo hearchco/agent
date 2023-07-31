@@ -19,6 +19,8 @@ var (
 
 		// flags
 		Query     string `type:"string" default:"${query_string}" env:"BRZAGUZA_QUERY" help:"Query string used for search"`
+		MaxPages  int    `type:"counter" default:"1" env:"BRZAGUZA_MAX_PAGES" help:"Number of pages to search"`
+		Visit     bool   `type:"bool" default:"false" env:"BRZAGUZA_VISIT" help:"Should results be visited"`
 		Log       string `type:"path" default:"${log_file}" env:"BRZAGUZA_LOG_FILE" help:"Log file path"`
 		Verbosity int    `type:"counter" default:"0" short:"v" env:"BRZAGUZA_VERBOSITY" help:"Log level verbosity"`
 	}
@@ -48,7 +50,7 @@ func setupCli() {
 			Compact: true,
 		}),
 		kong.Vars{
-			"version":      fmt.Sprintf("%s (%s@%s)", Version, GitCommit, Timestamp),
+			"version":      fmt.Sprintf("%v (%v@%v)", Version, GitCommit, Timestamp),
 			"log_file":     "brzaguza.log",
 			"query_string": "cars for sale in Toronto, Canada",
 		},
