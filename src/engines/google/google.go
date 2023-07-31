@@ -132,17 +132,20 @@ func setResultResponse(link string, response *colly.Response, relay *structures.
 	log.Trace().Msgf("Got Response %v", link)
 
 	relay.Mutex.Lock()
-	defer relay.Mutex.Unlock()
-
 	mapRes, exists := relay.ResultMap[link]
 
 	if !exists {
 		log.Error().Msgf("URL not in map when adding response! Should not be possible. URL: %v", link)
+		relay.Mutex.Unlock()
 		return
 	}
 
 	mapRes.Response = response
-	rank.SetRank(mapRes) //IF I PASS COPY HERE, THAN I CAN UNLOCK EARLIER (MAYBE)
+
+	resCopy := *mapRes
+	rankAddr := &(mapRes.Rank)
+	relay.Mutex.Unlock()
+	rank.SetRank(&resCopy, rankAddr, &(relay.Mutex)) //copy contains pointer to response
 }
 
 func getPageNum(uri string) int {
