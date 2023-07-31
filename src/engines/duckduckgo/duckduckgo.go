@@ -9,15 +9,18 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
-	"github.com/tminaorg/brzaguza/src/rank"
+	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/search/limit"
 	"github.com/tminaorg/brzaguza/src/search/useragent"
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-// https://lite.duckduckgo.com/lite/?q=tryme&p=3
+/*
+	This module uses POST requests. GET requests could be used like
+	https://lite.duckduckgo.com/lite/?q=<query>&dc=<rank of first result on page>
+*/
 
-const seName string = "DuckDuckGo Lite"
+const seName string = "DuckDuckGo"
 const seURL string = "https://lite.duckduckgo.com/lite/"
 
 func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
@@ -63,7 +66,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	pagesCol.OnResponse(func(r *colly.Response) {
 		urll := r.Ctx.Get("originalURL")
 
-		setResultResponse(urll, r, relay)
+		bucket.SetResultResponse(urll, r, relay, seName)
 	})
 
 	col.OnRequest(func(r *colly.Request) {
@@ -120,7 +123,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 						SearchEngine: seName,
 					}
 
-					setResult(&res, relay, options, pagesCol)
+					bucket.SetResult(&res, relay, options, pagesCol)
 				}
 			}
 		})
@@ -135,42 +138,4 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	pagesCol.Wait()
 
 	return retError
-}
-
-func setResult(result *structures.Result, relay *structures.Relay, options *structures.Options, pagesCol *colly.Collector) {
-	log.Trace().Msgf("%v: Got Result -> %v: %v", seName, result.Title, result.URL)
-
-	relay.Mutex.Lock()
-	mapRes, exists := relay.ResultMap[result.URL]
-
-	if !exists {
-		relay.ResultMap[result.URL] = result
-	} else if len(mapRes.Description) < len(result.Description) {
-		mapRes.Description = result.Description
-	}
-	relay.Mutex.Unlock()
-
-	if !exists && options.VisitPages {
-		pagesCol.Visit(result.URL)
-	}
-}
-
-func setResultResponse(link string, response *colly.Response, relay *structures.Relay) {
-	log.Trace().Msgf("%v: Got Response -> %v", seName, link)
-
-	relay.Mutex.Lock()
-	mapRes, exists := relay.ResultMap[link]
-
-	if !exists {
-		log.Error().Msgf("URL not in map when adding response! Should not be possible. URL: %v", link)
-		relay.Mutex.Unlock()
-		return
-	}
-
-	mapRes.Response = response
-
-	resCopy := *mapRes
-	rankAddr := &(mapRes.Rank)
-	relay.Mutex.Unlock()
-	rank.SetRank(&resCopy, rankAddr, &(relay.Mutex)) //copy contains pointer to response
 }
