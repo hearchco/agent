@@ -48,6 +48,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			retError = err
 			return
 		}
+		r.Ctx.Put("originalURL", r.URL.String())
 	})
 
 	pagesCol.OnError(func(r *colly.Response, err error) {
@@ -55,7 +56,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	pagesCol.OnResponse(func(r *colly.Response) {
-		urll := strings.ToLower(r.Request.URL.String()) //temporary hack, read comment in col.OnHTML
+		urll := r.Ctx.Get("originalURL")
 
 		setResultResponse(urll, r, relay)
 	})
@@ -79,7 +80,6 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 		linkHref, _ := dom.Find("a").Attr("href")
 		linkText := strings.TrimSpace(linkHref)
-		linkText = strings.ToLower(linkText) // r.Request.URL.String() in pageCol is SOMETIMES lowercase, making this lowercase as well to compensate - temporary fix until better solution is found, since urls are case sensitive https://stackoverflow.com/questions/7996919/should-url-be-case-sensitive
 		titleText := strings.TrimSpace(dom.Find("div > div > div > a > h3").Text())
 		descText := strings.TrimSpace(dom.Find("div > div > div > div:first-child > span:first-child").Text())
 
