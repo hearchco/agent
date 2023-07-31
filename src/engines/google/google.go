@@ -44,6 +44,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 	pagesCol.OnRequest(func(r *colly.Request) {
 		if err := ctx.Err(); err != nil { // dont fully understand this
+			log.Error().Msgf("Pages Collector; Error OnRequest %v", r)
 			r.Abort()
 			retError = err
 			return
@@ -52,6 +53,8 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	pagesCol.OnError(func(r *colly.Response, err error) {
+		log.Error().Msgf("Pages Collector; Error OnError:\nURL: %v\nError: %v", r.Ctx.Get("originalURL"), err)
+		log.Trace().Msgf("HTML Response:\n%v", string(r.Body))
 		retError = err
 	})
 
@@ -63,6 +66,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 	col.OnRequest(func(r *colly.Request) {
 		if err := ctx.Err(); err != nil { // dont fully understand this
+			log.Error().Msgf("SE Collector; Error OnRequest %v", r)
 			r.Abort()
 			retError = err
 			return
@@ -70,6 +74,8 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	col.OnError(func(r *colly.Response, err error) {
+		log.Error().Msgf("SE Collector; Error OnError:\nURL: %v\nError: %v", r.Request.URL.String(), err)
+		log.Trace().Msgf("HTML Response:\n%v", string(r.Body))
 		retError = err
 	})
 
