@@ -2,8 +2,6 @@ package google
 
 import (
 	"context"
-	"fmt"
-	"net/url"
 	"strconv"
 	"strings"
 
@@ -55,7 +53,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	pagesCol.OnError(func(r *colly.Response, err error) {
-		log.Error().Msgf("%v: Pages Collector; Error OnError:\nURL: %v\nError: %v", seName, r.Ctx.Get("originalURL"), err)
+		log.Debug().Msgf("%v: Pages Collector; Error OnError:\nURL: %v\nError: %v", seName, r.Ctx.Get("originalURL"), err)
 		log.Trace().Msgf("%v: HTML Response:\n%v", seName, string(r.Body))
 		//retError = err
 	})
@@ -92,42 +90,36 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		descText := strings.TrimSpace(dom.Find("div > div > div > div:first-child > span:first-child").Text())
 
 		if linkText != "" && linkText != "#" && titleText != "" {
-			pageNum := getPageNum(e.Request.URL.String())
+			var pageStr string = e.Request.Ctx.Get("page")
+			page, _ := strconv.Atoi(pageStr)
+
 			res := structures.Result{
 				URL:          linkText,
 				Rank:         -1,
 				SERank:       -1,
-				SEPage:       pageNum,
-				SEOnPageRank: pageRankCounter[pageNum] + 1,
+				SEPage:       page,
+				SEOnPageRank: pageRankCounter[page] + 1,
 				Title:        titleText,
 				Description:  descText,
 				SearchEngine: seName,
 			}
-			pageRankCounter[pageNum]++
+			pageRankCounter[page]++
 
 			bucket.SetResult(&res, relay, options, pagesCol)
 		}
 	})
 
-	col.Visit(seURL + query)
+	colCtx := colly.NewContext()
+	colCtx.Put("page", strconv.Itoa(1))
+	col.Request("GET", seURL+query, nil, colCtx, nil)
 	for i := 1; i < options.MaxPages; i++ {
-		col.Visit(seURL + query + "&start=" + strconv.Itoa(i*10))
+		colCtx = colly.NewContext()
+		colCtx.Put("page", strconv.Itoa(i+1))
+		col.Request("GET", seURL+query+"&start="+strconv.Itoa(i*10), nil, colCtx, nil)
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
 	return retError
-}
-
-// this may be able to be replaced with some Ctx usage
-func getPageNum(uri string) int {
-	urll, err := url.Parse(uri)
-	if err != nil {
-		fmt.Println(err)
-	}
-	qry := urll.Query()
-	startString := qry.Get("start")
-	startInt, _ := strconv.Atoi(startString)
-	return startInt/10 + 1
 }

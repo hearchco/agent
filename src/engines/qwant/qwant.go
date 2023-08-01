@@ -84,7 +84,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	pagesCol.OnError(func(r *colly.Response, err error) {
-		log.Error().Msgf("%v: Pages Collector; Error OnError:\nURL: %v\nError: %v", seName, r.Ctx.Get("originalURL"), err)
+		log.Debug().Msgf("%v: Pages Collector; Error OnError:\nURL: %v\nError: %v", seName, r.Ctx.Get("originalURL"), err)
 		log.Trace().Msgf("%v: HTML Response:\n%v", seName, string(r.Body))
 		//retError = err
 	})
@@ -156,7 +156,6 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	col.OnHTML("div[data-testid=\"sectionWeb\"] > div > div", func(e *colly.HTMLElement) {
 		//first page
 		idx := e.Index
-		log.Info().Msgf("INDEX: %v", idx)
 
 		dom := e.DOM
 		baseDOM := dom.Find("div[data-testid=\"webResult\"] > div > div > div > div > div")
