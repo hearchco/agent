@@ -10,6 +10,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/engines/duckduckgo"
 	"github.com/tminaorg/brzaguza/src/engines/google"
 	"github.com/tminaorg/brzaguza/src/engines/mojeek"
+	"github.com/tminaorg/brzaguza/src/engines/qwant"
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
@@ -50,6 +51,13 @@ func PerformSearch(query string, maxPages int, visitPages bool) []structures.Res
 		err := mojeek.Search(context.Background(), query, &relay, &options)
 		if err != nil {
 			log.Error().Err(err).Msg("Failed searching mojeek.com")
+		}
+	})
+
+	worker.Go(func() {
+		err := qwant.Search(context.Background(), query, &relay, &options)
+		if err != nil {
+			log.Error().Err(err).Msg("Failed searching qwant.com")
 		}
 	})
 

@@ -2,14 +2,14 @@ package mojeek
 
 import (
 	"context"
-	"fmt"
-	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
+	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/tminaorg/brzaguza/src/rank"
 	"github.com/tminaorg/brzaguza/src/search/limit"
 	"github.com/tminaorg/brzaguza/src/search/useragent"
 	"github.com/tminaorg/brzaguza/src/structures"
@@ -55,9 +55,9 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	pagesCol.OnError(func(r *colly.Response, err error) {
-		log.Error().Msgf("%v: Pages Collector; Error OnError:\nURL: %v\nError: %v", seName, r.Ctx.Get("originalURL"), err)
+		log.Debug().Msgf("%v: Pages Collector; Error OnError:\nURL: %v\nError: %v", seName, r.Ctx.Get("originalURL"), err)
 		log.Trace().Msgf("%v: HTML Response:\n%v", seName, string(r.Body))
-		retError = err
+		//retError = err
 	})
 
 	pagesCol.OnResponse(func(r *colly.Response) {
@@ -93,41 +93,39 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		descText := strings.TrimSpace(dom.Find("p.s").Text())
 
 		if linkText != "" && linkText != "#" && titleText != "" {
-			pageNum := getPageNum(e.Request.URL.String())
+			var pageStr string = e.Request.Ctx.Get("page")
+			page, _ := strconv.Atoi(pageStr)
+
 			res := structures.Result{
 				URL:          linkText,
 				Rank:         -1,
-				SERank:       -1,
-				SEPage:       pageNum,
-				SEOnPageRank: pageRankCounter[pageNum] + 1,
+				SERank:       (page-1)*resPerPage + pageRankCounter[page] + 1,
+				SEPage:       page,
+				SEOnPageRank: pageRankCounter[page] + 1,
 				Title:        titleText,
 				Description:  descText,
 				SearchEngine: seName,
 			}
-			pageRankCounter[pageNum]++
+			if config.InsertDefaultRank {
+				res.Rank = rank.DefaultRank(res.SERank, res.SEPage, res.SEOnPageRank)
+			}
+			pageRankCounter[page]++
 
 			bucket.SetResult(&res, relay, options, pagesCol)
 		}
 	})
 
-	col.Visit(seURL + query)
+	colCtx := colly.NewContext()
+	colCtx.Put("page", strconv.Itoa(1))
+	col.Request("GET", seURL+query, nil, colCtx, nil)
 	for i := 1; i < options.MaxPages; i++ {
-		col.Visit(seURL + query + "&s=" + strconv.Itoa(i*10+1))
+		colCtx = colly.NewContext()
+		colCtx.Put("page", strconv.Itoa(i+1))
+		col.Request("GET", seURL+query+"&s="+strconv.Itoa(i*10+1), nil, colCtx, nil)
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
 	return retError
-}
-
-func getPageNum(uri string) int {
-	urll, err := url.Parse(uri)
-	if err != nil {
-		fmt.Println(err)
-	}
-	qry := urll.Query()
-	startString := qry.Get("s")
-	startInt, _ := strconv.Atoi(startString)
-	return startInt/10 + 1
 }
