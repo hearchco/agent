@@ -27,3 +27,7 @@ func SetRank(result *structures.Result, rankAddr *int, mutex *sync.RWMutex) {
 
 	log.Trace().Msgf("Set rank to %v for %v: %v", rrank, result.Title, result.URL)
 }
+
+func DefaultRank(seRank int, sePage int, seOnPageRank int) int {
+	return sePage*100 + seOnPageRank
+}

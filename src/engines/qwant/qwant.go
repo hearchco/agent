@@ -9,6 +9,8 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
+	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/tminaorg/brzaguza/src/rank"
 	"github.com/tminaorg/brzaguza/src/search/limit"
 	"github.com/tminaorg/brzaguza/src/search/useragent"
 	"github.com/tminaorg/brzaguza/src/structures"
@@ -119,8 +121,6 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 		page, _ := strconv.Atoi(pageStr)
 
-		log.Trace().Msgf("ENTERED PAGE: %v", page)
-
 		var parsedResponse QwantResponse
 		err := json.Unmarshal(r.Body, &parsedResponse)
 		if err != nil {
@@ -139,12 +139,15 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 				res := structures.Result{
 					URL:          goodURL,
 					Rank:         -1,
-					SERank:       -1, //ch
+					SERank:       (page-1)*qResCount + counter,
 					SEPage:       page,
 					SEOnPageRank: counter%defaultResultsPerPage + 1,
 					Title:        result.Title,
 					Description:  result.Description,
 					SearchEngine: seName,
+				}
+				if config.InsertDefaultRank {
+					res.Rank = rank.DefaultRank(res.SERank, res.SEPage, res.SEOnPageRank)
 				}
 
 				bucket.SetResult(&res, relay, options, pagesCol)

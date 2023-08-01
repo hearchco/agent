@@ -8,6 +8,8 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
+	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/tminaorg/brzaguza/src/rank"
 	"github.com/tminaorg/brzaguza/src/search/limit"
 	"github.com/tminaorg/brzaguza/src/search/useragent"
 	"github.com/tminaorg/brzaguza/src/structures"
@@ -102,6 +104,9 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 				Title:        titleText,
 				Description:  descText,
 				SearchEngine: seName,
+			}
+			if config.InsertDefaultRank {
+				res.Rank = rank.DefaultRank(res.SERank, res.SEPage, res.SEOnPageRank)
 			}
 			pageRankCounter[page]++
 
