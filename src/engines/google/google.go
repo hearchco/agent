@@ -57,7 +57,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	pagesCol.OnError(func(r *colly.Response, err error) {
 		log.Error().Msgf("%v: Pages Collector; Error OnError:\nURL: %v\nError: %v", seName, r.Ctx.Get("originalURL"), err)
 		log.Trace().Msgf("%v: HTML Response:\n%v", seName, string(r.Body))
-		retError = err
+		//retError = err
 	})
 
 	pagesCol.OnResponse(func(r *colly.Response) {
