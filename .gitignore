@@ -24,3 +24,5 @@ brzaguza-bin
 brzaguza.log
 
 .vscode/*
+
+src/engines/yandex/site/*
