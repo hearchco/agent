@@ -32,10 +32,16 @@ Look at searxng to see how they handle it - they don't see [this](https://github
 
 https://yastatic.net/nearest.js probably gets the server
 
-`home-statis.js`: ctrl+f  `setRequestHeader` and `requestHeaders` ; `cookie`
+Keywords to look out for in javascript: 
++ `setRequestHeader`
++ `requestHeaders`
++ `cookie`
++ `initTimestamp`
++ `new Date`
++ `captcha`
 
-
-
+Better cookie managment?: http://go-colly.org/docs/introduction/crawling/
+-> https://github.com/juju/persistent-cookiejar
 
 Browser request headers to https://yandex.com/
 ```
@@ -187,3 +193,15 @@ content-type: text/html; charset=utf-8
 strict-transport-security: max-age=31536000; includeSubDomains
 X-Firefox-Spdy: h2
 ```
+
+**Response is not actually time based.**
+
+The only important header is `Cookie:` - the other ones don't matter. It seems that almost every time you send a request without cookies, you will be hit with a capcha. Yandex makes [their own captcha](https://cloud.yandex.com/en/services/smartcaptcha), maybe try to crack it?
+
+From [support](https://yandex.com/support/smart-captcha/): 
+> A Yandex service may be blocked if it receives many similar requests from users or programs. For example, this may happen if multiple people use a Yandex service from devices that are connected to the internet from the same IP address. In this case, Yandex interprets them all as one user and asks for additional confirmation.
+
+Figuring out the `spravka` parameter is probably the key to success.
+Sending identical requests is /VERY/ bad/obvious.
+
+![repeated](site/image.png)

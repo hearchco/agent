@@ -7,8 +7,11 @@ package yandex
 import (
 	"context"
 	"fmt"
+	"math/rand"
+	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
@@ -25,7 +28,7 @@ const seName string = "Yandex"
 const seURL string = "https://yandex.com/search/?text="
 const resPerPage int = 10
 
-const locale string = "en-US,en"
+// const locale string = "en-US,en"
 const sendRND bool = false
 
 func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
@@ -82,29 +85,31 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			return
 		}
 
-		//r.Headers.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
-		/*
-			r.Headers.Set("Accept-Language", locale+";q=0.5")
-			r.Headers.Set("Accept-Encoding", "gzip, deflate, br")
-			r.Headers.Set("DNT", "1")
-			r.Headers.Set("Connection", "keep-alive")
-			r.Headers.Set("Upgrade-Insecure-Requests", "1")
-			r.Headers.Set("Sec-Fetch-Dest", "document")
-			r.Headers.Set("Sec-Fetch-Mode", "navigate")
-			r.Headers.Set("Sec-Fetch-Site", "none")
-			r.Headers.Set("Sec-Fetch-User", "?1")
-			r.Headers.Set("Sec-GPC", "1")
-			r.Headers.Set("sec-ch-ua-platform", "Linux") // UserAgent specific
-			r.Headers.Set("sec-ch-ua", "\"Google Chrome\";v=\"112\", \"Chromium\";v=\"112\", \"Not=A?Brand\";v=\"24\"")
-			r.Headers.Set("sec-ch-ua-mobile", "?0")
-			r.Headers.Set("TE", "trailers")
-		*/
-		//r.Headers.Set("Cookie")
-		r.Headers.Del("User-Agent")
-		fmt.Println(r.Headers)
-		cookies := col.Cookies("https://yandex.com")
-		for cookie := range cookies {
-			fmt.Printf("cookie: %v\n", cookie)
+		r.Headers.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
+		r.Headers.Set("Accept-Language", "en-US,en;q=0.5")
+		r.Headers.Set("Accept-Encoding", "gzip, deflate, br")
+		r.Headers.Set("Referer", "https://yandex.com/")
+		r.Headers.Set("DNT", "1")
+		r.Headers.Set("Connection", "keep-alive")
+		if len(col.Cookies("https://yandex.com")) == 0 {
+			r.Headers.Set("Cookie", r.Ctx.Get("cook"))
+		}
+		r.Headers.Set("Upgrade-Insecure-Requests", "1")
+		r.Headers.Set("Sec-Fetch-Dest", "document")
+		r.Headers.Set("Sec-Fetch-Mode", "navigate")
+		r.Headers.Set("Sec-Fetch-Site", "same-origin")
+		r.Headers.Set("Sec-Fetch-User", "?1")
+		r.Headers.Set("Sec-GPC", "1")
+		r.Headers.Set("sec-ch-ua-platform", "Linux") // UserAgent specific
+		r.Headers.Set("sec-ch-ua", "\"Google Chrome\";v=\"112\", \"Chromium\";v=\"112\", \"Not=A?Brand\";v=\"24\"")
+		r.Headers.Set("sec-ch-ua-mobile", "?0")
+		r.Headers.Set("TE", "trailers")
+
+		log.Trace().Msgf("Request Headers:\n%v", r.Headers)
+		log.Trace().Msgf("The Cookies:")
+		ccookies := col.Cookies("https://yandex.com")
+		for cookie := range ccookies {
+			log.Trace().Msgf("%v", cookie)
 		}
 	})
 
@@ -119,7 +124,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	col.OnHTML("ul#search-result > li", func(e *colly.HTMLElement) {
 		dom := e.DOM
 
-		fmt.Print("IN RES")
+		log.Info().Msg("YANDEX GRACED US")
 
 		linkHref, _ := dom.Find("div:first-child > a").Attr("href")
 		linkText := utility.ParseURL(linkHref)
@@ -151,41 +156,50 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		}
 	})
 
-	//var ycookies []string
-
 	col.OnResponse(func(r *colly.Response) {
 		if strings.Contains(string(r.Body), "Please confirm that you and not a robot are sending requests") {
 			log.Error().Msgf("%v: Returned captcha.", seName)
+		} else {
+			log.Info().Msgf("NOT IN CAPTHA WOOOOOOOO!")
 		}
-		//ycookies = r.Headers.Values("set-cookie")
-		fmt.Printf("Response headers: %v", r.Headers)
+
+		log.Trace().Msgf("Response headers:\n%v", r.Headers)
 	})
 
-	/*
-		rndText := ""
-		if sendRND {
-			randS := rand.New(rand.NewSource(time.Now().UnixNano()))
-			rndText = "&rnd=" + strconv.Itoa(randS.Intn(99999-1000+1)+1000) //random number from [1000,99999]
-		}
-	*/
+	rndText := ""
+	if sendRND {
+		randS := rand.New(rand.NewSource(time.Now().UnixNano()))
+		rndText = "&rnd=" + strconv.Itoa(randS.Intn(99999-1000+1)+1000) //random number from [1000,99999]
+	}
 
-	//col.UserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
-	col.UserAgent = ""
-	col.Request("GET", "https://yandex.com/", nil, nil, nil)
+	var cookies string
+	readCookies("./src/engines/yandex/cookie.db", &cookies, col)
 
-	/*
-		colCtx := colly.NewContext()
-		colCtx.Put("page", strconv.Itoa(1))
-		col.Request("GET", seURL+query+"&search_source=yacom_desktop_common", nil, colCtx, nil)
-		for i := 1; i < options.MaxPages; i++ {
-			colCtx = colly.NewContext()
-			colCtx.Put("page", strconv.Itoa(i+1))
-			col.Request("GET", seURL+query+"&p="+strconv.Itoa(i*10)+rndText, nil, colCtx, nil)
-		}
-	*/
+	colCtx := colly.NewContext()
+	colCtx.Put("page", strconv.Itoa(1))
+	colCtx.Put("cook", cookies)
+
+	col.UserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
+	col.Request("GET", seURL+query, nil, colCtx, nil)
+	//col.Request("GET", seURL+query+"&search_source=yacom_desktop_common&msid=1691021728532406-396109311027094500-balancer-l7leveler-kubr-yp-vla-50-BAL-8238", nil, colCtx, nil)
+
+	for i := 1; i < options.MaxPages; i++ {
+		colCtx = colly.NewContext()
+		colCtx.Put("page", strconv.Itoa(i+1))
+		col.Request("GET", seURL+query+"&p="+strconv.Itoa(i*10)+rndText, nil, colCtx, nil)
+	}
 
 	col.Wait()
 	pagesCol.Wait()
 
 	return retError
+}
+
+func readCookies(filename string, cookies *string, col *colly.Collector) {
+	dat, err := os.ReadFile("./" + filename)
+	if err != nil {
+		panic(err)
+	}
+
+	*cookies = string(dat)
 }

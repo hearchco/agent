@@ -11,6 +11,12 @@ require (
 )
 
 require (
+	github.com/juju/go4 v0.0.0-20160222163258-40d72ab9641a // indirect
+	gopkg.in/errgo.v1 v1.0.1 // indirect
+	gopkg.in/retry.v1 v1.0.3 // indirect
+)
+
+require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/PuerkitoBio/goquery v1.8.1 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
@@ -20,6 +26,7 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/juju/persistent-cookiejar v1.0.0
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
