@@ -133,7 +133,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 	col.OnResponse(func(r *colly.Response) {
 		if strings.Contains(string(r.Body), "Sorry for the CAPTCHA") {
-			log.Error().Msgf("%v: returned captcha.", seName)
+			log.Error().Msgf("%v: Returned captcha.", seName)
 		}
 	})
 
