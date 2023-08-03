@@ -17,6 +17,8 @@ import (
 	"github.com/tminaorg/brzaguza/src/utility"
 )
 
+const SEDomain string = "www.qwant.com"
+
 const seName string = "Qwant"
 
 // const seURL string = "https://www.qwant.com/?q="
