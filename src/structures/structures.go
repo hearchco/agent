@@ -29,14 +29,17 @@ type Options struct {
 	VisitPages    bool
 }
 
+// SE* variables are 1-indexed
 type Result struct {
-	URL         string
-	Rank        int
-	SEPageRank  int
-	SEPage      int
-	Title       string
-	Description string
-	Response    *colly.Response
+	URL          string
+	Rank         int
+	SERank       int
+	SEPage       int
+	SEOnPageRank int
+	Title        string
+	Description  string
+	SearchEngine string
+	Response     *colly.Response
 }
 
 /*

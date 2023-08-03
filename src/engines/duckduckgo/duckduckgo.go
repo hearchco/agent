@@ -1,10 +1,12 @@
-package google
+package duckduckgo
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
@@ -16,9 +18,8 @@ import (
 	"github.com/tminaorg/brzaguza/src/utility"
 )
 
-const seName string = "Google"
-const seURL string = "https://www.google.com/search?q="
-const resPerPage int = 10
+const seName string = "DuckDuckGo"
+const seURL string = "https://lite.duckduckgo.com/lite/"
 
 func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
 	if ctx == nil {
@@ -61,7 +62,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	pagesCol.OnResponse(func(r *colly.Response) {
-		urll := r.Ctx.Get("originalURL")
+		urll := r.Ctx.Get("originalURL") //because i may have followed redirects
 
 		bucket.SetResultResponse(urll, r, relay, seName)
 	})
@@ -73,6 +74,14 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			retError = err
 			return
 		}
+		if r.Body == nil {
+			//This is the first page, so this isnt a POST request
+			r.Ctx.Put("body", "q="+query+"&dc=1")
+		} else {
+			var reqBody []byte
+			r.Body.Read(reqBody)
+			r.Ctx.Put("body", string(reqBody))
+		}
 	})
 
 	col.OnError(func(r *colly.Response, err error) {
@@ -81,46 +90,61 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		retError = err
 	})
 
-	var pageRankCounter []int = make([]int, options.MaxPages*resPerPage)
+	col.OnHTML("div.filters > table > tbody", func(e *colly.HTMLElement) {
+		var linkText string
+		var linkScheme string
+		var titleText string
+		var descText string
+		var rrank int
 
-	col.OnHTML("div.g", func(e *colly.HTMLElement) {
-		dom := e.DOM
+		var reqBody string = e.Request.Ctx.Get("body")
+		var page int
+		fmt.Sscanf(reqBody, "q="+query+"&dc=%d", &page)
+		page = page/20 + 1
 
-		linkHref, _ := dom.Find("a").Attr("href")
-		linkText := utility.ParseURL(linkHref)
-		titleText := strings.TrimSpace(dom.Find("div > div > div > a > h3").Text())
-		descText := strings.TrimSpace(dom.Find("div > div > div > div:first-child > span:first-child").Text())
+		e.DOM.Children().Each(func(i int, row *goquery.Selection) {
+			switch i % 4 {
+			case 0:
+				rankText := strings.TrimSpace(row.Children().First().Text())
+				fmt.Sscanf(rankText, "%d", &rrank)
+				linkHref, _ := row.Find("a.result-link").Attr("href")
+				if strings.Contains(linkHref, "https") {
+					linkScheme = "https://"
+				} else {
+					linkScheme = "http://"
+				}
+				titleText = strings.TrimSpace(row.Find("td > a.result-link").Text())
+			case 1:
+				descText = strings.TrimSpace(row.Find("td.result-snippet").Text())
+			case 2:
+				rawURL := linkScheme + row.Find("td > span.link-text").Text()
+				linkText = utility.ParseURL(rawURL)
+			case 3:
+				if linkText != "" && linkText != "#" && titleText != "" {
+					res := structures.Result{
+						URL:          linkText,
+						Rank:         -1,
+						SERank:       rrank,
+						SEPage:       page,
+						SEOnPageRank: (i/4 + 1),
+						Title:        titleText,
+						Description:  descText,
+						SearchEngine: seName,
+					}
+					if config.InsertDefaultRank {
+						res.Rank = rank.DefaultRank(res.SERank, res.SEPage, res.SEOnPageRank)
+					}
 
-		if linkText != "" && linkText != "#" && titleText != "" {
-			var pageStr string = e.Request.Ctx.Get("page")
-			page, _ := strconv.Atoi(pageStr)
-
-			res := structures.Result{
-				URL:          linkText,
-				Rank:         -1,
-				SERank:       -1,
-				SEPage:       page,
-				SEOnPageRank: pageRankCounter[page] + 1,
-				Title:        titleText,
-				Description:  descText,
-				SearchEngine: seName,
+					bucket.SetResult(&res, relay, options, pagesCol)
+				}
 			}
-			if config.InsertDefaultRank {
-				res.Rank = rank.DefaultRank(res.SERank, res.SEPage, res.SEOnPageRank)
-			}
-			pageRankCounter[page]++
-
-			bucket.SetResult(&res, relay, options, pagesCol)
-		}
+		})
 	})
 
-	colCtx := colly.NewContext()
-	colCtx.Put("page", strconv.Itoa(1))
-	col.Request("GET", seURL+query, nil, colCtx, nil)
+	col.Visit(seURL + "?q=" + query)
+	//col.PostRaw(seURL, []byte("q="+query+"&dc=1"))
 	for i := 1; i < options.MaxPages; i++ {
-		colCtx = colly.NewContext()
-		colCtx.Put("page", strconv.Itoa(i+1))
-		col.Request("GET", seURL+query+"&start="+strconv.Itoa(i*10), nil, colCtx, nil)
+		col.PostRaw(seURL, []byte("q="+query+"&dc="+strconv.Itoa(i*20)))
 	}
 
 	col.Wait()

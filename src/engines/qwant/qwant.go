@@ -1,7 +1,8 @@
-package google
+package qwant
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 	"strings"
 
@@ -16,9 +17,39 @@ import (
 	"github.com/tminaorg/brzaguza/src/utility"
 )
 
-const seName string = "Google"
-const seURL string = "https://www.google.com/search?q="
-const resPerPage int = 10
+const seName string = "Qwant"
+
+// const seURL string = "https://www.qwant.com/?q="
+const seAPIURL string = "https://api.qwant.com/v3/search/web?q="
+
+const defaultResultsPerPage int = 10
+
+const qSafeSearch string = "0" //sets safeSearch for Qwant
+const qDevice string = "desktop"
+const qLocale string = "en_us"
+const qResCount int = 10 //ask this many results back
+
+type QwantResults struct {
+	Title       string `json:"title"`
+	URL         string `json:"url"` //there is also a source field, what is it?
+	Description string `json:"desc"`
+}
+
+type QwantMainlineItems struct {
+	Type  string         `json:"type"`
+	Items []QwantResults `json:"items"`
+}
+
+type QwantResponse struct {
+	Status string `json:"status"`
+	Data   struct {
+		Res struct {
+			Items struct {
+				Mainline []QwantMainlineItems `json:"mainline"`
+			} `json:"items"`
+		} `json:"result"`
+	} `json:"data"`
+}
 
 func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
 	if ctx == nil {
@@ -81,46 +112,85 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		retError = err
 	})
 
-	var pageRankCounter []int = make([]int, options.MaxPages*resPerPage)
+	col.OnResponse(func(r *colly.Response) {
+		var pageStr string = r.Ctx.Get("page")
+		if pageStr == "" {
+			//the first page
+			return
+		}
 
-	col.OnHTML("div.g", func(e *colly.HTMLElement) {
+		page, _ := strconv.Atoi(pageStr)
+
+		var parsedResponse QwantResponse
+		err := json.Unmarshal(r.Body, &parsedResponse)
+		if err != nil {
+			log.Error().Err(err).Msgf("%v: Failed body unmarshall to json:\n%v", seName, string(r.Body))
+		}
+
+		mainline := parsedResponse.Data.Res.Items.Mainline
+		counter := 0
+		for _, group := range mainline {
+			if group.Type != "web" {
+				continue
+			}
+			for _, result := range group.Items {
+
+				goodURL := utility.ParseURL(result.URL)
+				res := structures.Result{
+					URL:          goodURL,
+					Rank:         -1,
+					SERank:       (page-1)*qResCount + counter,
+					SEPage:       page,
+					SEOnPageRank: counter%defaultResultsPerPage + 1,
+					Title:        result.Title,
+					Description:  result.Description,
+					SearchEngine: seName,
+				}
+				if config.InsertDefaultRank {
+					res.Rank = rank.DefaultRank(res.SERank, res.SEPage, res.SEOnPageRank)
+				}
+
+				bucket.SetResult(&res, relay, options, pagesCol)
+				counter += 1
+			}
+		}
+	})
+
+	col.OnHTML("div[data-testid=\"sectionWeb\"] > div > div", func(e *colly.HTMLElement) {
+		//first page
+		idx := e.Index
+
 		dom := e.DOM
-
-		linkHref, _ := dom.Find("a").Attr("href")
+		baseDOM := dom.Find("div[data-testid=\"webResult\"] > div > div > div > div > div")
+		hrefElement := baseDOM.Find("a[data-testid=\"serTitle\"]")
+		linkHref, _ := hrefElement.Attr("href")
 		linkText := utility.ParseURL(linkHref)
-		titleText := strings.TrimSpace(dom.Find("div > div > div > a > h3").Text())
-		descText := strings.TrimSpace(dom.Find("div > div > div > div:first-child > span:first-child").Text())
+		titleText := strings.TrimSpace(hrefElement.Text())
+		descText := strings.TrimSpace(baseDOM.Find("div > span").Text())
 
 		if linkText != "" && linkText != "#" && titleText != "" {
-			var pageStr string = e.Request.Ctx.Get("page")
-			page, _ := strconv.Atoi(pageStr)
-
 			res := structures.Result{
 				URL:          linkText,
 				Rank:         -1,
 				SERank:       -1,
-				SEPage:       page,
-				SEOnPageRank: pageRankCounter[page] + 1,
+				SEPage:       1,
+				SEOnPageRank: idx + 1,
 				Title:        titleText,
 				Description:  descText,
 				SearchEngine: seName,
 			}
-			if config.InsertDefaultRank {
-				res.Rank = rank.DefaultRank(res.SERank, res.SEPage, res.SEOnPageRank)
-			}
-			pageRankCounter[page]++
 
 			bucket.SetResult(&res, relay, options, pagesCol)
+		} else {
+			log.Info().Msgf("Not Good! %v\n%v\n%v", linkText, titleText, descText)
 		}
 	})
 
-	colCtx := colly.NewContext()
-	colCtx.Put("page", strconv.Itoa(1))
-	col.Request("GET", seURL+query, nil, colCtx, nil)
-	for i := 1; i < options.MaxPages; i++ {
-		colCtx = colly.NewContext()
+	for i := 0; i < options.MaxPages; i++ {
+		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		col.Request("GET", seURL+query+"&start="+strconv.Itoa(i*10), nil, colCtx, nil)
+		reqString := seAPIURL + query + "&count=" + strconv.Itoa(qResCount) + "&locale=" + qLocale + "&offset=" + strconv.Itoa(i*qResCount) + "&device=" + qDevice + "&safesearch=" + qSafeSearch
+		col.Request("GET", reqString, nil, colCtx, nil)
 	}
 
 	col.Wait()
