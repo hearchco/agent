@@ -26,3 +26,4 @@ brzaguza.log
 .vscode/*
 
 src/engines/yandex/site/*
+src/engines/etools/site/*

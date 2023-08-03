@@ -41,12 +41,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	}
 	log.Trace().Msgf("%v: UserAgent: %v", seName, options.UserAgent)
 
-	var col *colly.Collector
-	if options.MaxPages == 1 {
-		col = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) // so there is no thread creation overhead
-	} else {
-		col = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async(true))
-	}
+	var col *colly.Collector = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) //site breaks if this is Async
 	pagesCol := colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async(true))
 
 	var retError error
@@ -136,6 +131,12 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		}
 	})
 
+	col.OnResponse(func(r *colly.Response) {
+		if strings.Contains(string(r.Body), "Sorry for the CAPTCHA") {
+			log.Error().Msgf("%v: returned captcha.", seName)
+		}
+	})
+
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
@@ -148,6 +149,11 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		colCtx = colly.NewContext()
 		colCtx.Put("page", pageStr)
 		col.Request("GET", sePAGEURL+pageStr, nil, colCtx, nil)
+
+		//col.Wait()
+
+		//time.Sleep(200 * time.Millisecond)
+		//a delay can help reduce response volatility for this site
 	}
 
 	col.Wait()
