@@ -2,8 +2,8 @@ package search
 
 import (
 	"context"
+	"net/url"
 	"sort"
-	"strings"
 
 	"github.com/rs/zerolog/log"
 	"github.com/sourcegraph/conc"
@@ -13,10 +13,6 @@ import (
 	"github.com/tminaorg/brzaguza/src/engines/qwant"
 	"github.com/tminaorg/brzaguza/src/structures"
 )
-
-func cleanQuery(query string) string {
-	return strings.Replace(strings.Trim(query, " "), " ", "+", -1)
-}
 
 func PerformSearch(query string, maxPages int, visitPages bool) []structures.Result {
 	relay := structures.Relay{
@@ -29,7 +25,7 @@ func PerformSearch(query string, maxPages int, visitPages bool) []structures.Res
 		VisitPages: visitPages,
 	}
 
-	query = cleanQuery(query)
+	query = url.QueryEscape(query)
 
 	var worker conc.WaitGroup
 
