@@ -8,6 +8,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/sourcegraph/conc"
 	"github.com/tminaorg/brzaguza/src/engines/duckduckgo"
+	"github.com/tminaorg/brzaguza/src/engines/etools"
 	"github.com/tminaorg/brzaguza/src/engines/google"
 	"github.com/tminaorg/brzaguza/src/engines/mojeek"
 	"github.com/tminaorg/brzaguza/src/engines/qwant"
@@ -21,6 +22,7 @@ const (
 	Mojeek
 	DuckDuckGo
 	Qwant
+	Etools
 )
 
 func PerformSearch(query string, maxPages int, visitPages bool) []structures.Result {
@@ -37,7 +39,7 @@ func PerformSearch(query string, maxPages int, visitPages bool) []structures.Res
 	query = url.QueryEscape(query)
 
 	var worker conc.WaitGroup
-	var toSearch []Engine = []Engine{Google, Mojeek, DuckDuckGo}
+	var toSearch []Engine = []Engine{Etools}
 	runEngines(toSearch, query, &worker, &relay, &options)
 	worker.Wait()
 
@@ -85,6 +87,13 @@ func runEngines(toSearch []Engine, query string, worker *conc.WaitGroup, relay *
 				err := qwant.Search(context.Background(), query, relay, options)
 				if err != nil {
 					log.Error().Err(err).Msg("Failed searching qwant.com")
+				}
+			})
+		case Etools:
+			worker.Go(func() {
+				err := etools.Search(context.Background(), query, relay, options)
+				if err != nil {
+					log.Error().Err(err).Msg("Failed searching etools.ch")
 				}
 			})
 		}
