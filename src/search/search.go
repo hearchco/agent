@@ -93,7 +93,7 @@ func runEngines(toSearch []Engine, query string, worker *conc.WaitGroup, relay *
 			worker.Go(func() {
 				err := etools.Search(context.Background(), query, relay, options)
 				if err != nil {
-					log.Error().Err(err).Msg("Failed searching etools.ch")
+					log.Error().Err(err).Msgf("Failed searching %v", etools.SEDomain)
 				}
 			})
 		}

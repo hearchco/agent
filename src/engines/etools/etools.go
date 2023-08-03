@@ -16,6 +16,8 @@ import (
 	"github.com/tminaorg/brzaguza/src/utility"
 )
 
+const SEDomain string = "www.etools.ch"
+
 const seName string = "Etools"
 const seURL string = "https://www.etools.ch/searchSubmit.do"
 
