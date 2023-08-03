@@ -63,28 +63,28 @@ func runEngines(toSearch []Engine, query string, worker *conc.WaitGroup, relay *
 			worker.Go(func() {
 				err := google.Search(context.Background(), query, relay, options)
 				if err != nil {
-					log.Error().Err(err).Msg("Failed searching google.com")
+					log.Error().Err(err).Msgf("Failed searching %v", google.SEDomain)
 				}
 			})
 		case DuckDuckGo:
 			worker.Go(func() {
 				err := duckduckgo.Search(context.Background(), query, relay, options)
 				if err != nil {
-					log.Error().Err(err).Msg("Failed searching lite.duckduckgo.com")
+					log.Error().Err(err).Msgf("Failed searching %v", duckduckgo.SEDomain)
 				}
 			})
 		case Mojeek:
 			worker.Go(func() {
 				err := mojeek.Search(context.Background(), query, relay, options)
 				if err != nil {
-					log.Error().Err(err).Msg("Failed searching mojeek.com")
+					log.Error().Err(err).Msgf("Failed searching %v", mojeek.SEDomain)
 				}
 			})
 		case Qwant:
 			worker.Go(func() {
 				err := qwant.Search(context.Background(), query, relay, options)
 				if err != nil {
-					log.Error().Err(err).Msg("Failed searching qwant.com")
+					log.Error().Err(err).Msgf("Failed searching %v", qwant.SEDomain)
 				}
 			})
 		}

@@ -16,6 +16,8 @@ import (
 	"github.com/tminaorg/brzaguza/src/utility"
 )
 
+const SEDomain string = "www.google.com"
+
 const seName string = "Google"
 const seURL string = "https://www.google.com/search?q="
 const resPerPage int = 10

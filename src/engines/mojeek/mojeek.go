@@ -16,6 +16,8 @@ import (
 	"github.com/tminaorg/brzaguza/src/utility"
 )
 
+const SEDomain string = "www.mojeek.com"
+
 const seName string = "Mojeek"
 const seURL string = "https://www.mojeek.com/search?q="
 const resPerPage int = 10

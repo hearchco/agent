@@ -18,6 +18,8 @@ import (
 	"github.com/tminaorg/brzaguza/src/utility"
 )
 
+const SEDomain string = "lite.duckduckgo.com"
+
 const seName string = "DuckDuckGo"
 const seURL string = "https://lite.duckduckgo.com/lite/"
 
