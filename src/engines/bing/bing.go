@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/rank"
@@ -43,12 +44,19 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	col.OnHTML("ol#b_results > li.b_algo", func(e *colly.HTMLElement) {
 		dom := e.DOM
 
-		linkHref, _ := dom.Find("div.tpcn > a.tilk").Attr("href")
+		linkHref, _ := dom.Find("h2 > a").Attr("href")
 		linkText := utility.ParseURL(linkHref)
 		titleText := strings.TrimSpace(dom.Find("h2 > a").Text())
 		descText := strings.TrimSpace(dom.Find("div.b_caption").Text())
 
 		if linkText != "" && linkText != "#" && titleText != "" {
+			if descText == "" {
+				descText = strings.TrimSpace(dom.Find("p.b_algoSlug").Text())
+			}
+			if strings.Contains(descText, "Web") {
+				descText = strings.Split(descText, "Web")[1]
+			}
+
 			var pageStr string = e.Request.Ctx.Get("page")
 			page, _ := strconv.Atoi(pageStr)
 
@@ -68,6 +76,8 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			pageRankCounter[page]++
 
 			bucket.SetResult(&res, relay, options, pagesCol)
+		} else {
+			log.Trace().Msgf("%v: Matched Result, but couldn't retrieve data.\nURL:%v\nTitle:%v\nDescription:%v", seName, linkText, titleText, descText)
 		}
 	})
 
