@@ -12,6 +12,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/engines/google"
 	"github.com/tminaorg/brzaguza/src/engines/mojeek"
 	"github.com/tminaorg/brzaguza/src/engines/qwant"
+	"github.com/tminaorg/brzaguza/src/engines/swisscows"
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
@@ -23,6 +24,7 @@ const (
 	DuckDuckGo
 	Qwant
 	Etools
+	Swisscows
 )
 
 func PerformSearch(query string, maxPages int, visitPages bool) []structures.Result {
@@ -39,7 +41,7 @@ func PerformSearch(query string, maxPages int, visitPages bool) []structures.Res
 	query = url.QueryEscape(query)
 
 	var worker conc.WaitGroup
-	var toSearch []Engine = []Engine{Mojeek}
+	var toSearch []Engine = []Engine{Swisscows}
 	runEngines(toSearch, query, &worker, &relay, &options)
 	worker.Wait()
 
@@ -94,6 +96,13 @@ func runEngines(toSearch []Engine, query string, worker *conc.WaitGroup, relay *
 				err := etools.Search(context.Background(), query, relay, options)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", etools.SEDomain)
+				}
+			})
+		case Swisscows:
+			worker.Go(func() {
+				err := swisscows.Search(context.Background(), query, relay, options)
+				if err != nil {
+					log.Error().Err(err).Msgf("Failed searching %v", swisscows.SEDomain)
 				}
 			})
 		}
