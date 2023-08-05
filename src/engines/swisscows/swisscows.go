@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/rank"
@@ -17,8 +18,12 @@ import (
 const SEDomain string = "swisscows.com"
 
 const seName string = "Swisscows"
-const seURL string = "https://swisscows.com/en/web?query="
-const resPerPage int = 10
+const seAPIURL string = "https://api.swisscows.com/web/search?"
+const sResCount int = 10
+const locale string = "de-CH"
+
+// const defaultResultsPerPage int = 10
+// const seURL string = "https://swisscows.com/en/web?query="
 
 func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
 	if err := sedefaults.FunctionPrepare(seName, options, &ctx); err != nil {
@@ -35,10 +40,24 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	sedefaults.PagesColError(seName, pagesCol)
 	sedefaults.PagesColResponse(seName, pagesCol, relay)
 
-	sedefaults.ColRequest(seName, col, &ctx, &retError)
+	col.OnRequest(func(r *colly.Request) {
+		if err := (ctx).Err(); err != nil {
+			log.Error().Msgf("%v: SE Collector; Error OnRequest %v", seName, r)
+			r.Abort()
+			retError = err
+			return
+		}
+		var qry string = "?" + r.URL.RawQuery
+		nonce, sig := GenerateAuth(qry)
+
+		//log.Debug().Msgf("qry: %v\nnonce: %v\nsignature: %v", qry, nonce, sig)
+
+		r.Headers.Set("X-Request-Nonce", nonce)
+		r.Headers.Set("X-Request-Signature", sig)
+	})
 	sedefaults.ColError(seName, col, &retError)
 
-	var pageRankCounter []int = make([]int, options.MaxPages*resPerPage)
+	var pageRankCounter []int = make([]int, options.MaxPages*sResCount)
 
 	col.OnHTML("div.web-results > article.item-web", func(e *colly.HTMLElement) {
 		dom := e.DOM
@@ -68,16 +87,22 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			pageRankCounter[page]++
 
 			bucket.SetResult(&res, relay, options, pagesCol)
+		} else {
+			log.Trace().Msgf("%v: Matched Result, but couldn't retrieve data.\nURL:%v\nTitle:%v\nDescription:%v", seName, linkText, titleText, descText)
 		}
+	})
+
+	col.OnResponse(func(r *colly.Response) {
+
 	})
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
-	col.Request("GET", seURL+query, nil, colCtx, nil)
+	col.Request("GET", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset=0&query="+query+"&region="+locale, nil, colCtx, nil)
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		col.Request("GET", seURL+query+"&offset="+strconv.Itoa(i*10), nil, colCtx, nil)
+		col.Request("GET", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
 	}
 
 	col.Wait()
