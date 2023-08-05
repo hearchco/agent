@@ -74,7 +74,9 @@ func generateSignature(params string, nonce string) string {
 }
 
 // returns nonce, signature
-func GenerateAuth(params string) (string, string) {
+func generateAuth(params string) (string, string) {
+	params = strings.ReplaceAll(params, "+", " ")
+
 	nonce := generateNonce(32)
 	auth := generateSignature(params, nonce)
 	return nonce, auth

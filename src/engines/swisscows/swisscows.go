@@ -2,6 +2,8 @@ package swisscows
 
 import (
 	"context"
+	"encoding/json"
+	"os"
 	"strconv"
 	"strings"
 
@@ -15,6 +17,18 @@ import (
 	"github.com/tminaorg/brzaguza/src/utility"
 )
 
+type SCItem struct {
+	Id         string `json:"id"`
+	Title      string `json:"title"`
+	Desc       string `json:"description"`
+	URL        string `json:"url"`
+	DisplayURL string `json:"displayUrl"`
+}
+
+type SCResponse struct {
+	Items []SCItem `json:"items"`
+}
+
 const SEDomain string = "swisscows.com"
 
 const seName string = "Swisscows"
@@ -22,7 +36,8 @@ const seAPIURL string = "https://api.swisscows.com/web/search?"
 const sResCount int = 10
 const locale string = "de-CH"
 
-// const defaultResultsPerPage int = 10
+const defaultResultsPerPage int = 10
+
 // const seURL string = "https://swisscows.com/en/web?query="
 
 func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
@@ -47,18 +62,34 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			retError = err
 			return
 		}
+
+		if r.Method == "OPTIONS" {
+			return
+		}
+
 		var qry string = "?" + r.URL.RawQuery
-		nonce, sig := GenerateAuth(qry)
+		nonce, sig := generateAuth(qry)
 
 		//log.Debug().Msgf("qry: %v\nnonce: %v\nsignature: %v", qry, nonce, sig)
 
 		r.Headers.Set("X-Request-Nonce", nonce)
 		r.Headers.Set("X-Request-Signature", sig)
+		r.Headers.Set("Pragma", "no-cache")
 	})
-	sedefaults.ColError(seName, col, &retError)
+
+	col.OnError(func(r *colly.Response, err error) {
+		log.Error().Msgf("%v: SE Collector - OnError.\nMethod: %v\nURL: %v\nError: %v", seName, r.Request.Method, r.Request.URL.String(), err)
+		log.Error().Msgf("%v: HTML Response written to %v%v_col.log.html", seName, config.LogDumpLocation, seName)
+		writeErr := os.WriteFile(config.LogDumpLocation+seName+"_col.log.html", r.Body, 0644)
+		if writeErr != nil {
+			log.Error().Err(writeErr)
+		}
+		retError = err
+	})
 
 	var pageRankCounter []int = make([]int, options.MaxPages*sResCount)
 
+	// not used
 	col.OnHTML("div.web-results > article.item-web", func(e *colly.HTMLElement) {
 		dom := e.DOM
 
@@ -93,15 +124,50 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 
 	col.OnResponse(func(r *colly.Response) {
+		log.Trace().Msgf("URL: %v\nNonce: %v\nSig: %v", r.Request.URL.String(), r.Request.Headers.Get("X-Request-Nonce"), r.Request.Headers.Get("X-Request-Signature"))
 
+		var pageStr string = r.Ctx.Get("page")
+		page, _ := strconv.Atoi(pageStr)
+
+		var parsedResponse SCResponse
+		err := json.Unmarshal(r.Body, &parsedResponse)
+		if err != nil {
+			log.Error().Err(err).Msgf("%v: Failed body unmarshall to json:\n%v", seName, string(r.Body))
+		}
+
+		counter := 0
+		for _, result := range parsedResponse.Items {
+			goodURL := utility.ParseURL(result.URL)
+			title := strings.ReplaceAll(result.Title, "<b>", "")
+			title = strings.ReplaceAll(title, "</b>", "")
+			desc := strings.ReplaceAll(result.Desc, "<b>", "")
+			desc = strings.ReplaceAll(desc, "</b>", "")
+
+			res := structures.Result{
+				URL:          goodURL,
+				Rank:         -1,
+				SERank:       -1,
+				SEPage:       page,
+				SEOnPageRank: counter%defaultResultsPerPage + 1,
+				Title:        title,
+				Description:  desc,
+				SearchEngine: seName,
+			}
+			if config.InsertDefaultRank {
+				res.Rank = rank.DefaultRank(res.SERank, res.SEPage, res.SEOnPageRank)
+			}
+
+			bucket.SetResult(&res, relay, options, pagesCol)
+			counter += 1
+		}
 	})
 
-	colCtx := colly.NewContext()
-	colCtx.Put("page", strconv.Itoa(1))
-	col.Request("GET", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset=0&query="+query+"&region="+locale, nil, colCtx, nil)
-	for i := 1; i < options.MaxPages; i++ {
+	var colCtx *colly.Context
+	for i := 0; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
+		//col.Request("OPTIONS", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
+		col.Wait()
 		col.Request("GET", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
 	}
 
