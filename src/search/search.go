@@ -7,6 +7,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/sourcegraph/conc"
+	"github.com/tminaorg/brzaguza/src/engines/brave"
 	"github.com/tminaorg/brzaguza/src/engines/bing"
 	"github.com/tminaorg/brzaguza/src/engines/duckduckgo"
 	"github.com/tminaorg/brzaguza/src/engines/etools"
@@ -25,6 +26,7 @@ const (
 	DuckDuckGo
 	Qwant
 	Etools
+	Brave
 	Bing
 	Startpage
 )
@@ -43,7 +45,7 @@ func PerformSearch(query string, maxPages int, visitPages bool) []structures.Res
 	query = url.QueryEscape(query)
 
 	var worker conc.WaitGroup
-	var toSearch []Engine = []Engine{Bing}
+	var toSearch []Engine = []Engine{Brave}
 	runEngines(toSearch, query, &worker, &relay, &options)
 	worker.Wait()
 
@@ -100,6 +102,11 @@ func runEngines(toSearch []Engine, query string, worker *conc.WaitGroup, relay *
 					log.Error().Err(err).Msgf("Failed searching %v", etools.SEDomain)
 				}
 			})
+		case Brave:
+			worker.Go(func() {
+				err := brave.Search(context.Background(), query, relay, options)
+				if err != nil {
+					log.Error().Err(err).Msgf("Failed searching %v", brave.SEDomain)
 		case Bing:
 			worker.Go(func() {
 				err := bing.Search(context.Background(), query, relay, options)
