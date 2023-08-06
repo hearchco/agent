@@ -63,3 +63,6 @@ SHA256 of /web/search?freshness=All&itemsCount=10&offset=10&query=something1lyim
 site/tcopy.js and site/tcopy.nice.js work perfectly.
 
 Converting the complicated JS to Golang is hard, so we just run a JS parser in `dontaskjustenjoy.go`.
+
+### Parsing
+The retrieved json results have HTML tags in them. The current way of escaping them could be improved.

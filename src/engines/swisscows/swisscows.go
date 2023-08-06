@@ -34,7 +34,7 @@ const SEDomain string = "swisscows.com"
 const seName string = "Swisscows"
 const seAPIURL string = "https://api.swisscows.com/web/search?"
 const sResCount int = 10
-const locale string = "de-CH"
+const locale string = "en-US"
 
 const defaultResultsPerPage int = 10
 
@@ -140,8 +140,11 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			goodURL := utility.ParseURL(result.URL)
 			title := strings.ReplaceAll(result.Title, "<b>", "")
 			title = strings.ReplaceAll(title, "</b>", "")
+			title = strings.ReplaceAll(title, "&amp;", "&")
 			desc := strings.ReplaceAll(result.Desc, "<b>", "")
 			desc = strings.ReplaceAll(desc, "</b>", "")
+			desc = strings.ReplaceAll(desc, "&amp;", "&")
+			//^ these are just most common, should probably add a more programatic way to do this
 
 			res := structures.Result{
 				URL:          goodURL,
@@ -167,7 +170,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 		//col.Request("OPTIONS", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
-		col.Wait()
+		//col.Wait()
 		col.Request("GET", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
 	}
 
