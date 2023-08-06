@@ -13,6 +13,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/engines/google"
 	"github.com/tminaorg/brzaguza/src/engines/mojeek"
 	"github.com/tminaorg/brzaguza/src/engines/qwant"
+	"github.com/tminaorg/brzaguza/src/engines/startpage"
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
@@ -25,6 +26,7 @@ const (
 	Qwant
 	Etools
 	Bing
+	Startpage
 )
 
 func PerformSearch(query string, maxPages int, visitPages bool) []structures.Result {
@@ -103,6 +105,11 @@ func runEngines(toSearch []Engine, query string, worker *conc.WaitGroup, relay *
 				err := bing.Search(context.Background(), query, relay, options)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", bing.SEDomain)
+		case Startpage:
+			worker.Go(func() {
+				err := startpage.Search(context.Background(), query, relay, options)
+				if err != nil {
+					log.Error().Err(err).Msgf("Failed searching %v", startpage.SEDomain)
 				}
 			})
 		}
