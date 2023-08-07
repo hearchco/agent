@@ -55,7 +55,7 @@ func setupCli() {
 			"version":       fmt.Sprintf("%v (%v@%v)", Version, GitCommit, Timestamp),
 			"config_folder": "./",
 			"config_file":   "brzaguza",
-			"log_file":      "brzaguza",
+			"log_file":      "brzaguza.log",
 			"query_string":  "banana death",
 		},
 	)
