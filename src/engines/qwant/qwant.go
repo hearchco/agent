@@ -114,6 +114,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		}
 	})
 
+	//not used
 	col.OnHTML("div[data-testid=\"sectionWeb\"] > div > div", func(e *colly.HTMLElement) {
 		//first page
 		idx := e.Index
