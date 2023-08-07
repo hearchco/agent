@@ -18,11 +18,13 @@ var (
 		globals
 
 		// flags
-		Query     string `type:"string" default:"${query_string}" env:"BRZAGUZA_QUERY" help:"Query string used for search"`
-		MaxPages  int    `type:"counter" default:"1" env:"BRZAGUZA_MAX_PAGES" help:"Number of pages to search"`
-		Visit     bool   `type:"bool" default:"false" env:"BRZAGUZA_VISIT" help:"Should results be visited"`
-		Log       string `type:"path" default:"${log_file}" env:"BRZAGUZA_LOG_FILE" help:"Log file path"`
-		Verbosity int    `type:"counter" default:"0" short:"v" env:"BRZAGUZA_VERBOSITY" help:"Log level verbosity"`
+		Query      string `type:"string" default:"${query_string}" env:"BRZAGUZA_QUERY" help:"Query string used for search"`
+		MaxPages   int    `type:"counter" default:"1" env:"BRZAGUZA_MAX_PAGES" help:"Number of pages to search"`
+		Visit      bool   `type:"bool" default:"false" env:"BRZAGUZA_VISIT" help:"Should results be visited"`
+		ConfigPath string `type:"path" default:"${config_folder}" env:"BRZAGUZA_CONFIG_FOLDER" help:"Config folder path"`
+		Config     string `type:"string" default:"${config_file}" env:"BRZAGUZA_CONFIG_FILE" help:"Config file name"`
+		Log        string `type:"path" default:"${log_file}" env:"BRZAGUZA_LOG_FILE" help:"Log file name"`
+		Verbosity  int    `type:"counter" default:"0" short:"v" env:"BRZAGUZA_VERBOSITY" help:"Log level verbosity"`
 	}
 )
 
@@ -50,9 +52,11 @@ func setupCli() {
 			Compact: true,
 		}),
 		kong.Vars{
-			"version":      fmt.Sprintf("%v (%v@%v)", Version, GitCommit, Timestamp),
-			"log_file":     "brzaguza.log",
-			"query_string": "cars for sale in Toronto, Canada",
+			"version":       fmt.Sprintf("%v (%v@%v)", Version, GitCommit, Timestamp),
+			"config_folder": "./",
+			"config_file":   "brzaguza",
+			"log_file":      "brzaguza",
+			"query_string":  "banana death",
 		},
 	)
 

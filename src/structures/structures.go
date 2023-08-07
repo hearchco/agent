@@ -53,3 +53,17 @@ type ByRank []Result
 func (r ByRank) Len() int           { return len(r) }
 func (r ByRank) Swap(i, j int)      { r[i], r[j] = r[j], r[i] }
 func (r ByRank) Less(i, j int) bool { return r[i].Rank < r[j].Rank }
+
+type Engine string
+
+const (
+	Google     Engine = "google"
+	Mojeek     Engine = "mojeek"
+	DuckDuckGo Engine = "duckduckgo"
+	Qwant      Engine = "qwant"
+	Etools     Engine = "etools"
+	Swisscows  Engine = "swisscows"
+	Brave      Engine = "brave"
+	Bing       Engine = "bing"
+	Startpage  Engine = "startpage"
+)
