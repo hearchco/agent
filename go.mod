@@ -11,6 +11,11 @@ require (
 )
 
 require (
+	github.com/robertkrimen/otto v0.2.1 // indirect
+	gopkg.in/sourcemap.v1 v1.0.5 // indirect
+)
+
+require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/PuerkitoBio/goquery v1.8.1 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect

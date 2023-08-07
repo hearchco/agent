@@ -1,4 +1,4 @@
-package mojeek
+package bing
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/rank"
@@ -14,10 +15,10 @@ import (
 	"github.com/tminaorg/brzaguza/src/utility"
 )
 
-const SEDomain string = "www.mojeek.com"
+const SEDomain string = "www.bing.com"
 
-const seName string = "Mojeek"
-const seURL string = "https://www.mojeek.com/search?q="
+const seName string = "Bing"
+const seURL string = "https://www.bing.com/search?q="
 const resPerPage int = 10
 
 func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
@@ -40,23 +41,29 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 	var pageRankCounter []int = make([]int, options.MaxPages*resPerPage)
 
-	col.OnHTML("ul.results-standard > li", func(e *colly.HTMLElement) {
+	col.OnHTML("ol#b_results > li.b_algo", func(e *colly.HTMLElement) {
 		dom := e.DOM
 
-		titleEl := dom.Find("h2 > a.title")
-		linkHref, _ := titleEl.Attr("href")
+		linkHref, _ := dom.Find("h2 > a").Attr("href")
 		linkText := utility.ParseURL(linkHref)
-		titleText := strings.TrimSpace(titleEl.Text())
-		descText := strings.TrimSpace(dom.Find("p.s").Text())
+		titleText := strings.TrimSpace(dom.Find("h2 > a").Text())
+		descText := strings.TrimSpace(dom.Find("div.b_caption").Text())
 
 		if linkText != "" && linkText != "#" && titleText != "" {
+			if descText == "" {
+				descText = strings.TrimSpace(dom.Find("p.b_algoSlug").Text())
+			}
+			if strings.Contains(descText, "Web") {
+				descText = strings.Split(descText, "Web")[1]
+			}
+
 			var pageStr string = e.Request.Ctx.Get("page")
 			page, _ := strconv.Atoi(pageStr)
 
 			res := structures.Result{
 				URL:          linkText,
 				Rank:         -1,
-				SERank:       (page-1)*resPerPage + pageRankCounter[page] + 1,
+				SERank:       -1,
 				SEPage:       page,
 				SEOnPageRank: pageRankCounter[page] + 1,
 				Title:        titleText,
@@ -69,6 +76,8 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			pageRankCounter[page]++
 
 			bucket.SetResult(&res, relay, options, pagesCol)
+		} else {
+			log.Trace().Msgf("%v: Matched Result, but couldn't retrieve data.\nURL:%v\nTitle:%v\nDescription:%v", seName, linkText, titleText, descText)
 		}
 	})
 
@@ -78,7 +87,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		col.Request("GET", seURL+query+"&s="+strconv.Itoa(i*10+1), nil, colCtx, nil)
+		col.Request("GET", seURL+query+"&first="+strconv.Itoa(i*10+1), nil, colCtx, nil)
 	}
 
 	col.Wait()

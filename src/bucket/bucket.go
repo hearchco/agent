@@ -17,6 +17,7 @@ func SetResult(result *structures.Result, relay *structures.Relay, options *stru
 		relay.ResultMap[result.URL] = result
 	} else if len(mapRes.Description) < len(result.Description) {
 		mapRes.Description = result.Description
+		//log.Trace().Msgf("%v: Extended Description -> %v: %v", result.SearchEngine, result.Title, result.URL)
 	}
 	relay.Mutex.Unlock()
 

@@ -1,4 +1,4 @@
-package mojeek
+package brave
 
 import (
 	"context"
@@ -14,11 +14,11 @@ import (
 	"github.com/tminaorg/brzaguza/src/utility"
 )
 
-const SEDomain string = "www.mojeek.com"
+const SEDomain string = "search.brave.com"
 
-const seName string = "Mojeek"
-const seURL string = "https://www.mojeek.com/search?q="
-const resPerPage int = 10
+const seName string = "Brave"
+const seURL string = "https://search.brave.com/search?q="
+const resPerPage int = 20
 
 func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
 	if err := sedefaults.FunctionPrepare(seName, options, &ctx); err != nil {
@@ -40,23 +40,29 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 	var pageRankCounter []int = make([]int, options.MaxPages*resPerPage)
 
-	col.OnHTML("ul.results-standard > li", func(e *colly.HTMLElement) {
+	col.OnHTML("div#results > div[class*=\"snippet fdb\"][data-type=\"web\"]", func(e *colly.HTMLElement) {
 		dom := e.DOM
 
-		titleEl := dom.Find("h2 > a.title")
-		linkHref, _ := titleEl.Attr("href")
+		linkHref, _ := dom.Find("a.result-header").Attr("href")
 		linkText := utility.ParseURL(linkHref)
-		titleText := strings.TrimSpace(titleEl.Text())
-		descText := strings.TrimSpace(dom.Find("p.s").Text())
+		titleText := strings.TrimSpace(dom.Find("a.result-header > span.snippet-title").Text())
+		descText := strings.TrimSpace(dom.Find("div.snippet-content > p.snippet-description").Text())
 
 		if linkText != "" && linkText != "#" && titleText != "" {
+			if descText == "" {
+				descText = strings.TrimSpace(dom.Find("div.product > div.flex-hcenter > div > div[class=\"text-sm text-gray\"]").Text())
+			}
+			if descText == "" {
+				descText = strings.TrimSpace(dom.Find("p.snippet-description").Text())
+			}
+
 			var pageStr string = e.Request.Ctx.Get("page")
 			page, _ := strconv.Atoi(pageStr)
 
 			res := structures.Result{
 				URL:          linkText,
 				Rank:         -1,
-				SERank:       (page-1)*resPerPage + pageRankCounter[page] + 1,
+				SERank:       -1,
 				SEPage:       page,
 				SEOnPageRank: pageRankCounter[page] + 1,
 				Title:        titleText,
@@ -74,11 +80,11 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
-	col.Request("GET", seURL+query, nil, colCtx, nil)
+	col.Request("GET", seURL+query+"&source=web", nil, colCtx, nil)
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		col.Request("GET", seURL+query+"&s="+strconv.Itoa(i*10+1), nil, colCtx, nil)
+		col.Request("GET", seURL+query+"&spellcheck=0&offset="+strconv.Itoa(i), nil, colCtx, nil)
 	}
 
 	col.Wait()
