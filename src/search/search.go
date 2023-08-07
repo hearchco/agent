@@ -7,15 +7,15 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/sourcegraph/conc"
-	"github.com/tminaorg/brzaguza/src/engines/brave"
 	"github.com/tminaorg/brzaguza/src/engines/bing"
+	"github.com/tminaorg/brzaguza/src/engines/brave"
 	"github.com/tminaorg/brzaguza/src/engines/duckduckgo"
 	"github.com/tminaorg/brzaguza/src/engines/etools"
 	"github.com/tminaorg/brzaguza/src/engines/google"
 	"github.com/tminaorg/brzaguza/src/engines/mojeek"
 	"github.com/tminaorg/brzaguza/src/engines/qwant"
-	"github.com/tminaorg/brzaguza/src/engines/swisscows"
 	"github.com/tminaorg/brzaguza/src/engines/startpage"
+	"github.com/tminaorg/brzaguza/src/engines/swisscows"
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
@@ -109,16 +109,22 @@ func runEngines(toSearch []Engine, query string, worker *conc.WaitGroup, relay *
 				err := swisscows.Search(context.Background(), query, relay, options)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", swisscows.SEDomain)
+				}
+			})
 		case Brave:
 			worker.Go(func() {
 				err := brave.Search(context.Background(), query, relay, options)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", brave.SEDomain)
+				}
+			})
 		case Bing:
 			worker.Go(func() {
 				err := bing.Search(context.Background(), query, relay, options)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", bing.SEDomain)
+				}
+			})
 		case Startpage:
 			worker.Go(func() {
 				err := startpage.Search(context.Background(), query, relay, options)

@@ -28,3 +28,5 @@ brzaguza.log
 src/engines/yandex/site/*
 src/engines/etools/site/*
 src/engines/swisscows/site/*
+
+logdump/*.html
