@@ -1,0 +1,2517 @@
+<!DOCTYPE html>
+<html class="no-js " lang="en-us">
+  <head>
+        
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="robots" content="noindex,nofollow">
+    <meta name="description" content="Search the web privately ...">
+    <meta property="og:title" content="Brave Search">
+    <meta property="og:description"  content="Search the web privately ...">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://search.brave.com/">
+    <meta property="og:locale" content="en-us">
+    <meta property="og:image" content="https://cdn.search.brave.com/serp/v1/static/brand/0afc6092b0fe05d8a9414d0b27ee3749523d824099384649a75b6a4c22d1cf54-ogImg.png" />
+    <meta property="og:image:width" content="307" />
+    <meta property="og:image:height" content="291" />
+    <meta property="og:site_name" content="Brave Search">
+    <meta name="keywords" content="brave, search">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="msapplication-TileColor" content="#da532c">
+          <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F9FAFD" />
+      <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1A1C23" />
+            <link rel="search" type="application/opensearchdescription+xml" title="Brave Search" href="https://cdn.search.brave.com/serp/v1/static/brand/1abed3d27215094c00f2b8b240ce9ecf9c86e1d4081ab9eac8959ba57b5c8318-opensearch.xml">
+        <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.search.brave.com/serp/v1/static/brand/8eabe183f0d1f2cb3e2916b7b20c310efd196d740c8cecd341732fcd396fb665-apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.search.brave.com/serp/v1/static/brand/16c26cd189da3f0f7ba4e55a584ddde6a7853c9cc340ff9f381afc6cb18e9a1e-favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.search.brave.com/serp/v1/static/brand/9b3cd14668935362449eebb1854f575091a1169bf51aba6a8c17b39f64a9d07e-favicon-16x16.png">
+    <link rel="manifest" crossorigin="anonymous" href="https://cdn.search.brave.com/serp/v1/static/brand/76c2eb434b6bb7c0a14d0769cb059c45b92a0076ce585ce47b024edff641d98d-site-webmanifest">
+    <link rel="mask-icon" href="https://cdn.search.brave.com/serp/v1/static/brand/dec70f98955eb6e2c347d2467f82672502d1348d40e0d40e1f7e2bab0d857708-safari-pinned-tab.svg">
+    <link href="https://cdn.search.brave.com" rel="preconnect" crossorigin="anonymous"/>
+    <link href="https://imgs.search.brave.com" rel="preconnect" crossorigin="anonymous"/>
+    <link href="https://tiles.search.brave.com" rel="preconnect" crossorigin="anonymous"/>
+    <link rel="preload" href="https://cdn.search.brave.com/serp/v1/static/fonts/poppins/62f952cd4056978a484c60e45d085979c975ab7fc2dff352e5bfe7479976aaeb-latin-normal-400.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="https://cdn.search.brave.com/serp/v1/static/fonts/poppins/83732ba1336a6eb212ff82ef2cedeaf0a157b91e5990153f732e1b6378685165-latin-normal-500.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a4d6bfcfe61641b5155affac466a844f84fe11ba88db396cd6b8f8bcb927f0a-latin-normal-400.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a4d6bfcfe61641b5155affac466a844f84fe11ba88db396cd6b8f8bcb927f0a-latin-normal-500.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <link rel="preload" href="https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a4d6bfcfe61641b5155affac466a844f84fe11ba88db396cd6b8f8bcb927f0a-latin-normal-600.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+    <title>a whole different query - Brave Search</title>
+    <style type="text/css">
+      /* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 100;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/c650f535721033ca5afa9c68a5c1bd70637028c2e0b0f8ebcff2fdce11573bd2-devanagari-italic-100.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 100;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/47e6236135e78708022a5f5bd7f56f4aaab5e35f43d97ba33aad6c1b37103749-latin-ext-italic-100.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 100;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/722bc07f9d6a783d4a62b663269d40428799edb2843224ecd487e4c588d15e15-latin-italic-100.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 200;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/0e64cf498a4867f9b7cf153fb9d8569ff0bd089392d14e89a5f5f4e84759119a-devanagari-italic-200.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 200;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/4b35a38e5a4485723a28724a8917c6171ecb080fca13a03f5adaf4cc5c5d15cd-latin-ext-italic-200.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 200;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/b5a0288aab72ac189e6c2fa2bc7232cb387823c25b448dafd190cb796d8b841d-latin-italic-200.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 300;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/1c78c9001d478b352b05b40e4bc29848c7f7f9255894658a413eeb5e5be76c2a-devanagari-italic-300.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 300;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/0cd63c58561c6b1da8fee3cbd658db8de2ecb7b8d01e15f4e8f10e3eeb569dc7-latin-ext-italic-300.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 300;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/72f7772bbd1553050e9f9fac7743e738d8198a66db22e25081d34df57742915a-latin-italic-300.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 400;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/5adce0af2fcf1dd7bc3d10524723348e340821e4ab16c5f9ec7dcd6dbdd19a16-devanagari-italic-400.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 400;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/d56b6e88fb17b5ced63d62c86312d3206a7d7b81977bb140d8ebeeb746ee8673-latin-ext-italic-400.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 400;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/1e4089579c06162025fc17d05480632f6b5474d319e561b09f93bbb788c3b6c4-latin-italic-400.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 500;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/90e703554a31d972fcec1361a09e9ecd00131bdbb4882f428744bb9d7ea4b69e-devanagari-italic-500.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 500;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/9feb91da2e41fc87de0e31102951d448b2a49de63f31eb341bb1561e80c6197a-latin-ext-italic-500.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 500;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/f8fe6ea265fd2573db30ea96f1c45e687346590bf8c148ad5fe1bae5233344b3-latin-italic-500.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 600;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/3feeceb6c3f109112b82c50e66b7ed00f9a0cb56f91626e0bde54d50f5fe49a1-devanagari-italic-600.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 600;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/fa18ad37ca04766d110454522e78b29da1c97d10be0b97b825199519ea709210-latin-ext-italic-600.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 600;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/fcc143967de11f77b052abef863f3ba51965d220b64b194d87c027280cbc3a12-latin-italic-600.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 700;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/4f5e7c85c54a5d8cbf1b77a2644ac4f61ed45eb544016e295751fa7a8d72b8ed-devanagari-italic-700.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 700;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/0095e6b776ea71d89a0cb86b5a898385535a89a7c591c21a332d92051ed0c85d-latin-ext-italic-700.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 700;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/715fb7e969638157269e2997e375101ac1faaecc5cbc7108135593147b9de361-latin-italic-700.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 800;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/269697e9d7fdcff81d4a3c0d4976f7c0e368b8515c2d343ebf915e8835428ab5-devanagari-italic-800.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 800;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/134252ee3a260848c1d5c1b3b2ca033e29e007022eacfed8c4e5a7ef33476c13-latin-ext-italic-800.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 800;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/7dfa53cdc4842b1f401893c57ba451f586960b91deae9cd35172a9bfbb220632-latin-italic-800.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 900;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/42bdb6bd6ef6d30243d54aededb8aef1b9aa8265345d7e041acc4da72bbf1b2b-devanagari-italic-900.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 900;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/b40572e22754a4adf3a4df9c15ca25e4980434ed1416e4bee1986c542930023f-latin-ext-italic-900.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: italic;
+    font-weight: 900;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/5c2dfc580fb4e7cf830bb1761c722d6d6366dd5a48073d5441ef4bba22c89fd6-latin-italic-900.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 100;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/f12c08abd174b73f0af1c314c645105bb17a7a6e6eae7fef01d39180aae6666d-devanagari-normal-100.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 100;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/2dc3fee289862517ed4fadc7bdd862d113bf9867b0e3947dc3221a7227659df8-latin-ext-normal-100.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 100;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/3241ffd729339a74b4cfc65e4f28317f3e206c66cd78814a184c1b48f6e83f05-latin-normal-100.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 200;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/0ce849a4d4b9cbad38014a71db2493650f57f4c8a424e69435fded3896229f23-devanagari-normal-200.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 200;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/f3e5e5a5ef39accd8a4ae3767dbcc8636078008f6c021a37852de4ee1ab0f757-latin-ext-normal-200.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 200;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/c7c673276ca86d3abf047cd0a09445d54f6aa08a538064bd7d2986e0461d788a-latin-normal-200.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 300;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/2faf467ad260b89a4f37c47d7e30eb76d7c091d1a008b7632d6fe699819c3490-devanagari-normal-300.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 300;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/c329f6898705dbfe94e824b6339e9a9a9e3222b6cb9bc31d9a36a5cdaa1e1a78-latin-ext-normal-300.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 300;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/52aa7ab9afecb948d53d6e4344d1f26f026afc1dfc5b9a42f8a02b355dc093e2-latin-normal-300.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 400;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/638a41dff8c7f8792fd523f1117001da8e88c5af8e7275adb3ea1c0d84e0c4c9-devanagari-normal-400.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 400;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/3d3ee9fff0c0638d6be371b340998add5db736ee819002304994825f60e2f79d-latin-ext-normal-400.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 400;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/62f952cd4056978a484c60e45d085979c975ab7fc2dff352e5bfe7479976aaeb-latin-normal-400.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 500;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/899bf34c628fc9520a49fc279c0a748d122ba0b4afdf490be8d8594defc0bdcf-devanagari-normal-500.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 500;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/7adedff536bdab6118c96051ba1860a08dd4aeb02596c947778ad997f53af377-latin-ext-normal-500.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 500;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/83732ba1336a6eb212ff82ef2cedeaf0a157b91e5990153f732e1b6378685165-latin-normal-500.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 600;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/0d002b3cb2bd9e954d9b3d5dc4c29057d800a07a57651a3e6a72b2324fc4dad6-devanagari-normal-600.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 600;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/f0a1fda3988f2e339e5d95671fc7a0b36d60d6257a711e334c478c96a3f63189-latin-ext-normal-600.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 600;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/39a7b74b934c298b66d1a04bd2c9518401fcaff19a95997109491862214e8bf5-latin-normal-600.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 700;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/f7a2b834106fcdfe41da37c4fb2d076403fe7a18f23119d467cb06af63c175ea-devanagari-normal-700.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 700;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/1303cbb760e15d2ee5d5e6e8fbb14cd8a4927f9b06aea0afa484d2d8cb08ffd9-latin-ext-normal-700.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 700;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/dac21f906a1d3b3b9db54983de7d598a2bc0d49f9ae84f23073c2e7f9faf1e7d-latin-normal-700.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 800;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/3a35fcf7505e0be53bd08a58e679959329ee7feca1fd913c92a055495ba16c65-devanagari-normal-800.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 800;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/94ecb4abaae6a45d145d796a8b2dba2b905cbd73682f9365211fc3ee3f5da738-latin-ext-normal-800.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 800;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/f7e0073b780cf927f4481aca2a8dc34a8336b22313bb974c505b7ab23c4412f5-latin-normal-800.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* devanagari */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 900;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/4ff16e3bcc969a5ba05851873de1fcee4120bd43ce9f3f3269f2dcd4ba697894-devanagari-normal-900.woff2") format("woff2");
+    unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 900;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/3832fea63294e1a168992314bd8b8f62c679a0cdc62753f0277dfe973af371ea-latin-ext-normal-900.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Poppins";
+    font-style: normal;
+    font-weight: 900;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/poppins/460782f9a0fe02f1aee8eca2ff5a0891a3d758b81950db9f066735b2c7e750ff-latin-normal-900.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 200;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/85b39e2274ec3893248b07fd65c8d561e85c4d1163a9cc4eea94cfa557864c9e-cyrillic-ext-normal-200.woff2") format("woff2");
+    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 200;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/8e18f9afd16b14d25727ebd53881d7f727cb202eaeac6bef7f2168ec5d2ec470-cyrillic-normal-200.woff2") format("woff2");
+    unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 200;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/a110f1c3caca1bc53e5b7e51f33da596ac2faf7ffba34d2c209122c8fdb75e28-greek-normal-200.woff2") format("woff2");
+    unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 200;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a24dc8345fc1e0b77afb130165aeddc9d4644681fd02161e569061d6bf27da6-vietnamese-normal-200.woff2") format("woff2");
+    unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 200;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/9c30612563bb1de5c55a33d94eaee47efba80644d1f91607841629b40134c73d-latin-ext-normal-200.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 200;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a4d6bfcfe61641b5155affac466a844f84fe11ba88db396cd6b8f8bcb927f0a-latin-normal-200.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 300;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/85b39e2274ec3893248b07fd65c8d561e85c4d1163a9cc4eea94cfa557864c9e-cyrillic-ext-normal-300.woff2") format("woff2");
+    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 300;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/8e18f9afd16b14d25727ebd53881d7f727cb202eaeac6bef7f2168ec5d2ec470-cyrillic-normal-300.woff2") format("woff2");
+    unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 300;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/a110f1c3caca1bc53e5b7e51f33da596ac2faf7ffba34d2c209122c8fdb75e28-greek-normal-300.woff2") format("woff2");
+    unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 300;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a24dc8345fc1e0b77afb130165aeddc9d4644681fd02161e569061d6bf27da6-vietnamese-normal-300.woff2") format("woff2");
+    unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 300;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/9c30612563bb1de5c55a33d94eaee47efba80644d1f91607841629b40134c73d-latin-ext-normal-300.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 300;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a4d6bfcfe61641b5155affac466a844f84fe11ba88db396cd6b8f8bcb927f0a-latin-normal-300.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 400;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/85b39e2274ec3893248b07fd65c8d561e85c4d1163a9cc4eea94cfa557864c9e-cyrillic-ext-normal-400.woff2") format("woff2");
+    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 400;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/8e18f9afd16b14d25727ebd53881d7f727cb202eaeac6bef7f2168ec5d2ec470-cyrillic-normal-400.woff2") format("woff2");
+    unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 400;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/a110f1c3caca1bc53e5b7e51f33da596ac2faf7ffba34d2c209122c8fdb75e28-greek-normal-400.woff2") format("woff2");
+    unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 400;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a24dc8345fc1e0b77afb130165aeddc9d4644681fd02161e569061d6bf27da6-vietnamese-normal-400.woff2") format("woff2");
+    unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 400;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/9c30612563bb1de5c55a33d94eaee47efba80644d1f91607841629b40134c73d-latin-ext-normal-400.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 400;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a4d6bfcfe61641b5155affac466a844f84fe11ba88db396cd6b8f8bcb927f0a-latin-normal-400.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 500;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/85b39e2274ec3893248b07fd65c8d561e85c4d1163a9cc4eea94cfa557864c9e-cyrillic-ext-normal-500.woff2") format("woff2");
+    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 500;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/8e18f9afd16b14d25727ebd53881d7f727cb202eaeac6bef7f2168ec5d2ec470-cyrillic-normal-500.woff2") format("woff2");
+    unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 500;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/a110f1c3caca1bc53e5b7e51f33da596ac2faf7ffba34d2c209122c8fdb75e28-greek-normal-500.woff2") format("woff2");
+    unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 500;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a24dc8345fc1e0b77afb130165aeddc9d4644681fd02161e569061d6bf27da6-vietnamese-normal-500.woff2") format("woff2");
+    unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 500;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/9c30612563bb1de5c55a33d94eaee47efba80644d1f91607841629b40134c73d-latin-ext-normal-500.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 500;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a4d6bfcfe61641b5155affac466a844f84fe11ba88db396cd6b8f8bcb927f0a-latin-normal-500.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 600;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/85b39e2274ec3893248b07fd65c8d561e85c4d1163a9cc4eea94cfa557864c9e-cyrillic-ext-normal-600.woff2") format("woff2");
+    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 600;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/8e18f9afd16b14d25727ebd53881d7f727cb202eaeac6bef7f2168ec5d2ec470-cyrillic-normal-600.woff2") format("woff2");
+    unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 600;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/a110f1c3caca1bc53e5b7e51f33da596ac2faf7ffba34d2c209122c8fdb75e28-greek-normal-600.woff2") format("woff2");
+    unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 600;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a24dc8345fc1e0b77afb130165aeddc9d4644681fd02161e569061d6bf27da6-vietnamese-normal-600.woff2") format("woff2");
+    unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 600;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/9c30612563bb1de5c55a33d94eaee47efba80644d1f91607841629b40134c73d-latin-ext-normal-600.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 600;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a4d6bfcfe61641b5155affac466a844f84fe11ba88db396cd6b8f8bcb927f0a-latin-normal-600.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 700;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/85b39e2274ec3893248b07fd65c8d561e85c4d1163a9cc4eea94cfa557864c9e-cyrillic-ext-normal-700.woff2") format("woff2");
+    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 700;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/8e18f9afd16b14d25727ebd53881d7f727cb202eaeac6bef7f2168ec5d2ec470-cyrillic-normal-700.woff2") format("woff2");
+    unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 700;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/a110f1c3caca1bc53e5b7e51f33da596ac2faf7ffba34d2c209122c8fdb75e28-greek-normal-700.woff2") format("woff2");
+    unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 700;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a24dc8345fc1e0b77afb130165aeddc9d4644681fd02161e569061d6bf27da6-vietnamese-normal-700.woff2") format("woff2");
+    unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 700;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/9c30612563bb1de5c55a33d94eaee47efba80644d1f91607841629b40134c73d-latin-ext-normal-700.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 700;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a4d6bfcfe61641b5155affac466a844f84fe11ba88db396cd6b8f8bcb927f0a-latin-normal-700.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 800;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/85b39e2274ec3893248b07fd65c8d561e85c4d1163a9cc4eea94cfa557864c9e-cyrillic-ext-normal-800.woff2") format("woff2");
+    unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 800;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/8e18f9afd16b14d25727ebd53881d7f727cb202eaeac6bef7f2168ec5d2ec470-cyrillic-normal-800.woff2") format("woff2");
+    unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 800;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/a110f1c3caca1bc53e5b7e51f33da596ac2faf7ffba34d2c209122c8fdb75e28-greek-normal-800.woff2") format("woff2");
+    unicode-range: U+0370-03FF;
+}
+/* vietnamese */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 800;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a24dc8345fc1e0b77afb130165aeddc9d4644681fd02161e569061d6bf27da6-vietnamese-normal-800.woff2") format("woff2");
+    unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 800;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/9c30612563bb1de5c55a33d94eaee47efba80644d1f91607841629b40134c73d-latin-ext-normal-800.woff2") format("woff2");
+    unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 800;
+    font-display: optional;
+    src: url("https://cdn.search.brave.com/serp/v1/static/fonts/manrope/2a4d6bfcfe61641b5155affac466a844f84fe11ba88db396cd6b8f8bcb927f0a-latin-normal-800.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}    </style>
+
+    <style type="text/css">
+      html {
+        font-size: 20px;
+      }
+      :root,
+::backdrop {
+  /* Fonts */
+  --brand-font: "Poppins", Helvetica, sans-serif;
+  --main-font: "Manrope", Helvetica, sans-serif;
+  --mono-font: Consolas, Menlo, Monaco, monospace;
+  --system-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+  /* Containers */
+  --main-column-width: 632px;
+  --normal-snippet-width: 600px;
+  --search-form-width: 700px;
+  --search-form-height: 45px;
+
+  /* TODO: Paddings, Margins */
+  --main-content-padding: 175px;
+  --border-radius-xlarge: 16px;
+  --border-radius-large: 12px;
+  --border-radius: 8px;
+  --border-radius-sm: 4px;
+  --border-radius-xs: 2px;
+  --border-radius-0: 0px;
+  --rh-result-padding: 1rem;
+  --base-padding: 16px;
+
+  /* text */
+  --text-sm: 0.66rem;
+  --text-sm-2: 12px;
+  --text-xs: 11px;
+
+  /* blur */
+  --blur: blur(4px);
+
+  /* effects */
+  --elevation-07: 0px 8px 40px -8px rgba(0, 0, 0, 0.2),
+    0px 2.75px 9px rgba(0, 0, 0, 0.02);
+}          </style>
+
+        <style type="text/css">
+      :root,
+      ::backdrop {
+        color-scheme: light;
+        /* colors */
+--body-bg: #F2F4F7;
+--bg-glassy: #ffffffb3;
+--bg-1: #EBEEF3;
+--bg-2: #e5e5e5;
+--bg-02: #F8F9FA; /* this is the 02 color from the Brave Design System */
+--bg-04: #F2F4F7;
+--bg-green: #a7f0ba;
+--bg-blue: #d0e2ff;
+--bg-red: #ffd6e8;
+--bg-favicon: var(--search-bgd-04);
+--bg-scrim: rgba(34, 37, 49, 0.40);
+
+--bg-form-control-selected: #E1E2F6;
+--bg-form-control-unselected: #DADCE8;
+--form-control-selected: #4C54D2;
+--form-control-hover: #4C54D2;
+--form-control-focus: #A0A5EB;
+
+/**
+* Search widget styles
+*/
+
+/**
+* Settings drawer styles
+*/
+--settings-header-bg: #FFFFFF;
+--settings-header-text: #222531;
+--settings-header-icon: #222531;
+--settings-widget-text: #808A9D;
+--settings-item-text: #3F4C63;
+--settings-item-icon: #A1A5E4;
+--settings-item-border: #EFF2F5;
+--settings-item-border-2: #D8DFE8;
+--settings-dark-theme-btn: #343A40;
+--settings-btn-bg: rgba(225, 226, 246, 0.5);
+--settings-btn-text: #4C54D2;
+--settings-widget-outline: #C7CFDC;
+--settings-independent-score: #4C54D2;
+--settings-global-score: #F1724A;
+--brave-supporter-bg: #EAEEF4;
+--brave-supporter-text: #2267BE;
+
+--context-menu-header-border: #E6E8F5;
+
+--color-primary: #27292f;
+--color-primary-2: #0D0C10;
+--color-primary-3: #212529; /* this variable should go away */
+--color-white: #ffffff;
+--color-gray-2: #828d9f;
+--color-gray-3: #58667E;
+--color-gray-4: #5A626D;
+--color-gray-5: #7E8790; /* this variable should go away */
+--color-gray-6: #CFD6E4;
+--color-green: #0f9d58;
+--color-red: #d23f31;
+--color-blue: #0043ce;
+--info-color: #828D9F; /* Temporary variable name */
+
+--link-primary: #1841d2;
+--link-secondary: #3861FB;
+--link-visited: #9C86F5;
+--snippet-url: #A6B0C3; /* Temporary variable name */
+
+--separator-dot: #A6B0C3;
+
+/* THEME NEW */
+--theme-purple: #4C54D2;
+--theme-yellow: #F8BE2D;
+
+/* Borders related */
+--border-color: #E2E8ED;
+
+/* Brave UI Design System */
+--text-01: #212529;
+--text-02: #495057;
+--text-03: #868E96;
+--interactive-04: #353DAB;
+--interactive-05: #4C54D2;
+--interactive-06: #737ADE;
+--interactive-07: #212529;
+--interactive-08: #AEB1C2;
+--focus-border: #A0A5EB;
+--divider-01: #E9E9F4;
+--disabled: #DADCE8;
+
+/* Brave UI Design System Derivatives */
+--btn-filled-bg: var(--interactive-05);
+--btn-filled-bg-hover: var(--interactive-04);
+--btn-filled-text-active: rgba(255, 255, 255, 0.7);
+--btn-filled-bg-active: rgba(53, 61, 171, 0.7);
+--btn-filled-text-disabled: #ffff;
+
+--btn-outline-border: var(--interactive-08);
+--btn-outline-border-hover: var(--interactive-05);
+--btn-outline-text: var(--interactive-07);
+--btn-outline-text-hover: var(--interactive-05);
+--btn-outline-text-active: rgba(76, 84, 210, 0.7);
+--btn-outline-border-active: rgba(76, 84, 210, 0.7);
+--btn-outline-text-disabled: #C2C4CF;
+
+--btn-icon-svg-hover: var(--interactive-05);
+--btn-icon-bg-hover: rgba(160, 165, 235, 0.16);
+--btn-icon-svg-active: rgba(76, 84, 210, 0.7);
+
+/* CODE SNIPPETS THEME */
+--code-bg-0: #F8FAFD;
+--code-border: #EFF2F5;
+--code-color-1: #96979D;
+--code-color-2: #58667E;
+--code-color-3: #49964B;
+--code-color-4: #127DB2;
+--code-color-5: #9D2E99;
+
+/* SHADOWS */
+--shadow-1: 0 1px 1px 0 rgba(66, 66, 66, 0.08), 0 1px 3px 1px rgba(66, 66, 66, 0.16);
+--shadow-2: 0 1px 6px rgba(32, 33, 36, 0.28);
+
+/* New Color Scheme */
+--search-bgd-01: #E3E5EA;
+--search-bgd-02: #F2F4F7;
+--search-bgd-03: #F9FAFD;
+--search-bgd-04: #FFFFFF;
+--search-bgd-05: #ECEEF2;
+--search-bgd-06: #FFFFFF;
+--search-bgd-07: #F9FAFD;
+--search-bgd-08: #1E2028;
+--search-line-01: #ECEEF2;
+--search-line-02: #AFB3C1;
+--search-text-01: #242731;
+--search-text-02: #333744;
+--search-text-03: #434756;
+--search-text-04: #636876;
+--search-text-05: #7E8292;
+--search-text-06: #9599A9;
+--search-text-09: #087783;
+--search-text-10: #EA3A0D;
+--search-interactive-01: #1841D2;
+--search-interactive-02: #7431DD;
+--search-interactive-03: #6318F5;
+--search-interactive-04: #3861FB;
+--search-interactive-05: #A0A5EB;
+
+/* Leo Design system colors */
+--gray-30: #E2E3E7;
+--gray-60: #8C90A1;
+--gray-90: #424552;
+--gray-110: #1D1F25;
+--gray-120: #121316;
+--green-40: #31803E;
+
+--secondary-90: #2B34AD;      }
+
+      @media (prefers-color-scheme: light) {
+        :root:not(.dark) .theme--dark {
+          display: none !important;
+        }
+      }
+
+      :root.light .theme--dark {
+        display: none !important;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not(.light),
+        :not(.light) ::backdrop {
+          color-scheme: dark;
+          /* colors */
+--body-bg: #1E2028;
+--bg-glassy: #1A1C23;
+--bg-1: #313543;
+--bg-2: #282828;
+--bg-02: #17171F; /* this is the 02 color from the Brave Design System */
+--bg-04: #1E2027;
+--bg-green: #a7f0ba;
+--bg-blue: #d0e2ff;
+--bg-red: #ffd6e8;
+--bg-favicon: #4B5062;
+--bg-scrim: rgba(34, 37, 49, 0.6);
+
+--bg-form-control-selected: #7679B1;
+--bg-form-control-unselected: #5E6175;
+--form-control-selected: #4436E1;
+--form-control-hover: #D0D2F7;
+--form-control-focus: #A0A5EB;
+
+/**
+* Search widget styles
+*/
+
+/**
+* Settings drawer styles
+*/
+--settings-header-bg: #222531;
+--settings-header-text: #F8FAFD;
+--settings-header-icon: #808A9D;
+--settings-widget-text: #828D9F;
+--settings-item-text: #CFD6E4;
+--settings-item-icon: #A1A5E4;
+--settings-item-border: #2B3445;
+--settings-item-border-2: #3F4C63;
+--settings-dark-theme-btn: #343A40;
+--settings-btn-bg: #3A3F55;
+--settings-btn-text: #CFD6E4;
+--settings-widget-outline: #3F4C63;
+--settings-independent-score: #7078FF;
+--settings-global-score: #FF845D;
+--brave-supporter-bg: #252730;
+--brave-supporter-text: #2267BE;
+
+--context-menu-header-border: #58667E;
+
+--color-primary: #c9d4dc;
+--color-primary-2: #bcbcbc;
+--color-primary-3: #c9d4dc; /* this variable should go away */
+--color-white: #ffffff;
+--color-gray-2: #a6b0c3;
+--color-gray-3: #A6B0C3;
+--color-gray-4: #7E8790;
+--color-gray-5: #7E8790; /* this variable should go away */
+--color-gray-6: #828d9f;
+--color-green: #0f9d58;
+--color-red: #d23f31;
+--color-blue: #0043ce;
+--info-color: #828D9F; /* Temporary variable name */
+
+--link-primary: #EFF2F5;
+--link-secondary: #CFD6E4;
+--link-visited: #A0A5EB;
+--snippet-url: #6E798D; /* Temporary variable name */
+
+--separator-dot: #808a9d;
+
+/* THEME NEW */
+--theme-purple: #7675fd;
+--theme-yellow: #F8BE2D;
+
+/* Borders related */
+--border-color: #333;
+
+/* Brave UI Design System */
+--blurple-300: #A0A5EB;
+--text-01: #F8FAFD;
+--text-02: #C2C4CF;
+--text-03: #84889C;
+--interactive-04: #353DAB;
+--interactive-05: #4C54D2;
+--interactive-06: #737ADE;
+--interactive-07: #F0F2FF;
+--interactive-08: #5E6175;
+--focus-border: #555889;
+--divider-01: #3B3E4F;
+--disabled: #343A40;
+
+/* Brave UI Design System Derivatives */
+--btn-filled-bg: var(--interactive-05);
+--btn-filled-bg-hover: var(--interactive-06);
+--btn-filled-text-active: rgba(255, 255, 255, 0.7);
+--btn-filled-bg-active: rgba(115, 122, 222, 0.7);
+--btn-filled-text-disabled: #677078;
+
+--btn-outline-border: var(--interactive-08);
+--btn-outline-border-hover: var(--interactive-06);
+--btn-outline-text: var(--interactive-07);
+--btn-outline-text-hover: var(--blurple-300);
+--btn-outline-text-active: rgba(160, 165, 235, 0.7);
+--btn-outline-border-active: rgba(115, 122, 222, 0.7);
+--btn-outline-text-disabled: #495057;
+
+--btn-icon-svg-hover: var(--blurple-300);
+--btn-icon-bg-hover: rgba(160, 165, 235, 0.32);
+--btn-icon-svg-active: rgba(160, 165, 235, 0.7);
+
+/* CODE SNIPPETS THEME */
+--code-bg-0: #2F313C;
+--code-border: #22232A;
+--code-color-1: #525964;
+--code-color-2: #ACBBD5;
+--code-color-3: #7FA569;
+--code-color-4: #5198D4;
+--code-color-5: #B26AC7;
+
+/* SHADOWS */
+--shadow-1: 0 1px 1px 0 rgba(66, 66, 66, 0.08), 0 1px 3px 1px rgba(66, 66, 66, 0.16);
+--shadow-2: 0 1px 6px rgba(32, 33, 36, 0.28);
+
+/* New Color Scheme */
+--search-bgd-01: #121418;
+--search-bgd-02: #17191E;
+--search-bgd-03: #1A1C23;
+--search-bgd-04: #1E2028;
+--search-bgd-05: #242731;
+--search-bgd-06: #242731;
+--search-bgd-07: #1E2028;
+--search-bgd-08: #17191E;
+--search-line-01: #333744;
+--search-line-02: #636876;
+--search-text-01: #ECEEF2;
+--search-text-02: #C9CCD7;
+--search-text-03: #AFB3C1;
+--search-text-04: #9599A9;
+--search-text-05: #7E8292;
+--search-text-06: #636876;
+--search-text-09: #997B08;
+--search-text-10: #FB542B;
+--search-interactive-01: #7799E5;
+--search-interactive-02: #7166A9;
+--search-interactive-03: #796DB5;
+--search-interactive-04: #5483ED;
+--search-interactive-05: #A0A5EB;
+
+/* Leo Design system colors */
+--gray-30: #2E3039;
+--gray-60: #6B7084;
+--gray-90: #C6C8D0;
+--gray-110: #EEEFF1;
+--gray-120: #F6F6F7;
+--green-40: #3FA450;
+
+--secondary-90: #C3C6F0;        }
+
+        :root:not(.light) .theme--light {
+          display: none !important;
+        }
+      }
+
+      :root.dark,
+      .dark ::backdrop {
+        color-scheme: dark;
+        /* colors */
+--body-bg: #1E2028;
+--bg-glassy: #1A1C23;
+--bg-1: #313543;
+--bg-2: #282828;
+--bg-02: #17171F; /* this is the 02 color from the Brave Design System */
+--bg-04: #1E2027;
+--bg-green: #a7f0ba;
+--bg-blue: #d0e2ff;
+--bg-red: #ffd6e8;
+--bg-favicon: #4B5062;
+--bg-scrim: rgba(34, 37, 49, 0.6);
+
+--bg-form-control-selected: #7679B1;
+--bg-form-control-unselected: #5E6175;
+--form-control-selected: #4436E1;
+--form-control-hover: #D0D2F7;
+--form-control-focus: #A0A5EB;
+
+/**
+* Search widget styles
+*/
+
+/**
+* Settings drawer styles
+*/
+--settings-header-bg: #222531;
+--settings-header-text: #F8FAFD;
+--settings-header-icon: #808A9D;
+--settings-widget-text: #828D9F;
+--settings-item-text: #CFD6E4;
+--settings-item-icon: #A1A5E4;
+--settings-item-border: #2B3445;
+--settings-item-border-2: #3F4C63;
+--settings-dark-theme-btn: #343A40;
+--settings-btn-bg: #3A3F55;
+--settings-btn-text: #CFD6E4;
+--settings-widget-outline: #3F4C63;
+--settings-independent-score: #7078FF;
+--settings-global-score: #FF845D;
+--brave-supporter-bg: #252730;
+--brave-supporter-text: #2267BE;
+
+--context-menu-header-border: #58667E;
+
+--color-primary: #c9d4dc;
+--color-primary-2: #bcbcbc;
+--color-primary-3: #c9d4dc; /* this variable should go away */
+--color-white: #ffffff;
+--color-gray-2: #a6b0c3;
+--color-gray-3: #A6B0C3;
+--color-gray-4: #7E8790;
+--color-gray-5: #7E8790; /* this variable should go away */
+--color-gray-6: #828d9f;
+--color-green: #0f9d58;
+--color-red: #d23f31;
+--color-blue: #0043ce;
+--info-color: #828D9F; /* Temporary variable name */
+
+--link-primary: #EFF2F5;
+--link-secondary: #CFD6E4;
+--link-visited: #A0A5EB;
+--snippet-url: #6E798D; /* Temporary variable name */
+
+--separator-dot: #808a9d;
+
+/* THEME NEW */
+--theme-purple: #7675fd;
+--theme-yellow: #F8BE2D;
+
+/* Borders related */
+--border-color: #333;
+
+/* Brave UI Design System */
+--blurple-300: #A0A5EB;
+--text-01: #F8FAFD;
+--text-02: #C2C4CF;
+--text-03: #84889C;
+--interactive-04: #353DAB;
+--interactive-05: #4C54D2;
+--interactive-06: #737ADE;
+--interactive-07: #F0F2FF;
+--interactive-08: #5E6175;
+--focus-border: #555889;
+--divider-01: #3B3E4F;
+--disabled: #343A40;
+
+/* Brave UI Design System Derivatives */
+--btn-filled-bg: var(--interactive-05);
+--btn-filled-bg-hover: var(--interactive-06);
+--btn-filled-text-active: rgba(255, 255, 255, 0.7);
+--btn-filled-bg-active: rgba(115, 122, 222, 0.7);
+--btn-filled-text-disabled: #677078;
+
+--btn-outline-border: var(--interactive-08);
+--btn-outline-border-hover: var(--interactive-06);
+--btn-outline-text: var(--interactive-07);
+--btn-outline-text-hover: var(--blurple-300);
+--btn-outline-text-active: rgba(160, 165, 235, 0.7);
+--btn-outline-border-active: rgba(115, 122, 222, 0.7);
+--btn-outline-text-disabled: #495057;
+
+--btn-icon-svg-hover: var(--blurple-300);
+--btn-icon-bg-hover: rgba(160, 165, 235, 0.32);
+--btn-icon-svg-active: rgba(160, 165, 235, 0.7);
+
+/* CODE SNIPPETS THEME */
+--code-bg-0: #2F313C;
+--code-border: #22232A;
+--code-color-1: #525964;
+--code-color-2: #ACBBD5;
+--code-color-3: #7FA569;
+--code-color-4: #5198D4;
+--code-color-5: #B26AC7;
+
+/* SHADOWS */
+--shadow-1: 0 1px 1px 0 rgba(66, 66, 66, 0.08), 0 1px 3px 1px rgba(66, 66, 66, 0.16);
+--shadow-2: 0 1px 6px rgba(32, 33, 36, 0.28);
+
+/* New Color Scheme */
+--search-bgd-01: #121418;
+--search-bgd-02: #17191E;
+--search-bgd-03: #1A1C23;
+--search-bgd-04: #1E2028;
+--search-bgd-05: #242731;
+--search-bgd-06: #242731;
+--search-bgd-07: #1E2028;
+--search-bgd-08: #17191E;
+--search-line-01: #333744;
+--search-line-02: #636876;
+--search-text-01: #ECEEF2;
+--search-text-02: #C9CCD7;
+--search-text-03: #AFB3C1;
+--search-text-04: #9599A9;
+--search-text-05: #7E8292;
+--search-text-06: #636876;
+--search-text-09: #997B08;
+--search-text-10: #FB542B;
+--search-interactive-01: #7799E5;
+--search-interactive-02: #7166A9;
+--search-interactive-03: #796DB5;
+--search-interactive-04: #5483ED;
+--search-interactive-05: #A0A5EB;
+
+/* Leo Design system colors */
+--gray-30: #2E3039;
+--gray-60: #6B7084;
+--gray-90: #C6C8D0;
+--gray-110: #EEEFF1;
+--gray-120: #F6F6F7;
+--green-40: #3FA450;
+
+--secondary-90: #C3C6F0;      }
+
+      :root.dark .theme--light {
+        display: none !important;
+      }
+    </style>
+
+    <link rel="icon" href="https://cdn.search.brave.com/serp/v1/static/brand/d6a7857f7f3c2d5e1a55d27a8e25b39a31c4c5d093ff479aeb1b99d0faca5c71-favicon.ico">
+    <link href="https://cdn.search.brave.com/serp/v1/static/css/6cedc56d016eced794b0f6391565851f7194212341117ee82dbb5500a7246a36-spectre.min.css" rel="stylesheet" />
+<link href="https://cdn.search.brave.com/serp/v1/static/css/a94064d9a6d2a4299a0467a718537a29c408258cff323d008327199fdd1f4d76-icons.css" rel="stylesheet" />
+<link href="https://cdn.search.brave.com/serp/v1/static/css/346f1208ccab71e44cdd39cb63060c904c991ca8726e6af79c928d157573ba6d-search.css" rel="stylesheet" />
+<link href="https://cdn.search.brave.com/serp/v1/static/css/components/5b80d896e998b1bcb9c8ede3c49ccea915d9d8622e5654d5c000a4811564faf6-results.css" rel="stylesheet" />
+<link href="https://cdn.search.brave.com/serp/v1/static/serp-js/suggest/cd6def7ab41f641b3778ed873418e76c4a8e34019884efdc44c19e7948435fb3-main.bundle.css" rel="stylesheet" />
+<link href="https://cdn.search.brave.com/serp/v1/static/serp-js/sticky-header/604254e172fc15ac84af281b9ce81dbd2e5896dc1272ddd107900ec9a1a9b263-main.bundle.css" rel="stylesheet" />
+<link href="https://cdn.search.brave.com/serp/v1/static/serp-js/filters/dfbb4e10b353a9287094b6ff0c81a11b78c6d71ab5a75fe72a072bfb32fb9fb4-main.bundle.css" rel="stylesheet" />
+<link href="https://cdn.search.brave.com/serp/v1/static/serp-js/settings/a3b85650afd5146c73ad37d5f34cbfcc74ea54de06bbff48de21b1d0ce4085cd-main.bundle.css" rel="stylesheet" />
+<link href="https://cdn.search.brave.com/serp/v1/static/serp-js/feedback/cd6a4938c68a6192d1f2db42dad5c28b5807f0031f28b2a6816d72c1331360b6-main.bundle.css" rel="stylesheet" />
+<link href="https://cdn.search.brave.com/serp/v1/static/serp-js/searchElsewhere/cfc661f6f418346363cebfbaf34a5abf3a8ed57ace42a85e6e7ecb1fd27c8217-main.bundle.css" rel="stylesheet" />
+<link href="https://cdn.search.brave.com/serp/v1/static/serp-js/paid/034d2cad0827367096e02997fce4dc117a3c25b8c4d0f54e25b052d056caca36-main.bundle.css" rel="stylesheet" />
+  </head>
+
+  <body class="is-pc ">
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="height:0;position:absolute;width:0"><defs><linearGradient id="gradient02-alt" x1="16.53" x2="-.379" y1="15.918" y2="3.159" gradientUnits="userSpaceOnUse"><stop stop-color="#BF14A2"/><stop offset="1" stop-color="#F73A1C"/></linearGradient></defs></svg>
+    <div id="paid"></div>
+
+    
+
+<header id="site-header" class="navbar">
+  <!-- backdrop-filter does not seem to work properly in Firefox see: https://bugzilla.mozilla.org/show_bug.cgi?id=1591674 -->
+    <div id="search-container" class="flex">
+    <div class="flex">
+    <a id="nav-logo" href="/" class="btn btn-link">
+      <img alt="Brave logo" class="logo-large theme--dark" title="Brave Search"
+        src="https://cdn.search.brave.com/serp/v1/static/brand/373c0fe6934b2f59b99a51a3a3c2d5091535c1d19cb361ed6d110ff0c4927b58-brave-logo-light.svg" />
+      <img alt="Brave logo" class="logo-large theme--light" title="Brave Search"
+        src="https://cdn.search.brave.com/serp/v1/static/brand/d28fc5b7b2908fbaed2ee4b7a14f282c6f9821df14c5da9c5b711d6b19dcd2fd-brave-logo-dark.svg" />
+      <img alt="Brave logo" class="logo-small" title="Brave Search"
+        src="https://cdn.search.brave.com/serp/v1/static/brand/7aad80c1b58c70bab482ce1e3c4e332fba2eab52180bfca5b012b571a31d2696-brave-logo-small.svg" />
+    </a>
+    <div class="searchform-container">
+  <form class="form" action="/search" method="GET" id="searchform">
+        <span id="search-icon" class="no-display">
+      <svg width="15" height="15" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M6.57212 13.1442C2.94254 13.1442 0 10.2016 0 6.57173C0 2.94248 2.94268 0 6.57212 0C10.2016 0 13.1442 2.94248 13.1442 6.57173C13.1442 8.05658 12.6519 9.42642 11.8215 10.5269L16.3528 15.0581C16.7103 15.4156 16.7103 15.9952 16.3528 16.3527C15.9953 16.7102 15.4157 16.7102 15.0582 16.3527L10.527 11.8215C9.42657 12.6519 8.05682 13.1442 6.57212 13.1442ZM6.57212 11.2665C3.97956 11.2665 1.87775 9.16463 1.87775 6.57184C1.87775 3.97952 3.97966 1.87775 6.57212 1.87775C9.16458 1.87775 11.2665 3.97952 11.2665 6.57184C11.2665 9.16463 9.16468 11.2665 6.57212 11.2665Z" fill="#C2C4CF"/>
+      </svg>
+    </span>
+    <div class="searchbox-wrapper">
+      <input
+        id="searchbox"
+        type="text"
+        class="form-input"
+        placeholder="Search the web privately…"
+        name="q"
+        value="a whole different query"
+        autocapitalize="off"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+        aria-label="Search"
+        title="Search"
+        aria-autocomplete="both"
+        aria-haspopup="false"
+        maxlength="2048"
+              />
+    </div>
+    <input name="source" value="web" type="hidden">
+                                    <input name="" value="" type="hidden" id="goggleQueryParam">
+                <button id="submit-button" class="btn btn--filled input-group-btn">
+      <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="18" height="17" viewBox="0 0 18 17"><path fill-rule="evenodd" d="M1.6 7.336a5.736 5.736 0 1 1 11.471 0 5.736 5.736 0 0 1-11.471 0ZM7.336 0a7.336 7.336 0 1 0 4.957 12.743l3.56 3.561a.8.8 0 0 0 1.132-1.131l-3.636-3.636A7.336 7.336 0 0 0 7.335 0Z" clip-rule="evenodd"/></svg>    </button>
+      </form>
+</div>    </div>
+    <div id="settings"></div>
+  </div>
+  </header>
+<div class="" id="navbar-tabs">
+  <div class="container-80" id="nav-tabs-container">
+    
+<nav id="nav-tabs" role="navigation">
+  <ul id="primary-tabs">
+              <li class="active">
+       <a href="/search?q=a%20whole%20different%20query&source=web">
+        <span class="icon-wrapper">
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="18" height="17" viewBox="0 0 18 17"><path fill-rule="evenodd" d="M1.6 7.336a5.736 5.736 0 1 1 11.471 0 5.736 5.736 0 0 1-11.471 0ZM7.336 0a7.336 7.336 0 1 0 4.957 12.743l3.56 3.561a.8.8 0 0 0 1.132-1.131l-3.636-3.636A7.336 7.336 0 0 0 7.335 0Z" clip-rule="evenodd"/></svg>        </span>
+        <span>
+                    All
+                  </span>
+      </a>
+    </li>
+
+          <li>
+       <a href="/images?q=a%20whole%20different%20query&source=web">
+        <span class="icon-wrapper">
+          <svg class="icon" width="17" height="17" viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.492 2.093h-8a2.6 2.6 0 00-2.6 2.6v8a2.6 2.6 0 002.6 2.6h8a2.6 2.6 0 002.6-2.6v-8a2.6 2.6 0 00-2.6-2.6zm-8-1.4a4 4 0 00-4 4v8a4 4 0 004 4h8a4 4 0 004-4v-8a4 4 0 00-4-4h-8zm5.46 7.048a.7.7 0 01.514.156l2.971 2.447a.7.7 0 01-.89 1.08L10.12 9.427l-2.172 2.676a.7.7 0 01-1.001.088l-1.142-.987L4.55 12.86a.7.7 0 01-1.116-.845L5.14 9.763a.7.7 0 011.016-.107l1.16 1.003 2.162-2.663a.7.7 0 01.473-.255zM4.34 5.291a.5.5 0 111 0 .5.5 0 01-1 0zm.5-1.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"/></svg>        </span>
+        <span>
+                    Images
+                  </span>
+      </a>
+    </li>
+
+          <li>
+       <a href="/news?q=a%20whole%20different%20query&source=web">
+        <span class="icon-wrapper">
+          <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M3.55 2.75C3.55 1.23122 4.78122 0 6.3 0H12.7688C14.2875 0 15.5188 1.23122 15.5188 2.75V13.25C15.5188 14.7688 14.2875 16 12.7688 16H2.5H2V15.95C0.85888 15.7184 0 14.7095 0 13.5V6.5C0 5.11929 1.11929 4 2.5 4H3.55V2.75ZM12.7688 14.5H4.79198C4.92578 14.1938 5 13.8556 5 13.5V13H5.05V2.75C5.05 2.05964 5.60965 1.5 6.3 1.5H12.7688C13.4591 1.5 14.0188 2.05964 14.0188 2.75V13.25C14.0188 13.9404 13.4591 14.5 12.7688 14.5ZM3.5 13.5C3.5 14.0523 3.05228 14.5 2.5 14.5C1.94772 14.5 1.5 14.0523 1.5 13.5V6.5C1.5 6.12986 1.7011 5.80669 2 5.63378C2.14709 5.5487 2.31786 5.5 2.5 5.5H3.5V13.5ZM6.25 4C5.83579 4 5.5 4.33579 5.5 4.75C5.5 5.16421 5.83579 5.5 6.25 5.5H10.75C11.1642 5.5 11.5 5.16421 11.5 4.75C11.5 4.33579 11.1642 4 10.75 4H6.25ZM5.5 7.75C5.5 7.33579 5.83579 7 6.25 7H12.75C13.1642 7 13.5 7.33579 13.5 7.75C13.5 8.16421 13.1642 8.5 12.75 8.5H6.25C5.83579 8.5 5.5 8.16421 5.5 7.75ZM6.25 10C5.83579 10 5.5 10.3358 5.5 10.75C5.5 11.1642 5.83579 11.5 6.25 11.5H12.75C13.1642 11.5 13.5 11.1642 13.5 10.75C13.5 10.3358 13.1642 10 12.75 10H6.25Z" fill="currentColor"/>
+</svg>        </span>
+        <span>
+                    News
+                  </span>
+      </a>
+    </li>
+
+          <li>
+       <a href="/videos?q=a%20whole%20different%20query&source=web">
+        <span class="icon-wrapper">
+          <svg class="icon" width="16" height="17" viewBox="0 0 16 17" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.283 1.408h2.161c.2 0 .395.026.58.073L10.296 4.21H7.483l2.78-2.78a.462.462 0 00.02-.02zm-1.507 0H6.067a.544.544 0 01-.02.022l-2.78 2.78h2.708l2.8-2.802zM1.759 4.21l2.8-2.8H3.557a2.311 2.311 0 00-2.312 2.31v.49h.515zm10.046 0h2.95v-.49c0-.676-.29-1.284-.753-1.707L11.805 4.21zM1.245 5.454h13.51v7.154a2.311 2.311 0 01-2.31 2.311h-8.89a2.311 2.311 0 01-2.31-2.31V5.453zM0 3.719A3.556 3.556 0 013.556.164h8.888A3.556 3.556 0 0116 3.719v8.89a3.556 3.556 0 01-3.556 3.555H3.556A3.556 3.556 0 010 12.608V3.72zm7.22 8.674l2.933-1.694a.978.978 0 000-1.693L7.22 7.312a.978.978 0 00-1.466.847v3.387a.978.978 0 001.466.847zm-.222-3.772l2.133 1.232-2.133 1.231V8.621z" clip-rule="evenodd"/></svg>        </span>
+        <span>
+                    Videos
+                  </span>
+      </a>
+    </li>
+
+          <li>
+       <a href="/goggles?q=a%20whole%20different%20query&source=web">
+        <span class="icon-wrapper">
+          <svg class="icon" width="21" height="10" viewBox="0 0 21 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 2.74286C21 2.29821 20.6478 1.93929 20.2115 1.93929H19.4458C18.5487 0.760714 17.1452 0 15.5682 0H5.43179C3.85482 0 2.45131 0.760714 1.55419 1.93929H0.788486C0.35219 1.93929 0 2.29821 0 2.74286C0 3.1875 0.325907 3.51429 0.737672 3.54107C0.599249 4.00357 0.525657 4.49286 0.525657 5C0.525657 7.76071 2.7229 10 5.43179 10C8.14068 10 10.3379 7.76071 10.3379 5C10.3379 3.69107 9.84381 2.49821 9.03429 1.60714H11.9657C11.1562 2.49821 10.6621 3.69107 10.6621 5C10.6621 7.76071 12.8593 10 15.5682 10C18.2771 10 20.4743 7.76071 20.4743 5C20.4743 4.49286 20.399 4.00357 20.2623 3.54107C20.6741 3.51429 21 3.16964 21 2.74286ZM5.43179 8.39286C3.59374 8.39286 2.10263 6.87321 2.10263 5C2.10263 3.12679 3.59374 1.60714 5.43179 1.60714C7.26984 1.60714 8.76095 3.12679 8.76095 5C8.76095 6.87321 7.26984 8.39286 5.43179 8.39286ZM15.5682 8.39286C13.7302 8.39286 12.239 6.87321 12.239 5C12.239 3.12679 13.7302 1.60714 15.5682 1.60714C17.4063 1.60714 18.8974 3.12679 18.8974 5C18.8974 6.87321 17.4063 8.39286 15.5682 8.39286Z" fill="currentColor"/></svg>        </span>
+        <span>
+                    <span class="flex-hcenter"> Goggles <sup>BETA</sup></span>
+                  </span>
+      </a>
+    </li>
+
+      </ul>
+  <ul id="secondary-tabs">
+    <li id="tools-info"></li>
+    <li class="tabs-divider"></li>
+    <li id="feedback"></li>
+  </ul>
+</nav>  </div>
+</div>
+
+<div class="">
+  <div class="container-80">
+    <div id="search-filters"></div>
+  </div>
+</div>
+<main id="search-main">
+    
+                                            
+
+
+  <div class="container-80">
+        
+        
+
+        <div id="ask-for-location"></div>
+
+  </div>
+
+  <div class="container-80 flex">
+    <div id="results" class="section">
+
+                                                                                                                                                
+            
+      
+                              
+                          
+
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="0" data-type="web" data-ref-pos="0" >
+  <a href="https://www.techtarget.com/searchdatamanagement/definition/query" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/Uvss73qJLks_ZrWMPzQG4aRYEtFnmR4o84kP14gykRQ/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvZjhkYjViOTRh/NzMwOGYxYzBmNGU4/MTJjOTE3YjE2NTBj/NmVkZGQyYjMwNTlj/YzAxNzI0NzcyMzQz/ZDc0YTY0ZC93d3cu/dGVjaHRhcmdldC5j/b20v" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>What is a query? Explore database queries and more
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">techtarget.com</span>
+      <span class="url-path">› searchdatamanagement  › definition  › query</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                            <p class="snippet-description">
+            Learn about database <strong>queries</strong> -- formal requests for data -- how they work, the <strong>difference</strong> between SQL and NOSQL, <strong>query</strong> folding, web <strong>queries</strong> and more.
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="1" data-type="web" data-ref-pos="1" >
+  <a href="https://www.jetbrains.com/help/datagrip/viewing-query-results.html" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/5zC8sNccH5SsM_xgiatItJcJVKclkXv7okP6CwYMhCU/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMWE0ZjM1Zjk0/YjEwOWEwZjUyMjk2/ZmM2ZTJlMTJjN2E4/NDI4NTg4ZDRhNWIw/ZGQ3NDU3NjdlNDRj/YzkyOGQ3ZS93d3cu/amV0YnJhaW5zLmNv/bS8" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>Query results | DataGrip Documentation
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">jetbrains.com</span>
+      <span class="url-path">› help  › datagrip  › viewing-query-results.html</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                    <img class="thumb" src="https://imgs.search.brave.com/eap2BlIVIUGKnNbXsSdL5hpH06slnAKY8ZYlYzjIVIo/rs:fit:200:200:1/g:ce/aHR0cHM6Ly9yZXNv/dXJjZXMuamV0YnJh/aW5zLmNvbS9zdG9y/YWdlL3Byb2R1Y3Rz/L2RhdGFncmlwL2lt/Zy9tZXRhL3ByZXZp/ZXcucG5n" alt="" width="100" loading="lazy" />
+                <p class="snippet-description">
+            Run <strong>queries</strong> to tables that you want to compare. In the Services tool window, click the Compare with icon (), and select the result set that you want to add to diff. If needed, change a value of the Tolerance parameter in the comparison dialog. The Tolerance parameter defines a maximum number of <strong>differences</strong> ...
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="2" data-type="web" data-ref-pos="2" >
+  <a href="https://support.awesome-table.com/hc/en-us/articles/115001152945-Use-Queries-to-show-records-based-on-conditions-" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/08VC4M1KjEbL6W9ilok7vOlouyv3_UDa4WPbit0jeV8/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYmE5ODg3OGMw/YzljMzFkYzEwNDFj/NzA5ZTlkMWRkNGFj/YWQ2MmM0ODljNDIy/MDc0OTdkNzU2OTEy/NmUxMjQ5YS9zdXBw/b3J0LmF3ZXNvbWUt/dGFibGUuY29tLw" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>Use Queries to show records based on conditions
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">support.awesome-table.com</span>
+      <span class="url-path">› hc  › en-us  › articles  › 115001152945-Use-Queries-to-show-records-based-on-conditions-</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                            <p class="snippet-description">
+            2 In this tutorial, you will learn how to use <strong>Query</strong> statements in Awesome Table to display only the columns of interest, reorder your columns, show items that meet the criteria you have set, sort ...
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="3" data-type="web" data-ref-pos="3" >
+  <a href="https://www.actiondesk.io/blog/ultimate-beginners-guide-to-the-query-function-in-google-sheets" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title"  title="Google Sheets Query Function: The Ultimate Beginner&#39;s Guide | Actiondesk" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/vbyhzA-z41gHq3eu_oHArIgbcBBtD5OYhBZZIdZcdFY/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvZDNkODJmNDgw/NzhjYjkwYjAzZmMy/YTY0NmVmMjI2MDY5/NGI4YzExNTRmNjhj/OTExMDg0NTMzNjA2/ODgxYTA4Mi93d3cu/YWN0aW9uZGVzay5p/by8" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>Google Sheets Query Function: The Ultimate Beginner&#39;s Guide | ...
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">actiondesk.io</span>
+      <span class="url-path">› blog  › ultimate-beginners-guide-to-the-query-function-in-google-sheets</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                            <p class="snippet-description">
+            You can also <strong>query</strong> from a completely <strong>different</strong> spreadsheet. Let’s say Growth2 wasn’t on this spreadsheet and it was on <strong>a</strong> <strong>whole</strong> other spreadsheet and we still wanted to aggregate it. We would take the same function:
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="4" data-type="web" data-ref-pos="4" >
+  <a href="https://www.benlcollins.com/spreadsheets/google-sheets-query-sql/" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title"  title="Google Sheets Query function: Learn the most powerful function in Sheets" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/_uiNtMCjFix-MB1nhW8mTd-Gd2f8IQddxOU9qXA5b3g/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNjQzZmY3MmM2/NjljNmRmNDI1ZDdm/OTZiOWRmNDQyZDE2/OWVkNGFlMDkwOTE2/NzExODk0ZDRjNjJm/MzgzNDQ5Mi93d3cu/YmVubGNvbGxpbnMu/Y29tLw" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>Google Sheets Query function: Learn the most powerful function ...
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">benlcollins.com</span>
+      <span class="url-path">  › home  › google sheets query function: the most powerful function in google sheets</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                            <p class="snippet-description">
+            February 24, 2022 -
+            Learn how to use the super-powerful Google Sheets <strong>Query</strong> function to analyze your data in Google Sheets. Includes template.
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="5" data-type="web" data-ref-pos="5" >
+  <a href="https://blog.coupler.io/google-sheets-query-function/" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/AKwWkdH3n_c165TwDmb99FFUtf1spqkjU923UfQ32Zc/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNWYxNTVjOGYw/YjJiYzQ5MDk1YzUy/NWFmZDQ5YTk2NWM5/MWVmNTJmMDNlODhk/ZTE5ODY0NDBmMTky/YjI1Mjc4ZS9ibG9n/LmNvdXBsZXIuaW8v" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>Google Sheets QUERY Function Tutorial 2023 | Coupler.io Blog
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">blog.coupler.io</span>
+      <span class="url-path">  › home  › google sheets query function: everything you need to know in one article</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                            <p class="snippet-description">
+            April 13, 2023 -
+            Explore the Google Sheets <strong>QUERY</strong> function to learn how you can use it to optimize your data manipulation experience in spreadsheets.
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="6" data-type="web" data-ref-pos="6" >
+  <a href="https://developer.wordpress.org/reference/classes/wp_query/" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/tm2SB4s4j41ihcGpfgPFL9lySSIV0r1JpfkKwDfSwmg/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvN2Y2NDBjZTc4/MTcxZGNjMDMwMjRk/YzkyNjlhZWVkMDBk/MDdkMzYyYTdiNGI5/YmRjMDA2ZjAwOTlj/YTI5ZWYyMi9kZXZl/bG9wZXIud29yZHBy/ZXNzLm9yZy8" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>WP_Query | Class | WordPress Developer Resources
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">developer.wordpress.org</span>
+      <span class="url-path">› reference  › classes  › wp_query</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                    <p class="snippet-description">
+            The WordPress <strong>Query</strong> class. ... Most of the time you can find the information you want without actually dealing with the class internals and global variables. There are <strong>a</strong> <strong>whole</strong> bunch of functions that you can call from anywhere that will enable you to get the information you need.
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="7" data-type="web" data-ref-pos="7" >
+  <a href="https://www.jetbrains.com/datagrip/features/executing.html" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title"  title="Running queries: read-only mode, history, explain plan, SQL log - Features | DataGrip" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/5zC8sNccH5SsM_xgiatItJcJVKclkXv7okP6CwYMhCU/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMWE0ZjM1Zjk0/YjEwOWEwZjUyMjk2/ZmM2ZTJlMTJjN2E4/NDI4NTg4ZDRhNWIw/ZGQ3NDU3NjdlNDRj/YzkyOGQ3ZS93d3cu/amV0YnJhaW5zLmNv/bS8" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>Running queries: read-only mode, history, explain plan, SQL log ...
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">jetbrains.com</span>
+      <span class="url-path">› datagrip  › features  › executing.html</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                    <p class="snippet-description">
+            DataGrip provides smart options ... inside <strong>a</strong> <strong>query</strong>, the execution can be customized with several possible options available. Define its intended behavior: execute the smallest statement, the largest statement, ask you to choose what to execute, or execute the <strong>whole</strong> ...
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="8" data-type="web" data-ref-pos="8" >
+  <a href="https://support.microsoft.com/en-us/office/introduction-to-queries-a9739a09-d3ff-4f36-8ac3-5760249fb65c" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/yWQMZCEMXPc4X7rE4drt80ljIGGeyNP12hJEaz9A3iM/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYzQ5OGEwMzNh/MzllMGIxMWQ1OGUx/ZTJkNzhlMjYzMDgz/ZGRkYTAwZDc4MTNh/Y2VhZDZmZWJjMzRl/NDA3NTNjYy9zdXBw/b3J0Lm1pY3Jvc29m/dC5jb20v" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>Introduction to queries - Microsoft Support
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">support.microsoft.com</span>
+      <span class="url-path">› en-us  › office  › introduction-to-queries-a9739a09-d3ff-4f36-8ac3-5760249fb65c</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                    <p class="snippet-description">
+            An Access <strong>query</strong> is very versatile and can pull information from various tables and assemble it for display in a form or report. An Access <strong>query</strong> can either be a request for data results from your database or for action on the data, or for both. An Access <strong>query</strong> can give you an answer to a simple ...
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="9" data-type="web" data-ref-pos="9" >
+  <a href="https://codingisforlosers.com/google-sheets-query-function/" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title"  title="Query Function in Google Sheets - Complete Tutorial | Coding is for Losers" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/Xza44n-6xLdMXjrIAXRMdD5eckhmrmSbfJ1cLGEFSXQ/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMmFhMDg1YWE2/ZTBlZWFmMTA1Zjc2/NTBiY2NjMmRkNGMy/OTFjMWU0NzcwNzUx/YmVlMzNlMzBmOTcz/NDBiOWZkZC9jb2Rp/bmdpc2Zvcmxvc2Vy/cy5jb20v" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>Query Function in Google Sheets - Complete Tutorial | Coding is ...
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">codingisforlosers.com</span>
+      <span class="url-path">› google-sheets-query-function</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                            <p class="snippet-description">
+            March 5, 2020 -
+            Learn how lazy Google Sheets users take advantage of the <strong>QUERY</strong> function, which lets you write SQL <strong>queries</strong> in a Sheet. Sit back and watch the data flow.
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                        
+<div id="search-elsewhere" class="text-gray">
+  <noscript>
+    <div class="panel">
+            <div class="flex-hcenter flex-wrap">
+        <span class="icon-wrapper mr-10">
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="18" height="17" viewBox="0 0 18 17"><path fill-rule="evenodd" d="M1.6 7.336a5.736 5.736 0 1 1 11.471 0 5.736 5.736 0 0 1-11.471 0ZM7.336 0a7.336 7.336 0 1 0 4.957 12.743l3.56 3.561a.8.8 0 0 0 1.132-1.131l-3.636-3.636A7.336 7.336 0 0 0 7.335 0Z" clip-rule="evenodd"/></svg>        </span>
+        <span class="mr-15">Find elsewhere</span>
+        <a class="chip mr-10" href="/search?q=a whole different query !g" rel="noopener">Google</a>
+        <a class="chip mr-10" href="/search?q=a whole different query !b" rel="noopener">Bing</a>
+        <a class="chip mr-10" href="/search?q=a whole different query !mojeek" rel="noopener">Mojeek</a>
+      </div>
+          </div>
+  </noscript>
+</div>
+
+
+                  
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="11" data-type="web" data-ref-pos="10" >
+  <a href="https://www.ablebits.com/office-addins-blog/2020/01/28/google-sheets-query-function/" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/ztb1uaG4_gG7SBvkt-mEtapUrfG7NLEaL2jXvFx826Q/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvOGM5ZTBjZTNm/MTM1NTE2NjQxYTZl/ZDk5YTY1OTZlYWU4/MmI4MjIxNDllMjBh/NzU0YjRmZDcxMjRi/Mzk1ZWJiYi93d3cu/YWJsZWJpdHMuY29t/Lw" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>How to use Google Sheets QUERY function - Ablebits
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">ablebits.com</span>
+      <span class="url-path">  › ablebits blog  › google sheets tips  › google sheets functions  › how to use google sheets query function – standard clauses and an alternative tool</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                            <p class="snippet-description">
+            April 24, 2020 -
+            Explore <strong>different</strong> ways of using Google Sheets <strong>QUERY</strong> function: build <strong>QUERY</strong> formulas from scratch or make a special add-on create them for you.
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="12" data-type="web" data-ref-pos="11" >
+  <a href="https://en.wikipedia.org/wiki/Query_string" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/0kxnVOiqv-faZvOJc7zpym4Zin1CTs1f1svfNZSzmfU/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNjQwNGZhZWY0/ZTQ1YWUzYzQ3MDUw/MmMzMGY3NTQ0ZjNj/NDUwMDk5ZTI3MWRk/NWYyNTM4N2UwOTE0/NTI3ZDQzNy9lbi53/aWtpcGVkaWEub3Jn/Lw" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>Query string - Wikipedia
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">en.wikipedia.org</span>
+      <span class="url-path">› wiki  › Query_string</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                    <p class="snippet-description">
+            3 weeks ago -
+            A program receiving <strong>a</strong> <strong>query</strong> string can ignore part or all of it. If the requested URL corresponds to a file and not to a program, the <strong>whole</strong> <strong>query</strong> string is ignored. However, regardless of whether the <strong>query</strong> string is used or not, the <strong>whole</strong> URL including it is stored in the server log files.
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+        <div class="deep-results-buttons">
+        <a class="deep-link" href="https://en.wikipedia.org/wiki/Query_string#Structure" target="_self" rel="noopener">
+      Structure
+    </a>
+     <span class="attr-separator"> • </span>
+                <a class="deep-link" href="https://en.wikipedia.org/wiki/Query_string#URL_encoding" target="_self" rel="noopener">
+      URL encoding
+    </a>
+     <span class="attr-separator"> • </span>
+                <a class="deep-link" href="https://en.wikipedia.org/wiki/Query_string#Example" target="_self" rel="noopener">
+      Example
+    </a>
+     <span class="attr-separator"> • </span>
+                <a class="deep-link" href="https://en.wikipedia.org/wiki/Query_string#Tracking" target="_self" rel="noopener">
+      Tracking
+    </a>
+     <span class="attr-separator"> • </span>
+                <a class="deep-link" href="https://en.wikipedia.org/wiki/Query_string#Compatibility_issues" target="_self" rel="noopener">
+      Compatibility issues
+    </a>
+            </div>
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="13" data-type="web" data-ref-pos="12" >
+  <a href="https://support.google.com/docs/answer/3093343?hl=en" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/Dn7_iTJOv_nJ5djqaRqFGfUViURoSl2c4FWMtaN9bUA/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNTA2MDAzMjNk/ZjljZWM1YjhiZmEz/ZDkwNmJkYTQzMThi/NDc5Yjg0MzQ3Mzdk/ODYxMTFhYWIxYjdm/NjRkNjY2My9zdXBw/b3J0Lmdvb2dsZS5j/b20v" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>QUERY function - Google Docs Editors Help
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">support.google.com</span>
+      <span class="url-path">› docs  › answer  › 3093343</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                    <p class="snippet-description">
+            In case of mixed data types in a single column, the majority data type determines the data type of the column for <strong>query</strong> purposes. Minority data types are considered null values. <strong>query</strong> - <strong>The</strong> <strong>query</strong> to perform, written in the Google Visualization API <strong>Query</strong> Language.
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="14" data-type="web" data-ref-pos="13" >
+  <a href="https://www.seerinteractive.com/blog/how-to-query-data-in-google-sheets/" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/cDPaER4NqSTP8A6E8N_Vz0XTGMToKbTJU6jDtSWWHaU/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvMGIxNDk3Yjgy/ZTk0YjY4ODUwYmU0/OWU2MTM1ZGEwNDdi/ODBiMWQ0NmQ2MzVi/MGRhNmNmNDBkNmY0/OGYwZDA5OC93d3cu/c2VlcmludGVyYWN0/aXZlLmNvbS8" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>How to Query Data in Google Sheets with =QUERY Function
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">seerinteractive.com</span>
+      <span class="url-path">› blog  › how-to-query-data-in-google-sheets</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                            <p class="snippet-description">
+            June 11, 2019 -
+            In this step-by-step tutorial, you’ll learn how to use the powerful =QUERY function and get a free template to help you apply what you learn.
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="15" data-type="web" data-ref-pos="14" >
+  <a href="https://www.mssqltips.com/sqlservertip/2346/different-options-for-query-results-in-sql-server-management-studio/" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/JeClYBvS4q4JCaxy59VdZq6riM-YBgWruFp_fTsE9fA/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYzc5MWI3YWJi/NTk3MTc2OWNiZmU5/NTUwMDVhMTJlODM1/YmE3ZjNlYmJmZDkw/YWVjODg0NmY3ODYz/YzNjZWQyMi93d3cu/bXNzcWx0aXBzLmNv/bS8" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>Different Options for Query Results in SQL Server Management Studio
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">mssqltips.com</span>
+      <span class="url-path">› sqlservertip  › 2346  › different-options-for-query-results-in-sql-server-management-studio</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                    <img class="thumb" src="https://imgs.search.brave.com/-ngEKZUHSUQJU5DFSrBzrYYyeVnrhilh9-GpRwcp2QQ/rs:fit:200:200:1/g:ce/aHR0cHM6Ly93d3cu/bXNzcWx0aXBzLmNv/bS9pbWFnZXNfbmV3/c2xldHRlci8yMzQ2/X05ld3NsZXR0ZXJJ/bWFnZS5wbmc" alt="" width="100" loading="lazy" />
+                <p class="snippet-description">
+            While looking through the new features and improvements in SQL Server Management Studio (SSMS), we found several options for displaying <strong>query</strong> results. In this tip we cover what options are available in SSMS and how they can assist you when dealing with qu
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="16" data-type="web" data-ref-pos="15" >
+  <a href="https://www.tutorialspoint.com/sql/sql-select-database.htm" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/Wt8BSkivPlFwcU5yBtf7YzuvTuRExyd_502cdABCS5c/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYjcyYjAzYmVl/ODU4MzZiMjJiYTFh/MjJhZDNmNWE4YzA5/MDgyYTZhMDg3NTYw/M2NiY2NiZTUxN2I5/MjU1MWFmMS93d3cu/dHV0b3JpYWxzcG9p/bnQuY29tLw" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>SQL - SELECT Database, USE Statement
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">tutorialspoint.com</span>
+      <span class="url-path">› sql  › sql-select-database.htm</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                    <p class="snippet-description">
+            SQL SELECT Database USE Statement - To work with a database in SQL, we need to first select the database we want to work with using the USE statement. The USE statement in SQL is used to specify the name of the database we want to select. After selecting the database, we can perform various ...
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="17" data-type="web" data-ref-pos="16" >
+  <a href="https://stackoverflow.com/questions/7662800/how-do-you-select-top-x-but-still-get-a-count-of-the-whole-query" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title"  title="sql - How do you Select TOP x but still get a COUNT of the whole query? - Stack Overflow" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/snMTn5UndzYVBcY9ljraLivTObHfHpTei9IWTdrtCj4/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvNWU3Zjg0ZjA1/YjQ3ZTlkNjQ1ODA1/MjAwODhiNjhjYWU0/OTc4MjM4ZDJlMTBi/ODExYmNiNTkzMjdh/YjM3MGExMS9zdGFj/a292ZXJmbG93LmNv/bS8" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>sql - How do you Select TOP x but still get a COUNT of the whole ...
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">stackoverflow.com</span>
+      <span class="url-path">› questions  › 7662800  › how-do-you-select-top-x-but-still-get-a-count-of-the-whole-query</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                            <p class="snippet-description">
+            I&#x27;m writing a webpage to interactively filter results based on filter criteria as it is specified by the user. I only want to return from SQL the TOP 20 rows but I want to know how many rows met the
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="18" data-type="web" data-ref-pos="17" >
+  <a href="https://www.sqlshack.com/different-ways-to-search-for-objects-in-sql-databases/" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/AZX7_rbKnT3BRQa-5eXKy8bXVEWJfQABOVYrOeMej2I/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvYzVkMzNiZmVm/NGI4MzFmZDVhNjBm/ZWJmN2FmZDQ5MGFi/OWE4NmJlZGY1MTE5/MzZhNzUzZWUzYjRl/YjkwOTU3MS93d3cu/c3Fsc2hhY2suY29t/Lw" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>Different ways to search for objects in SQL databases
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">sqlshack.com</span>
+      <span class="url-path">› different-ways-to-search-for-objects-in-sql-databases</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                            <p class="snippet-description">
+            June 29, 2020 -
+            In this article, we will talk about various ways to search objects in a SQL database.
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+                              <div
+  class="snippet fdb  "
+  data-loc="main" data-pos="19" data-type="web" data-ref-pos="18" >
+  <a href="https://www.mrexcel.com/board/threads/can-i-use-power-query-to-compare-whole-rows-in-two-different-worksheets.1148893/" class="result-header" target="_self" rel="noopener">
+    <span class="snippet-title"  title="Can I use Power Query to compare whole rows in two different worksheets? | MrExcel Message Board" >
+      <div class="favicon-wrapper">
+        <img alt="🌐" class="favicon" src="https://imgs.search.brave.com/-dfeD76qMAkFFmEHBpV0zmOx0oFBZFhPOTIHE1hPjL4/rs:fit:32:32:1/g:ce/aHR0cDovL2Zhdmlj/b25zLnNlYXJjaC5i/cmF2ZS5jb20vaWNv/bnMvY2IzYjk3YWI1/MGIxYmYzZjI0NmYw/MTQ4YjZlMzY3Zjdh/ZTg1ODhlZTJlYTg1/Njg0NTQ2ZjY4ZjIy/YzFhMDBlOS93d3cu/bXJleGNlbC5jb20v" loading="lazy" width="16" height="16" />
+      </div>
+      <em></em>Can I use Power Query to compare whole rows in two different ...
+    </span>
+    <cite class="snippet-url">
+      <span class="netloc">mrexcel.com</span>
+      <span class="url-path">  › forums  › question forums  › power tools</span>
+          </cite>
+  </a>
+    <div class="snippet-content">
+                    <p class="snippet-description">
+            June 18, 2020 -
+            I am trying to compare two worksheets which contain the columns Date, Type, Number, Name, Debit, Credit, Balance. Approximately 50% of the rows will be identical in both sheets, however there are going to be rows in either sheet that don&#x27;t appear in the other. Or there might be rows that are...
+    </p>
+  </div>
+
+  
+  
+    
+
+
+  
+    
+
+    
+</div>
+
+            
+      
+            <div id="pagination">
+        <a
+    class="btn ml-15 "
+    href="/search?q=a%20whole%20different%20query&amp;offset=1&amp;spellcheck=0"
+  >
+    Next
+    <div class="icon-wrapper ml-10 icon-right">
+      <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"><path fill-rule="evenodd" d="M13.604 7.189a.868.868 0 01-.268.626l-6.19 5.932a.868.868 0 11-1.2-1.253l4.63-4.437H.872a.868.868 0 110-1.736h9.704l-4.63-4.438A.868.868 0 117.145.63l6.19 5.932c.171.164.268.39.268.627z" clip-rule="evenodd"/></svg>    </div>
+  </a>
+</div>
+
+          </div>
+
+
+        <div id="side-right" class="section">
+      
+          </div>
+  </div>
+
+
+    <div id="debug"></div>
+
+    <style>
+  footer {
+    background-color: var(--search-bgd-04);
+    color: var(--color-primary);
+    height: fit-content;
+    padding: 2rem 0px;
+    margin-top: 2rem;
+  }
+
+  footer .content {
+    display: flex;
+    align-items: baseline;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  footer h6 {
+    color: var(--color-gray-3);
+    font-family: var(--brand-font);
+  }
+
+  footer .text-sm {
+    font-size: var(--text-sm);
+  }
+
+  footer .text-gray {
+    color: var(--color-gray-3) !important;
+  }
+
+  footer .container-sm {
+    max-width: 1000px;
+    padding-left: 175px;
+  }
+
+  footer .content .block {
+    margin-bottom: 1rem;
+  }
+
+  footer .block a.flex-row {
+    align-items: center;
+    gap: 6px;
+  }
+
+  footer .block a.flex-row > .icon {
+    --size: 15px;
+  }
+</style>
+<footer>
+  <div class="container-sm">
+    <div class="content">
+      <div class="block">
+        <h6>Resources</h6>
+        <div>
+          <a
+            class="text-gray text-sm flex-row"
+            href="https://account.brave.com/?intent=checkout&amp;product=search"
+            target="_self"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="none" class="icon" viewBox="0 0 19 19"><defs><linearGradient id="premium-icon-b" x1="1.834" x2="20.625" y1=".305" y2="11.612" gradientUnits="userSpaceOnUse"><stop stop-color="#392DD1"/><stop offset="1" stop-color="#22B8CF"/></linearGradient><linearGradient id="premium-icon-c" x1="2.959" x2="18.762" y1="1.805" y2="11.504" gradientUnits="userSpaceOnUse"><stop stop-color="#392DD1"/><stop offset="1" stop-color="#22B8CF"/></linearGradient><linearGradient id="premium-icon-d" x1="5.77" x2="13.429" y1="5.319" y2="10.849" gradientUnits="userSpaceOnUse"><stop stop-color="#392DD1"/><stop offset="1" stop-color="#22B8CF"/></linearGradient><filter id="premium-icon-a" width="18.781" height="21.781" x="-.056" y="-1.585" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur"/><feBlend in="SourceGraphic" in2="effect1_backgroundBlur" result="shape"/></filter></defs><g filter="url(#premium-icon-a)"><path fill="url(#premium-icon-b)" fill-opacity=".36" d="M16.099 13.319a10.47 10.47 0 0 1-2.372 2.386 24.66 24.66 0 0 1-4.274 2.565.25.25 0 0 1-.257 0 25.507 25.507 0 0 1-4.038-2.4 11.615 11.615 0 0 1-2.38-2.252 4.02 4.02 0 0 1-.929-2.182v-6.76c0-.477 0-.953-.015-1.429 0-.187.087-.245.257-.307 1.485-.54 2.967-1.083 4.446-1.63C7.422.986 8.303.655 9.19.328a.477.477 0 0 1 .292 0c1.72.626 3.438 1.262 5.157 1.893.663.25 1.33.49 2 .72.06.014.112.048.148.096a.238.238 0 0 1 .045.166v7.843a3.808 3.808 0 0 1-.734 2.273Z" style="mix-blend-mode:multiply"/><path fill="url(#premium-icon-c)" d="M9.33 16.805a.762.762 0 0 1-.328-.078A20.085 20.085 0 0 1 5.764 14.8a9.482 9.482 0 0 1-1.977-1.859 3.637 3.637 0 0 1-.826-1.96v-6.38a.683.683 0 0 1 .13-.457.742.742 0 0 1 .403-.277l3.463-1.26.715-.262 1.363-.49a.92.92 0 0 1 .602 0c.88.319 1.77.647 2.63.96l1.4.513c.46.169 1.002.365 1.542.558.15.046.28.137.37.26a.66.66 0 0 1 .13.421v6.09a3.437 3.437 0 0 1-.656 2.045 8.64 8.64 0 0 1-1.965 1.96 19.906 19.906 0 0 1-3.423 2.06.763.763 0 0 1-.334.083ZM4.01 4.758v6.166c.058.525.278 1.022.633 1.428a8.539 8.539 0 0 0 1.774 1.658c.914.665 1.89 1.25 2.914 1.747a18.658 18.658 0 0 0 3.104-1.882 7.55 7.55 0 0 0 1.738-1.732c.316-.43.485-.944.484-1.47V4.759c-.486-.171-.962-.343-1.371-.49l-1.396-.514c-.839-.306-1.703-.625-2.556-.933-.427.151-.86.31-1.286.465l-.715.265L4.01 4.758Z"/></g><path fill="url(#premium-icon-d)" fill-rule="evenodd" d="M11.268 12.148a.428.428 0 0 1-.242-.083l-1.825-1.248-.039.002-1.82 1.246c-.185.126-.395.098-.504-.046-.05-.066-.098-.18-.05-.352L7.34 9.72a.146.146 0 0 0-.022-.085L5.9 8.192c-.118-.12-.159-.275-.108-.413.05-.137.18-.229.349-.244l1.877-.176a.146.146 0 0 0 .066-.05l.754-1.738c.069-.158.198-.252.347-.252.149 0 .279.095.347.254l.755 1.739a.148.148 0 0 0 .067.048l1.876.174c.168.017.298.109.348.246.05.138.01.292-.108.412l-1.42 1.443a.145.145 0 0 0-.021.085l.55 1.947c.05.172 0 .286-.049.352a.326.326 0 0 1-.262.129Z" clip-rule="evenodd"/></svg>            Brave Search Premium
+          </a>
+        </div>
+        <div>
+          <a class="text-gray text-sm" href="/help">
+            Brave Search Help
+          </a>
+        </div>
+        <div><a class="text-gray text-sm" href="https://brave.com/transparency/">
+            Transparency Report
+          </a>
+        </div>
+        <div>
+          <a class="text-gray text-sm" target="_blank" rel="noopener" href="https://hackerone.com/brave">
+            Report a security issue
+          </a>
+        </div>
+        <div>
+          <a class="text-gray text-sm" href="https://status.brave.com/">
+            Status
+          </a>
+        </div>
+      </div>
+      <div class="block">
+        <h6>Products</h6>
+        <div>
+          <a class="text-gray text-sm" href="https://brave.com/download/">
+            Brave Browser
+          </a>
+        </div>
+        <div>
+          <a class="text-gray text-sm" href="https://search.brave.com">
+            Brave Search
+          </a>
+        </div>
+        <div>
+          <a class="text-gray text-sm" href="https://brave.com/wallet">
+            Brave Wallet
+          </a>
+        </div>
+        <div>
+          <a class="text-gray text-sm" href="https://talk.brave.com/">
+            Brave Talk
+          </a>
+        </div>
+        <div>
+          <a class="text-gray text-sm" href="https://brave.com/firewall-vpn/">
+            Brave Firewall + VPN
+          </a>
+        </div>
+        <div>
+          <a class="text-gray text-sm" href="https://brave.com/playlist/">
+            Brave Playlist
+          </a>
+        </div>
+        <div>
+          <a class="text-gray text-sm" href="https://brave.com/brave-news/">
+            Brave News
+          </a>
+        </div>
+        <div>
+          <a class="text-gray text-sm" href="https://brave.com/brave-rewards/">
+            Brave Rewards
+          </a>
+        </div>
+        <div>
+          <a class="text-gray text-sm" href="https://brave.com/search/api/">
+            Brave Search API
+          </a>
+        </div>
+      </div>
+      <div class="block">
+        <h6>Policies</h6>
+        <div><a class="text-gray text-sm" href="/help/privacy-policy">
+            Privacy Policy</a>
+        </div>
+        <div>
+          <a class="text-gray text-sm" href="https://brave.com/terms-of-use/">
+            Terms of Use
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer></main>
+
+<div id="usage-metrics"></div>
+
+<script
+  id="js-shared"
+  src="https://cdn.search.brave.com/serp/v1/static/serp-js/shared/2cdebd45faeb07b61950b71313ea8d61811a67ce6388ac15fec384ce7d8888db-main.bundle.js"
+  data="{&#34;reproducible_parameters&#34;:{&#34;country&#34;:&#34;all&#34;,&#34;search_lang&#34;:&#34;en&#34;,&#34;spellcheck&#34;:0,&#34;external&#34;:&#34;0&#34;,&#34;show_local&#34;:1,&#34;unit&#34;:&#34;metric&#34;,&#34;geoloc&#34;:&#34;45.25x19.836&#34;},&#34;is_mobile&#34;:false,&#34;is_ios&#34;:false,&#34;browser&#34;:&#34;chrome&#34;,&#34;os&#34;:&#34;Mac OS X&#34;,&#34;paid&#34;:false,&#34;i18n&#34;:{&#34;Learn more&#34;:&#34;Learn more&#34;,&#34;Feedback&#34;:&#34;Feedback&#34;,&#34;Help us improve Brave Search&#34;:&#34;Help us improve Brave Search&#34;,&#34;What do you think of the information shown?&#34;:&#34;What do you think of the information shown?&#34;,&#34;This is helpful&#34;:&#34;This is helpful&#34;,&#34;This isn&#39;t relevant&#34;:&#34;This isn&#39;t relevant&#34;,&#34;Something is wrong&#34;:&#34;Something is wrong&#34;,&#34;This isn&#39;t useful&#34;:&#34;This isn&#39;t useful&#34;,&#34;The location is wrong&#34;:&#34;The location is wrong&#34;,&#34;The weather is wrong&#34;:&#34;The weather is wrong&#34;,&#34;The currency is wrong&#34;:&#34;The currency is wrong&#34;,&#34;The currency rate is wrong&#34;:&#34;The currency rate is wrong&#34;,&#34;The cryptocurrency is wrong&#34;:&#34;The cryptocurrency is wrong&#34;,&#34;The cryptocurrency price is wrong&#34;:&#34;The cryptocurrency price is wrong&#34;,&#34;The unit is wrong&#34;:&#34;The unit is wrong&#34;,&#34;The times are wrong&#34;:&#34;The times are wrong&#34;,&#34;The stock is wrong&#34;:&#34;The stock is wrong&#34;,&#34;The stock price is wrong&#34;:&#34;The stock price is wrong&#34;,&#34;Comments or suggestions?&#34;:&#34;Comments or suggestions?&#34;,&#34;Submit&#34;:&#34;Submit&#34;,&#34;Thank you for your feedback!&#34;:&#34;Thank you for your feedback!&#34;,&#34;Your feedback helps us improve the Brave Search experience for everyone&#34;:&#34;Your feedback helps us improve the Brave Search experience for everyone&#34;}}"
+  defer="true">
+</script>
+<script
+  id="js-umNotice"
+  src="https://cdn.search.brave.com/serp/v1/static/serp-js/umNotice/19859eef689d7833e3e012664eeecb1416b352cef0af7293052f5842bfdfb5cd-main.bundle.js"
+  data="{&#34;i18n&#34;:{&#34;usage-metrics-notice&#34;:&#34;Brave Search uses private usage metrics to estimate overall activity and performance. You can turn off this option in &lt;a href=&#39;/settings&#39;&gt;Settings&lt;/a&gt;.&#34;,&#34;Learn more&#34;:&#34;Learn more&#34;}}"
+  defer="true">
+</script>
+<script
+  id="js-telemetry"
+  src="https://cdn.search.brave.com/serp/v1/static/serp-js/telemetry/e2b75d1fd6046a7fe60654d711858febfbd0a0989e1dae615dd4c516b6182ab2-main.bundle.js"
+  data="{&#34;os&#34;:&#34;Mac OS X&#34;,&#34;browser&#34;:&#34;Chrome&#34;,&#34;is_dev&#34;:false}"
+  defer="true">
+</script>
+<script
+  id="js-suggest"
+  src="https://cdn.search.brave.com/serp/v1/static/serp-js/suggest/6a88ef6fa2844ae952b07cc7ab80359c39dcbe39e6f813fa0a1c8c87c014a9cf-main.bundle.js"
+  data="{&#34;is_mobile&#34;:false,&#34;is_dev&#34;:false}"
+  defer="true">
+</script>
+<script
+  id="js-sticky-header"
+  src="https://cdn.search.brave.com/serp/v1/static/serp-js/sticky-header/71c1a66bb61a6942ae553905fe3509922985a21d02f019d89608d56cff150547-main.bundle.js"
+  data="{&#34;is_mobile&#34;:false}"
+  defer="true">
+</script>
+<script
+  id="js-filters"
+  src="https://cdn.search.brave.com/serp/v1/static/serp-js/filters/779fb74b47ec32b509e7adf55d63d61f03e44b70d69d97f051d5754a12d93ec6-main.bundle.js"
+  data="{&#34;is_mobile&#34;:false,&#34;page&#34;:&#34;search&#34;,&#34;city&#34;:&#34;Novi Sad&#34;,&#34;country&#34;:&#34;RS&#34;,&#34;state&#34;:&#34;VO&#34;,&#34;postal_code&#34;:&#34;&#34;,&#34;lat&#34;:45.25,&#34;long&#34;:19.836,&#34;indepMetric&#34;:1,&#34;resultsAvailable&#34;:true,&#34;custom_location_label&#34;:&#34;Novi Sad, Autonomna Pokrajina Vojvodina, RS&#34;,&#34;fss&#34;:false,&#34;i18n&#34;:{&#34;Info&#34;:&#34;Info&#34;,&#34;Tools&#34;:&#34;Tools&#34;,&#34;Response took {seconds} seconds&#34;:&#34;Response took {responseTime} seconds&#34;,&#34;Learn more&#34;:&#34;Learn more&#34;,&#34;All results from Brave&#34;:&#34;All results from Brave&#34;,&#34;{thirdPartyPercentage}% of results mixed from Bing&#34;:&#34;{thirdPartyPercentage}% of results mixed from Bing&#34;,&#34;Results from Bing&#34;:&#34;Results from Bing&#34;,&#34;All regions&#34;:&#34;All regions&#34;,&#34;Argentina&#34;:&#34;Argentina&#34;,&#34;Australia&#34;:&#34;Australia&#34;,&#34;Austria&#34;:&#34;Austria&#34;,&#34;Belgium&#34;:&#34;Belgium&#34;,&#34;Brazil&#34;:&#34;Brazil&#34;,&#34;Canada&#34;:&#34;Canada&#34;,&#34;Chile&#34;:&#34;Chile&#34;,&#34;Country&#34;:&#34;Country&#34;,&#34;Time&#34;:&#34;Time&#34;,&#34;Sizes&#34;:&#34;Sizes&#34;,&#34;Types&#34;:&#34;Types&#34;,&#34;Resolution&#34;:&#34;Resolution&#34;,&#34;Length&#34;:&#34;Length&#34;,&#34;Layouts&#34;:&#34;Layouts&#34;,&#34;Colors&#34;:&#34;Colors&#34;,&#34;License&#34;:&#34;License&#34;,&#34;Denmark&#34;:&#34;Denmark&#34;,&#34;Finland&#34;:&#34;Finland&#34;,&#34;France&#34;:&#34;France&#34;,&#34;Germany&#34;:&#34;Germany&#34;,&#34;Hong Kong&#34;:&#34;Hong Kong&#34;,&#34;India&#34;:&#34;India&#34;,&#34;Indonesia&#34;:&#34;Indonesia&#34;,&#34;Italy&#34;:&#34;Italy&#34;,&#34;Japan&#34;:&#34;Japan&#34;,&#34;Korea&#34;:&#34;Korea&#34;,&#34;Malaysia&#34;:&#34;Malaysia&#34;,&#34;Mexico&#34;:&#34;Mexico&#34;,&#34;Netherlands&#34;:&#34;Netherlands&#34;,&#34;New Zealand&#34;:&#34;New Zealand&#34;,&#34;Norway&#34;:&#34;Norway&#34;,&#34;China&#34;:&#34;China&#34;,&#34;Poland&#34;:&#34;Poland&#34;,&#34;Portugal&#34;:&#34;Portugal&#34;,&#34;Philippines&#34;:&#34;Philippines&#34;,&#34;Russia&#34;:&#34;Russia&#34;,&#34;Saudi Arabia&#34;:&#34;Saudi Arabia&#34;,&#34;South Africa&#34;:&#34;South Africa&#34;,&#34;Spain&#34;:&#34;Spain&#34;,&#34;Sweden&#34;:&#34;Sweden&#34;,&#34;Switzerland&#34;:&#34;Switzerland&#34;,&#34;Taiwan&#34;:&#34;Taiwan&#34;,&#34;Turkey&#34;:&#34;Turkey&#34;,&#34;United Kingdom&#34;:&#34;United Kingdom&#34;,&#34;United States&#34;:&#34;United States&#34;,&#34;clear-verb&#34;:&#34;Clear&#34;,&#34;Safe search&#34;:&#34;Safe search&#34;,&#34;Any time&#34;:&#34;Any time&#34;,&#34;Past day&#34;:&#34;Past day&#34;,&#34;Past week&#34;:&#34;Past week&#34;,&#34;Past month&#34;:&#34;Past month&#34;,&#34;Past year&#34;:&#34;Past year&#34;,&#34;Custom&#34;:&#34;Custom&#34;,&#34;Custom range&#34;:&#34;Custom range&#34;,&#34;Choose date range&#34;:&#34;Choose date range&#34;,&#34;Start date&#34;:&#34;Start date&#34;,&#34;End date&#34;:&#34;End date&#34;,&#34;Search&#34;:&#34;Search&#34;,&#34;Moderate&#34;:&#34;Moderate&#34;,&#34;Strict&#34;:&#34;Strict&#34;,&#34;Off&#34;:&#34;Off&#34;,&#34;All sizes&#34;:&#34;All sizes&#34;,&#34;Small&#34;:&#34;Small&#34;,&#34;Medium&#34;:&#34;Medium&#34;,&#34;Large&#34;:&#34;Large&#34;,&#34;Wallpaper&#34;:&#34;Wallpaper&#34;,&#34;All types&#34;:&#34;All types&#34;,&#34;Photograph&#34;:&#34;Photograph&#34;,&#34;Clipart&#34;:&#34;Clipart&#34;,&#34;Animated GIF&#34;:&#34;Animated GIF&#34;,&#34;Transparent&#34;:&#34;Transparent&#34;,&#34;All layouts&#34;:&#34;All layouts&#34;,&#34;Square&#34;:&#34;Square&#34;,&#34;Tall&#34;:&#34;Tall&#34;,&#34;Wide&#34;:&#34;Wide&#34;,&#34;All colors&#34;:&#34;All colors&#34;,&#34;Black and white&#34;:&#34;Black and white&#34;,&#34;Color only&#34;:&#34;Color only&#34;,&#34;Red&#34;:&#34;Red&#34;,&#34;Orange&#34;:&#34;Orange&#34;,&#34;Yellow&#34;:&#34;Yellow&#34;,&#34;Green&#34;:&#34;Green&#34;,&#34;Blue&#34;:&#34;Blue&#34;,&#34;Purple&#34;:&#34;Purple&#34;,&#34;Pink&#34;:&#34;Pink&#34;,&#34;Brown&#34;:&#34;Brown&#34;,&#34;Black&#34;:&#34;Black&#34;,&#34;Gray&#34;:&#34;Gray&#34;,&#34;Teal&#34;:&#34;Teal&#34;,&#34;White&#34;:&#34;White&#34;,&#34;All licenses&#34;:&#34;All licenses&#34;,&#34;Public Domain&#34;:&#34;Public Domain&#34;,&#34;Free to Share and Use&#34;:&#34;Free to Share and Use&#34;,&#34;Free to Share and Use Commercially&#34;:&#34;Free to Share and Use Commercially&#34;,&#34;Free to Modify, Share and Use&#34;:&#34;Free to Modify, Share and Use&#34;,&#34;Free to Modify, Share and Use Commercially&#34;:&#34;Free to Modify, Share and Use Commercially&#34;,&#34;Any resolution&#34;:&#34;Any resolution&#34;,&#34;1080p&#34;:&#34;1080p&#34;,&#34;720p&#34;:&#34;720p&#34;,&#34;480p&#34;:&#34;480p&#34;,&#34;360p&#34;:&#34;360p&#34;,&#34;Any duration&#34;:&#34;Any duration&#34;,&#34;Short (less than 5 min)&#34;:&#34;Short (less than 5 min)&#34;,&#34;Medium (5 - 20 min)&#34;:&#34;Medium (5 - 20 min)&#34;,&#34;Long (over 20 min)&#34;:&#34;Long (over 20 min)&#34;,&#34;Anonymous local results&#34;:&#34;Anonymous local results&#34;,&#34;anonymous_local_results_description_short&#34;:&#34;Location information is derived from your IP address for more accurate results. It&#39;s stored only on your device. Brave never stores your IP or geo coordinates&#34;,&#34;Set manually&#34;:&#34;Set manually&#34;,&#34;Location set manually&#34;:&#34;Location set manually&#34;,&#34;Set location manually&#34;:&#34;Set location manually&#34;,&#34;No location&#34;:&#34;No location&#34;,&#34;Clear and get current location&#34;:&#34;Clear and get current location&#34;,&#34;Disable&#34;:&#34;Disable&#34;,&#34;Enable anonymous local results&#34;:&#34;Enable anonymous local results&#34;,&#34;On&#34;:&#34;On&#34;,&#34;Before-{date}&#34;:&#34;From {date}&#34;,&#34;From-{start_date}-to-{end_date}&#34;:&#34;From {start_date} to {end_date}&#34;,&#34;Move map to adjust current location&#34;:&#34;Move map to adjust current location&#34;,&#34;Done&#34;:&#34;Done&#34;}}"
+  defer="true">
+</script>
+<script
+  id="js-settings"
+  src="https://cdn.search.brave.com/serp/v1/static/serp-js/settings/ee71c81cb82f58259fbc4360bf513864a802f6ce2ac9d14e20cd8a4a60823203-main.bundle.js"
+  data="{&#34;is_mobile&#34;:false,&#34;default_possible&#34;:true,&#34;premium_href&#34;:&#34;https://account.brave.com/?intent=checkout&amp;product=search&#34;,&#34;i18n&#34;:{&#34;See all settings&#34;:&#34;See all settings&#34;,&#34;Appearance&#34;:&#34;Appearance&#34;,&#34;Theme&#34;:&#34;Theme&#34;,&#34;Change the look of Brave Search&#34;:&#34;Change the look of Brave Search&#34;,&#34;General&#34;:&#34;General&#34;,&#34;Set language&#34;:&#34;Set language&#34;,&#34;Set as default&#34;:&#34;Set as default&#34;,&#34;Set default&#34;:&#34;Set default&#34;,&#34;Set Brave Search as default&#34;:&#34;Set Brave Search as default&#34;,&#34;Preferred language for Brave Search&#34;:&#34;Preferred language for Brave Search&#34;,&#34;Coming soon&#34;:&#34;Coming soon&#34;,&#34;Open links in new tab&#34;:&#34;Open links in new tab&#34;,&#34;olnt-description&#34;:&#34;Links clicked from search will open in a new browser tab&#34;,&#34;Learn more&#34;:&#34;Learn more&#34;,&#34;Your results independence&#34;:&#34;Your results independence&#34;,&#34;Global results independence&#34;:&#34;Global results independence&#34;,&#34;% of search results from Brave Index&#34;:&#34;% of search results from Brave Index&#34;,&#34;indep-metric-more-searches&#34;:&#34;More searches are needed to calculate your value&#34;,&#34;Info&#34;:&#34;Info&#34;,&#34;Tools&#34;:&#34;Tools&#34;,&#34;Response took {seconds} seconds&#34;:&#34;Response took {responseTime} seconds&#34;,&#34;All results from Brave&#34;:&#34;All results from Brave&#34;,&#34;{thirdPartyPercentage}% of results mixed from Bing&#34;:&#34;{thirdPartyPercentage}% of results mixed from Bing&#34;,&#34;All regions&#34;:&#34;All regions&#34;,&#34;Argentina&#34;:&#34;Argentina&#34;,&#34;Australia&#34;:&#34;Australia&#34;,&#34;Austria&#34;:&#34;Austria&#34;,&#34;Belgium&#34;:&#34;Belgium&#34;,&#34;Brazil&#34;:&#34;Brazil&#34;,&#34;Canada&#34;:&#34;Canada&#34;,&#34;Chile&#34;:&#34;Chile&#34;,&#34;Denmark&#34;:&#34;Denmark&#34;,&#34;Finland&#34;:&#34;Finland&#34;,&#34;France&#34;:&#34;France&#34;,&#34;Germany&#34;:&#34;Germany&#34;,&#34;Hong Kong&#34;:&#34;Hong Kong&#34;,&#34;India&#34;:&#34;India&#34;,&#34;Indonesia&#34;:&#34;Indonesia&#34;,&#34;Italy&#34;:&#34;Italy&#34;,&#34;Japan&#34;:&#34;Japan&#34;,&#34;Korea&#34;:&#34;Korea&#34;,&#34;Malaysia&#34;:&#34;Malaysia&#34;,&#34;Mexico&#34;:&#34;Mexico&#34;,&#34;Netherlands&#34;:&#34;Netherlands&#34;,&#34;New Zealand&#34;:&#34;New Zealand&#34;,&#34;Norway&#34;:&#34;Norway&#34;,&#34;China&#34;:&#34;China&#34;,&#34;Poland&#34;:&#34;Poland&#34;,&#34;Portugal&#34;:&#34;Portugal&#34;,&#34;Philippines&#34;:&#34;Philippines&#34;,&#34;Russia&#34;:&#34;Russia&#34;,&#34;Saudi Arabia&#34;:&#34;Saudi Arabia&#34;,&#34;South Africa&#34;:&#34;South Africa&#34;,&#34;Spain&#34;:&#34;Spain&#34;,&#34;Sweden&#34;:&#34;Sweden&#34;,&#34;Switzerland&#34;:&#34;Switzerland&#34;,&#34;Taiwan&#34;:&#34;Taiwan&#34;,&#34;Turkey&#34;:&#34;Turkey&#34;,&#34;United Kingdom&#34;:&#34;United Kingdom&#34;,&#34;United States&#34;:&#34;United States&#34;,&#34;clear-verb&#34;:&#34;Clear&#34;,&#34;Safe search&#34;:&#34;Safe search&#34;,&#34;Search&#34;:&#34;Search&#34;,&#34;Moderate&#34;:&#34;Moderate&#34;,&#34;Strict&#34;:&#34;Strict&#34;,&#34;Off&#34;:&#34;Off&#34;,&#34;Make Brave Search default&#34;:&#34;Make Brave Search default&#34;,&#34;Show more&#34;:&#34;Show more&#34;,&#34;Search settings&#34;:&#34;Search settings&#34;,&#34;Quick settings&#34;:&#34;Quick settings&#34;,&#34;Search results independence&#34;:&#34;Search results independence&#34;,&#34;Search results independence description&#34;:&#34;&lt;strong&gt;Search results delivered solely from Brave Index&lt;/strong&gt; as opposed to mixing with big tech index. Private, not tracked.&#34;,&#34;All searches across all Brave Search users&#34;:&#34;All searches across all Brave Search users&#34;,&#34;System&#34;:&#34;System&#34;,&#34;Light&#34;:&#34;Light&#34;,&#34;Dark&#34;:&#34;Dark&#34;,&#34;Country&#34;:&#34;Country&#34;,&#34;Want ad-free search results?&#34;:&#34;Want ad-free search results?&#34;,&#34;Upgrade to Brave Search Premium.&#34;:&#34;Upgrade to Brave Search Premium.&#34;,&#34;Go Premium&#34;:&#34;Go Premium&#34;,&#34;You&#39;re a Brave Supporter&#34;:&#34;You&#39;re a Brave Supporter&#34;,&#34;You&#39;re a Brave Supporter_formatted&#34;:&#34;You&#39;re a &lt;span class=&#39;brave-supporter__label&#39;&gt;Brave Supporter&lt;/span&gt;&#34;,&#34;Manage&#34;:&#34;Manage&#34;,&#34;Preferred results providers&#34;:&#34;Preferred results providers&#34;,&#34;Images&#34;:&#34;Images&#34;,&#34;Videos&#34;:&#34;Videos&#34;,&#34;Not selected&#34;:&#34;Not selected&#34;}}"
+  defer="true">
+</script>
+<script
+  id="js-feedback"
+  src="https://cdn.search.brave.com/serp/v1/static/serp-js/feedback/13867174987bc754f4887df046e2406fc67f509e94c95c6f73299a3290f6fac3-main.bundle.js"
+  data="{&#34;is_mobile&#34;:false,&#34;page&#34;:&#34;search&#34;,&#34;i18n&#34;:{&#34;Thank you!&#34;:&#34;Thank you!&#34;,&#34;How were the search results?&#34;:&#34;How were the search results?&#34;,&#34;Help us improve Brave Search&#34;:&#34;Help us improve Brave Search&#34;,&#34;What do you think of the information shown?&#34;:&#34;What do you think of the information shown?&#34;,&#34;Comments or suggestions?&#34;:&#34;Comments or suggestions?&#34;,&#34;Submit&#34;:&#34;Submit&#34;,&#34;Feedback&#34;:&#34;Feedback&#34;}}"
+  defer="true">
+</script>
+<script
+  id="js-searchElsewhere"
+  src="https://cdn.search.brave.com/serp/v1/static/serp-js/searchElsewhere/1b09d262229c981a8d5aa90d1dde5bc3cd81d6f8490285fb4e7332f13e7b6cfd-main.bundle.js"
+  data="{&#34;is_mobile&#34;:false,&#34;is_fallback_api_available&#34;:false,&#34;query&#34;:&#34;a whole different query&#34;,&#34;is_bad_query&#34;:false,&#34;i18n&#34;:{&#34;Learn more&#34;:&#34;Learn more&#34;,&#34;Find elsewhere&#34;:&#34;Find elsewhere&#34;,&#34;Dismiss and search in Google&#34;:&#34;Dismiss and search in Google&#34;,&#34;bad-results-header&#34;:&#34;Not many great matches came back for your search&#34;,&#34;Try more general keywords&#34;:&#34;Try more general keywords&#34;,&#34;Try fewer keywords&#34;:&#34;Try fewer keywords&#34;,&#34;Try other Goggles&#34;:&#34;Try other Goggles&#34;,&#34;bad-results-for-query-{query}&#34;:&#34;We&#39;re sorry you are not finding the results you wanted for &lt;strong&gt;{query}&lt;/strong&gt;&#34;,&#34;Enable Google Fallback Mixing&#34;:&#34;Enable Google Fallback Mixing&#34;,&#34;serp-fallback-cta-desc&#34;:&#34;For queries where Brave Search is not yet refined, your browser will anonymously check Google for the same query, mix the results for you and send the query data back to us so we can improve Brave Search for everyone.&#34;,&#34;Dismiss&#34;:&#34;Dismiss&#34;}}"
+  defer="true">
+</script>
+<script
+  id="js-gmix"
+  src="https://cdn.search.brave.com/serp/v1/static/serp-js/gmix/81d8341061862059a78197de0db4df9586037149f9458a736f2ac728e432c2d1-main.bundle.js"
+  data="{&#34;score&#34;:1,&#34;favicon_token&#34;:null,&#34;search&#34;:{&#34;query&#34;:{&#34;sf&#34;:false},&#34;mixed&#34;:{&#34;main&#34;:[{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:0},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:1},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:2},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:3},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:4},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:5},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:6},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:7},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:8},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:9},{&#34;type&#34;:&#34;search-elsewhere&#34;,&#34;index&#34;:0},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:10},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:11},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:12},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:13},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:14},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:15},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:16},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:17},{&#34;type&#34;:&#34;web&#34;,&#34;index&#34;:18}]},&#34;web&#34;:{&#34;results&#34;:[{&#34;url&#34;:&#34;https://www.techtarget.com/searchdatamanagement/definition/query&#34;,&#34;title&#34;:&#34;What is a query? Explore database queries and more&#34;,&#34;description&#34;:&#34;Learn about database &lt;strong&gt;queries&lt;/strong&gt; -- formal requests for data -- how they work, the &lt;strong&gt;difference&lt;/strong&gt; between SQL and NOSQL, &lt;strong&gt;query&lt;/strong&gt; folding, web &lt;strong&gt;queries&lt;/strong&gt; and more.&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://www.jetbrains.com/help/datagrip/viewing-query-results.html&#34;,&#34;title&#34;:&#34;Query results | DataGrip Documentation&#34;,&#34;description&#34;:&#34;Run &lt;strong&gt;queries&lt;/strong&gt; to tables that you want to compare. In the Services tool window, click the Compare with icon (), and select the result set that you want to add to diff. If needed, change a value of the Tolerance parameter in the comparison dialog. The Tolerance parameter defines a maximum number of &lt;strong&gt;differences&lt;/strong&gt; ...&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://support.awesome-table.com/hc/en-us/articles/115001152945-Use-Queries-to-show-records-based-on-conditions-&#34;,&#34;title&#34;:&#34;Use Queries to show records based on conditions&#34;,&#34;description&#34;:&#34;2 In this tutorial, you will learn how to use &lt;strong&gt;Query&lt;/strong&gt; statements in Awesome Table to display only the columns of interest, reorder your columns, show items that meet the criteria you have set, sort ...&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://www.actiondesk.io/blog/ultimate-beginners-guide-to-the-query-function-in-google-sheets&#34;,&#34;title&#34;:&#34;Google Sheets Query Function: The Ultimate Beginner&#39;s Guide | ...&#34;,&#34;description&#34;:&#34;You can also &lt;strong&gt;query&lt;/strong&gt; from a completely &lt;strong&gt;different&lt;/strong&gt; spreadsheet. Let’s say Growth2 wasn’t on this spreadsheet and it was on &lt;strong&gt;a&lt;/strong&gt; &lt;strong&gt;whole&lt;/strong&gt; other spreadsheet and we still wanted to aggregate it. We would take the same function:&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://www.benlcollins.com/spreadsheets/google-sheets-query-sql/&#34;,&#34;title&#34;:&#34;Google Sheets Query function: Learn the most powerful function ...&#34;,&#34;description&#34;:&#34;Learn how to use the super-powerful Google Sheets &lt;strong&gt;Query&lt;/strong&gt; function to analyze your data in Google Sheets. Includes template.&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://blog.coupler.io/google-sheets-query-function/&#34;,&#34;title&#34;:&#34;Google Sheets QUERY Function Tutorial 2023 | Coupler.io Blog&#34;,&#34;description&#34;:&#34;Explore the Google Sheets &lt;strong&gt;QUERY&lt;/strong&gt; function to learn how you can use it to optimize your data manipulation experience in spreadsheets.&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://developer.wordpress.org/reference/classes/wp_query/&#34;,&#34;title&#34;:&#34;WP_Query | Class | WordPress Developer Resources&#34;,&#34;description&#34;:&#34;The WordPress &lt;strong&gt;Query&lt;/strong&gt; class. ... Most of the time you can find the information you want without actually dealing with the class internals and global variables. There are &lt;strong&gt;a&lt;/strong&gt; &lt;strong&gt;whole&lt;/strong&gt; bunch of functions that you can call from anywhere that will enable you to get the information you need.&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://www.jetbrains.com/datagrip/features/executing.html&#34;,&#34;title&#34;:&#34;Running queries: read-only mode, history, explain plan, SQL log ...&#34;,&#34;description&#34;:&#34;DataGrip provides smart options ... inside &lt;strong&gt;a&lt;/strong&gt; &lt;strong&gt;query&lt;/strong&gt;, the execution can be customized with several possible options available. Define its intended behavior: execute the smallest statement, the largest statement, ask you to choose what to execute, or execute the &lt;strong&gt;whole&lt;/strong&gt; ...&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://support.microsoft.com/en-us/office/introduction-to-queries-a9739a09-d3ff-4f36-8ac3-5760249fb65c&#34;,&#34;title&#34;:&#34;Introduction to queries - Microsoft Support&#34;,&#34;description&#34;:&#34;An Access &lt;strong&gt;query&lt;/strong&gt; is very versatile and can pull information from various tables and assemble it for display in a form or report. An Access &lt;strong&gt;query&lt;/strong&gt; can either be a request for data results from your database or for action on the data, or for both. An Access &lt;strong&gt;query&lt;/strong&gt; can give you an answer to a simple ...&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://codingisforlosers.com/google-sheets-query-function/&#34;,&#34;title&#34;:&#34;Query Function in Google Sheets - Complete Tutorial | Coding is ...&#34;,&#34;description&#34;:&#34;Learn how lazy Google Sheets users take advantage of the &lt;strong&gt;QUERY&lt;/strong&gt; function, which lets you write SQL &lt;strong&gt;queries&lt;/strong&gt; in a Sheet. Sit back and watch the data flow.&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://www.ablebits.com/office-addins-blog/2020/01/28/google-sheets-query-function/&#34;,&#34;title&#34;:&#34;How to use Google Sheets QUERY function - Ablebits&#34;,&#34;description&#34;:&#34;Explore &lt;strong&gt;different&lt;/strong&gt; ways of using Google Sheets &lt;strong&gt;QUERY&lt;/strong&gt; function: build &lt;strong&gt;QUERY&lt;/strong&gt; formulas from scratch or make a special add-on create them for you.&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://en.wikipedia.org/wiki/Query_string&#34;,&#34;title&#34;:&#34;Query string - Wikipedia&#34;,&#34;description&#34;:&#34;A program receiving &lt;strong&gt;a&lt;/strong&gt; &lt;strong&gt;query&lt;/strong&gt; string can ignore part or all of it. If the requested URL corresponds to a file and not to a program, the &lt;strong&gt;whole&lt;/strong&gt; &lt;strong&gt;query&lt;/strong&gt; string is ignored. However, regardless of whether the &lt;strong&gt;query&lt;/strong&gt; string is used or not, the &lt;strong&gt;whole&lt;/strong&gt; URL including it is stored in the server log files.&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://support.google.com/docs/answer/3093343?hl=en&#34;,&#34;title&#34;:&#34;QUERY function - Google Docs Editors Help&#34;,&#34;description&#34;:&#34;In case of mixed data types in a single column, the majority data type determines the data type of the column for &lt;strong&gt;query&lt;/strong&gt; purposes. Minority data types are considered null values. &lt;strong&gt;query&lt;/strong&gt; - &lt;strong&gt;The&lt;/strong&gt; &lt;strong&gt;query&lt;/strong&gt; to perform, written in the Google Visualization API &lt;strong&gt;Query&lt;/strong&gt; Language.&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://www.seerinteractive.com/blog/how-to-query-data-in-google-sheets/&#34;,&#34;title&#34;:&#34;How to Query Data in Google Sheets with =QUERY Function&#34;,&#34;description&#34;:&#34;In this step-by-step tutorial, you’ll learn how to use the powerful =QUERY function and get a free template to help you apply what you learn.&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://www.mssqltips.com/sqlservertip/2346/different-options-for-query-results-in-sql-server-management-studio/&#34;,&#34;title&#34;:&#34;Different Options for Query Results in SQL Server Management Studio&#34;,&#34;description&#34;:&#34;While looking through the new features and improvements in SQL Server Management Studio (SSMS), we found several options for displaying &lt;strong&gt;query&lt;/strong&gt; results. In this tip we cover what options are available in SSMS and how they can assist you when dealing with qu&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://www.tutorialspoint.com/sql/sql-select-database.htm&#34;,&#34;title&#34;:&#34;SQL - SELECT Database, USE Statement&#34;,&#34;description&#34;:&#34;SQL SELECT Database USE Statement - To work with a database in SQL, we need to first select the database we want to work with using the USE statement. The USE statement in SQL is used to specify the name of the database we want to select. After selecting the database, we can perform various ...&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://stackoverflow.com/questions/7662800/how-do-you-select-top-x-but-still-get-a-count-of-the-whole-query&#34;,&#34;title&#34;:&#34;sql - How do you Select TOP x but still get a COUNT of the whole ...&#34;,&#34;description&#34;:&#34;I&amp;#x27;m writing a webpage to interactively filter results based on filter criteria as it is specified by the user. I only want to return from SQL the TOP 20 rows but I want to know how many rows met the&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://www.sqlshack.com/different-ways-to-search-for-objects-in-sql-databases/&#34;,&#34;title&#34;:&#34;Different ways to search for objects in SQL databases&#34;,&#34;description&#34;:&#34;In this article, we will talk about various ways to search objects in a SQL database.&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null},{&#34;url&#34;:&#34;https://www.mrexcel.com/board/threads/can-i-use-power-query-to-compare-whole-rows-in-two-different-worksheets.1148893/&#34;,&#34;title&#34;:&#34;Can I use Power Query to compare whole rows in two different ...&#34;,&#34;description&#34;:&#34;I am trying to compare two worksheets which contain the columns Date, Type, Number, Name, Debit, Credit, Balance. Approximately 50% of the rows will be identical in both sheets, however there are going to be rows in either sheet that don&amp;#x27;t appear in the other. Or there might be rows that are...&#34;,&#34;ls&#34;:true,&#34;tc&#34;:true,&#34;ft&#34;:true,&#34;bt&#34;:null}]}}}"
+  defer="true">
+</script>
+<script
+  id="js-paid"
+  src="https://cdn.search.brave.com/serp/v1/static/serp-js/paid/b3de2da47c3b8b460e1ffa65add2f6ddfc8f31f62ccfd445172c0ed85095dc0e-main.bundle.js"
+  data="{&#34;i18n&#34;:{&#34;Thanks for supporting independent search!&#34;:&#34;Thanks for supporting independent search!&#34;,&#34;You now have full access to Brave Search&#34;:&#34;You now have full access to Brave Search Premium, and ad-free search results. Enjoy!&#34;,&#34;You&#39;re a Brave Supporter&#34;:&#34;You&#39;re a Brave Supporter&#34;,&#34;You&#39;re a Brave Supporter_formatted&#34;:&#34;You&#39;re a &lt;span class=&#39;brave-supporter__label&#39;&gt;Brave Supporter&lt;/span&gt;&#34;}}"
+  defer="true">
+</script>
+
+
+        <script src="/03248e57c99a72d3cd8dcc8cb352573208878f9bb41c3895a6ee3fa2981702ae-sw.bundle.js" defer="true"></script>
+    
+          </body>
+</html>
