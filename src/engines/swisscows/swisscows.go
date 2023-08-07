@@ -138,13 +138,8 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		counter := 0
 		for _, result := range parsedResponse.Items {
 			goodURL := utility.ParseURL(result.URL)
-			title := strings.ReplaceAll(result.Title, "<b>", "")
-			title = strings.ReplaceAll(title, "</b>", "")
-			title = strings.ReplaceAll(title, "&amp;", "&")
-			desc := strings.ReplaceAll(result.Desc, "<b>", "")
-			desc = strings.ReplaceAll(desc, "</b>", "")
-			desc = strings.ReplaceAll(desc, "&amp;", "&")
-			//^ these are just most common, should probably add a more programatic way to do this
+			title := utility.ParseTextWithHTML(result.Title)
+			desc := utility.ParseTextWithHTML(result.Desc)
 
 			res := structures.Result{
 				URL:          goodURL,
