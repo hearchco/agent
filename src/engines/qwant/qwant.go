@@ -9,8 +9,6 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
-	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/rank"
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 	"github.com/tminaorg/brzaguza/src/structures"
 	"github.com/tminaorg/brzaguza/src/utility"
@@ -92,23 +90,10 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 				continue
 			}
 			for _, result := range group.Items {
-
 				goodURL := utility.ParseURL(result.URL)
-				res := structures.Result{
-					URL:          goodURL,
-					Rank:         -1,
-					SERank:       (page-1)*qResCount + counter,
-					SEPage:       page,
-					SEOnPageRank: counter%defaultResultsPerPage + 1,
-					Title:        result.Title,
-					Description:  result.Description,
-					SearchEngine: seName,
-				}
-				if config.InsertDefaultRank {
-					res.Rank = rank.DefaultRank(res.SERank, res.SEPage, res.SEOnPageRank)
-				}
 
-				bucket.SetResult(&res, relay, options, pagesCol)
+				res := bucket.MakeSEResult(goodURL, result.Title, result.Description, seName, (page-1)*qResCount+counter, page, counter%defaultResultsPerPage+1)
+				bucket.AddSEResult(res, seName, relay, options, pagesCol)
 				counter += 1
 			}
 		}
@@ -128,18 +113,11 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		descText := strings.TrimSpace(baseDOM.Find("div > span").Text())
 
 		if linkText != "" && linkText != "#" && titleText != "" {
-			res := structures.Result{
-				URL:          linkText,
-				Rank:         -1,
-				SERank:       -1,
-				SEPage:       1,
-				SEOnPageRank: idx + 1,
-				Title:        titleText,
-				Description:  descText,
-				SearchEngine: seName,
-			}
+			var pageStr string = e.Request.Ctx.Get("page")
+			page, _ := strconv.Atoi(pageStr)
 
-			bucket.SetResult(&res, relay, options, pagesCol)
+			res := bucket.MakeSEResult(linkText, titleText, descText, seName, -1, page, idx+1)
+			bucket.AddSEResult(res, seName, relay, options, pagesCol)
 		} else {
 			log.Info().Msgf("Not Good! %v\n%v\n%v", linkText, titleText, descText)
 		}

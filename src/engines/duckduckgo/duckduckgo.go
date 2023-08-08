@@ -10,8 +10,6 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
-	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/rank"
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 	"github.com/tminaorg/brzaguza/src/structures"
 	"github.com/tminaorg/brzaguza/src/utility"
@@ -86,21 +84,8 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 				linkText = utility.ParseURL(rawURL)
 			case 3:
 				if linkText != "" && linkText != "#" && titleText != "" {
-					res := structures.Result{
-						URL:          linkText,
-						Rank:         -1,
-						SERank:       rrank,
-						SEPage:       page,
-						SEOnPageRank: (i/4 + 1),
-						Title:        titleText,
-						Description:  descText,
-						SearchEngine: seName,
-					}
-					if config.InsertDefaultRank {
-						res.Rank = rank.DefaultRank(res.SERank, res.SEPage, res.SEOnPageRank)
-					}
-
-					bucket.SetResult(&res, relay, options, pagesCol)
+					res := bucket.MakeSEResult(linkText, titleText, descText, seName, rrank, page, (i/4 + 1))
+					bucket.AddSEResult(res, seName, relay, options, pagesCol)
 				}
 			}
 		})
