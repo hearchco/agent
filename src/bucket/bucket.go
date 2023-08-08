@@ -50,7 +50,7 @@ func AddSEResult(seResult *structures.SEResult, seName string, relay *structures
 	}
 }
 
-func AddSEResultResponse(link string, response *colly.Response, relay *structures.Relay, seName string) {
+func SetResultResponse(link string, response *colly.Response, relay *structures.Relay, seName string) {
 	log.Trace().Msgf("%v: Got Response -> %v", seName, link)
 
 	relay.Mutex.Lock()
