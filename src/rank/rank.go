@@ -19,7 +19,7 @@ func SetRank(result *structures.Result, rankAddr *int, mutex *sync.RWMutex) {
 		log.Trace().Msgf("(This is ok) Request URL not same as result.URL \\/ %v | %v", reqUrl, result.URL)
 	}
 
-	rrank := result.SEPage*100 + result.SEOnPageRank
+	rrank := result.SearchEngines[0].Page*100 + result.SearchEngines[0].OnPageRank
 
 	mutex.Lock()
 	*rankAddr = rrank

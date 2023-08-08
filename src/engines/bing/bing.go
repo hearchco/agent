@@ -8,8 +8,6 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
-	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/rank"
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 	"github.com/tminaorg/brzaguza/src/structures"
 	"github.com/tminaorg/brzaguza/src/utility"
@@ -60,22 +58,9 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			var pageStr string = e.Request.Ctx.Get("page")
 			page, _ := strconv.Atoi(pageStr)
 
-			res := structures.Result{
-				URL:          linkText,
-				Rank:         -1,
-				SERank:       -1,
-				SEPage:       page,
-				SEOnPageRank: pageRankCounter[page] + 1,
-				Title:        titleText,
-				Description:  descText,
-				SearchEngine: seName,
-			}
-			if config.InsertDefaultRank {
-				res.Rank = rank.DefaultRank(res.SERank, res.SEPage, res.SEOnPageRank)
-			}
+			res := bucket.MakeSEResult(linkText, titleText, descText, seName, -1, page, pageRankCounter[page]+1)
+			bucket.AddSEResult(res, seName, relay, options, pagesCol)
 			pageRankCounter[page]++
-
-			bucket.SetResult(&res, relay, options, pagesCol)
 		} else {
 			log.Trace().Msgf("%v: Matched Result, but couldn't retrieve data.\nURL:%v\nTitle:%v\nDescription:%v", seName, linkText, titleText, descText)
 		}

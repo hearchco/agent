@@ -34,7 +34,7 @@ func PagesColError(seName string, pagesCol *colly.Collector) {
 func PagesColResponse(seName string, pagesCol *colly.Collector, relay *structures.Relay) {
 	pagesCol.OnResponse(func(r *colly.Response) {
 		urll := r.Ctx.Get("originalURL")
-		bucket.SetResultResponse(urll, r, relay, seName)
+		bucket.AddSEResultResponse(urll, r, relay, seName)
 	})
 }
 
