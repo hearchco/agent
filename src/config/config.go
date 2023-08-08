@@ -13,9 +13,6 @@ import (
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-const InsertDefaultRank bool = true       // this should be moved to config
-const LogDumpLocation string = "logdump/" // this should be moved to config
-
 // Config struct for Koanf
 type Config struct {
 	Engines []structures.Engine `koanf:"engines"`
@@ -74,3 +71,9 @@ func SetupConfig(path string, name string) *Config {
 
 	return &config
 }
+
+const InsertDefaultRank bool = true       // this should be moved to config
+const LogDumpLocation string = "logdump/" // this should be moved to config
+
+// update this when loading config
+var NumberOfEngines int = 10

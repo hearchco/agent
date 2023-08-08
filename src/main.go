@@ -13,7 +13,14 @@ import (
 func printResults(results []structures.Result) {
 	fmt.Print("\n\tThe Search Results:\n\n")
 	for _, r := range results {
-		fmt.Printf("%v -----\n\t\"%v\"\n\t\"%v\"\n\t\"%v\"\n\t-%v\n", r.Rank, r.Title, r.URL, r.Description, r.SearchEngine)
+		fmt.Printf("%v -----\n\t\"%v\"\n\t\"%v\"\n\t\"%v\"\n\t-", r.Rank, r.Title, r.URL, r.Description)
+		for seInd := 0; seInd < r.TimesReturned; seInd++ {
+			fmt.Printf("%v", r.SearchEngines[seInd].SearchEngine)
+			if seInd != r.TimesReturned-1 {
+				fmt.Print(", ")
+			}
+		}
+		fmt.Printf("\n")
 	}
 }
 
