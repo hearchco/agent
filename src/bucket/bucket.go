@@ -8,7 +8,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-func AddSEResult(seResult *structures.SEResult, seName string, relay *structures.Relay, options *structures.Options, pagesCol *colly.Collector) {
+func AddSEResult(seResult *structures.SEResult, seName string, relay *structures.Relay, options *structures.SEOptions, pagesCol *colly.Collector) {
 	log.Trace().Msgf("%v: Got Result -> %v: %v", seName, seResult.Title, seResult.URL)
 
 	relay.Mutex.RLock()
@@ -16,7 +16,7 @@ func AddSEResult(seResult *structures.SEResult, seName string, relay *structures
 	relay.Mutex.RUnlock()
 
 	if !exists {
-		searchEngines := make([]structures.SERank, config.NumberOfEngines)
+		searchEngines := make([]structures.SERank, len(config.EnabledEngines))
 		searchEngines[0] = seResult.Rank
 		result := structures.Result{
 			URL:           seResult.URL,

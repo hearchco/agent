@@ -39,7 +39,7 @@ const defaultResultsPerPage int = 10
 
 // const seURL string = "https://swisscows.com/en/web?query="
 
-func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
+func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.SEOptions, settings *config.SESettings) error {
 	if err := sedefaults.FunctionPrepare(seName, options, &ctx); err != nil {
 		return err
 	}

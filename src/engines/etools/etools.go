@@ -8,6 +8,7 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
+	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 	"github.com/tminaorg/brzaguza/src/structures"
 	"github.com/tminaorg/brzaguza/src/utility"
@@ -24,7 +25,7 @@ const sePAGEURL string = "https://www.etools.ch/search.do?page="
 
 const resultsPerPage int = 10
 
-func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
+func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.SEOptions, settings *config.SESettings) error {
 	if err := sedefaults.FunctionPrepare(seName, options, &ctx); err != nil {
 		return err
 	}

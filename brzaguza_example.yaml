@@ -1,10 +1,5 @@
 engines:
-    - Google
-    - DuckDuckGo
-    - Mojeek
-    - Qwant
-    - Etools
-    - Swisscows
-    - Brave
-    - Bing
-    - Startpage
+  google:
+    enabled: false
+  duckduckgo:
+    enabled: true

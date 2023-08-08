@@ -61,7 +61,7 @@ func ColError(seName string, col *colly.Collector, retError *error) {
 	})
 }
 
-func FunctionPrepare(seName string, options *structures.Options, ctx *context.Context) error {
+func FunctionPrepare(seName string, options *structures.SEOptions, ctx *context.Context) error {
 	if ctx == nil {
 		*ctx = context.Background()
 	} //^ not necessary as ctx is always passed in search.go, branch predictor will skip this if
@@ -78,7 +78,7 @@ func FunctionPrepare(seName string, options *structures.Options, ctx *context.Co
 	return nil
 }
 
-func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collector, options *structures.Options) {
+func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collector, options *structures.SEOptions) {
 	if options.MaxPages == 1 {
 		*colPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) // so there is no thread creation overhead
 	} else {

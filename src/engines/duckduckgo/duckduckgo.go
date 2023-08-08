@@ -10,6 +10,7 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
+	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 	"github.com/tminaorg/brzaguza/src/structures"
 	"github.com/tminaorg/brzaguza/src/utility"
@@ -20,7 +21,7 @@ const SEDomain string = "lite.duckduckgo.com"
 const seName string = "DuckDuckGo"
 const seURL string = "https://lite.duckduckgo.com/lite/"
 
-func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
+func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.SEOptions, settings *config.SESettings) error {
 	if err := sedefaults.FunctionPrepare(seName, options, &ctx); err != nil {
 		return err
 	}
