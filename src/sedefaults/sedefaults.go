@@ -78,11 +78,28 @@ func FunctionPrepare(seName string, options *structures.Options, ctx *context.Co
 	return nil
 }
 
-func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collector, options *structures.Options) {
+func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collector, options *structures.Options, timings *structures.Timings) {
 	if options.MaxPages == 1 {
 		*colPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) // so there is no thread creation overhead
 	} else {
 		*colPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 	}
 	*pagesColPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
+
+	if timings != nil {
+		var limitRule *colly.LimitRule = &colly.LimitRule{
+			DomainGlob:  "*",
+			Delay:       timings.Delay,
+			RandomDelay: timings.RandomDelay,
+			Parallelism: timings.Parallelism,
+		}
+
+		(*colPtr).Limit(limitRule)
+		if timings.Timeout != 0 {
+			(*colPtr).SetRequestTimeout(timings.Timeout)
+		}
+		if timings.PageTimeout != 0 {
+			(*pagesColPtr).SetRequestTimeout(timings.PageTimeout)
+		}
+	}
 }

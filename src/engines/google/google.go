@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/tminaorg/brzaguza/src/bucket"
@@ -18,6 +19,15 @@ const seName string = "Google"
 const seURL string = "https://www.google.com/search?q="
 const resPerPage int = 10
 
+// This should be in SESettings
+var timings structures.Timings = structures.Timings{
+	Timeout:     10 * time.Second, // the default in colly
+	PageTimeout: 5 * time.Second,
+	Delay:       100 * time.Millisecond,
+	RandomDelay: 50 * time.Millisecond,
+	Parallelism: 2, //two requests will be sent to the server, 100 + [0,50) milliseconds apart from the next two
+}
+
 func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
 	if err := sedefaults.FunctionPrepare(seName, options, &ctx); err != nil {
 		return err
@@ -27,7 +37,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, options)
+	sedefaults.InitializeCollectors(&col, &pagesCol, options, &timings)
 
 	sedefaults.PagesColRequest(seName, pagesCol, &ctx, &retError)
 	sedefaults.PagesColError(seName, pagesCol)

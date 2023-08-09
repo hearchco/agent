@@ -47,7 +47,7 @@ func PerformSearch(query string, maxPages int, visitPages bool) []structures.Res
 	query = url.QueryEscape(query)
 
 	var worker conc.WaitGroup
-	var toSearch []Engine = []Engine{Swisscows, Mojeek, Etools}
+	var toSearch []Engine = []Engine{Google}
 	runEngines(toSearch, query, &worker, &relay, &options)
 	worker.Wait()
 
