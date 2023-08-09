@@ -78,11 +78,15 @@ func FunctionPrepare(seName string, options *structures.Options, ctx *context.Co
 	return nil
 }
 
-func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collector, options *structures.Options) {
+func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collector, options *structures.Options, limitRule *colly.LimitRule) {
 	if options.MaxPages == 1 {
 		*colPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) // so there is no thread creation overhead
 	} else {
 		*colPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 	}
 	*pagesColPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
+
+	if limitRule != nil {
+		(*colPtr).Limit(limitRule)
+	}
 }
