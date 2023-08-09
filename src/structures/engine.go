@@ -1,5 +1,17 @@
 package structures
 
+import "time"
+
+// Delegates Timeout, PageTimeout to colly.Collector.SetRequestTimeout(); Note: See https://github.com/gocolly/colly/issues/644
+// Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit()
+type Timings struct {
+	Timeout     time.Duration
+	PageTimeout time.Duration
+	Delay       time.Duration
+	RandomDelay time.Duration
+	Parallelism int
+}
+
 type SEInfo struct {
 	Domain     string
 	Name       string

@@ -31,7 +31,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, options)
+	sedefaults.InitializeCollectors(&col, &pagesCol, options, nil)
 
 	sedefaults.PagesColRequest(seName, pagesCol, &ctx, &retError)
 	sedefaults.PagesColError(seName, pagesCol)
