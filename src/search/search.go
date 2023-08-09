@@ -52,11 +52,11 @@ func PerformSearch(query string, maxPages int, visitPages bool, config *config.C
 	return results
 }
 
-func runEngines(engines map[structures.Engine]config.Engine, query string, worker *conc.WaitGroup, relay *structures.Relay, options *structures.SEOptions) {
+func runEngines(engines []config.Engine, query string, worker *conc.WaitGroup, relay *structures.Relay, options *structures.SEOptions) {
 	log.Info().Msgf("Enabled engines: %v", config.EnabledEngines)
 
-	for name, engine := range engines {
-		switch name {
+	for _, engine := range engines {
+		switch engine.Name {
 		case structures.Google:
 			worker.Go(func() {
 				err := google.Search(context.Background(), query, relay, options, &engine.Settings)

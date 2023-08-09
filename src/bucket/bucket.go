@@ -37,7 +37,7 @@ func AddSEResult(seResult *structures.SEResult, seName string, relay *structures
 		relay.Mutex.Unlock()
 	} else {
 		relay.Mutex.Lock()
-		mapRes.SearchEngines[mapRes.TimesReturned] = seResult.Rank
+		mapRes.SearchEngines[mapRes.TimesReturned] = seResult.Rank //crashes if a search engine returns the same results twice (e.g. on different pages, swisscows main culprit), due to allocation
 		mapRes.TimesReturned++
 		if len(mapRes.Description) < len(seResult.Description) {
 			mapRes.Description = seResult.Description
