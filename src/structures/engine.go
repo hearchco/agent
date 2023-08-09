@@ -1,9 +1,9 @@
 package structures
 
 type SEInfo struct {
-	SEDomain   string
-	SEName     string
-	SEURL      string
+	Domain     string
+	Name       string
+	URL        string
 	ResPerPage int
 }
 

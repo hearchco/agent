@@ -131,10 +131,12 @@ func SetupConfig(path string, name string) *Config {
 	var config Config
 	k.Unmarshal("", &config)
 
-	// Count number of engines
+	// Add enabled engines names and remove disabled ones
 	for name, engine := range config.Engines {
 		if engine.Enabled {
 			EnabledEngines = append(EnabledEngines, name)
+		} else {
+			delete(config.Engines, name)
 		}
 	}
 
