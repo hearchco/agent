@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"strings"
+	"time"
 
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/env"
@@ -13,10 +14,19 @@ import (
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
+// Delegates Timeout, PageTimeout to colly.Collector.SetRequestTimeout(); Note: See https://github.com/gocolly/colly/issues/644
+// Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit()
+type SETimings struct {
+	Timeout     time.Duration `koanf:"timeout"`
+	PageTimeout time.Duration `koanf:"pagetimeout"`
+	Delay       time.Duration `koanf:"delay"`
+	RandomDelay time.Duration `koanf:"randomdelay"`
+	Parallelism int           `koanf:"parallelism"`
+}
+
 type SESettings struct {
-	Timeout  int                 `koanf:"timeout"`
-	Shortcut string              `koanf:"shortcut"`
-	Crawlers []structures.Engine `koanf:"crawlers"`
+	Shortcut string    `koanf:"shortcut"`
+	Timings  SETimings `koanf:"timings"`
 }
 
 type Engine struct {
@@ -26,10 +36,10 @@ type Engine struct {
 
 // Config struct for Koanf
 type Config struct {
-	Engines map[structures.Engine]Engine `koanf:"engines"`
+	Engines map[structures.EngineName]Engine `koanf:"engines"`
 }
 
-var EnabledEngines []structures.Engine = make([]structures.Engine, 0)
+var EnabledEngines []structures.EngineName = make([]structures.EngineName, 0)
 
 func SetupConfig(path string, name string) *Config {
 	// Use "." as the key path delimiter. This can be "/" or any character.
@@ -39,68 +49,59 @@ func SetupConfig(path string, name string) *Config {
 	// We provide a struct along with the struct tag `koanf` to the
 	// provider.
 	k.Load(structs.Provider(Config{
-		Engines: map[structures.Engine]Engine{
+		Engines: map[structures.EngineName]Engine{
 			"bing": {
 				Enabled: true,
 				Settings: SESettings{
 					Shortcut: "bi",
-					Crawlers: []structures.Engine{structures.Bing},
 				},
 			},
 			"brave": {
 				Enabled: true,
 				Settings: SESettings{
 					Shortcut: "br",
-					Crawlers: []structures.Engine{structures.Brave, structures.Google},
 				},
 			},
 			"duckduckgo": {
 				Enabled: true,
 				Settings: SESettings{
 					Shortcut: "ddg",
-					Crawlers: []structures.Engine{structures.Bing},
 				},
 			},
 			"etools": {
 				Enabled: true,
 				Settings: SESettings{
 					Shortcut: "ets",
-					Crawlers: []structures.Engine{structures.Bing, structures.Google, structures.Mojeek, structures.Yandex},
 				},
 			},
 			"google": {
 				Enabled: true,
 				Settings: SESettings{
 					Shortcut: "go",
-					Crawlers: []structures.Engine{structures.Google},
 				},
 			},
 			"mojeek": {
 				Enabled: true,
 				Settings: SESettings{
 					Shortcut: "mjk",
-					Crawlers: []structures.Engine{structures.Mojeek},
 				},
 			},
 			"qwant": {
 				Enabled: true,
 				Settings: SESettings{
 					Shortcut: "qw",
-					Crawlers: []structures.Engine{structures.Qwant, structures.Bing},
 				},
 			},
 			"startpage": {
 				Enabled: true,
 				Settings: SESettings{
 					Shortcut: "sp",
-					Crawlers: []structures.Engine{structures.Google},
 				},
 			},
 			"swisscows": {
 				Enabled: true,
 				Settings: SESettings{
 					Shortcut: "sc",
-					Crawlers: []structures.Engine{structures.Bing},
 				},
 			},
 		},

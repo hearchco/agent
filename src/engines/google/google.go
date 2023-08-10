@@ -9,19 +9,13 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/tminaorg/brzaguza/src/search/parse"
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 	"github.com/tminaorg/brzaguza/src/structures"
-	"github.com/tminaorg/brzaguza/src/utility"
 )
 
-const SEDomain string = "www.google.com"
-
-const seName string = "Google"
-const seURL string = "https://www.google.com/search?q="
-const resPerPage int = 10
-
 // This should be in SESettings
-var timings structures.Timings = structures.Timings{
+var timings config.SETimings = config.SETimings{
 	Timeout:     10 * time.Second, // the default in colly
 	PageTimeout: 5 * time.Second,
 	Delay:       100 * time.Millisecond,
@@ -29,8 +23,8 @@ var timings structures.Timings = structures.Timings{
 	Parallelism: 2, //two requests will be sent to the server, 100 + [0,50) milliseconds apart from the next two
 }
 
-func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.SEOptions, settings *config.SESettings) error {
-	if err := sedefaults.FunctionPrepare(seName, options, &ctx); err != nil {
+func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options, settings *config.SESettings) error {
+	if err := sedefaults.FunctionPrepare(Info.Name, options, &ctx); err != nil {
 		return err
 	}
 
@@ -40,40 +34,40 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 	sedefaults.InitializeCollectors(&col, &pagesCol, options, &timings)
 
-	sedefaults.PagesColRequest(seName, pagesCol, &ctx, &retError)
-	sedefaults.PagesColError(seName, pagesCol)
-	sedefaults.PagesColResponse(seName, pagesCol, relay)
+	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
+	sedefaults.PagesColError(Info.Name, pagesCol)
+	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
-	sedefaults.ColRequest(seName, col, &ctx, &retError)
-	sedefaults.ColError(seName, col, &retError)
+	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
+	sedefaults.ColError(Info.Name, col, &retError)
 
-	var pageRankCounter []int = make([]int, options.MaxPages*resPerPage)
+	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResPerPage)
 
-	col.OnHTML("div.g", func(e *colly.HTMLElement) {
+	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
 
-		linkHref, _ := dom.Find("a").Attr("href")
-		linkText := utility.ParseURL(linkHref)
-		titleText := strings.TrimSpace(dom.Find("div > div > div > a > h3").Text())
-		descText := strings.TrimSpace(dom.Find("div > div > div > div:first-child > span:first-child").Text())
+		linkHref, _ := dom.Find(dompaths.Link).Attr("href")
+		linkText := parse.ParseURL(linkHref)
+		titleText := strings.TrimSpace(dom.Find(dompaths.Title).Text())
+		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
 
 		if linkText != "" && linkText != "#" && titleText != "" {
 			var pageStr string = e.Request.Ctx.Get("page")
 			page, _ := strconv.Atoi(pageStr)
 
-			res := bucket.MakeSEResult(linkText, titleText, descText, seName, -1, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, seName, relay, options, pagesCol)
+			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, pageRankCounter[page]+1)
+			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 			pageRankCounter[page]++
 		}
 	})
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
-	col.Request("GET", seURL+query, nil, colCtx, nil)
+	col.Request("GET", Info.URL+query, nil, colCtx, nil)
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		col.Request("GET", seURL+query+"&start="+strconv.Itoa(i*10), nil, colCtx, nil)
+		col.Request("GET", Info.URL+query+"&start="+strconv.Itoa(i*10), nil, colCtx, nil)
 	}
 
 	col.Wait()

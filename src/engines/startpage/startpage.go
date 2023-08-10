@@ -9,21 +9,15 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/tminaorg/brzaguza/src/search/parse"
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 	"github.com/tminaorg/brzaguza/src/structures"
-	"github.com/tminaorg/brzaguza/src/utility"
 )
-
-const SEDomain string = "www.startpage.com"
-
-const seName string = "Startpage"
-const seURL string = "https://www.startpage.com/sp/search?q="
-const resPerPage int = 10
 
 const useSafeSearch bool = false
 
-func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.SEOptions, settings *config.SESettings) error {
-	if err := sedefaults.FunctionPrepare(seName, options, &ctx); err != nil {
+func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options, settings *config.SESettings) error {
+	if err := sedefaults.FunctionPrepare(Info.Name, options, &ctx); err != nil {
 		return err
 	}
 
@@ -33,40 +27,40 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 	sedefaults.InitializeCollectors(&col, &pagesCol, options, nil)
 
-	sedefaults.PagesColRequest(seName, pagesCol, &ctx, &retError)
-	sedefaults.PagesColError(seName, pagesCol)
-	sedefaults.PagesColResponse(seName, pagesCol, relay)
+	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
+	sedefaults.PagesColError(Info.Name, pagesCol)
+	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
-	sedefaults.ColRequest(seName, col, &ctx, &retError)
-	sedefaults.ColError(seName, col, &retError)
+	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
+	sedefaults.ColError(Info.Name, col, &retError)
 
-	var pageRankCounter []int = make([]int, options.MaxPages*resPerPage)
+	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResPerPage)
 
-	col.OnHTML("section > div.w-gl__result", func(e *colly.HTMLElement) {
+	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
 
-		linkHref, _ := dom.Find("a.result-link").Attr("href")
-		linkText := utility.ParseURL(linkHref)
-		titleText := strings.TrimSpace(dom.Find("a.w-gl__result-title").Text())
-		descText := strings.TrimSpace(dom.Find("p.w-gl__description").Text())
+		linkHref, _ := dom.Find(dompaths.Link).Attr("href")
+		linkText := parse.ParseURL(linkHref)
+		titleText := strings.TrimSpace(dom.Find(dompaths.Title).Text())
+		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
 
 		if linkText != "" && linkText != "#" && titleText != "" {
 			var pageStr string = e.Request.Ctx.Get("page")
 			page, _ := strconv.Atoi(pageStr)
 
-			res := bucket.MakeSEResult(linkText, titleText, descText, seName, -1, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, seName, relay, options, pagesCol)
+			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, pageRankCounter[page]+1)
+			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 			pageRankCounter[page]++
 		} else {
-			log.Trace().Msgf("%v: Matched Result, but couldn't retrieve data.\nURL:%v\nTitle:%v\nDescription:%v", seName, linkText, titleText, descText)
+			log.Trace().Msgf("%v: Matched Result, but couldn't retrieve data.\nURL:%v\nTitle:%v\nDescription:%v", Info.Name, linkText, titleText, descText)
 		}
 	})
 
 	col.OnResponse(func(r *colly.Response) {
 		if strings.Contains(string(r.Body), "to prevent possible abuse of our service") {
-			log.Error().Msgf("%v: Request blocked by engine due to scraping.", seName)
+			log.Error().Msgf("%v: Request blocked by engine due to scraping.", Info.Name)
 		} else if strings.Contains(string(r.Body), "This page cannot function without javascript") {
-			log.Error().Msgf("%v: Engine couldn't load requests, needs javascript.", seName)
+			log.Error().Msgf("%v: Engine couldn't load requests, needs javascript.", Info.Name)
 		}
 	})
 
@@ -77,11 +71,11 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
-	col.Request("GET", seURL+query+safeSearchParameter, nil, colCtx, nil)
+	col.Request("GET", Info.URL+query+safeSearchParameter, nil, colCtx, nil)
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		col.Request("GET", seURL+query+"&page="+strconv.Itoa(i+1)+safeSearchParameter, nil, colCtx, nil)
+		col.Request("GET", Info.URL+query+"&page="+strconv.Itoa(i+1)+safeSearchParameter, nil, colCtx, nil)
 	}
 
 	col.Wait()

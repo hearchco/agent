@@ -1,30 +1,11 @@
 package structures
 
-import "time"
-
-// Delegates Timeout, PageTimeout to colly.Collector.SetRequestTimeout(); Note: See https://github.com/gocolly/colly/issues/644
-// Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit()
-type Timings struct {
-	Timeout     time.Duration
-	PageTimeout time.Duration
-	Delay       time.Duration
-	RandomDelay time.Duration
-	Parallelism int
-}
-
 type SEInfo struct {
 	Domain     string
 	Name       string
 	URL        string
 	ResPerPage int
-}
-
-type SEOptions struct {
-	UserAgent     string
-	MaxPages      int
-	ProxyAddr     string
-	JustFirstPage bool
-	VisitPages    bool
+	Crawlers   []EngineName
 }
 
 type SEDOMPaths struct {
@@ -36,17 +17,25 @@ type SEDOMPaths struct {
 	NextPage         string // button
 }
 
-type Engine string
+type Options struct {
+	UserAgent     string
+	MaxPages      int
+	ProxyAddr     string
+	JustFirstPage bool
+	VisitPages    bool
+}
+
+type EngineName string
 
 const (
-	Google     Engine = "google" // needs to be toLower
-	Mojeek     Engine = "mojeek"
-	DuckDuckGo Engine = "duckduckgo"
-	Qwant      Engine = "qwant"
-	Etools     Engine = "etools"
-	Swisscows  Engine = "swisscows"
-	Brave      Engine = "brave"
-	Bing       Engine = "bing"
-	Startpage  Engine = "startpage"
-	Yandex     Engine = "yandex" // needed for crawler types
+	Google     EngineName = "google" // needs to be toLower
+	Mojeek     EngineName = "mojeek"
+	DuckDuckGo EngineName = "duckduckgo"
+	Qwant      EngineName = "qwant"
+	Etools     EngineName = "etools"
+	Swisscows  EngineName = "swisscows"
+	Brave      EngineName = "brave"
+	Bing       EngineName = "bing"
+	Startpage  EngineName = "startpage"
+	Yandex     EngineName = "yandex" // needed for crawler types
 )

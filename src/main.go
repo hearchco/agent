@@ -39,6 +39,8 @@ func main() {
 	results := search.PerformSearch(cli.Query, cli.MaxPages, cli.Visit, config)
 	duration := time.Since(start)
 
-	printResults(results)
+	if !cli.Silent {
+		printResults(results)
+	}
 	log.Info().Msgf("Found %v results in %vms", len(results), duration.Milliseconds())
 }
