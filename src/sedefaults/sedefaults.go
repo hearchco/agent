@@ -61,7 +61,7 @@ func ColError(seName string, col *colly.Collector, retError *error) {
 	})
 }
 
-func FunctionPrepare(seName string, options *structures.Options, ctx *context.Context) error {
+func Prepare(seName string, options *structures.Options, settings *config.SESettings, support *structures.SupportedSettings, info *structures.SEInfo, ctx *context.Context) error {
 	if ctx == nil {
 		*ctx = context.Background()
 	} //^ not necessary as ctx is always passed in search.go, branch predictor will skip this if
@@ -74,6 +74,32 @@ func FunctionPrepare(seName string, options *structures.Options, ctx *context.Co
 		options.UserAgent = useragent.RandomUserAgent()
 	}
 	log.Trace().Msgf("%v: UserAgent: %v", seName, options.UserAgent)
+
+	// These two ifs, could be moved to config.SetupConfig
+	if settings.RequestedResultsPerPage != 0 && !support.RequestedResultsPerPage {
+		log.Error().Msgf("%v: Variable settings.RequestedResultsPerPage is set, but not supported in this search engine. Its value is: %v", seName, settings.RequestedResultsPerPage)
+		panic("sedefaults.Prepare(): Setting not supported.")
+	}
+	if settings.RequestedResultsPerPage == 0 && support.RequestedResultsPerPage {
+		// If its used in the code but not set, give it the default value.
+		settings.RequestedResultsPerPage = info.ResultsPerPage
+	}
+
+	if options.Mobile && !support.Mobile {
+		options.Mobile = false // this line shouldn't matter [1]
+		log.Debug().Msgf("%v: Mobile set but not supported. Value: %v", seName, options.Mobile)
+	}
+	if options.Locale != "" && !support.Locale {
+		options.Locale = config.DefaultLocale // [1]
+		log.Debug().Msgf("%v: Locale set but not supported. Value: %v", seName, options.Mobile)
+	}
+	if options.Locale == "" && support.Locale {
+		options.Locale = config.DefaultLocale
+	}
+	if options.SafeSearch && !support.SafeSearch {
+		options.SafeSearch = false // [1]
+		log.Debug().Msgf("%v: SafeSearch set but not supported.", seName)
+	}
 
 	return nil
 }

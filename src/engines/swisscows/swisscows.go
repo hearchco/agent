@@ -15,25 +15,8 @@ import (
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-type SCItem struct {
-	Id         string `json:"id"`
-	Title      string `json:"title"`
-	Desc       string `json:"description"`
-	URL        string `json:"url"`
-	DisplayURL string `json:"displayUrl"`
-}
-
-type SCResponse struct {
-	Items []SCItem `json:"items"`
-}
-
-const locale string = "en-US"
-const defaultResultsPerPage int = 10
-
-// const Info.URL string = "https://swisscows.com/en/web?query="
-
-func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options, settings *config.SESettings) error {
-	if err := sedefaults.FunctionPrepare(Info.Name, options, &ctx); err != nil {
+func Search(ctx context.Context, query string, relay *structures.Relay, options structures.Options, settings config.SESettings) error {
+	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
 
@@ -41,7 +24,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, options, nil)
+	sedefaults.InitializeCollectors(&col, &pagesCol, &options, nil)
 
 	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
 	sedefaults.PagesColError(Info.Name, pagesCol)
@@ -79,29 +62,6 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		retError = err
 	})
 
-	/* // not used
-
-	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResPerPage)
-	col.OnHTML("div.web-results > article.item-web", func(e *colly.HTMLElement) {
-		dom := e.DOM
-
-		linkHref, _ := dom.Find("a.site").Attr("href")
-		linkText := parse.ParseURL(linkHref)
-		titleText := strings.TrimSpace(dom.Find("h2.title").Text())
-		descText := strings.TrimSpace(dom.Find("p.description").Text())
-
-		if linkText != "" && linkText != "#" && titleText != "" {
-			var pageStr string = e.Request.Ctx.Get("page")
-			page, _ := strconv.Atoi(pageStr)
-
-			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
-			pageRankCounter[page]++
-		} else {
-			log.Trace().Msgf("%v: Matched Result, but couldn't retrieve data.\nURL:%v\nTitle:%v\nDescription:%v", Info.Name, linkText, titleText, descText)
-		}
-	}) */
-
 	col.OnResponse(func(r *colly.Response) {
 		log.Trace().Msgf("URL: %v\nNonce: %v\nSig: %v", r.Request.URL.String(), r.Request.Headers.Get("X-Request-Nonce"), r.Request.Headers.Get("X-Request-Signature"))
 
@@ -120,11 +80,13 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			title := parse.ParseTextWithHTML(result.Title)
 			desc := parse.ParseTextWithHTML(result.Desc)
 
-			res := bucket.MakeSEResult(goodURL, title, desc, Info.Name, -1, page, counter%defaultResultsPerPage+1)
-			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+			res := bucket.MakeSEResult(goodURL, title, desc, Info.Name, -1, page, counter%Info.ResultsPerPage+1)
+			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 			counter += 1
 		}
 	})
+
+	var locale string = getLocale(&options)
 
 	var colCtx *colly.Context
 	for i := 0; i < options.MaxPages; i++ {
@@ -132,7 +94,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		colCtx.Put("page", strconv.Itoa(i+1))
 		//col.Request("OPTIONS", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
 		//col.Wait()
-		col.Request("GET", Info.URL+"freshness=All&itemsCount="+strconv.Itoa(Info.ResPerPage)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
+		col.Request("GET", Info.URL+"freshness=All&itemsCount="+strconv.Itoa(settings.RequestedResultsPerPage)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
 	}
 
 	col.Wait()
@@ -140,3 +102,30 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 	return retError
 }
+
+func getLocale(options *structures.Options) string {
+	return options.Locale
+}
+
+/*
+var pageRankCounter []int = make([]int, options.MaxPages*Info.ResPerPage)
+col.OnHTML("div.web-results > article.item-web", func(e *colly.HTMLElement) {
+	dom := e.DOM
+
+	linkHref, _ := dom.Find("a.site").Attr("href")
+	linkText := parse.ParseURL(linkHref)
+	titleText := strings.TrimSpace(dom.Find("h2.title").Text())
+	descText := strings.TrimSpace(dom.Find("p.description").Text())
+
+	if linkText != "" && linkText != "#" && titleText != "" {
+		var pageStr string = e.Request.Ctx.Get("page")
+		page, _ := strconv.Atoi(pageStr)
+
+		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, pageRankCounter[page]+1)
+		bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+		pageRankCounter[page]++
+	} else {
+		log.Trace().Msgf("%v: Matched Result, but couldn't retrieve data.\nURL:%v\nTitle:%v\nDescription:%v", Info.Name, linkText, titleText, descText)
+	}
+})
+*/

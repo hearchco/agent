@@ -14,12 +14,8 @@ import (
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-// const seGETURL string = "https://www.etools.ch/searchSubmit.do?query="
-// https://www.etools.ch/search.do?page=<page number>&query=<query>
-const sePAGEURL string = "https://www.etools.ch/search.do?page="
-
-func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options, settings *config.SESettings) error {
-	if err := sedefaults.FunctionPrepare(Info.Name, options, &ctx); err != nil {
+func Search(ctx context.Context, query string, relay *structures.Relay, options structures.Options, settings config.SESettings) error {
+	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
 
@@ -27,7 +23,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, options, nil)
+	sedefaults.InitializeCollectors(&col, &pagesCol, &options, nil)
 
 	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
 	sedefaults.PagesColError(Info.Name, pagesCol)
@@ -64,10 +60,10 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			}
 
 			//var onPageRank int = e.Index // this should also work, but is a bit more volatile
-			var onPageRank int = (seRank-1)%Info.ResPerPage + 1
+			var onPageRank int = (seRank-1)%Info.ResultsPerPage + 1
 
 			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, seRank, page, onPageRank)
-			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 		}
 	})
 
@@ -80,7 +76,6 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
-	//also takes "&token=5d8d98d9a968388eeb4191afa00ca469"
 	col.Request("POST", Info.URL, strings.NewReader("query="+query+"&country=web&language=all"), colCtx, nil)
 	col.Wait() //wait so I can get the JSESSION cookie back
 
@@ -88,12 +83,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		pageStr := strconv.Itoa(i + 1)
 		colCtx = colly.NewContext()
 		colCtx.Put("page", pageStr)
-		col.Request("GET", sePAGEURL+pageStr, nil, colCtx, nil)
-
-		//col.Wait()
-
-		//time.Sleep(200 * time.Millisecond)
-		//a delay can help reduce response volatility for this site
+		col.Request("GET", pageURL+pageStr, nil, colCtx, nil)
 	}
 
 	col.Wait()

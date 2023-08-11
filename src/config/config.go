@@ -25,8 +25,9 @@ type SETimings struct {
 }
 
 type SESettings struct {
-	Shortcut string    `koanf:"shortcut"`
-	Timings  SETimings `koanf:"timings"`
+	RequestedResultsPerPage int       `koanf:"requestedResults"`
+	Shortcut                string    `koanf:"shortcut"`
+	Timings                 SETimings `koanf:"timings"`
 }
 
 type Engine struct {
@@ -48,64 +49,7 @@ func SetupConfig(path string, name string) *Config {
 	// Load default values using the structs provider.
 	// We provide a struct along with the struct tag `koanf` to the
 	// provider.
-	k.Load(structs.Provider(Config{
-		Engines: map[structures.EngineName]Engine{
-			"bing": {
-				Enabled: true,
-				Settings: SESettings{
-					Shortcut: "bi",
-				},
-			},
-			"brave": {
-				Enabled: true,
-				Settings: SESettings{
-					Shortcut: "br",
-				},
-			},
-			"duckduckgo": {
-				Enabled: true,
-				Settings: SESettings{
-					Shortcut: "ddg",
-				},
-			},
-			"etools": {
-				Enabled: true,
-				Settings: SESettings{
-					Shortcut: "ets",
-				},
-			},
-			"google": {
-				Enabled: true,
-				Settings: SESettings{
-					Shortcut: "go",
-				},
-			},
-			"mojeek": {
-				Enabled: true,
-				Settings: SESettings{
-					Shortcut: "mjk",
-				},
-			},
-			"qwant": {
-				Enabled: true,
-				Settings: SESettings{
-					Shortcut: "qw",
-				},
-			},
-			"startpage": {
-				Enabled: true,
-				Settings: SESettings{
-					Shortcut: "sp",
-				},
-			},
-			"swisscows": {
-				Enabled: true,
-				Settings: SESettings{
-					Shortcut: "sc",
-				},
-			},
-		},
-	}, "koanf"), nil)
+	k.Load(structs.Provider(DefaultConfig, "koanf"), nil)
 
 	// Check if path ends with "/" and add it otherwise
 	if path[len(path)-1] != '/' {

@@ -1,11 +1,18 @@
 package structures
 
+type SupportedSettings struct {
+	Locale                  bool
+	SafeSearch              bool
+	Mobile                  bool
+	RequestedResultsPerPage bool
+}
+
 type SEInfo struct {
-	Domain     string
-	Name       string
-	URL        string
-	ResPerPage int
-	Crawlers   []EngineName
+	Domain         string
+	Name           string
+	URL            string
+	ResultsPerPage int
+	Crawlers       []EngineName
 }
 
 type SEDOMPaths struct {
@@ -14,7 +21,6 @@ type SEDOMPaths struct {
 	Link             string // a href
 	Title            string // heading
 	Description      string // paragraph
-	NextPage         string // button
 }
 
 type Options struct {
@@ -23,6 +29,9 @@ type Options struct {
 	ProxyAddr     string
 	JustFirstPage bool
 	VisitPages    bool
+	Locale        string
+	SafeSearch    bool
+	Mobile        bool
 }
 
 type EngineName string
