@@ -5,17 +5,17 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/search"
-	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-func printResults(results []structures.Result) {
+func printResults(results []result.Result) {
 	fmt.Print("\n\tThe Search Results:\n\n")
 	for _, r := range results {
 		fmt.Printf("%v -----\n\t\"%v\"\n\t\"%v\"\n\t\"%v\"\n\t-", r.Rank, r.Title, r.URL, r.Description)
 		for seInd := 0; seInd < r.TimesReturned; seInd++ {
-			fmt.Printf("%v", r.SearchEngines[seInd].SearchEngine)
+			fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine)
 			if seInd != r.TimesReturned-1 {
 				fmt.Print(", ")
 			}

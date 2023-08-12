@@ -4,19 +4,19 @@ import (
 	"time"
 
 	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/structures"
+	"github.com/tminaorg/brzaguza/src/engines"
 )
 
-var Info structures.SEInfo = structures.SEInfo{
+var Info engines.Info = engines.Info{
 	Domain:         "www.google.com",
 	Name:           "Google",
 	URL:            "https://www.google.com/search?q=",
 	ResultsPerPage: 10,
-	Crawlers:       []structures.EngineName{structures.Google},
+	Crawlers:       []engines.Name{engines.Google},
 }
 
-// This should be in SESettings
-var timings config.SETimings = config.SETimings{
+// This should be in Settings
+var timings config.Timings = config.Timings{
 	Timeout:     10 * time.Second, // the default in colly
 	PageTimeout: 5 * time.Second,
 	Delay:       100 * time.Millisecond,
@@ -24,11 +24,11 @@ var timings config.SETimings = config.SETimings{
 	Parallelism: 2, //two requests will be sent to the server, 100 + [0,50) milliseconds apart from the next two
 }
 
-var dompaths structures.SEDOMPaths = structures.SEDOMPaths{
+var dompaths engines.DOMPaths = engines.DOMPaths{
 	Result:      "div.g",
 	Link:        "a",
 	Title:       "div > div > div > a > h3",
 	Description: "div > div > div > div:first-child > span:first-child",
 }
 
-var Support structures.SupportedSettings = structures.SupportedSettings{}
+var Support engines.SupportedSettings = engines.SupportedSettings{}

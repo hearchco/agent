@@ -10,12 +10,12 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/tminaorg/brzaguza/src/engines"
 	"github.com/tminaorg/brzaguza/src/search/parse"
 	"github.com/tminaorg/brzaguza/src/sedefaults"
-	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-func Search(ctx context.Context, query string, relay *structures.Relay, options structures.Options, settings config.SESettings) error {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings) error {
 	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
@@ -82,21 +82,21 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	return retError
 }
 
-func getLocale(options *structures.Options) string {
+func getLocale(options *engines.Options) string {
 	locale := options.Locale
 	locale = strings.ToLower(locale)
 	locale = strings.ReplaceAll(locale, "-", "_")
 	return locale
 }
 
-func getDevice(options *structures.Options) string {
+func getDevice(options *engines.Options) string {
 	if options.Mobile {
 		return "mobile"
 	}
 	return "desktop"
 }
 
-func getSafeSearch(options *structures.Options) string {
+func getSafeSearch(options *engines.Options) string {
 	if options.SafeSearch {
 		return "1"
 	}

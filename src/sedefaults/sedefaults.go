@@ -8,9 +8,8 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/search/limit"
+	"github.com/tminaorg/brzaguza/src/engines"
 	"github.com/tminaorg/brzaguza/src/search/useragent"
-	"github.com/tminaorg/brzaguza/src/structures"
 )
 
 func PagesColRequest(seName string, pagesCol *colly.Collector, ctx *context.Context, retError *error) {
@@ -31,7 +30,7 @@ func PagesColError(seName string, pagesCol *colly.Collector) {
 	})
 }
 
-func PagesColResponse(seName string, pagesCol *colly.Collector, relay *structures.Relay) {
+func PagesColResponse(seName string, pagesCol *colly.Collector, relay *bucket.Relay) {
 	pagesCol.OnResponse(func(r *colly.Response) {
 		urll := r.Ctx.Get("originalURL")
 		bucket.SetResultResponse(urll, r, relay, seName)
@@ -61,14 +60,10 @@ func ColError(seName string, col *colly.Collector, retError *error) {
 	})
 }
 
-func Prepare(seName string, options *structures.Options, settings *config.SESettings, support *structures.SupportedSettings, info *structures.SEInfo, ctx *context.Context) error {
+func Prepare(seName string, options *engines.Options, settings *config.Settings, support *engines.SupportedSettings, info *engines.Info, ctx *context.Context) error {
 	if ctx == nil {
 		*ctx = context.Background()
 	} //^ not necessary as ctx is always passed in search.go, branch predictor will skip this if
-
-	if err := limit.RateLimit.Wait(*ctx); err != nil {
-		return err
-	}
 
 	if options.UserAgent == "" {
 		options.UserAgent = useragent.RandomUserAgent()
@@ -104,7 +99,7 @@ func Prepare(seName string, options *structures.Options, settings *config.SESett
 	return nil
 }
 
-func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collector, options *structures.Options, timings *config.SETimings) {
+func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collector, options *engines.Options, timings *config.Timings) {
 	if options.MaxPages == 1 {
 		*colPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) // so there is no thread creation overhead
 	} else {
