@@ -16,8 +16,8 @@ import (
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options, settings *config.SESettings) error {
-	if err := sedefaults.FunctionPrepare(Info.Name, options, &ctx); err != nil {
+func Search(ctx context.Context, query string, relay *structures.Relay, options structures.Options, settings config.SESettings) error {
+	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
 
@@ -25,7 +25,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, options, nil)
+	sedefaults.InitializeCollectors(&col, &pagesCol, &options, nil)
 
 	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
 	sedefaults.PagesColError(Info.Name, pagesCol)
@@ -49,7 +49,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	})
 	sedefaults.ColError(Info.Name, col, &retError)
 
-	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
+	col.OnHTML(dompaths.ResultsContainer, func(e *colly.HTMLElement) {
 		var linkText string
 		var linkScheme string
 		var titleText string
@@ -81,14 +81,13 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			case 3:
 				if linkText != "" && linkText != "#" && titleText != "" {
 					res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, rrank, page, (i/4 + 1))
-					bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+					bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 				}
 			}
 		})
 	})
 
 	col.Visit(Info.URL + "?q=" + query)
-	//col.PostRaw(Info.URL, []byte("q="+query+"&dc=1"))
 	for i := 1; i < options.MaxPages; i++ {
 		col.PostRaw(Info.URL, []byte("q="+query+"&dc="+strconv.Itoa(i*20)))
 	}

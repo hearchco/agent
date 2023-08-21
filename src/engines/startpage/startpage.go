@@ -16,8 +16,8 @@ import (
 
 const useSafeSearch bool = false
 
-func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options, settings *config.SESettings) error {
-	if err := sedefaults.FunctionPrepare(Info.Name, options, &ctx); err != nil {
+func Search(ctx context.Context, query string, relay *structures.Relay, options structures.Options, settings config.SESettings) error {
+	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
 
@@ -25,7 +25,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, options, nil)
+	sedefaults.InitializeCollectors(&col, &pagesCol, &options, nil)
 
 	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
 	sedefaults.PagesColError(Info.Name, pagesCol)
@@ -34,7 +34,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
 	sedefaults.ColError(Info.Name, col, &retError)
 
-	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResPerPage)
+	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
@@ -49,7 +49,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			page, _ := strconv.Atoi(pageStr)
 
 			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 			pageRankCounter[page]++
 		} else {
 			log.Trace().Msgf("%v: Matched Result, but couldn't retrieve data.\nURL:%v\nTitle:%v\nDescription:%v", Info.Name, linkText, titleText, descText)
@@ -64,22 +64,26 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 		}
 	})
 
-	var safeSearchParameter string = ""
-	if !useSafeSearch {
-		safeSearchParameter += "&qadf=none"
-	}
+	safeSearch := getSafeSeach(&options)
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
-	col.Request("GET", Info.URL+query+safeSearchParameter, nil, colCtx, nil)
+	col.Request("GET", Info.URL+query+safeSearch, nil, colCtx, nil)
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		col.Request("GET", Info.URL+query+"&page="+strconv.Itoa(i+1)+safeSearchParameter, nil, colCtx, nil)
+		col.Request("GET", Info.URL+query+"&page="+strconv.Itoa(i+1)+safeSearch, nil, colCtx, nil)
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
 	return retError
+}
+
+func getSafeSeach(options *structures.Options) string {
+	if options.SafeSearch {
+		return "" // for startpage, Safe Search is the default
+	}
+	return "&qadf=none"
 }

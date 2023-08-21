@@ -14,8 +14,8 @@ import (
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options, settings *config.SESettings) error {
-	if err := sedefaults.FunctionPrepare(Info.Name, options, &ctx); err != nil {
+func Search(ctx context.Context, query string, relay *structures.Relay, options structures.Options, settings config.SESettings) error {
+	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
 
@@ -23,7 +23,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, options, nil)
+	sedefaults.InitializeCollectors(&col, &pagesCol, &options, nil)
 
 	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
 	sedefaults.PagesColError(Info.Name, pagesCol)
@@ -32,7 +32,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
 	sedefaults.ColError(Info.Name, col, &retError)
 
-	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResPerPage)
+	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
@@ -44,7 +44,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 
 		if linkText != "" && linkText != "#" && titleText != "" {
 			if descText == "" {
-				descText = strings.TrimSpace(dom.Find(dompaths.NextPage).Text())
+				descText = strings.TrimSpace(dom.Find("p.b_algoSlug").Text())
 			}
 			if strings.Contains(descText, "Web") {
 				descText = strings.Split(descText, "Web")[1]
@@ -54,7 +54,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			page, _ := strconv.Atoi(pageStr)
 
 			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 			pageRankCounter[page]++
 		} else {
 			log.Trace().Msgf("%v: Matched Result, but couldn't retrieve data.\nURL:%v\nTitle:%v\nDescription:%v", Info.Name, linkText, titleText, descText)

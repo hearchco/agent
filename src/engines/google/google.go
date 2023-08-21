@@ -4,7 +4,6 @@ import (
 	"context"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/tminaorg/brzaguza/src/bucket"
@@ -14,17 +13,8 @@ import (
 	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-// This should be in SESettings
-var timings config.SETimings = config.SETimings{
-	Timeout:     10 * time.Second, // the default in colly
-	PageTimeout: 5 * time.Second,
-	Delay:       100 * time.Millisecond,
-	RandomDelay: 50 * time.Millisecond,
-	Parallelism: 2, //two requests will be sent to the server, 100 + [0,50) milliseconds apart from the next two
-}
-
-func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options, settings *config.SESettings) error {
-	if err := sedefaults.FunctionPrepare(Info.Name, options, &ctx); err != nil {
+func Search(ctx context.Context, query string, relay *structures.Relay, options structures.Options, settings config.SESettings) error {
+	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
 
@@ -32,7 +22,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, options, &timings)
+	sedefaults.InitializeCollectors(&col, &pagesCol, &options, &timings)
 
 	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
 	sedefaults.PagesColError(Info.Name, pagesCol)
@@ -41,7 +31,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
 	sedefaults.ColError(Info.Name, col, &retError)
 
-	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResPerPage)
+	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
@@ -56,7 +46,7 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			page, _ := strconv.Atoi(pageStr)
 
 			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 			pageRankCounter[page]++
 		}
 	})
