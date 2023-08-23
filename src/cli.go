@@ -44,8 +44,12 @@ func (v versionFlag) BeforeApply(app *kong.Kong, vars kong.Vars) error {
 }
 
 func setupCli() {
-	configPath := os.Getenv("BRZAGUZA_CONFIG_FILE")
-	if configPath == "" {
+	// this is used to determine if the container image is being built
+	_, dockerEnv := os.LookupEnv("BRZAGUZA_DOCKER")
+	var configPath string
+	if dockerEnv {
+		configPath = "/config"
+	} else {
 		configPath = "./"
 	}
 
