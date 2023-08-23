@@ -1,62 +1,62 @@
 package config
 
-import "github.com/tminaorg/brzaguza/src/structures"
+import "github.com/tminaorg/brzaguza/src/engines"
 
 const DefaultLocale string = "en-US"
 
 var DefaultConfig Config = Config{
-	Engines: map[structures.EngineName]Engine{
+	Engines: map[engines.Name]Engine{
 		"bing": {
 			Enabled: true,
-			Settings: SESettings{
+			Settings: Settings{
 				Shortcut: "bi",
 			},
 		},
 		"brave": {
 			Enabled: true,
-			Settings: SESettings{
+			Settings: Settings{
 				Shortcut: "br",
 			},
 		},
 		"duckduckgo": {
 			Enabled: true,
-			Settings: SESettings{
+			Settings: Settings{
 				Shortcut: "ddg",
 			},
 		},
 		"etools": {
 			Enabled: true,
-			Settings: SESettings{
+			Settings: Settings{
 				Shortcut: "ets",
 			},
 		},
 		"google": {
 			Enabled: true,
-			Settings: SESettings{
+			Settings: Settings{
 				Shortcut: "go",
 			},
 		},
 		"mojeek": {
 			Enabled: true,
-			Settings: SESettings{
+			Settings: Settings{
 				Shortcut: "mjk",
 			},
 		},
 		"qwant": {
 			Enabled: true,
-			Settings: SESettings{
+			Settings: Settings{
 				Shortcut: "qw",
 			},
 		},
 		"startpage": {
 			Enabled: true,
-			Settings: SESettings{
+			Settings: Settings{
 				Shortcut: "sp",
 			},
 		},
 		"swisscows": {
 			Enabled: true,
-			Settings: SESettings{
+			Settings: Settings{
 				Shortcut: "sc",
 			},
 		},

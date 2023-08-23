@@ -1,16 +1,16 @@
 package qwant
 
-import "github.com/tminaorg/brzaguza/src/structures"
+import "github.com/tminaorg/brzaguza/src/engines"
 
-var Info structures.SEInfo = structures.SEInfo{
+var Info engines.Info = engines.Info{
 	Domain:         "www.qwant.com",
 	Name:           "Qwant",
 	URL:            "https://api.qwant.com/v3/search/web?q=",
 	ResultsPerPage: 10,
-	Crawlers:       []structures.EngineName{structures.Qwant, structures.Bing},
+	Crawlers:       []engines.Name{engines.Qwant, engines.Bing},
 }
 
-var Support structures.SupportedSettings = structures.SupportedSettings{
+var Support engines.SupportedSettings = engines.SupportedSettings{
 	Locale:                  true,
 	SafeSearch:              true,
 	Mobile:                  true,

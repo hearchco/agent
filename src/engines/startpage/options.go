@@ -1,22 +1,22 @@
 package startpage
 
-import "github.com/tminaorg/brzaguza/src/structures"
+import "github.com/tminaorg/brzaguza/src/engines"
 
-var Info structures.SEInfo = structures.SEInfo{
+var Info engines.Info = engines.Info{
 	Domain:         "www.startpage.com",
 	Name:           "Startpage",
 	URL:            "https://www.startpage.com/sp/search?q=",
 	ResultsPerPage: 10,
-	Crawlers:       []structures.EngineName{structures.Google},
+	Crawlers:       []engines.Name{engines.Google},
 }
 
-var dompaths structures.SEDOMPaths = structures.SEDOMPaths{
+var dompaths engines.DOMPaths = engines.DOMPaths{
 	Result:      "section > div.w-gl__result",
 	Link:        "a.result-link",
 	Title:       "a.w-gl__result-title",
 	Description: "p.w-gl__description",
 }
 
-var Support structures.SupportedSettings = structures.SupportedSettings{
+var Support engines.SupportedSettings = engines.SupportedSettings{
 	SafeSearch: true,
 }

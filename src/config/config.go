@@ -11,12 +11,12 @@ import (
 	"github.com/knadh/koanf/providers/structs"
 	"github.com/knadh/koanf/v2"
 	"github.com/rs/zerolog/log"
-	"github.com/tminaorg/brzaguza/src/structures"
+	"github.com/tminaorg/brzaguza/src/engines"
 )
 
 // Delegates Timeout, PageTimeout to colly.Collector.SetRequestTimeout(); Note: See https://github.com/gocolly/colly/issues/644
 // Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit()
-type SETimings struct {
+type Timings struct {
 	Timeout     time.Duration `koanf:"timeout"`
 	PageTimeout time.Duration `koanf:"pagetimeout"`
 	Delay       time.Duration `koanf:"delay"`
@@ -24,23 +24,23 @@ type SETimings struct {
 	Parallelism int           `koanf:"parallelism"`
 }
 
-type SESettings struct {
-	RequestedResultsPerPage int       `koanf:"requestedResults"`
-	Shortcut                string    `koanf:"shortcut"`
-	Timings                 SETimings `koanf:"timings"`
+type Settings struct {
+	RequestedResultsPerPage int     `koanf:"requestedResults"`
+	Shortcut                string  `koanf:"shortcut"`
+	Timings                 Timings `koanf:"timings"`
 }
 
 type Engine struct {
-	Enabled  bool       `koanf:"enabled"`
-	Settings SESettings `koanf:"settings"`
+	Enabled  bool     `koanf:"enabled"`
+	Settings Settings `koanf:"settings"`
 }
 
 // Config struct for Koanf
 type Config struct {
-	Engines map[structures.EngineName]Engine `koanf:"engines"`
+	Engines map[engines.Name]Engine `koanf:"engines"`
 }
 
-var EnabledEngines []structures.EngineName = make([]structures.EngineName, 0)
+var EnabledEngines []engines.Name = make([]engines.Name, 0)
 
 func SetupConfig(path string, name string) *Config {
 	// Use "." as the key path delimiter. This can be "/" or any character.

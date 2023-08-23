@@ -1,15 +1,15 @@
 package swisscows
 
-import "github.com/tminaorg/brzaguza/src/structures"
+import "github.com/tminaorg/brzaguza/src/engines"
 
-var Info structures.SEInfo = structures.SEInfo{
+var Info engines.Info = engines.Info{
 	Domain:         "swisscows.com",
 	Name:           "Swisscows",
 	URL:            "https://api.swisscows.com/web/search?",
 	ResultsPerPage: 10,
-	Crawlers:       []structures.EngineName{structures.Bing},
+	Crawlers:       []engines.Name{engines.Bing},
 }
 
-var Support structures.SupportedSettings = structures.SupportedSettings{
+var Support engines.SupportedSettings = engines.SupportedSettings{
 	Locale: true,
 }

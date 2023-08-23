@@ -1,20 +1,20 @@
 package duckduckgo
 
-import "github.com/tminaorg/brzaguza/src/structures"
+import "github.com/tminaorg/brzaguza/src/engines"
 
-var Info structures.SEInfo = structures.SEInfo{
+var Info engines.Info = engines.Info{
 	Domain:         "lite.duckduckgo.com",
 	Name:           "DuckDuckGo",
 	URL:            "https://lite.duckduckgo.com/lite/",
 	ResultsPerPage: 10,
-	Crawlers:       []structures.EngineName{structures.Bing},
+	Crawlers:       []engines.Name{engines.Bing},
 }
 
-var dompaths structures.SEDOMPaths = structures.SEDOMPaths{
+var dompaths engines.DOMPaths = engines.DOMPaths{
 	ResultsContainer: "div.filters > table > tbody",
 	Link:             "a.result-link",
 	Title:            "td > a.result-link",
 	Description:      "td.result-snippet",
 }
 
-var Support structures.SupportedSettings = structures.SupportedSettings{}
+var Support engines.SupportedSettings = engines.SupportedSettings{}
