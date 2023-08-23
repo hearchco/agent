@@ -44,6 +44,11 @@ func (v versionFlag) BeforeApply(app *kong.Kong, vars kong.Vars) error {
 }
 
 func setupCli() {
+	configPath := os.Getenv("BRZAGUZA_CONFIG_FILE")
+	if configPath == "" {
+		configPath = "./"
+	}
+
 	ctx := kong.Parse(&cli,
 		kong.Name("brzaguza"),
 		kong.Description("Fastasst metasearch engine"),
@@ -54,8 +59,8 @@ func setupCli() {
 		}),
 		kong.Vars{
 			"version":       fmt.Sprintf("%v (%v@%v)", Version, GitCommit, Timestamp),
-			"config_folder": "./",
-			"config_file":   "brzaguza",
+			"config_folder": configPath,
+			"config_file":   "brzaguza", // can be .yaml or any other type defined by Koanf
 			"log_file":      "brzaguza.log",
 			"query_string":  "banana death",
 		},
