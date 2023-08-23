@@ -10,18 +10,14 @@ import (
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
+	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/tminaorg/brzaguza/src/engines"
+	"github.com/tminaorg/brzaguza/src/search/parse"
 	"github.com/tminaorg/brzaguza/src/sedefaults"
-	"github.com/tminaorg/brzaguza/src/structures"
-	"github.com/tminaorg/brzaguza/src/utility"
 )
 
-const SEDomain string = "lite.duckduckgo.com"
-
-const seName string = "DuckDuckGo"
-const seURL string = "https://lite.duckduckgo.com/lite/"
-
-func Search(ctx context.Context, query string, relay *structures.Relay, options *structures.Options) error {
-	if err := sedefaults.FunctionPrepare(seName, options, &ctx); err != nil {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings) error {
+	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
 
@@ -29,15 +25,15 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, options, nil)
+	sedefaults.InitializeCollectors(&col, &pagesCol, &options, nil)
 
-	sedefaults.PagesColRequest(seName, pagesCol, &ctx, &retError)
-	sedefaults.PagesColError(seName, pagesCol)
-	sedefaults.PagesColResponse(seName, pagesCol, relay)
+	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
+	sedefaults.PagesColError(Info.Name, pagesCol)
+	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
 	col.OnRequest(func(r *colly.Request) {
 		if err := ctx.Err(); err != nil { // dont fully understand this
-			log.Error().Msgf("%v: SE Collector; Error OnRequest %v", seName, r)
+			log.Error().Msgf("%v: SE Collector; Error OnRequest %v", Info.Name, r)
 			r.Abort()
 			retError = err
 			return
@@ -51,9 +47,9 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			r.Ctx.Put("body", string(reqBody))
 		}
 	})
-	sedefaults.ColError(seName, col, &retError)
+	sedefaults.ColError(Info.Name, col, &retError)
 
-	col.OnHTML("div.filters > table > tbody", func(e *colly.HTMLElement) {
+	col.OnHTML(dompaths.ResultsContainer, func(e *colly.HTMLElement) {
 		var linkText string
 		var linkScheme string
 		var titleText string
@@ -70,31 +66,30 @@ func Search(ctx context.Context, query string, relay *structures.Relay, options 
 			case 0:
 				rankText := strings.TrimSpace(row.Children().First().Text())
 				fmt.Sscanf(rankText, "%d", &rrank)
-				linkHref, _ := row.Find("a.result-link").Attr("href")
+				linkHref, _ := row.Find(dompaths.Link).Attr("href")
 				if strings.Contains(linkHref, "https") {
 					linkScheme = "https://"
 				} else {
 					linkScheme = "http://"
 				}
-				titleText = strings.TrimSpace(row.Find("td > a.result-link").Text())
+				titleText = strings.TrimSpace(row.Find(dompaths.Title).Text())
 			case 1:
-				descText = strings.TrimSpace(row.Find("td.result-snippet").Text())
+				descText = strings.TrimSpace(row.Find(dompaths.Description).Text())
 			case 2:
 				rawURL := linkScheme + row.Find("td > span.link-text").Text()
-				linkText = utility.ParseURL(rawURL)
+				linkText = parse.ParseURL(rawURL)
 			case 3:
 				if linkText != "" && linkText != "#" && titleText != "" {
-					res := bucket.MakeSEResult(linkText, titleText, descText, seName, rrank, page, (i/4 + 1))
-					bucket.AddSEResult(res, seName, relay, options, pagesCol)
+					res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, rrank, page, (i/4 + 1))
+					bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 				}
 			}
 		})
 	})
 
-	col.Visit(seURL + "?q=" + query)
-	//col.PostRaw(seURL, []byte("q="+query+"&dc=1"))
+	col.Visit(Info.URL + "?q=" + query)
 	for i := 1; i < options.MaxPages; i++ {
-		col.PostRaw(seURL, []byte("q="+query+"&dc="+strconv.Itoa(i*20)))
+		col.PostRaw(Info.URL, []byte("q="+query+"&dc="+strconv.Itoa(i*20)))
 	}
 
 	col.Wait()

@@ -14,7 +14,7 @@ You can submit a GET request like:
 https://www.etools.ch/search.do?page=4&query=cool+cars
 But you need the JSESSIONID cookie for it to work
 
-It seems that, if performed too fast, the server can accidentaly return the same response for different pages. Thus the page requests are performed synchronously here. 
+It seems that, if performed too fast, the server can accidentaly return the same response for different pages. Thus, this package could benefit from some Timings.
 
 
 `?dataSourceResults=20` loads more requests

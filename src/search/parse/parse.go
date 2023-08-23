@@ -1,4 +1,4 @@
-package utility
+package parse
 
 import (
 	"net/url"

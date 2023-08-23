@@ -1,14 +1,23 @@
 package bucket
 
 import (
+	"sync"
+
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
+	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/tminaorg/brzaguza/src/engines"
 	"github.com/tminaorg/brzaguza/src/rank"
-	"github.com/tminaorg/brzaguza/src/structures"
 )
 
-func AddSEResult(seResult *structures.SEResult, seName string, relay *structures.Relay, options *structures.Options, pagesCol *colly.Collector) {
+type Relay struct {
+	ResultMap         map[string]*result.Result
+	Mutex             sync.RWMutex
+	EngineDoneChannel chan bool
+}
+
+func AddSEResult(seResult *engines.RetrievedResult, seName string, relay *Relay, options *engines.Options, pagesCol *colly.Collector) {
 	log.Trace().Msgf("%v: Got Result -> %v: %v", seName, seResult.Title, seResult.URL)
 
 	relay.Mutex.RLock()
@@ -16,14 +25,14 @@ func AddSEResult(seResult *structures.SEResult, seName string, relay *structures
 	relay.Mutex.RUnlock()
 
 	if !exists {
-		searchEngines := make([]structures.SERank, config.NumberOfEngines)
-		searchEngines[0] = seResult.Rank
-		result := structures.Result{
+		engineRanks := make([]engines.RetrievedRank, len(config.EnabledEngines))
+		engineRanks[0] = seResult.Rank
+		result := result.Result{
 			URL:           seResult.URL,
 			Rank:          -1,
 			Title:         seResult.Title,
 			Description:   seResult.Description,
-			SearchEngines: searchEngines,
+			EngineRanks:   engineRanks,
 			TimesReturned: 1,
 			Response:      nil,
 		}
@@ -37,7 +46,7 @@ func AddSEResult(seResult *structures.SEResult, seName string, relay *structures
 		relay.Mutex.Unlock()
 	} else {
 		relay.Mutex.Lock()
-		mapRes.SearchEngines[mapRes.TimesReturned] = seResult.Rank
+		mapRes.EngineRanks[mapRes.TimesReturned] = seResult.Rank
 		mapRes.TimesReturned++
 		if len(mapRes.Description) < len(seResult.Description) {
 			mapRes.Description = seResult.Description
@@ -50,7 +59,7 @@ func AddSEResult(seResult *structures.SEResult, seName string, relay *structures
 	}
 }
 
-func SetResultResponse(link string, response *colly.Response, relay *structures.Relay, seName string) {
+func SetResultResponse(link string, response *colly.Response, relay *Relay, seName string) {
 	log.Trace().Msgf("%v: Got Response -> %v", seName, link)
 
 	relay.Mutex.Lock()
@@ -70,14 +79,14 @@ func SetResultResponse(link string, response *colly.Response, relay *structures.
 	rank.SetRank(&resCopy, rankAddr, &(relay.Mutex)) //copy contains pointer to response
 }
 
-func MakeSEResult(urll string, title string, description string, searchEngineName string, seRank int, sePage int, seOnPageRank int) *structures.SEResult {
-	ser := structures.SERank{
+func MakeSEResult(urll string, title string, description string, searchEngineName string, seRank int, sePage int, seOnPageRank int) *engines.RetrievedResult {
+	ser := engines.RetrievedRank{
 		SearchEngine: searchEngineName,
 		Rank:         seRank,
 		Page:         sePage,
 		OnPageRank:   seOnPageRank,
 	}
-	res := structures.SEResult{
+	res := engines.RetrievedResult{
 		URL:         urll,
 		Title:       title,
 		Description: description,

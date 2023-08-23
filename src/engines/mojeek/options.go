@@ -1,0 +1,19 @@
+package mojeek
+
+import "github.com/tminaorg/brzaguza/src/engines"
+
+var Info engines.Info = engines.Info{
+	Domain:         "www.mojeek.com",
+	Name:           "Mojeek",
+	URL:            "https://www.mojeek.com/search?q=",
+	ResultsPerPage: 10,
+	Crawlers:       []engines.Name{engines.Mojeek},
+}
+
+var dompaths engines.DOMPaths = engines.DOMPaths{
+	Result:      "ul.results-standard > li",
+	Title:       "h2 > a.title",
+	Description: "p.s",
+}
+
+var Support engines.SupportedSettings = engines.SupportedSettings{}

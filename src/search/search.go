@@ -7,6 +7,10 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/sourcegraph/conc"
+	"github.com/tminaorg/brzaguza/src/bucket"
+	"github.com/tminaorg/brzaguza/src/bucket/result"
+	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/tminaorg/brzaguza/src/engines"
 	"github.com/tminaorg/brzaguza/src/engines/bing"
 	"github.com/tminaorg/brzaguza/src/engines/brave"
 	"github.com/tminaorg/brzaguza/src/engines/duckduckgo"
@@ -16,30 +20,16 @@ import (
 	"github.com/tminaorg/brzaguza/src/engines/qwant"
 	"github.com/tminaorg/brzaguza/src/engines/startpage"
 	"github.com/tminaorg/brzaguza/src/engines/swisscows"
-	"github.com/tminaorg/brzaguza/src/structures"
+	"github.com/tminaorg/brzaguza/src/rank"
 )
 
-type Engine int
-
-const (
-	Google Engine = iota
-	Mojeek
-	DuckDuckGo
-	Qwant
-	Etools
-	Swisscows
-	Brave
-	Bing
-	Startpage
-)
-
-func PerformSearch(query string, maxPages int, visitPages bool) []structures.Result {
-	relay := structures.Relay{
-		ResultMap:         make(map[string]*structures.Result),
+func PerformSearch(query string, maxPages int, visitPages bool, config *config.Config) []result.Result {
+	relay := bucket.Relay{
+		ResultMap:         make(map[string]*result.Result),
 		EngineDoneChannel: make(chan bool),
 	}
 
-	options := structures.Options{
+	options := engines.Options{
 		MaxPages:   maxPages,
 		VisitPages: visitPages,
 	}
@@ -47,16 +37,15 @@ func PerformSearch(query string, maxPages int, visitPages bool) []structures.Res
 	query = url.QueryEscape(query)
 
 	var worker conc.WaitGroup
-	var toSearch []Engine = []Engine{Google}
-	runEngines(toSearch, query, &worker, &relay, &options)
+	runEngines(config.Engines, query, &worker, &relay, options)
 	worker.Wait()
 
-	var results []structures.Result = make([]structures.Result, 0, len(relay.ResultMap))
+	results := make([]result.Result, 0, len(relay.ResultMap))
 	for _, res := range relay.ResultMap {
 		results = append(results, *res)
 	}
 
-	sort.Sort(structures.ByRank(results))
+	sort.Sort(rank.ByRank(results))
 
 	log.Debug().Msg("All processing done, waiting for closing of goroutines.")
 	worker.Wait()
@@ -66,70 +55,72 @@ func PerformSearch(query string, maxPages int, visitPages bool) []structures.Res
 	return results
 }
 
-func runEngines(toSearch []Engine, query string, worker *conc.WaitGroup, relay *structures.Relay, options *structures.Options) {
-	for _, eng := range toSearch {
-		switch Engine(eng) {
-		case Google:
+func runEngines(engineMap map[engines.Name]config.Engine, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
+	log.Info().Msgf("Enabled engines: %v", config.EnabledEngines)
+
+	for name, engine := range engineMap {
+		switch name {
+		case engines.Google:
 			worker.Go(func() {
-				err := google.Search(context.Background(), query, relay, options)
+				err := google.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
-					log.Error().Err(err).Msgf("Failed searching %v", google.SEDomain)
+					log.Error().Err(err).Msgf("Failed searching %v", google.Info.Domain)
 				}
 			})
-		case DuckDuckGo:
+		case engines.DuckDuckGo:
 			worker.Go(func() {
-				err := duckduckgo.Search(context.Background(), query, relay, options)
+				err := duckduckgo.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
-					log.Error().Err(err).Msgf("Failed searching %v", duckduckgo.SEDomain)
+					log.Error().Err(err).Msgf("Failed searching %v", duckduckgo.Info.Domain)
 				}
 			})
-		case Mojeek:
+		case engines.Mojeek:
 			worker.Go(func() {
-				err := mojeek.Search(context.Background(), query, relay, options)
+				err := mojeek.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
-					log.Error().Err(err).Msgf("Failed searching %v", mojeek.SEDomain)
+					log.Error().Err(err).Msgf("Failed searching %v", mojeek.Info.Domain)
 				}
 			})
-		case Qwant:
+		case engines.Qwant:
 			worker.Go(func() {
-				err := qwant.Search(context.Background(), query, relay, options)
+				err := qwant.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
-					log.Error().Err(err).Msgf("Failed searching %v", qwant.SEDomain)
+					log.Error().Err(err).Msgf("Failed searching %v", qwant.Info.Domain)
 				}
 			})
-		case Etools:
+		case engines.Etools:
 			worker.Go(func() {
-				err := etools.Search(context.Background(), query, relay, options)
+				err := etools.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
-					log.Error().Err(err).Msgf("Failed searching %v", etools.SEDomain)
+					log.Error().Err(err).Msgf("Failed searching %v", etools.Info.Domain)
 				}
 			})
-		case Swisscows:
+		case engines.Swisscows:
 			worker.Go(func() {
-				err := swisscows.Search(context.Background(), query, relay, options)
+				err := swisscows.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
-					log.Error().Err(err).Msgf("Failed searching %v", swisscows.SEDomain)
+					log.Error().Err(err).Msgf("Failed searching %v", swisscows.Info.Domain)
 				}
 			})
-		case Brave:
+		case engines.Brave:
 			worker.Go(func() {
-				err := brave.Search(context.Background(), query, relay, options)
+				err := brave.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
-					log.Error().Err(err).Msgf("Failed searching %v", brave.SEDomain)
+					log.Error().Err(err).Msgf("Failed searching %v", brave.Info.Domain)
 				}
 			})
-		case Bing:
+		case engines.Bing:
 			worker.Go(func() {
-				err := bing.Search(context.Background(), query, relay, options)
+				err := bing.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
-					log.Error().Err(err).Msgf("Failed searching %v", bing.SEDomain)
+					log.Error().Err(err).Msgf("Failed searching %v", bing.Info.Domain)
 				}
 			})
-		case Startpage:
+		case engines.Startpage:
 			worker.Go(func() {
-				err := startpage.Search(context.Background(), query, relay, options)
+				err := startpage.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
-					log.Error().Err(err).Msgf("Failed searching %v", startpage.SEDomain)
+					log.Error().Err(err).Msgf("Failed searching %v", startpage.Info.Domain)
 				}
 			})
 		}
