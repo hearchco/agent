@@ -8,7 +8,6 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
@@ -31,22 +30,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
-	col.OnRequest(func(r *colly.Request) {
-		if err := ctx.Err(); err != nil { // dont fully understand this
-			log.Error().Msgf("%v: SE Collector; Error OnRequest %v", Info.Name, r)
-			r.Abort()
-			retError = err
-			return
-		}
-		if r.Body == nil {
-			//This is the first page, so this isnt a POST request
-			r.Ctx.Put("body", "q="+query+"&dc=1")
-		} else {
-			var reqBody []byte
-			r.Body.Read(reqBody)
-			r.Ctx.Put("body", string(reqBody))
-		}
-	})
+	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
 	sedefaults.ColError(Info.Name, col, &retError)
 
 	col.OnHTML(dompaths.ResultsContainer, func(e *colly.HTMLElement) {
@@ -56,10 +40,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		var descText string
 		var rrank int
 
-		var reqBody string = e.Request.Ctx.Get("body")
-		var page int
-		fmt.Sscanf(reqBody, "q="+query+"&dc=%d", &page)
-		page = page/20 + 1
+		var pageStr string = e.Request.Ctx.Get("page")
+		page, _ := strconv.Atoi(pageStr)
 
 		e.DOM.Children().Each(func(i int, row *goquery.Selection) {
 			switch i % 4 {
@@ -87,9 +69,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		})
 	})
 
-	col.Visit(Info.URL + "?q=" + query)
+	colCtx := colly.NewContext()
+	colCtx.Put("page", strconv.Itoa(1))
+	col.Request("GET", Info.URL+"?q="+query, nil, colCtx, nil)
 	for i := 1; i < options.MaxPages; i++ {
-		col.PostRaw(Info.URL, []byte("q="+query+"&dc="+strconv.Itoa(i*20)))
+		colCtx = colly.NewContext()
+		colCtx.Put("page", strconv.Itoa(i+1))
+		col.Request("POST", Info.URL, strings.NewReader("q="+query+"&dc="+strconv.Itoa(i*20)), colCtx, nil)
 	}
 
 	col.Wait()
