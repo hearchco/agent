@@ -46,7 +46,7 @@ type Options struct {
 	ProxyAddr     string
 	JustFirstPage bool
 	VisitPages    bool
-	Locale        string
+	Locale        string //format: en-US
 	SafeSearch    bool
 	Mobile        bool
 }
@@ -64,4 +64,5 @@ const (
 	Bing       Name = "bing"
 	Startpage  Name = "startpage"
 	Yandex     Name = "yandex" // needed for crawler types
+	Yep        Name = "yep"
 )
