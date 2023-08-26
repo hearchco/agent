@@ -2,13 +2,10 @@ package yep
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
@@ -35,44 +32,10 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	sedefaults.ColError(Info.Name, col, &retError)
 
 	col.OnResponse(func(r *colly.Response) {
-
-		var yr YepResponse
-		err1 := json.Unmarshal(r.Body, &yr)
-		if err1 != nil {
-			log.Error().Err(err1).Msgf("%v: Failed body unmarshall to json:\n%v", Info.Name, string(r.Body))
-		}
-
-		tmp, err2 := json.Marshal(yr[1])
-		fmt.Printf("%v", string(tmp))
-		if err2 != nil {
-			panic(err2)
-		}
-		var mmm AMain
-		err3 := json.Unmarshal(tmp, &mmm)
-		if err3 != nil {
-			panic(err3)
-		}
-
-		fmt.Printf("%v, %v", tmp, mmm)
-
-		//fmt.Printf("%v, %v, %v", yr, yr[0], yr[1])
-		//var mainline Main = yr[1].(Main) //https://eagain.net/articles/go-json-array-to-struct/ <- look at this for fix
-
-		/*
-			if err := json.Unmarshal(, &mainline); err != nil {
-				log.Error().Err(err).Msgf("%v: Failed body unmarshall to json:\n%v", Info.Name, string(r.Body))
-			}
-		*/
-
-		/*
-			var mainline Main
-			if err := json.Unmarshal([]byte(r.Body), &mainline); err != nil {
-				log.Error().Err(err).Msg("Bad unmashall")
-			}
-		*/
+		content := parseJSON(r.Body)
 
 		counter := 0
-		for _, result := range mmm.Results {
+		for _, result := range content.Results {
 			if result.TType != "Organic" {
 				continue
 			}

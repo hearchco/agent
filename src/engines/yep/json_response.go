@@ -2,28 +2,13 @@ package yep
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/rs/zerolog/log"
 )
 
-func (m *AMain) UnmarshalJSON(buf []byte) error {
-	var status string
-	tmp := []interface{}{&status, m}
-	wantLen := len(tmp)
-	if err := json.Unmarshal(buf, &tmp); err != nil {
-		return err
-	}
-	if g, e := len(tmp), wantLen; g != e {
-		log.Error().Msgf("Wrong number of fields in Yep JSON response: %v != %v", g, e)
-		return fmt.Errorf("wrong number of fields in Yep JSON response: %v != %v", g, e) //is this the best way to do this?
-	}
-	return nil
-}
-
 type YepResponse []interface{}
 
-type AResult struct {
+type Result struct {
 	URL       string `json:"url"`
 	Title     string `json:"title"`
 	TType     string `json:"type"`
@@ -32,7 +17,31 @@ type AResult struct {
 	FirstSeen string `json:"first_seen"`
 }
 
-type AMain struct {
-	Total   int       `json:"total"`
-	Results []AResult `json:"results"`
+type MainContent struct {
+	Total   int      `json:"total"`
+	Results []Result `json:"results"`
+}
+
+// This is pretty inefficient, and can probably be done better
+func parseJSON(body []byte) *MainContent {
+	var yr YepResponse
+	err1 := json.Unmarshal(body, &yr)
+	if err1 != nil {
+		log.Error().Err(err1).Msgf("%v: Failed body unmarshall to json:\n%v\n", Info.Name, string(body))
+		return nil
+	}
+	byteMain, err2 := json.Marshal(yr[1])
+	if err2 != nil {
+		log.Error().Err(err2).Msgf("%v: Failed marshalling the relevant json content:\n%v\n", Info.Name, string(body))
+		return nil
+	}
+
+	var mainContent MainContent
+	err3 := json.Unmarshal(byteMain, &mainContent)
+	if err3 != nil {
+		log.Error().Err(err3).Msgf("%v: Failed unmarshalling to MainContent:\n%v\n", Info.Name, string(byteMain))
+		return nil
+	}
+
+	return &mainContent
 }
