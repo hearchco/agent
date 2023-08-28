@@ -39,7 +39,7 @@ func PagesColResponse(seName string, pagesCol *colly.Collector, relay *bucket.Re
 
 func ColRequest(seName string, col *colly.Collector, ctx *context.Context, retError *error) {
 	col.OnRequest(func(r *colly.Request) {
-		if err := (*ctx).Err(); err != nil { // dont fully understand this
+		if err := (*ctx).Err(); err != nil {
 			log.Error().Msgf("%v: SE Collector; Error OnRequest %v", seName, r)
 			r.Abort()
 			*retError = err

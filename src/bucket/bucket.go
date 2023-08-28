@@ -46,7 +46,7 @@ func AddSEResult(seResult *engines.RetrievedResult, seName string, relay *Relay,
 		relay.Mutex.Unlock()
 	} else {
 		relay.Mutex.Lock()
-		mapRes.EngineRanks[mapRes.TimesReturned] = seResult.Rank
+		mapRes.EngineRanks[mapRes.TimesReturned] = seResult.Rank //can go out of bounds if the same results is returned multiple times by the same engine (e.g. swisscows, presearch ("banana death" -> slate result))
 		mapRes.TimesReturned++
 		if len(mapRes.Description) < len(seResult.Description) {
 			mapRes.Description = seResult.Description
