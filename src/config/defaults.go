@@ -6,55 +6,55 @@ const DefaultLocale string = "en-US"
 
 var DefaultConfig Config = Config{
 	Engines: map[engines.Name]Engine{
-		"bing": {
+		engines.Bing: {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "bi",
 			},
 		},
-		"brave": {
+		engines.Brave: {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "br",
 			},
 		},
-		"duckduckgo": {
+		engines.DuckDuckGo: {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "ddg",
 			},
 		},
-		"etools": {
+		engines.Etools: {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "ets",
 			},
 		},
-		"google": {
+		engines.Google: {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "go",
 			},
 		},
-		"mojeek": {
+		engines.Mojeek: {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "mjk",
 			},
 		},
-		"qwant": {
+		engines.Qwant: {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "qw",
 			},
 		},
-		"startpage": {
+		engines.Startpage: {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "sp",
 			},
 		},
-		"swisscows": {
+		engines.Swisscows: {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "sc",

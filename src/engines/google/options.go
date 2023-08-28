@@ -9,7 +9,7 @@ import (
 
 var Info engines.Info = engines.Info{
 	Domain:         "www.google.com",
-	Name:           "Google",
+	Name:           engines.Google,
 	URL:            "https://www.google.com/search?q=",
 	ResultsPerPage: 10,
 	Crawlers:       []engines.Name{engines.Google},
