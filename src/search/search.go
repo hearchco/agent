@@ -20,6 +20,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/engines/qwant"
 	"github.com/tminaorg/brzaguza/src/engines/startpage"
 	"github.com/tminaorg/brzaguza/src/engines/swisscows"
+	"github.com/tminaorg/brzaguza/src/engines/yahoo"
 	"github.com/tminaorg/brzaguza/src/engines/yep"
 	"github.com/tminaorg/brzaguza/src/rank"
 )
@@ -129,6 +130,13 @@ func runEngines(engineMap map[engines.Name]config.Engine, query string, worker *
 				err := yep.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", yep.Info.Domain)
+				}
+			})
+		case engines.Yahoo:
+			worker.Go(func() {
+				err := yahoo.Search(context.Background(), query, relay, options, engine.Settings)
+				if err != nil {
+					log.Error().Err(err).Msgf("Failed searching %v", yahoo.Info.Domain)
 				}
 			})
 		}
