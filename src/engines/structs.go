@@ -3,7 +3,7 @@ package engines
 // variables are 1-indexed
 // Information about what Rank a result was on some Search Engine
 type RetrievedRank struct {
-	SearchEngine string
+	SearchEngine string // this should be changed to Name
 	Rank         int
 	Page         int
 	OnPageRank   int

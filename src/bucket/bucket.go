@@ -45,9 +45,21 @@ func AddSEResult(seResult *engines.RetrievedResult, seName string, relay *Relay,
 		relay.ResultMap[result.URL] = &result
 		relay.Mutex.Unlock()
 	} else {
+		alreadyIn := false
+		relay.Mutex.RLock()
+		for ind := range mapRes.EngineRanks { // this could also be done by changing EngineRanks to a map
+			if seName == mapRes.EngineRanks[ind].SearchEngine {
+				alreadyIn = true
+				break
+			}
+		}
+		relay.Mutex.RUnlock()
+
 		relay.Mutex.Lock()
-		mapRes.EngineRanks[mapRes.TimesReturned] = seResult.Rank
-		mapRes.TimesReturned++
+		if !alreadyIn {
+			mapRes.EngineRanks[mapRes.TimesReturned] = seResult.Rank
+			mapRes.TimesReturned++
+		}
 		if len(mapRes.Description) < len(seResult.Description) {
 			mapRes.Description = seResult.Description
 		}
