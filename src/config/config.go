@@ -38,8 +38,8 @@ type Engine struct {
 // Server config
 type Server struct {
 	Port        int    `koanf:"port"`
-	FrontendUrl string `koanf:"frontendUrl`
-	RedisUrl    string `koanf:"redisUrl`
+	FrontendUrl string `koanf:"frontendUrl"`
+	RedisUrl    string `koanf:"redisUrl"`
 }
 
 // Config struct for Koanf

@@ -4,7 +4,7 @@ import "github.com/tminaorg/brzaguza/src/engines"
 
 var Info engines.Info = engines.Info{
 	Domain:         "www.bing.com",
-	Name:           "Bing",
+	Name:           engines.Bing,
 	URL:            "https://www.bing.com/search?q=",
 	ResultsPerPage: 10,
 	Crawlers:       []engines.Name{engines.Brave, engines.Google},
