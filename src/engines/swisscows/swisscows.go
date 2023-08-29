@@ -55,7 +55,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	col.OnError(func(r *colly.Response, err error) {
 		log.Error().Msgf("%v: SE Collector - OnError.\nMethod: %v\nURL: %v\nError: %v", Info.Name, r.Request.Method, r.Request.URL.String(), err)
 		log.Error().Msgf("%v: HTML Response written to %v%v_col.log.html", Info.Name, config.LogDumpLocation, Info.Name)
-		writeErr := os.WriteFile(config.LogDumpLocation+Info.Name+"_col.log.html", r.Body, 0644)
+		writeErr := os.WriteFile(config.LogDumpLocation+string(Info.Name)+"_col.log.html", r.Body, 0644)
 		if writeErr != nil {
 			log.Error().Err(writeErr)
 		}

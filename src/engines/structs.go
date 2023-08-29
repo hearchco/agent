@@ -3,7 +3,7 @@ package engines
 // variables are 1-indexed
 // Information about what Rank a result was on some Search Engine
 type RetrievedRank struct {
-	SearchEngine string
+	SearchEngine Name
 	Rank         int
 	Page         int
 	OnPageRank   int
@@ -26,7 +26,7 @@ type SupportedSettings struct {
 
 type Info struct {
 	Domain         string
-	Name           string
+	Name           Name
 	URL            string
 	ResultsPerPage int
 	Crawlers       []Name
@@ -54,16 +54,16 @@ type Options struct {
 type Name string
 
 const (
-	Google     Name = "google" // needs to be toLower
-	Mojeek     Name = "mojeek"
-	DuckDuckGo Name = "duckduckgo"
-	Qwant      Name = "qwant"
-	Etools     Name = "etools"
-	Swisscows  Name = "swisscows"
-	Brave      Name = "brave"
-	Bing       Name = "bing"
-	Startpage  Name = "startpage"
-	Yandex     Name = "yandex" // needed for crawler types
-	Yep        Name = "yep"
-	Yahoo      Name = "yahoo"
+	Google     Name = "Google" // needs to be toLower
+	Mojeek     Name = "Mojeek"
+	DuckDuckGo Name = "DuckDuckGo"
+	Qwant      Name = "Qwant"
+	Etools     Name = "Etools"
+	Swisscows  Name = "Swisscows"
+	Brave      Name = "Brave"
+	Bing       Name = "Bing"
+	Startpage  Name = "Startpage"
+	Yandex     Name = "Yandex" // needed for crawler types
+	Yep        Name = "Yep"
+	Yahoo      Name = "Yahoo"
 )

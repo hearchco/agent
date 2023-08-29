@@ -6,7 +6,7 @@ import (
 
 var Info engines.Info = engines.Info{
 	Domain:         "yep.com",
-	Name:           "Yep",
+	Name:           engines.Yep,
 	URL:            "https://api.yep.com/fs/2/search?",
 	ResultsPerPage: 20,
 	Crawlers:       []engines.Name{engines.Yep},
