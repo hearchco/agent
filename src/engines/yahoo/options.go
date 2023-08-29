@@ -8,7 +8,7 @@ import "github.com/tminaorg/brzaguza/src/engines"
 
 var Info engines.Info = engines.Info{
 	Domain:         "search.yahoo.com",
-	Name:           "Yahoo",
+	Name:           engines.Yahoo,
 	URL:            "https://search.yahoo.com/search?p=",
 	ResultsPerPage: 10,
 	Crawlers:       []engines.Name{engines.Yahoo},

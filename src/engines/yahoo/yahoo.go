@@ -40,14 +40,15 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		linkHref, _ := titleEl.Attr("href")
 		linkText := parse.ParseURL(linkHref)
 		linkText = removeTelemetry(linkText)
-		titleText := strings.TrimSpace(titleEl.Text())
+		titleAria, _ := titleEl.Attr("aria-label")
+		titleText := strings.TrimSpace(titleAria)
 		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
 
 		if linkText != "" && linkText != "#" && titleText != "" {
 			var pageStr string = e.Request.Ctx.Get("page")
 			page, _ := strconv.Atoi(pageStr)
 
-			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, (page-1)*Info.ResultsPerPage+pageRankCounter[page]+1, page, pageRankCounter[page]+1)
+			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, pageRankCounter[page]+1)
 			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 			pageRankCounter[page]++
 		}
