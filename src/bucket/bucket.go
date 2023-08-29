@@ -17,7 +17,7 @@ type Relay struct {
 	EngineDoneChannel chan bool
 }
 
-func AddSEResult(seResult *engines.RetrievedResult, seName string, relay *Relay, options *engines.Options, pagesCol *colly.Collector) {
+func AddSEResult(seResult *engines.RetrievedResult, seName engines.Name, relay *Relay, options *engines.Options, pagesCol *colly.Collector) {
 	log.Trace().Msgf("%v: Got Result -> %v: %v", seName, seResult.Title, seResult.URL)
 
 	relay.Mutex.RLock()
@@ -71,7 +71,7 @@ func AddSEResult(seResult *engines.RetrievedResult, seName string, relay *Relay,
 	}
 }
 
-func SetResultResponse(link string, response *colly.Response, relay *Relay, seName string) {
+func SetResultResponse(link string, response *colly.Response, relay *Relay, seName engines.Name) {
 	log.Trace().Msgf("%v: Got Response -> %v", seName, link)
 
 	relay.Mutex.Lock()
@@ -91,7 +91,7 @@ func SetResultResponse(link string, response *colly.Response, relay *Relay, seNa
 	rank.SetRank(&resCopy, rankAddr, &(relay.Mutex)) //copy contains pointer to response
 }
 
-func MakeSEResult(urll string, title string, description string, searchEngineName string, seRank int, sePage int, seOnPageRank int) *engines.RetrievedResult {
+func MakeSEResult(urll string, title string, description string, searchEngineName engines.Name, seRank int, sePage int, seOnPageRank int) *engines.RetrievedResult {
 	ser := engines.RetrievedRank{
 		SearchEngine: searchEngineName,
 		Rank:         seRank,

@@ -4,7 +4,7 @@ import "github.com/tminaorg/brzaguza/src/engines"
 
 var Info engines.Info = engines.Info{
 	Domain:         "lite.duckduckgo.com",
-	Name:           "DuckDuckGo",
+	Name:           engines.DuckDuckGo,
 	URL:            "https://lite.duckduckgo.com/lite/",
 	ResultsPerPage: 10,
 	Crawlers:       []engines.Name{engines.Bing},
