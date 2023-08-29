@@ -4,7 +4,7 @@ import "github.com/tminaorg/brzaguza/src/engines"
 
 var Info engines.Info = engines.Info{
 	Domain:         "swisscows.com",
-	Name:           "Swisscows",
+	Name:           engines.Swisscows,
 	URL:            "https://api.swisscows.com/web/search?",
 	ResultsPerPage: 10,
 	Crawlers:       []engines.Name{engines.Bing},
