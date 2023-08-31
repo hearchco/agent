@@ -60,5 +60,11 @@ var DefaultConfig Config = Config{
 				Shortcut: "sc",
 			},
 		},
+		engines.Yep.ToLower(): {
+			Enabled: true,
+			Settings: Settings{
+				Shortcut: "yep",
+			},
+		},
 	},
 }

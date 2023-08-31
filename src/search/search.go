@@ -61,71 +61,71 @@ func runEngines(engineMap map[string]config.Engine, query string, worker *conc.W
 	log.Info().Msgf("Enabled engines: %v", config.EnabledEngines)
 
 	for name, engine := range engineMap {
-		switch name {
-		case engines.Google.ToLower():
+		switch engines.ConvertToName(name) {
+		case engines.Google:
 			worker.Go(func() {
 				err := google.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", google.Info.Domain)
 				}
 			})
-		case engines.DuckDuckGo.ToLower():
+		case engines.DuckDuckGo:
 			worker.Go(func() {
 				err := duckduckgo.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", duckduckgo.Info.Domain)
 				}
 			})
-		case engines.Mojeek.ToLower():
+		case engines.Mojeek:
 			worker.Go(func() {
 				err := mojeek.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", mojeek.Info.Domain)
 				}
 			})
-		case engines.Qwant.ToLower():
+		case engines.Qwant:
 			worker.Go(func() {
 				err := qwant.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", qwant.Info.Domain)
 				}
 			})
-		case engines.Etools.ToLower():
+		case engines.Etools:
 			worker.Go(func() {
 				err := etools.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", etools.Info.Domain)
 				}
 			})
-		case engines.Swisscows.ToLower():
+		case engines.Swisscows:
 			worker.Go(func() {
 				err := swisscows.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", swisscows.Info.Domain)
 				}
 			})
-		case engines.Brave.ToLower():
+		case engines.Brave:
 			worker.Go(func() {
 				err := brave.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", brave.Info.Domain)
 				}
 			})
-		case engines.Bing.ToLower():
+		case engines.Bing:
 			worker.Go(func() {
 				err := bing.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", bing.Info.Domain)
 				}
 			})
-		case engines.Startpage.ToLower():
+		case engines.Startpage:
 			worker.Go(func() {
 				err := startpage.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", startpage.Info.Domain)
 				}
 			})
-		case engines.Yep.ToLower():
+		case engines.Yep:
 			worker.Go(func() {
 				err := yep.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
