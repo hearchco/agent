@@ -17,6 +17,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/engines/etools"
 	"github.com/tminaorg/brzaguza/src/engines/google"
 	"github.com/tminaorg/brzaguza/src/engines/mojeek"
+	"github.com/tminaorg/brzaguza/src/engines/presearch"
 	"github.com/tminaorg/brzaguza/src/engines/qwant"
 	"github.com/tminaorg/brzaguza/src/engines/startpage"
 	"github.com/tminaorg/brzaguza/src/engines/swisscows"
@@ -129,6 +130,13 @@ func runEngines(engineMap map[engines.Name]config.Engine, query string, worker *
 				err := yep.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", yep.Info.Domain)
+				}
+			})
+		case engines.Presearch:
+			worker.Go(func() {
+				err := presearch.Search(context.Background(), query, relay, options, engine.Settings)
+				if err != nil {
+					log.Error().Err(err).Msgf("Failed searching %v", presearch.Info.Domain)
 				}
 			})
 		}

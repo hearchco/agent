@@ -59,8 +59,8 @@ func AddSEResult(seResult *engines.RetrievedResult, seName engines.Name, relay *
 		if !alreadyIn {
 			mapRes.EngineRanks[mapRes.TimesReturned] = seResult.Rank
 			mapRes.TimesReturned++
-		}
-		if len(mapRes.Description) < len(seResult.Description) {
+		}	
+    if len(mapRes.Description) < len(seResult.Description) {
 			mapRes.Description = seResult.Description
 		}
 		relay.Mutex.Unlock()

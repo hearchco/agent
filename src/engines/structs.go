@@ -65,4 +65,5 @@ const (
 	Startpage  Name = "Startpage"
 	Yandex     Name = "Yandex" // needed for crawler types
 	Yep        Name = "Yep"
+	Presearch  Name = "Presearch"
 )
