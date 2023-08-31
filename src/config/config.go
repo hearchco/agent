@@ -11,6 +11,7 @@ import (
 	"github.com/knadh/koanf/providers/structs"
 	"github.com/knadh/koanf/v2"
 	"github.com/rs/zerolog/log"
+	"github.com/tminaorg/brzaguza/src/engines"
 )
 
 // Delegates Timeout, PageTimeout to colly.Collector.SetRequestTimeout(); Note: See https://github.com/gocolly/colly/issues/644
@@ -47,7 +48,7 @@ type Config struct {
 	Engines map[string]Engine `koanf:"engines"`
 }
 
-var EnabledEngines []string = make([]string, 0)
+var EnabledEngines []engines.Name = make([]engines.Name, 0)
 
 func SetupConfig(path string) *Config {
 	// Use "." as the key path delimiter. This can be "/" or any character.
@@ -86,7 +87,7 @@ func SetupConfig(path string) *Config {
 	// Add enabled engines names and remove disabled ones
 	for name, engine := range config.Engines {
 		if engine.Enabled {
-			EnabledEngines = append(EnabledEngines, name)
+			EnabledEngines = append(EnabledEngines, engines.ConvertToName(name))
 		} else {
 			delete(config.Engines, name)
 		}
