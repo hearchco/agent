@@ -5,6 +5,11 @@ import "github.com/tminaorg/brzaguza/src/engines"
 const DefaultLocale string = "en-US"
 
 var DefaultConfig Config = Config{
+	Server: Server{
+		Port:        3030,
+		FrontendUrl: "http://localhost:8000",
+		RedisUrl:    "http://localhost:6379",
+	},
 	Engines: map[string]Engine{
 		engines.Bing.ToLower(): {
 			Enabled: true,
