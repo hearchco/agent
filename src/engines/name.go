@@ -51,3 +51,36 @@ func (n Name) String() string {
 func (n Name) ToLower() string {
 	return strings.ToLower(n.String())
 }
+
+func (n Name) Equals(s string) bool {
+	return n.ToLower() == strings.ToLower(s)
+}
+
+func ConvertToName(s string) Name {
+	switch {
+	case Google.Equals(s):
+		return Google
+	case Mojeek.Equals(s):
+		return Mojeek
+	case DuckDuckGo.Equals(s):
+		return DuckDuckGo
+	case Qwant.Equals(s):
+		return Qwant
+	case Etools.Equals(s):
+		return Etools
+	case Swisscows.Equals(s):
+		return Swisscows
+	case Brave.Equals(s):
+		return Brave
+	case Bing.Equals(s):
+		return Bing
+	case Startpage.Equals(s):
+		return Startpage
+	case Yandex.Equals(s):
+		return Yandex
+	case Yep.Equals(s):
+		return Yep
+	default:
+		return Undefined
+	}
+}
