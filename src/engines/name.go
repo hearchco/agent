@@ -22,40 +22,32 @@ const (
 func (n Name) String() string {
 	switch n {
 	case Google:
-		return "google"
+		return "Google"
 	case Mojeek:
-		return "mojeek"
+		return "Mojeek"
 	case DuckDuckGo:
-		return "duckduckgo"
+		return "DuckDuckGo"
 	case Qwant:
-		return "qwant"
+		return "Qwant"
 	case Etools:
-		return "etools"
+		return "Etools"
 	case Swisscows:
-		return "swisscows"
+		return "Swisscows"
 	case Brave:
-		return "brave"
+		return "Brave"
 	case Bing:
-		return "bing"
+		return "Bing"
 	case Startpage:
-		return "startpage"
+		return "Startpage"
 	case Yandex:
-		return "yandex"
+		return "Yandex"
 	case Yep:
-		return "yep"
+		return "Yep"
 	default:
-		return "undefined"
+		return "Undefined"
 	}
-}
-
-func (n Name) ToUpper() string {
-	return strings.ToUpper(n.String())
 }
 
 func (n Name) ToLower() string {
 	return strings.ToLower(n.String())
-}
-
-func (n Name) Equals(s string) bool {
-	return n.ToUpper() == strings.ToUpper(s)
 }
