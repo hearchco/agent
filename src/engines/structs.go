@@ -50,19 +50,3 @@ type Options struct {
 	SafeSearch    bool
 	Mobile        bool
 }
-
-type Name string
-
-const (
-	Google     Name = "Google" // needs to be toLower
-	Mojeek     Name = "Mojeek"
-	DuckDuckGo Name = "DuckDuckGo"
-	Qwant      Name = "Qwant"
-	Etools     Name = "Etools"
-	Swisscows  Name = "Swisscows"
-	Brave      Name = "Brave"
-	Bing       Name = "Bing"
-	Startpage  Name = "Startpage"
-	Yandex     Name = "Yandex" // needed for crawler types
-	Yep        Name = "Yep"
-)
