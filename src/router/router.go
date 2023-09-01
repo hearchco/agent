@@ -39,6 +39,7 @@ func SetupRouter(config *config.Config) {
 
 		if resultsJson, err := json.Marshal(results); err != nil {
 			log.Error().Err(err).Msg("failed marshalling results")
+			c.String(http.StatusInternalServerError, "")
 		} else {
 			c.String(http.StatusOK, string(resultsJson))
 		}
