@@ -6,55 +6,55 @@ const DefaultLocale string = "en-US"
 
 var DefaultConfig Config = Config{
 	Engines: map[string]Engine{
-		engines.Bing.String(): {
+		engines.Bing.ToLower(): {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "bi",
 			},
 		},
-		engines.Brave.String(): {
+		engines.Brave.ToLower(): {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "br",
 			},
 		},
-		engines.DuckDuckGo.String(): {
+		engines.DuckDuckGo.ToLower(): {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "ddg",
 			},
 		},
-		engines.Etools.String(): {
+		engines.Etools.ToLower(): {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "ets",
 			},
 		},
-		engines.Google.String(): {
+		engines.Google.ToLower(): {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "go",
 			},
 		},
-		engines.Mojeek.String(): {
+		engines.Mojeek.ToLower(): {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "mjk",
 			},
 		},
-		engines.Qwant.String(): {
+		engines.Qwant.ToLower(): {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "qw",
 			},
 		},
-		engines.Startpage.String(): {
+		engines.Startpage.ToLower(): {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "sp",
 			},
 		},
-		engines.Swisscows.String(): {
+		engines.Swisscows.ToLower(): {
 			Enabled: true,
 			Settings: Settings{
 				Shortcut: "sc",
