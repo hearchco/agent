@@ -6,6 +6,11 @@ const DefaultLocale string = "en-US"
 
 func New() *Config {
 	return &Config{
+		Server: Server{
+			Port:        3030,
+			FrontendUrl: "http://localhost:8000",
+			RedisUrl:    "http://localhost:6379",
+		},
 		Engines: map[string]Engine{
 			engines.Bing.ToLower(): {
 				Enabled: true,

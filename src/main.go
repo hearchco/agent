@@ -8,6 +8,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/logger"
+	"github.com/tminaorg/brzaguza/src/router"
 	"github.com/tminaorg/brzaguza/src/search"
 )
 
@@ -36,18 +37,22 @@ func main() {
 	config := config.New()
 	config.Load(cli.Config)
 
-	log.Info().
-		Str("query", cli.Query).
-		Str("max-pages", fmt.Sprintf("%v", cli.MaxPages)).
-		Str("visit", fmt.Sprintf("%v", cli.Visit)).
-		Msg("Started searching")
+	if cli.Cli {
+		log.Info().
+			Str("query", cli.Query).
+			Str("max-pages", fmt.Sprintf("%v", cli.MaxPages)).
+			Str("visit", fmt.Sprintf("%v", cli.Visit)).
+			Msg("Started searching")
 
-	start := time.Now()
-	results := search.PerformSearch(cli.Query, cli.MaxPages, cli.Visit, config)
-	duration := time.Since(start)
+		start := time.Now()
+		results := search.PerformSearch(cli.Query, cli.MaxPages, cli.Visit, config)
+		duration := time.Since(start)
 
-	if !cli.Silent {
-		printResults(results)
+		if !cli.Silent {
+			printResults(results)
+		}
+		log.Info().Msgf("Found %v results in %vms", len(results), duration.Milliseconds())
+	} else {
+		router.SetupRouter(config)
 	}
-	log.Info().Msgf("Found %v results in %vms", len(results), duration.Milliseconds())
 }
