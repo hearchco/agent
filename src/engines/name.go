@@ -2,7 +2,7 @@ package engines
 
 import "strings"
 
-type Name int64
+type Name int
 
 const (
 	Undefined Name = iota
@@ -55,33 +55,29 @@ func (n Name) ToLower() string {
 	return strings.ToLower(n.String())
 }
 
-func (n Name) Equals(s string) bool {
-	return n.ToLower() == strings.ToLower(s)
-}
-
 func ConvertToName(s string) Name {
-	switch {
-	case Google.Equals(s):
+	switch strings.ToLower(s) {
+	case Google.ToLower():
 		return Google
-	case Mojeek.Equals(s):
+	case Mojeek.ToLower():
 		return Mojeek
-	case DuckDuckGo.Equals(s):
+	case DuckDuckGo.ToLower():
 		return DuckDuckGo
-	case Qwant.Equals(s):
+	case Qwant.ToLower():
 		return Qwant
-	case Etools.Equals(s):
+	case Etools.ToLower():
 		return Etools
-	case Swisscows.Equals(s):
+	case Swisscows.ToLower():
 		return Swisscows
-	case Brave.Equals(s):
+	case Brave.ToLower():
 		return Brave
-	case Bing.Equals(s):
+	case Bing.ToLower():
 		return Bing
-	case Startpage.Equals(s):
+	case Startpage.ToLower():
 		return Startpage
-	case Yandex.Equals(s):
+	case Yandex.ToLower():
 		return Yandex
-	case Yep.Equals(s):
+	case Yep.ToLower():
 		return Yep
 	default:
 		return Undefined
