@@ -11,7 +11,6 @@ import (
 	"github.com/knadh/koanf/providers/structs"
 	"github.com/knadh/koanf/v2"
 	"github.com/rs/zerolog/log"
-	"github.com/tminaorg/brzaguza/src/engines"
 )
 
 // Delegates Timeout, PageTimeout to colly.Collector.SetRequestTimeout(); Note: See https://github.com/gocolly/colly/issues/644
@@ -44,11 +43,11 @@ type Server struct {
 
 // Config struct for Koanf
 type Config struct {
-	Server  Server                  `koanf:"server"`
-	Engines map[engines.Name]Engine `koanf:"engines"`
+	Server  Server            `koanf:"server"`
+	Engines map[string]Engine `koanf:"engines"`
 }
 
-var EnabledEngines []engines.Name = make([]engines.Name, 0)
+var EnabledEngines []string = make([]string, 0)
 
 func SetupConfig(path string, name string) *Config {
 	// Use "." as the key path delimiter. This can be "/" or any character.
@@ -68,7 +67,13 @@ func SetupConfig(path string, name string) *Config {
 	// Load YAML config
 	yamlPath := fullPath + ".yaml"
 	if _, err := os.Stat(yamlPath); err != nil {
-		log.Trace().Msgf("no yaml config present at path: %v", yamlPath)
+		log.Trace().Msgf("no yaml config present at path: %v, looking for .yml", yamlPath)
+		yamlPath = fullPath + ".yml"
+		if _, errr := os.Stat(yamlPath); errr != nil {
+			log.Trace().Msgf("no yaml config present at path: %v", yamlPath)
+		} else if errr := k.Load(file.Provider(yamlPath), yaml.Parser()); errr != nil {
+			log.Fatal().Msgf("error loading yaml config: %v", err)
+		}
 	} else if err := k.Load(file.Provider(yamlPath), yaml.Parser()); err != nil {
 		log.Fatal().Msgf("error loading yaml config: %v", err)
 	}
@@ -81,7 +86,7 @@ func SetupConfig(path string, name string) *Config {
 	}
 
 	// Unmarshal config into struct
-	var config Config
+	config := DefaultConfig
 	k.Unmarshal("", &config)
 
 	// Add enabled engines names and remove disabled ones
