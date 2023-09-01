@@ -1,4 +1,4 @@
-package main
+package logger
 
 import (
 	"io"
@@ -10,14 +10,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func setupLog() {
+func Setup(filename string, verbosity int) {
 	logger := log.Output(io.MultiWriter(zerolog.ConsoleWriter{
 		TimeFormat: time.Stamp,
 		Out:        os.Stderr,
 	}, zerolog.ConsoleWriter{
 		TimeFormat: time.Stamp,
 		Out: &lumberjack.Logger{
-			Filename:   cli.Log,
+			Filename:   filename,
 			MaxSize:    5,
 			MaxAge:     14,
 			MaxBackups: 5,
@@ -26,9 +26,9 @@ func setupLog() {
 	}))
 
 	switch {
-	case cli.Verbosity == 1:
+	case verbosity == 1:
 		log.Logger = logger.Level(zerolog.DebugLevel)
-	case cli.Verbosity > 1:
+	case verbosity > 1:
 		log.Logger = logger.Level(zerolog.TraceLevel)
 	default:
 		log.Logger = logger.Level(zerolog.InfoLevel)

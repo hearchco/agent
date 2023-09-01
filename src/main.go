@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/tminaorg/brzaguza/src/logger"
 	"github.com/tminaorg/brzaguza/src/search"
 )
 
@@ -26,7 +27,7 @@ func printResults(results []result.Result) {
 
 func main() {
 	setupCli()
-	setupLog()
+	logger.Setup(cli.Log, cli.Verbosity)
 	config := config.SetupConfig(cli.ConfigPath, cli.Config)
 
 	log.Info().
