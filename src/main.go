@@ -25,9 +25,15 @@ func printResults(results []result.Result) {
 }
 
 func main() {
+	// parse cli arguments
 	setupCli()
+
+	// configure logging
 	setupLog()
-	config := config.SetupConfig(cli.ConfigPath, cli.Config)
+
+	// load config file
+	config := config.New()
+	config.Load(cli.ConfigPath, cli.Config)
 
 	log.Info().
 		Str("query", cli.Query).
