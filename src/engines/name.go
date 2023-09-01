@@ -6,6 +6,7 @@ type Name int64
 
 const (
 	Undefined Name = iota
+<<<<<<< HEAD
 	Bing
 	Brave
 	DuckDuckGo
@@ -16,12 +17,24 @@ const (
 	Qwant
 	Startpage
 	Swisscows
+=======
+	Google
+	Mojeek
+	DuckDuckGo
+	Qwant
+	Etools
+	Swisscows
+	Brave
+	Bing
+	Startpage
+>>>>>>> a0694f64bea02e5a0f681448bf43971a1d74148e
 	Yandex
 	Yep
 )
 
 func (n Name) String() string {
 	switch n {
+<<<<<<< HEAD
 	case Bing:
 		return "Bing"
 	case Brave:
@@ -30,10 +43,13 @@ func (n Name) String() string {
 		return "DuckDuckGo"
 	case Etools:
 		return "Etools"
+=======
+>>>>>>> a0694f64bea02e5a0f681448bf43971a1d74148e
 	case Google:
 		return "Google"
 	case Mojeek:
 		return "Mojeek"
+<<<<<<< HEAD
 	case Presearch:
 		return "Presearch"
 	case Qwant:
@@ -42,6 +58,22 @@ func (n Name) String() string {
 		return "Startpage"
 	case Swisscows:
 		return "Swisscows"
+=======
+	case DuckDuckGo:
+		return "DuckDuckGo"
+	case Qwant:
+		return "Qwant"
+	case Etools:
+		return "Etools"
+	case Swisscows:
+		return "Swisscows"
+	case Brave:
+		return "Brave"
+	case Bing:
+		return "Bing"
+	case Startpage:
+		return "Startpage"
+>>>>>>> a0694f64bea02e5a0f681448bf43971a1d74148e
 	case Yandex:
 		return "Yandex"
 	case Yep:
