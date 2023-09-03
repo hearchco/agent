@@ -10,6 +10,7 @@ import (
 	"github.com/knadh/koanf/providers/structs"
 	"github.com/knadh/koanf/v2"
 	"github.com/rs/zerolog/log"
+	"github.com/tminaorg/brzaguza/src/engines"
 )
 
 var EnabledEngines []engines.Name = make([]engines.Name, 0)
