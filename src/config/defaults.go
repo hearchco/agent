@@ -127,6 +127,12 @@ var DefaultConfig Config = Config{
 				Shortcut: "sc",
 			},
 		},
+		engines.Yep.ToLower(): {
+			Enabled: true,
+			Settings: Settings{
+				Shortcut: "yep",
+			},
+		},
 	},
 >>>>>>> 75bb49c (Using correct formating inside the code, while loading is lowercase)
 }
