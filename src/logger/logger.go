@@ -11,29 +11,32 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+func CalculateDatetime() string {
+	year, month, day := time.Now().Date()
+	datetime := fmt.Sprintf("%v%v%v", year, month, day)
+	if month < 10 {
+		if day < 10 {
+			datetime = fmt.Sprintf("%v0%v0%v", year, month, day)
+		} else {
+			datetime = fmt.Sprintf("%v0%v%v", year, month, day)
+		}
+	} else {
+		if day < 10 {
+			datetime = fmt.Sprintf("%v%v0%v", year, month, day)
+		}
+	}
+	return datetime
+}
+
 func Setup(path string, name string, verbosity int) {
 	// Check if path ends with "/" and add it otherwise
 	if path[len(path)-1] != '/' {
 		path = path + "/"
 	}
 
-	// Calculate dated log name
-	year, month, day := time.Now().Date()
-	datetime := fmt.Sprintf("%d%d%d", year, month, day)
-	if month < 10 {
-		if day < 10 {
-			datetime = fmt.Sprintf("%d0%d0%d", year, month, day)
-		} else {
-			datetime = fmt.Sprintf("%d0%d%d", year, month, day)
-		}
-	} else {
-		if day < 10 {
-			datetime = fmt.Sprintf("%d%d0%d", year, month, day)
-		}
-	}
-
-	// Combine into full path
-	fullPath := fmt.Sprintf("%v%v_%v.log", path, name, datetime)
+	// Generate logfile name
+	datetime := CalculateDatetime()
+	fullpath := fmt.Sprintf("%v%v_%v.log", path, name, datetime)
 
 	// Setup logger
 	logger := log.Output(io.MultiWriter(zerolog.ConsoleWriter{
@@ -42,7 +45,7 @@ func Setup(path string, name string, verbosity int) {
 	}, zerolog.ConsoleWriter{
 		TimeFormat: time.Stamp,
 		Out: &lumberjack.Logger{
-			Filename:   fullPath,
+			Filename:   fullpath,
 			MaxSize:    5,
 			MaxAge:     14,
 			MaxBackups: 5,
