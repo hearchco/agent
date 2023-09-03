@@ -30,7 +30,11 @@ func main() {
 	setupCli()
 
 	// configure logging
+<<<<<<< HEAD
 	logger.Setup(cli.ConfigPath, cli.Log, cli.Verbosity)
+=======
+	setupLog()
+>>>>>>> a0694f6 (Added New() and Load() to config)
 
 	// load config file
 	config := config.New()
