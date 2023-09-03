@@ -36,7 +36,7 @@ func Setup(path string, name string, verbosity int) {
 
 	// Generate logfile name
 	datetime := CalculateDatetime()
-	fullpath := fmt.Sprintf("%v%v_%v.log", path, name, datetime)
+	fullpath := fmt.Sprintf("%vlog/%v_%v.log", path, name, datetime)
 
 	// Setup logger
 	logger := log.Output(io.MultiWriter(zerolog.ConsoleWriter{
