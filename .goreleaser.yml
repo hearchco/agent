@@ -9,7 +9,7 @@ builds:
       - darwin
       - freebsd
       - windows
-    main: ./src/{{ .ProjectName }}
+    main: ./src
     goarch:
       - amd64
       - arm64
