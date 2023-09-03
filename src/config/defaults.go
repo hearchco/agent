@@ -4,7 +4,6 @@ import "github.com/tminaorg/brzaguza/src/engines"
 
 const DefaultLocale string = "en-US"
 
-<<<<<<< HEAD
 func New() *Config {
 	return &Config{
 		Server: Server{
@@ -72,19 +71,6 @@ func New() *Config {
 				Settings: Settings{
 					Shortcut: "yep",
 				},
-=======
-var DefaultConfig Config = Config{
-	Server: Server{
-		Port:        3030,
-		FrontendUrl: "http://localhost:8000",
-		RedisUrl:    "http://localhost:6379",
-	},
-	Engines: map[string]Engine{
-		engines.Bing.ToLower(): {
-			Enabled: true,
-			Settings: Settings{
-				Shortcut: "bi",
->>>>>>> 7576747 (Added gin-gonic and GET on /search)
 			},
 		},
 	}
