@@ -12,7 +12,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/search"
 )
 
-func SetupRouter(config *config.Config) {
+func Setup(config *config.Config) {
 	router := gin.Default()
 
 	router.GET("/search", func(c *gin.Context) {
