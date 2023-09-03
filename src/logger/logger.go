@@ -12,7 +12,9 @@ import (
 )
 
 func CalculateDatetime() string {
-	year, month, day := time.Now().Date()
+	year, monthS, day := time.Now().Date()
+	month := int(monthS)
+
 	datetime := fmt.Sprintf("%v%v%v", year, month, day)
 	if month < 10 {
 		if day < 10 {
@@ -25,18 +27,14 @@ func CalculateDatetime() string {
 			datetime = fmt.Sprintf("%v%v0%v", year, month, day)
 		}
 	}
+
 	return datetime
 }
 
-func Setup(path string, name string, verbosity int) {
-	// Check if path ends with "/" and add it otherwise
-	if path[len(path)-1] != '/' {
-		path = path + "/"
-	}
-
+func Setup(path string, verbosity int) {
 	// Generate logfile name
 	datetime := CalculateDatetime()
-	fullpath := fmt.Sprintf("%vlog/%v_%v.log", path, name, datetime)
+	filepath := fmt.Sprintf("%v/log/brzaguza_%v.log", path, datetime)
 
 	// Setup logger
 	logger := log.Output(io.MultiWriter(zerolog.ConsoleWriter{
@@ -45,7 +43,7 @@ func Setup(path string, name string, verbosity int) {
 	}, zerolog.ConsoleWriter{
 		TimeFormat: time.Stamp,
 		Out: &lumberjack.Logger{
-			Filename:   fullpath,
+			Filename:   filepath,
 			MaxSize:    5,
 			MaxAge:     14,
 			MaxBackups: 5,
