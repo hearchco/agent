@@ -53,7 +53,7 @@ dockers:
 - image_templates:
   - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:v{{ .Version }}-amd64"
   use: buildx
-  dockerfile: ./docker/{{ .ProjectName }}/Dockerfile
+  dockerfile: ./docker/Dockerfile
   build_flag_templates:
   - --platform=linux/amd64
   extra_files:
@@ -62,7 +62,7 @@ dockers:
   - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:v{{ .Version }}-arm64"
   use: buildx
   goarch: arm64
-  dockerfile: ./docker/{{ .ProjectName }}/Dockerfile
+  dockerfile: ./docker/Dockerfile
   build_flag_templates:
   - --platform=linux/arm64
   extra_files:
