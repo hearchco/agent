@@ -3,7 +3,6 @@ package config
 import (
 	"os"
 	"strings"
-	"time"
 
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/env"
@@ -14,56 +13,22 @@ import (
 	"github.com/tminaorg/brzaguza/src/engines"
 )
 
-// Delegates Timeout, PageTimeout to colly.Collector.SetRequestTimeout(); Note: See https://github.com/gocolly/colly/issues/644
-// Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit()
-type Timings struct {
-	Timeout     time.Duration `koanf:"timeout"`
-	PageTimeout time.Duration `koanf:"pageTimeout"`
-	Delay       time.Duration `koanf:"delay"`
-	RandomDelay time.Duration `koanf:"randomDelay"`
-	Parallelism int           `koanf:"parallelism"`
-}
-
-type Settings struct {
-	RequestedResultsPerPage int     `koanf:"requestedResults"`
-	Shortcut                string  `koanf:"shortcut"`
-	Timings                 Timings `koanf:"timings"`
-}
-
-type Engine struct {
-	Enabled  bool     `koanf:"enabled"`
-	Settings Settings `koanf:"settings"`
-}
-
-// Server config
-type Server struct {
-	Port        int    `koanf:"port"`
-	FrontendUrl string `koanf:"frontendUrl"`
-	RedisUrl    string `koanf:"redisUrl"`
-}
-
-// Config struct for Koanf
-type Config struct {
-	Server  Server            `koanf:"server"`
-	Engines map[string]Engine `koanf:"engines"`
-}
-
 var EnabledEngines []engines.Name = make([]engines.Name, 0)
 
-func SetupConfig(path string) *Config {
+func (c *Config) Load(path string) {
 	// Use "." as the key path delimiter. This can be "/" or any character.
 	k := koanf.New(".")
 
 	// Load default values using the structs provider.
 	// We provide a struct along with the struct tag `koanf` to the
 	// provider.
-	k.Load(structs.Provider(DefaultConfig, "koanf"), nil)
+	k.Load(structs.Provider(c, "koanf"), nil)
 
 	// Load YAML config
 	yamlPath := path + ".yaml"
 	if _, err := os.Stat(yamlPath); err != nil {
 		log.Trace().Msgf("no yaml config present at path: %v, looking for .yml", yamlPath)
-		yamlPath = fullPath + ".yml"
+		yamlPath = path + ".yml"
 		if _, errr := os.Stat(yamlPath); errr != nil {
 			log.Trace().Msgf("no yaml config present at path: %v", yamlPath)
 		} else if errr := k.Load(file.Provider(yamlPath), yaml.Parser()); errr != nil {
@@ -81,19 +46,16 @@ func SetupConfig(path string) *Config {
 	}
 
 	// Unmarshal config into struct
-	config := DefaultConfig
-	k.Unmarshal("", &config)
+	k.Unmarshal("", &c)
 
 	// Add enabled engines names and remove disabled ones
-	for name, engine := range config.Engines {
+	for name, engine := range c.Engines {
 		if engine.Enabled {
 			EnabledEngines = append(EnabledEngines, engines.ConvertToName(name))
 		} else {
-			delete(config.Engines, name)
+			delete(c.Engines, name)
 		}
 	}
-
-	return &config
 }
 
 const InsertDefaultRank bool = true       // this should be moved to config
