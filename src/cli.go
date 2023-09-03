@@ -65,7 +65,7 @@ func setupCli() {
 			"version":       fmt.Sprintf("%v (%v@%v)", Version, GitCommit, Timestamp),
 			"config_folder": configPath,
 			"config_file":   "brzaguza", // can be .yaml or any other type defined by Koanf
-			"log_file":      "brzaguza.log",
+			"log_file":      "brzaguza",
 			"query_string":  "banana death",
 		},
 	)

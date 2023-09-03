@@ -27,7 +27,7 @@ func printResults(results []result.Result) {
 
 func main() {
 	setupCli()
-	logger.Setup(cli.Log, cli.Verbosity)
+	logger.Setup(cli.ConfigPath, cli.Log, cli.Verbosity)
 	config := config.SetupConfig(cli.ConfigPath, cli.Config)
 
 	log.Info().
