@@ -4,7 +4,7 @@ import "github.com/tminaorg/brzaguza/src/engines"
 
 var Info engines.Info = engines.Info{
 	Domain:         "presearch.com",
-	Name:           "Presearch",
+	Name:           engines.Presearch,
 	URL:            "https://presearch.com/search?q=",
 	ResultsPerPage: 10,
 	Crawlers:       []engines.Name{engines.Presearch},
