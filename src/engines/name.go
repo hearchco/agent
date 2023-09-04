@@ -82,7 +82,7 @@ func ConvertToName(s string) Name {
 		return Yandex
 	case Yep.ToLower():
 		return Yep
-	case Yahoo.Equals(s):
+	case Yahoo.ToLower():
 		return Yahoo
 	default:
 		return Undefined
