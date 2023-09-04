@@ -11,29 +11,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func CalculateDatetime() string {
-	year, monthS, day := time.Now().Date()
-	month := int(monthS)
-
-	datetime := fmt.Sprintf("%v%v%v", year, month, day)
-	if month < 10 {
-		if day < 10 {
-			datetime = fmt.Sprintf("%v0%v0%v", year, month, day)
-		} else {
-			datetime = fmt.Sprintf("%v0%v%v", year, month, day)
-		}
-	} else {
-		if day < 10 {
-			datetime = fmt.Sprintf("%v%v0%v", year, month, day)
-		}
-	}
-
-	return datetime
+func DateString() string {
+	return time.Now().Format("20060102")
 }
 
 func Setup(path string, verbosity int) {
 	// Generate logfile name
-	datetime := CalculateDatetime()
+	datetime := DateString()
 	filepath := fmt.Sprintf("%v/log/brzaguza_%v.log", path, datetime)
 
 	// Setup logger
