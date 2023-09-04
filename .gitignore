@@ -32,3 +32,4 @@ src/engines/metager/site/*
 src/engines/presearch/site/*
 
 logdump/*.html
+log/*.log

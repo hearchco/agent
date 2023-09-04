@@ -18,6 +18,7 @@ const (
 	Swisscows
 	Yandex
 	Yep
+	Yahoo
 )
 
 func (n Name) String() string {
@@ -46,6 +47,8 @@ func (n Name) String() string {
 		return "Yandex"
 	case Yep:
 		return "Yep"
+	case Yahoo:
+		return "Yahoo"
 	default:
 		return "Undefined"
 	}
@@ -79,6 +82,8 @@ func ConvertToName(s string) Name {
 		return Yandex
 	case Yep.ToLower():
 		return Yep
+	case Yahoo.Equals(s):
+		return Yahoo
 	default:
 		return Undefined
 	}
