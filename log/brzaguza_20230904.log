@@ -1,0 +1,68 @@
+Sep  4 22:52:38 TRC no yaml config present at path: /var/home/aleksa/Stvari/Projekti/brzaguza.yaml, looking for .yml
+Sep  4 22:52:38 TRC no yaml config present at path: /var/home/aleksa/Stvari/Projekti/brzaguza.yml
+Sep  4 22:53:18 TRC no yaml config present at path: /var/home/aleksa/Stvari/Projekti/brzaguza.yaml, looking for .yml
+Sep  4 22:53:18 TRC no yaml config present at path: /var/home/aleksa/Stvari/Projekti/brzaguza.yml
+Sep  4 22:55:13 INF Enabled engines: [Google]
+Sep  4 22:55:13 TRC Google: UserAgent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36
+Sep  4 22:55:14 TRC Google: Got Result -> Meso i riba - Paštete: https://cenoteka.rs/proizvodi/meso-i-riba/pastete
+Sep  4 22:55:14 TRC Google: Got Result -> Paštete i mesni narezak: https://online.idea.rs/#!/categories/60007782/pastete-i-mesni-narezak/products
+Sep  4 22:55:14 TRC Google: Got Result -> Паштета: https://sr.wikipedia.org/sr-ec/%D0%9F%D0%B0%D1%88%D1%82%D0%B5%D1%82%D0%B0
+Sep  4 22:55:14 TRC Google: Got Result -> Paštete: https://carnex.rs/products/pastete
+Sep  4 22:55:14 TRC Google: Got Result -> Domaća pašteta i 6 recepata za celu porodicu: https://trudnocaizdravlje.rs/domaca-pasteta-i-6-recepata-za-celu-porodicu/
+Sep  4 22:55:14 TRC Google: Got Result -> Paštete u konzervi: https://www.maxi.rs/online/Meso-mesne-i-riblje-preradjevine/Mesne-konzerve/Pashtete-u-konzervi/c/040601
+Sep  4 22:55:14 TRC Google: Got Result -> Pašteta - 147 Recepata: https://bonapeti.rs/recepti/pastete/
+Sep  4 22:55:14 TRC Google: Got Result -> domaca-pasteta: https://www.coolinarika.com/inspiracija/domaca-pasteta-8a964dba-6322-11eb-bd29-0242ac120019
+Sep  4 22:55:14 TRC Google: Got Result -> Paštete | Uporedi cene: https://www.eponuda.com/pastete-cene
+Sep  4 22:55:14 TRC Google: Got Result -> PASTETA JETRENA 75G CARNEX FOLIJA: https://elakolije.rs/1008837/proizvod/pasteta-jetrena-75g-carnex-folija
+Sep  4 22:55:14 DBG All processing done, waiting for closing of goroutines.
+Sep  4 22:55:14 DBG Done! Received All Engines!
+Sep  4 22:55:48 INF Enabled engines: [Google]
+Sep  4 22:55:48 TRC Google: UserAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36
+Sep  4 22:55:49 DBG All processing done, waiting for closing of goroutines.
+Sep  4 22:55:49 DBG Done! Received All Engines!
+Sep  4 22:56:23 INF Enabled engines: [Google]
+Sep  4 22:56:23 TRC Google: UserAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.0.0
+Sep  4 22:56:24 DBG All processing done, waiting for closing of goroutines.
+Sep  4 22:56:24 DBG Done! Received All Engines!
+Sep  4 22:56:36 INF Enabled engines: [Google]
+Sep  4 22:56:36 TRC Google: UserAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.0.0
+Sep  4 22:56:37 DBG All processing done, waiting for closing of goroutines.
+Sep  4 22:56:37 DBG Done! Received All Engines!
+Sep  4 22:56:41 INF Enabled engines: [Google]
+Sep  4 22:56:41 TRC Google: UserAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36
+Sep  4 22:56:43 TRC Google: Got Result -> Meso i riba - Paštete - Cenoteka: https://cenoteka.rs/proizvodi/meso-i-riba/pastete
+Sep  4 22:56:43 TRC Google: Got Result -> Paštete i mesni narezak - IDEA online: https://online.idea.rs/#!/categories/60007782/pastete-i-mesni-narezak/products
+Sep  4 22:56:43 TRC Google: Got Result -> Паштета - Википедија: https://sr.wikipedia.org/sr-ec/%D0%9F%D0%B0%D1%88%D1%82%D0%B5%D1%82%D0%B0
+Sep  4 22:56:43 TRC Google: Got Result -> Paštete - Carnex: https://carnex.rs/products/pastete
+Sep  4 22:56:43 TRC Google: Got Result -> Domaća pašteta i 6 recepata za celu porodicu: https://trudnocaizdravlje.rs/domaca-pasteta-i-6-recepata-za-celu-porodicu/
+Sep  4 22:56:43 TRC Google: Got Result -> Paštete u konzervi - Maxi Online: https://www.maxi.rs/online/Meso-mesne-i-riblje-preradjevine/Mesne-konzerve/Pashtete-u-konzervi/c/040601
+Sep  4 22:56:43 TRC Google: Got Result -> Pašteta - 147 Recepata - Bonapeti.rs: https://bonapeti.rs/recepti/pastete/
+Sep  4 22:56:43 TRC Google: Got Result -> domaca-pasteta - Coolinarika: https://www.coolinarika.com/inspiracija/domaca-pasteta-8a964dba-6322-11eb-bd29-0242ac120019
+Sep  4 22:56:43 TRC Google: Got Result -> Paštete | Uporedi cene - ePonuda.com: https://www.eponuda.com/pastete-cene
+Sep  4 22:56:43 DBG All processing done, waiting for closing of goroutines.
+Sep  4 22:56:43 DBG Done! Received All Engines!
+Sep  4 23:01:41 INF Enabled engines: [Google]
+Sep  4 23:01:41 TRC Google: UserAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0
+Sep  4 23:01:42 DBG All processing done, waiting for closing of goroutines.
+Sep  4 23:01:42 DBG Done! Received All Engines!
+Sep  4 23:01:47 INF Enabled engines: [Google]
+Sep  4 23:01:47 TRC Google: UserAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36
+Sep  4 23:01:47 DBG All processing done, waiting for closing of goroutines.
+Sep  4 23:01:47 DBG Done! Received All Engines!
+Sep  4 23:02:11 INF Enabled engines: [Google]
+Sep  4 23:02:11 TRC Google: UserAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0
+Sep  4 23:02:12 DBG All processing done, waiting for closing of goroutines.
+Sep  4 23:02:12 DBG Done! Received All Engines!
+Sep  4 23:02:38 INF Enabled engines: [Google]
+Sep  4 23:02:38 TRC Google: UserAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0
+Sep  4 23:02:39 TRC Google: Got Result -> Speedtest by Ookla - The Global Broadband Speed Test: https://www.speedtest.net/
+Sep  4 23:02:39 TRC Google: Got Result -> Fast.com: Internet Speed Test: https://fast.com/
+Sep  4 23:02:39 TRC Google: Got Result -> Test - Telegraf.rs: https://www.telegraf.rs/teme/test
+Sep  4 23:02:39 TRC Google: Got Result -> Besplatan test ličnosti - 16Personalities: https://www.16personalities.com/sr/besplatan-test-licnosti
+Sep  4 23:02:39 TRC Google: Got Result -> Провера - Википедија: https://sr.wikipedia.org/sr-ec/%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%B0
+Sep  4 23:02:39 TRC Google: Got Result -> Test – Wikipedija / Википедија: https://sh.wikipedia.org/wiki/Test
+Sep  4 23:02:39 TRC Google: Got Result -> Speed Test by Speedcheck - Test my internet speed: https://www.speedcheck.org/
+Sep  4 23:02:39 TRC Google: Got Result -> е-Здравље - Здравствени подаци грађана на једном месту: https://www.e-zdravlje.gov.rs/
+Sep  4 23:02:39 TRC Google: Got Result -> Test - Blic.rs: https://www.blic.rs/test
+Sep  4 23:02:39 DBG All processing done, waiting for closing of goroutines.
+Sep  4 23:02:39 DBG Done! Received All Engines!
