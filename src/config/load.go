@@ -25,7 +25,7 @@ func (c *Config) Load(path string) {
 	k.Load(structs.Provider(c, "koanf"), nil)
 
 	// Load YAML config
-	yamlPath := path + ".yaml"
+	yamlPath := path + "/brzaguza.yaml"
 	if _, err := os.Stat(yamlPath); err != nil {
 		log.Trace().Msgf("no yaml config present at path: %v, looking for .yml", yamlPath)
 		yamlPath = path + ".yml"
