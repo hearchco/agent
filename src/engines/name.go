@@ -16,9 +16,9 @@ const (
 	Qwant
 	Startpage
 	Swisscows
+	Yahoo
 	Yandex
 	Yep
-	Yahoo
 )
 
 func (n Name) String() string {
@@ -43,12 +43,12 @@ func (n Name) String() string {
 		return "Startpage"
 	case Swisscows:
 		return "Swisscows"
+	case Yahoo:
+		return "Yahoo"
 	case Yandex:
 		return "Yandex"
 	case Yep:
 		return "Yep"
-	case Yahoo:
-		return "Yahoo"
 	default:
 		return "Undefined"
 	}
@@ -78,12 +78,12 @@ func ConvertToName(s string) Name {
 		return Bing
 	case Startpage.ToLower():
 		return Startpage
+	case Yahoo.ToLower():
+		return Yahoo
 	case Yandex.ToLower():
 		return Yandex
 	case Yep.ToLower():
 		return Yep
-	case Yahoo.ToLower():
-		return Yahoo
 	default:
 		return Undefined
 	}
