@@ -4,7 +4,7 @@ import "strings"
 
 type Name uint8
 
-//go:generate go run github.com/dmarkham/enumer -type=Name
+//go:generate enumer -type=Name
 const (
 	Undefined Name = iota
 	Bing

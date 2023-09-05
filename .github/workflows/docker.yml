@@ -44,7 +44,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate go code from go:generate comments
-        run: go get github.com/dmarkham/enumer && go generate ./...
+        run: |
+          go install github.com/dmarkham/enumer@latest
+          go generate ./...
 
       # build
       - name: Snapshot on non-tag
