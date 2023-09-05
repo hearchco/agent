@@ -14,7 +14,7 @@ import (
 func Search(config *config.Config) {
 	searchRoute := router.Group("/search")
 
-	searchRoute.GET("/", func(c *gin.Context) {
+	searchRoute.GET("", func(c *gin.Context) {
 		query := c.Query("q")
 
 		pages := c.DefaultQuery("pages", "1")
@@ -41,7 +41,7 @@ func Search(config *config.Config) {
 		}
 	})
 
-	searchRoute.POST("/", func(c *gin.Context) {
+	searchRoute.POST("", func(c *gin.Context) {
 		query := c.PostForm("q")
 
 		pages := c.DefaultPostForm("pages", "1")
