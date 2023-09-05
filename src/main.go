@@ -7,10 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/config"
-<<<<<<< HEAD
 	"github.com/tminaorg/brzaguza/src/logger"
-=======
->>>>>>> 7576747 (Added gin-gonic and GET on /search)
 	"github.com/tminaorg/brzaguza/src/router"
 	"github.com/tminaorg/brzaguza/src/search"
 )
@@ -33,7 +30,6 @@ func main() {
 	// parse cli arguments
 	setupCli()
 
-<<<<<<< HEAD
 	// configure logging
 	logger.Setup(cli.Log, cli.Verbosity)
 
@@ -51,20 +47,6 @@ func main() {
 		start := time.Now()
 		results := search.PerformSearch(cli.Query, cli.MaxPages, cli.Visit, config)
 		duration := time.Since(start)
-
-=======
-	if cli.Cli {
-		log.Info().
-			Str("query", cli.Query).
-			Str("max-pages", fmt.Sprintf("%v", cli.MaxPages)).
-			Str("visit", fmt.Sprintf("%v", cli.Visit)).
-			Msg("Started searching")
-
-		start := time.Now()
-		results := search.PerformSearch(cli.Query, cli.MaxPages, cli.Visit, config)
-		duration := time.Since(start)
-
->>>>>>> 7576747 (Added gin-gonic and GET on /search)
 		if !cli.Silent {
 			printResults(results)
 		}
