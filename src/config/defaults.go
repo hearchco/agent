@@ -72,6 +72,12 @@ func New() *Config {
 					Shortcut: "yep",
 				},
 			},
+			engines.Yahoo.ToLower(): {
+				Enabled: true,
+				Settings: Settings{
+					Shortcut: "yah",
+				},
+			},
 		},
 	}
 }

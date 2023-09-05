@@ -47,7 +47,6 @@ func main() {
 		start := time.Now()
 		results := search.PerformSearch(cli.Query, cli.MaxPages, cli.Visit, config)
 		duration := time.Since(start)
-
 		if !cli.Silent {
 			printResults(results)
 		}
