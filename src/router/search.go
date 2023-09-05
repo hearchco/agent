@@ -11,23 +11,22 @@ import (
 	"github.com/tminaorg/brzaguza/src/search"
 )
 
-func SetupSearch(config *config.Config, router *gin.Engine) {
-	router.GET("/search", func(c *gin.Context) {
+func Search(config *config.Config) {
+	searchRoute := router.Group("/search")
+
+	searchRoute.GET("/", func(c *gin.Context) {
 		query := c.Query("q")
 
-		pages := c.Query("pages")
-		maxPages := 1
-		if pages != "" {
-			tmpMapPages, err := strconv.Atoi(pages)
-			if err != nil {
-				log.Error().Err(err).Msgf("cannot convert maxPages=%v to int, reverting to default value of 1", pages)
-				maxPages = tmpMapPages
-			}
+		pages := c.DefaultQuery("pages", "1")
+		maxPages, err := strconv.Atoi(pages)
+		if err != nil {
+			log.Error().Err(err).Msgf("cannot convert \"%v\" to int, reverting to default value of 1", pages)
+			maxPages = 1
 		}
 
-		deepSearch := c.Query("deep")
+		deepSearch := c.DefaultQuery("deep", "false")
 		visit := false
-		if deepSearch != "" {
+		if deepSearch != "false" {
 			log.Trace().Msgf("doing a deep search because deep is: %v", deepSearch)
 			visit = true
 		}
@@ -42,22 +41,19 @@ func SetupSearch(config *config.Config, router *gin.Engine) {
 		}
 	})
 
-	router.POST("/search", func(c *gin.Context) {
+	searchRoute.POST("/", func(c *gin.Context) {
 		query := c.PostForm("q")
 
-		pages := c.PostForm("pages")
-		maxPages := 1
-		if pages != "" {
-			tmpMapPages, err := strconv.Atoi(pages)
-			if err != nil {
-				log.Error().Err(err).Msgf("cannot convert maxPages=%v to int, reverting to default value of 1", pages)
-				maxPages = tmpMapPages
-			}
+		pages := c.DefaultPostForm("pages", "1")
+		maxPages, err := strconv.Atoi(pages)
+		if err != nil {
+			log.Error().Err(err).Msgf("cannot convert \"%v\" to int, reverting to default value of 1", pages)
+			maxPages = 1
 		}
 
-		deepSearch := c.PostForm("deep")
+		deepSearch := c.DefaultPostForm("deep", "false")
 		visit := false
-		if deepSearch != "" {
+		if deepSearch != "false" {
 			log.Trace().Msgf("doing a deep search because deep is: %v", deepSearch)
 			visit = true
 		}

@@ -8,10 +8,9 @@ import (
 	"github.com/tminaorg/brzaguza/src/config"
 )
 
+var router = gin.Default()
+
 func Setup(config *config.Config) {
-	router := gin.Default()
-
-	SetupSearch(config, router)
-
+	Search(config)
 	router.Run(fmt.Sprintf(":%v", strconv.Itoa(config.Server.Port)))
 }
