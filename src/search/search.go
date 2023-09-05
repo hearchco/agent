@@ -133,14 +133,14 @@ func runEngines(engineMap map[string]config.Engine, query string, worker *conc.W
 					log.Error().Err(err).Msgf("Failed searching %v", yep.Info.Domain)
 				}
 			})
-		case engines.Yahoo.String():
+		case engines.Yahoo:
 			worker.Go(func() {
 				err := yahoo.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", yahoo.Info.Domain)
 				}
 			})
-		case engines.Presearch.String():
+		case engines.Presearch:
 			worker.Go(func() {
 				err := presearch.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
