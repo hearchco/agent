@@ -33,3 +33,7 @@ src/engines/presearch/site/*
 
 logdump/*.html
 log/*.log
+
+# go:generate
+*_stringer.go
+*_enumer.go
