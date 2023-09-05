@@ -58,11 +58,11 @@ func PerformSearch(query string, maxPages int, visitPages bool, config *config.C
 	return results
 }
 
-func runEngines(engineMap map[engines.Name]config.Engine, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
+func runEngines(engineMap map[string]config.Engine, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
 	log.Info().Msgf("Enabled engines: %v", config.EnabledEngines)
 
 	for name, engine := range engineMap {
-		switch name {
+		switch engines.ConvertToName(name) {
 		case engines.Google:
 			worker.Go(func() {
 				err := google.Search(context.Background(), query, relay, options, engine.Settings)
@@ -138,7 +138,7 @@ func runEngines(engineMap map[engines.Name]config.Engine, query string, worker *
 				err := yahoo.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", yahoo.Info.Domain)
-        }
+				}
 			})
 		case engines.Presearch:
 			worker.Go(func() {
