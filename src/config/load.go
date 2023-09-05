@@ -51,7 +51,11 @@ func (c *Config) Load(path string) {
 	// Add enabled engines names and remove disabled ones
 	for name, engine := range c.Engines {
 		if engine.Enabled {
-			EnabledEngines = append(EnabledEngines, engines.ConvertToName(name))
+			if engineName, err := engines.NameString(name); err != nil {
+				EnabledEngines = append(EnabledEngines, engineName)
+			} else {
+				log.Error().Err(err).Msg("failed converting string to engine name")
+			}
 		} else {
 			delete(c.Engines, name)
 		}
