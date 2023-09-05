@@ -26,9 +26,15 @@ func printResults(results []result.Result) {
 }
 
 func main() {
+	// parse cli arguments
 	setupCli()
+
+	// configure logging
 	logger.Setup(cli.Log, cli.Verbosity)
-	config := config.SetupConfig(cli.Config)
+
+	// load config file
+	config := config.New()
+	config.Load(cli.Config)
 
 	log.Info().
 		Str("query", cli.Query).
