@@ -1,5 +1,5 @@
 install:
 	go get ./...
-	go get github.com/dmarkham/enumer
+	go install github.com/dmarkham/enumer@latest
 	go generate ./...
 	go mod tidy
