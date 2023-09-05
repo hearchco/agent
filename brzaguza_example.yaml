@@ -1,5 +1,21 @@
 engines:
-  Google:
+  bing:
     enabled: false
-  DuckDuckGo:
-    enabled: true
+  brave:
+    enabled: false
+  duckduckgo:
+    enabled: false
+  etools:
+    enabled: false
+  google:
+    enabled: false
+  mojeek:
+    enabled: false
+  qwant:
+    enabled: false
+  startpage:
+    enabled: false
+  swisscows:
+    enabled: false
+  yep:
+    enabled: false
