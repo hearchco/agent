@@ -16,7 +16,6 @@ require (
 )
 
 require (
-	github.com/dmarkham/enumer v1.5.8 // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/knadh/koanf/maps v0.1.1 // indirect
@@ -24,9 +23,6 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
-	github.com/pascaldekloe/name v1.0.0 // indirect
-	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/tools v0.6.0 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
@@ -48,8 +44,8 @@ require (
 	github.com/sourcegraph/conc v0.3.0
 	github.com/temoto/robotstxt v1.1.2 // indirect
 	golang.org/x/net v0.14.0
-	golang.org/x/sys v0.11.0 // indirect
-	golang.org/x/text v0.12.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
