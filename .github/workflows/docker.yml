@@ -43,6 +43,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate go code from go:generate comments
+        run: go generate ./...
+
       # build
       - name: Snapshot on non-tag
         uses: goreleaser/goreleaser-action@v4
