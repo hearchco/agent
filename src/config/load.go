@@ -15,7 +15,11 @@ import (
 
 var EnabledEngines []engines.Name = make([]engines.Name, 0)
 
+<<<<<<< HEAD
 func (c *Config) Load(path string) {
+=======
+func (c *Config) Load(path string, name string) {
+>>>>>>> 9a569e1 (Rebasing to logger conflicts)
 	// Use "." as the key path delimiter. This can be "/" or any character.
 	k := koanf.New(".")
 
