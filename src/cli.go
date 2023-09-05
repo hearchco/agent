@@ -18,6 +18,7 @@ var (
 		globals
 
 		// flags
+<<<<<<< HEAD
 		Query      string `type:"string" default:"${query_string}" env:"BRZAGUZA_QUERY" help:"Query string used for search"`
 		MaxPages   int    `type:"counter" default:"1" env:"BRZAGUZA_MAX_PAGES" help:"Number of pages to search"`
 		Visit      bool   `type:"bool" default:"false" env:"BRZAGUZA_VISIT" help:"Should results be visited"`
@@ -27,6 +28,16 @@ var (
 		Config     string `type:"string" default:"${config_file}" env:"BRZAGUZA_CONFIG_FILE" help:"Config file name"`
 		Log        string `type:"path" default:"${log_file}" env:"BRZAGUZA_LOG_FILE" help:"Log file name"`
 		Verbosity  int    `type:"counter" default:"0" short:"v" env:"BRZAGUZA_VERBOSITY" help:"Log level verbosity"`
+=======
+		Query     string `type:"string" default:"${query_string}" env:"BRZAGUZA_QUERY" help:"Query string used for search"`
+		MaxPages  int    `type:"counter" default:"1" env:"BRZAGUZA_MAX_PAGES" help:"Number of pages to search"`
+		Cli       bool   `type:"bool" default:"false" env:"BRZAGUZA_CLI" help:"Use CLI mode"`
+		Visit     bool   `type:"bool" default:"false" env:"BRZAGUZA_VISIT" help:"Should results be visited"`
+		Silent    bool   `type:"bool" default:"false" short:"s" env:"BRZAGUZA_SILENT" help:"Should results be printed"`
+		Config    string `type:"path" default:"${config_path}" env:"BRZAGUZA_CONFIG" help:"Config folder path"`
+		Log       string `type:"path" default:"${log_path}" env:"BRZAGUZA_LOG" help:"Log file path"`
+		Verbosity int    `type:"counter" default:"0" short:"v" env:"BRZAGUZA_VERBOSITY" help:"Log level verbosity"`
+>>>>>>> 9fcf3d8 (Readded cli.Cli)
 	}
 )
 
