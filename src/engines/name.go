@@ -4,6 +4,7 @@ import "strings"
 
 type Name int
 
+//go:generate stringer -type=Name
 const (
 	Undefined Name = iota
 	Bing
@@ -20,39 +21,6 @@ const (
 	Yandex
 	Yep
 )
-
-func (n Name) String() string {
-	switch n {
-	case Bing:
-		return "Bing"
-	case Brave:
-		return "Brave"
-	case DuckDuckGo:
-		return "DuckDuckGo"
-	case Etools:
-		return "Etools"
-	case Google:
-		return "Google"
-	case Mojeek:
-		return "Mojeek"
-	case Presearch:
-		return "Presearch"
-	case Qwant:
-		return "Qwant"
-	case Startpage:
-		return "Startpage"
-	case Swisscows:
-		return "Swisscows"
-	case Yahoo:
-		return "Yahoo"
-	case Yandex:
-		return "Yandex"
-	case Yep:
-		return "Yep"
-	default:
-		return "Undefined"
-	}
-}
 
 func (n Name) ToLower() string {
 	return strings.ToLower(n.String())
