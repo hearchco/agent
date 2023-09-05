@@ -43,6 +43,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # go:generate
       - name: Generate go code from go:generate comments
         run: |
           go install github.com/dmarkham/enumer@latest
