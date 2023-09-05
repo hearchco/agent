@@ -62,83 +62,77 @@ func runEngines(engineMap map[string]config.Engine, query string, worker *conc.W
 	log.Info().Msgf("Enabled engines: %v", config.EnabledEngines)
 
 	for name, engine := range engineMap {
-<<<<<<< HEAD
 		switch engines.ConvertToName(name) {
 		case engines.Google:
-=======
-		switch name {
-		case engines.Google.String():
->>>>>>> f7daa83 (Fixed naming order, fixed name for Presearch)
 			worker.Go(func() {
 				err := google.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", google.Info.Domain)
 				}
 			})
-		case engines.DuckDuckGo.String():
+		case engines.DuckDuckGo:
 			worker.Go(func() {
 				err := duckduckgo.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", duckduckgo.Info.Domain)
 				}
 			})
-		case engines.Mojeek.String():
+		case engines.Mojeek:
 			worker.Go(func() {
 				err := mojeek.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", mojeek.Info.Domain)
 				}
 			})
-		case engines.Qwant.String():
+		case engines.Qwant:
 			worker.Go(func() {
 				err := qwant.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", qwant.Info.Domain)
 				}
 			})
-		case engines.Etools.String():
+		case engines.Etools:
 			worker.Go(func() {
 				err := etools.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", etools.Info.Domain)
 				}
 			})
-		case engines.Swisscows.String():
+		case engines.Swisscows:
 			worker.Go(func() {
 				err := swisscows.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", swisscows.Info.Domain)
 				}
 			})
-		case engines.Brave.String():
+		case engines.Brave:
 			worker.Go(func() {
 				err := brave.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", brave.Info.Domain)
 				}
 			})
-		case engines.Bing.String():
+		case engines.Bing:
 			worker.Go(func() {
 				err := bing.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", bing.Info.Domain)
 				}
 			})
-		case engines.Startpage.String():
+		case engines.Startpage:
 			worker.Go(func() {
 				err := startpage.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", startpage.Info.Domain)
 				}
 			})
-		case engines.Yep.String():
+		case engines.Yep:
 			worker.Go(func() {
 				err := yep.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
 					log.Error().Err(err).Msgf("Failed searching %v", yep.Info.Domain)
 				}
 			})
-<<<<<<< HEAD
 		case engines.Yahoo:
 			worker.Go(func() {
 				err := yahoo.Search(context.Background(), query, relay, options, engine.Settings)
@@ -147,9 +141,6 @@ func runEngines(engineMap map[string]config.Engine, query string, worker *conc.W
 				}
 			})
 		case engines.Presearch:
-=======
-		case engines.Presearch.String():
->>>>>>> f7daa83 (Fixed naming order, fixed name for Presearch)
 			worker.Go(func() {
 				err := presearch.Search(context.Background(), query, relay, options, engine.Settings)
 				if err != nil {
