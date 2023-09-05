@@ -32,17 +32,17 @@ func (c *Config) Load(path string) {
 		if _, errr := os.Stat(yamlPath); errr != nil {
 			log.Trace().Msgf("no yaml config present at path: %v", yamlPath)
 		} else if errr := k.Load(file.Provider(yamlPath), yaml.Parser()); errr != nil {
-			log.Fatal().Msgf("error loading yaml config: %v", err)
+			log.Panic().Msgf("error loading yaml config: %v", err)
 		}
 	} else if err := k.Load(file.Provider(yamlPath), yaml.Parser()); err != nil {
-		log.Fatal().Msgf("error loading yaml config: %v", err)
+		log.Panic().Msgf("error loading yaml config: %v", err)
 	}
 
 	// Load ENV config
 	if err := k.Load(env.Provider("BRZAGUZA_", ".", func(s string) string {
 		return strings.Replace(strings.ToLower(strings.TrimPrefix(s, "BRZAGUZA_")), "_", ".", -1)
 	}), nil); err != nil {
-		log.Fatal().Msgf("error loading env config: %v", err)
+		log.Panic().Msgf("error loading env config: %v", err)
 	}
 
 	// Unmarshal config into struct
@@ -51,10 +51,10 @@ func (c *Config) Load(path string) {
 	// Add enabled engines names and remove disabled ones
 	for name, engine := range c.Engines {
 		if engine.Enabled {
-			if engineName, err := engines.NameString(name); err != nil {
+			if engineName, err := engines.NameString(name); err == nil {
 				EnabledEngines = append(EnabledEngines, engineName)
 			} else {
-				log.Error().Err(err).Msg("failed converting string to engine name")
+				log.Panic().Err(err).Msgf("failed converting string %v to engine name", name)
 			}
 		} else {
 			delete(c.Engines, name)

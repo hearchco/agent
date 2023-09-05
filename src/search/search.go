@@ -62,7 +62,7 @@ func runEngines(engineMap map[string]config.Engine, query string, worker *conc.W
 	log.Info().Msgf("Enabled engines: %v", config.EnabledEngines)
 
 	for name, engine := range engineMap {
-		if engineName, err := engines.NameString(name); err != nil {
+		if engineName, err := engines.NameString(name); err == nil {
 			switch engineName {
 			case engines.Google:
 				worker.Go(func() {
@@ -150,7 +150,7 @@ func runEngines(engineMap map[string]config.Engine, query string, worker *conc.W
 				})
 			}
 		} else {
-			log.Error().Err(err).Msg("failed converting string to engine name")
+			log.Panic().Err(err).Msg("failed converting string to engine name")
 		}
 	}
 }
