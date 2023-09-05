@@ -50,7 +50,7 @@ type Config struct {
 
 var EnabledEngines []engines.Name = make([]engines.Name, 0)
 
-func SetupConfig(path string, name string) *Config {
+func SetupConfig(path string) *Config {
 	// Use "." as the key path delimiter. This can be "/" or any character.
 	k := koanf.New(".")
 
@@ -59,14 +59,8 @@ func SetupConfig(path string, name string) *Config {
 	// provider.
 	k.Load(structs.Provider(DefaultConfig, "koanf"), nil)
 
-	// Check if path ends with "/" and add it otherwise
-	if path[len(path)-1] != '/' {
-		path = path + "/"
-	}
-	fullPath := path + name // in case we add other config formats
-
 	// Load YAML config
-	yamlPath := fullPath + ".yaml"
+	yamlPath := path + ".yaml"
 	if _, err := os.Stat(yamlPath); err != nil {
 		log.Trace().Msgf("no yaml config present at path: %v", yamlPath)
 	} else if err := k.Load(file.Provider(yamlPath), yaml.Parser()); err != nil {
