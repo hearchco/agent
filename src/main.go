@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/tminaorg/brzaguza/src/engines"
 	"github.com/tminaorg/brzaguza/src/logger"
 	"github.com/tminaorg/brzaguza/src/router"
 	"github.com/tminaorg/brzaguza/src/search"
@@ -44,8 +45,13 @@ func main() {
 			Str("visit", fmt.Sprintf("%v", cli.Visit)).
 			Msg("Started searching")
 
+		options := engines.Options{
+			MaxPages:   cli.MaxPages,
+			VisitPages: cli.Visit,
+		}
+
 		start := time.Now()
-		results := search.PerformSearch(cli.Query, cli.MaxPages, cli.Visit, config)
+		results := search.PerformSearch(cli.Query, options, config)
 		duration := time.Since(start)
 		if !cli.Silent {
 			printResults(results)

@@ -10,10 +10,10 @@ var Info engines.Info = engines.Info{
 }
 
 var dompaths engines.DOMPaths = engines.DOMPaths{
-	Result:      "div#results > div[class*=\"snippet fdb\"][data-type=\"web\"]",
-	Link:        "a.result-header",
-	Title:       "a.result-header > span.snippet-title",
-	Description: "div.snippet-content > p.snippet-description",
+	Result:      "div.snippet",
+	Link:        "a",
+	Title:       "div.title",
+	Description: "div.snippet-description",
 }
 
 var Support engines.SupportedSettings = engines.SupportedSettings{}
