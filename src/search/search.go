@@ -26,15 +26,10 @@ import (
 	"github.com/tminaorg/brzaguza/src/rank"
 )
 
-func PerformSearch(query string, maxPages int, visitPages bool, config *config.Config) []result.Result {
+func PerformSearch(query string, options engines.Options, config *config.Config) []result.Result {
 	relay := bucket.Relay{
 		ResultMap:         make(map[string]*result.Result),
 		EngineDoneChannel: make(chan bool),
-	}
-
-	options := engines.Options{
-		MaxPages:   maxPages,
-		VisitPages: visitPages,
 	}
 
 	query = url.QueryEscape(query)

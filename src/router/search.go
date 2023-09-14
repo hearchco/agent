@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/tminaorg/brzaguza/src/engines"
 	"github.com/tminaorg/brzaguza/src/search"
 )
 
@@ -25,13 +26,18 @@ func Search(config *config.Config) {
 		}
 
 		deepSearch := c.DefaultQuery("deep", "false")
-		visit := false
+		visitPages := false
 		if deepSearch != "false" {
 			log.Trace().Msgf("doing a deep search because deep is: %v", deepSearch)
-			visit = true
+			visitPages = true
 		}
 
-		results := search.PerformSearch(query, maxPages, visit, config)
+		options := engines.Options{
+			MaxPages:   maxPages,
+			VisitPages: visitPages,
+		}
+
+		results := search.PerformSearch(query, options, config)
 
 		if resultsJson, err := json.Marshal(results); err != nil {
 			log.Error().Err(err).Msg("failed marshalling results")
@@ -52,13 +58,18 @@ func Search(config *config.Config) {
 		}
 
 		deepSearch := c.DefaultPostForm("deep", "false")
-		visit := false
+		visitPages := false
 		if deepSearch != "false" {
 			log.Trace().Msgf("doing a deep search because deep is: %v", deepSearch)
-			visit = true
+			visitPages = true
 		}
 
-		results := search.PerformSearch(query, maxPages, visit, config)
+		options := engines.Options{
+			MaxPages:   maxPages,
+			VisitPages: visitPages,
+		}
+
+		results := search.PerformSearch(query, options, config)
 
 		if resultsJson, err := json.Marshal(results); err != nil {
 			log.Error().Err(err).Msg("failed marshalling results")
