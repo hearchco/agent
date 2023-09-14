@@ -27,8 +27,8 @@ var timings config.Timings = config.Timings{
 var dompaths engines.DOMPaths = engines.DOMPaths{
 	Result:      "div.g",
 	Link:        "a",
-	Title:       "div > div > div > a > h3",
-	Description: "div > div > div > div:first-child > span:first-child",
+	Title:       "a > h3",
+	Description: "div > span",
 }
 
 var Support engines.SupportedSettings = engines.SupportedSettings{}
