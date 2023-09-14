@@ -14,23 +14,19 @@ type TestCase struct {
 }
 
 func TestSearch(t *testing.T) {
+	engineName := engines.Brave
+
 	// testing config
 	conf := config.Config{
 		Engines: map[string]config.Engine{
-			engines.Brave.ToLower(): {
+			engineName.ToLower(): {
 				Enabled: true,
 			},
 		},
 	}
 
 	// enabled engines names
-	for name, engine := range conf.Engines {
-		if engine.Enabled {
-			if engineName, err := engines.NameString(name); err == nil {
-				config.EnabledEngines = append(config.EnabledEngines, engineName)
-			}
-		}
-	}
+	config.EnabledEngines = append(config.EnabledEngines, engineName)
 
 	// test cases
 	testCases := [...]TestCase{{
