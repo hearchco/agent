@@ -46,8 +46,7 @@ jobs:
       # go:generate
       - name: Generate go code from go:generate comments
         run: |
-          go install github.com/dmarkham/enumer@latest
-          go generate ./...
+          make install
 
       # build
       - name: Snapshot on non-tag
@@ -67,6 +66,11 @@ jobs:
           args: release --clean --config goreleaser/release.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # go:test
+      - name: Test units
+        run: |
+          make test
 
       # cache
       - uses: actions/cache@v3
