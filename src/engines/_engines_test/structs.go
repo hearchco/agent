@@ -1,4 +1,4 @@
-package engines_test
+package _engines_test
 
 import (
 	"github.com/tminaorg/brzaguza/src/config"

@@ -1,4 +1,4 @@
-package engines_test
+package _engines_test
 
 import (
 	"strings"
@@ -10,6 +10,7 @@ import (
 
 func CheckTestCases(tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResults,
 	tcrr []TestCaseRankedResults, t *testing.T, conf *config.Config) {
+
 	// TestCaseHasAnyResults
 	for _, tc := range tchar {
 		if results := search.PerformSearch(tc.Query, tc.Options, conf); len(results) == 0 {
