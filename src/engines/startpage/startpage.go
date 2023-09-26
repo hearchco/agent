@@ -14,8 +14,6 @@ import (
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 )
 
-const useSafeSearch bool = false
-
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings) error {
 	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err

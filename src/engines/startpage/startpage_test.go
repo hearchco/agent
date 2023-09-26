@@ -3,44 +3,48 @@ package startpage_test
 import (
 	"testing"
 
-	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
-	"github.com/tminaorg/brzaguza/src/search"
+	"github.com/tminaorg/brzaguza/src/engines/_engines_test"
 )
-
-type TestCase struct {
-	query   string
-	options engines.Options
-}
 
 func TestSearch(t *testing.T) {
 	engineName := engines.Startpage
 
 	// testing config
-	conf := config.Config{
-		Engines: map[string]config.Engine{
-			engineName.ToLower(): {
-				Enabled: true,
-			},
-		},
-	}
-
-	// enabled engines names
-	config.EnabledEngines = append(config.EnabledEngines, engineName)
+	conf := _engines_test.NewConfig(engineName)
 
 	// test cases
-	testCases := [...]TestCase{{
-		query: "wikipedia",
-		options: engines.Options{
-			MaxPages:   1,
-			VisitPages: false,
-		},
-	}}
+	tchar := [...]_engines_test.TestCaseHasAnyResults{}
+	tccr := [...]_engines_test.TestCaseContainsResults{}
+	tcrr := [...]_engines_test.TestCaseRankedResults{}
 
-	// running tests
-	for _, tc := range testCases {
-		if results := search.PerformSearch(tc.query, tc.options, &conf); len(results) == 0 {
-			t.Errorf("Got no results for %v", tc.query)
-		}
-	}
+	/*
+		tchar := [...]_engines_test.TestCaseHasAnyResults{{
+			Query: "ping",
+			Options: engines.Options{
+				MaxPages:   1,
+				VisitPages: false,
+			},
+		}}
+
+		tccr := [...]_engines_test.TestCaseContainsResults{{
+			Query:     "facebook",
+			ResultURL: []string{"facebook.com"},
+			Options: engines.Options{
+				MaxPages:   1,
+				VisitPages: false,
+			},
+		}}
+
+		tcrr := [...]_engines_test.TestCaseRankedResults{{
+			Query:     "wikipedia",
+			ResultURL: []string{"wikipedia."},
+			Options: engines.Options{
+				MaxPages:   1,
+				VisitPages: false,
+			},
+		}}
+	*/
+
+	_engines_test.CheckTestCases(tchar[:], tccr[:], tcrr[:], t, conf)
 }
