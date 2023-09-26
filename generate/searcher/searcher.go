@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"go/ast"
@@ -67,7 +66,7 @@ func main() {
 		trimPrefix:  *trimprefix,
 		lineComment: *linecomment,
 	}
-	// TODO(suzmue): accept other patterns for packages (directories, list of files, import paths, etc).
+
 	if len(args) == 1 && isDirectoryFatal(args[0]) {
 		dir = args[0]
 	} else {
@@ -120,9 +119,7 @@ func (g *Generator) Printf(format string, args ...interface{}) {
 // parsePackage exits if there is an error.
 func (g *Generator) parsePackage(patterns []string, tags []string) {
 	cfg := &packages.Config{
-		Mode: packages.NeedName | packages.NeedTypes | packages.NeedTypesInfo | packages.NeedSyntax,
-		// TODO: Need to think about constants in test files. Maybe write type_string_test.go
-		// in a separate pass? For later.
+		Mode:       packages.NeedName | packages.NeedTypes | packages.NeedTypesInfo | packages.NeedSyntax,
 		Tests:      false,
 		BuildFlags: []string{fmt.Sprintf("-tags=%s", strings.Join(tags, " "))},
 		Logf:       g.logf,
@@ -176,8 +173,6 @@ func (g *Generator) generate(typeName string) {
 	for _, v := range values {
 		if validConst(v) {
 			g.Printf("import \"%s/%s\"\n", *enginesImport, strings.ToLower(v.originalName))
-		} else {
-			values = values.Delete(v)
 		}
 	}
 
@@ -310,50 +305,15 @@ func (f *File) genDecl(node ast.Node) bool {
 	return false
 }
 
-// Helpers
-
-// declareIndexAndNameVar is the single-run version of declareIndexAndNameVars
-func (g *Generator) declareIndexAndNameVar(run Values, typeName string) {
-	index, name := g.createIndexAndNameDecl(run, typeName, "")
-	g.Printf("const %s\n", name)
-	g.Printf("var %s\n", index)
-}
-
-// createIndexAndNameDecl returns the pair of declarations for the run. The caller will add "const" and "var".
-func (g *Generator) createIndexAndNameDecl(run Values, typeName string, suffix string) (string, string) {
-	b := new(bytes.Buffer)
-	indexes := make([]int, len(run))
-	for i := range run {
-		b.WriteString(run[i].name)
-		indexes[i] = b.Len()
-	}
-	nameConst := fmt.Sprintf("_%s_name%s = %q", typeName, suffix, b.String())
-	nameLen := b.Len()
-	b.Reset()
-	fmt.Fprintf(b, "_%s_index%s = [...]uint%d{0, ", typeName, suffix, usize(nameLen))
-	for i, v := range indexes {
-		if i > 0 {
-			fmt.Fprintf(b, ", ")
-		}
-		fmt.Fprintf(b, "%d", v)
-	}
-	fmt.Fprintf(b, "}")
-	return b.String(), nameConst
-}
-
 // buildOneRun generates the variables and String method for a single run of contiguous values.
 func (g *Generator) buildOneRun(values Values, typeName string) {
 	g.Printf("\n")
-	g.declareIndexAndNameVar(values, typeName)
 	// The generated code is simple enough to write as a Printf format.
-	g.Printf(`
-func NewEngineStarter() []EngineSearch {
-	mm := make([]EngineSearch, %d)`, len(values))
+	g.Printf("\nfunc NewEngineStarter() []EngineSearch {\n\tmm := make([]EngineSearch, %d)", len(values))
 	for _, v := range values {
-		g.Printf(`
-	mm[%s.%s] = %s.Search`, g.pkg.name, v.name, strings.ToLower(v.name))
+		if validConst(v) {
+			g.Printf("\n\tmm[%s.%s] = %s.Search", g.pkg.name, v.name, strings.ToLower(v.name))
+		}
 	}
-	g.Printf(`
-	return mm
-}`)
+	g.Printf("\n\treturn mm\n}")
 }
