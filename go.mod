@@ -13,7 +13,7 @@ require (
 	github.com/knadh/koanf/v2 v2.0.1
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/robertkrimen/otto v0.2.1
-	github.com/rs/zerolog v1.30.0
+	github.com/rs/zerolog v1.31.0
 )
 
 require (
