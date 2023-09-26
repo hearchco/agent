@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -19,29 +20,26 @@ func (s Values) IndexOf(x Value) int {
 			return i
 		}
 	}
+	log.Fatal(fmt.Errorf("indexOf func failed"))
 	return -1
 }
 
 func validConst(v Value) bool {
 	lowerName := strings.ToLower(v.name)
-	return lowerName != "undefined" && exists(lowerName)
-}
-
-// exists returns whether the given file or directory exists
-func exists(path string) bool {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true
-	}
-	if os.IsNotExist(err) {
-		return false
-	}
-	return false
+	return lowerName != "undefined" && isDirectory(lowerName)
 }
 
 // isDirectory reports whether the named file is a directory.
-func isDirectory(name string) bool {
-	info, err := os.Stat(name)
+func isDirectory(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return info.IsDir()
+}
+
+func isDirectoryFatal(path string) bool {
+	info, err := os.Stat(path)
 	if err != nil {
 		log.Fatal(err)
 	}

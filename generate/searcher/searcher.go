@@ -68,7 +68,7 @@ func main() {
 		lineComment: *linecomment,
 	}
 	// TODO(suzmue): accept other patterns for packages (directories, list of files, import paths, etc).
-	if len(args) == 1 && isDirectory(args[0]) {
+	if len(args) == 1 && isDirectoryFatal(args[0]) {
 		dir = args[0]
 	} else {
 		if len(tags) != 0 {
