@@ -25,11 +25,8 @@ brzaguza.*
 
 .vscode/*
 
-src/engines/yandex/site/*
-src/engines/etools/site/*
-src/engines/swisscows/site/*
-src/engines/metager/site/*
-src/engines/presearch/site/*
+src/engines/*/site/*
+!src/engines/_engines_test
 
 logdump/*.html
 log/*.log

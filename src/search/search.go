@@ -41,6 +41,9 @@ func PerformSearch(query string, options engines.Options, config *config.Config)
 	return results
 }
 
+// engine_searcher, NewEngineStarter()  use this.
+type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings) error
+
 func runEngines(engineMap map[string]config.Engine, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
 	log.Info().Msgf("Enabled engines: %v", config.EnabledEngines)
 
