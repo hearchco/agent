@@ -5,6 +5,7 @@ import "strings"
 type Name uint8
 
 //go:generate enumer -type=Name -json -text -yaml -sql
+//go:generate go run github.com/tminaorg/brzaguza/generate/searcher -type=Name -packagename search -output ../search/engine_searcher.go
 const (
 	Undefined Name = iota
 	Bing
