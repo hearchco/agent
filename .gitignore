@@ -37,3 +37,4 @@ log/*.log
 # go generate
 *_stringer.go
 *_enumer.go
+*_searcher.go
