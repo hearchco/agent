@@ -19,6 +19,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		return err
 	}
 
+	// Removes Telemetry. Ackwnoladge this overwrite user-side.
+	options.UserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
+
 	var col *colly.Collector
 	var pagesCol *colly.Collector
 	var retError error
