@@ -10,7 +10,7 @@ import (
 	"go/types"
 	"log"
 	"os"
-	"path/filepath"
+	"path"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
@@ -73,7 +73,7 @@ func main() {
 		if len(tags) != 0 {
 			log.Fatal("-tags option applies only to directories, not when files are specified")
 		}
-		dir = filepath.Dir(args[0])
+		dir = path.Dir(args[0])
 	}
 
 	g.parsePackage(args, tags)
@@ -103,7 +103,7 @@ func main() {
 	outputName := *output
 	if outputName == "" {
 		baseName := fmt.Sprintf("%s_searcher.go", types[0])
-		outputName = filepath.Join(dir, strings.ToLower(baseName))
+		outputName = path.Join(dir, strings.ToLower(baseName))
 	}
 	err := os.WriteFile(outputName, src, 0644)
 	if err != nil {
