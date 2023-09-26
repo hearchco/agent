@@ -305,7 +305,7 @@ func (f *File) genDecl(node ast.Node) bool {
 	return false
 }
 
-// buildOneRun generates the variables and String method for a single run of contiguous values.
+// buildOneRun generates the variables and NewEngineStarter func for a single run of contiguous values.
 func (g *Generator) buildOneRun(values Values, typeName string) {
 	g.Printf("\n")
 	// The generated code is simple enough to write as a Printf format.
