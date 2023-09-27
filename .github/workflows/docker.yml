@@ -1,12 +1,10 @@
-name: CI/CD for Docker
+name: Docker CI/CD
 
 on:
   push:
     branches: [ "main" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "*" ]
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -22,17 +20,19 @@ jobs:
       packages: write
       issues: write
     steps:
-      # prepare
+      # git
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
   
       - run: git fetch --force --tags
 
+      # go
       - uses: actions/setup-go@v4
         with:
           go-version: stable
       
+      # qemu
       - uses: docker/setup-qemu-action@v2
       
       # registry
@@ -45,12 +45,11 @@ jobs:
 
       # go:generate
       - name: Generate go code from go:generate comments
-        run: |
-          make install
+        run: make install
 
-      # build
+      # snapshot
       - name: Snapshot on non-tag
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         if: startsWith(github.ref, 'refs/tags/') == false
         with:
           version: latest
@@ -58,8 +57,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      ## go:test
+      - name: Test units
+        if: startsWith(github.ref, 'refs/tags/') == false
+        run: make test
+
+      # release
       - name: Release on tag
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         if: startsWith(github.ref, 'refs/tags/')
         with:
           version: latest
@@ -67,41 +72,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # go:test
-      - name: Test units
-        run: |
-          make test
-
-      # cache
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-cache-mod
-
-      - uses: actions/cache@v3
-        with:
-          path: .task/**/*
-          key: ${{ runner.os }}-go-task
-
-      # artifacts
+      ## artifacts
       - name: Artifact Linux
         uses: actions/upload-artifact@v3
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           name: build_linux
           path: dist/*linux*
 
       - name: Artifact Darwin
         uses: actions/upload-artifact@v3
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           name: build_darwin
           path: dist/*darwin*
       
       - name: Artifact Windows
         uses: actions/upload-artifact@v3
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           name: build_windows
           path: dist/*windows*
