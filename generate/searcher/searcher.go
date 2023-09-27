@@ -20,10 +20,10 @@ var (
 	typeName      = flag.String("type", "", "type name; must be set")
 	output        = flag.String("output", "", "output file name; default srcdir/<type>_searcher.go")
 	trimprefix    = flag.String("trimprefix", "", "trim the `prefix` from the generated constant names")
-	linecomment   = flag.Bool("linecomment", false, "use line comment text as printed text when present")
 	buildTags     = flag.String("tags", "", "comma-separated list of build tags to apply")
 	packageName   = flag.String("packagename", "", "name of the package for generated code; default current package")
 	enginesImport = flag.String("enginesimport", "github.com/tminaorg/brzaguza/src/engines", "source of the engines import, which is prefixed to imports for consts; default github.com/tminaorg/brzaguza/src/engines")
+	linecomment   = flag.Bool("linecomment", false, "use line comment text as printed text when present")
 )
 
 // Usage is a replacement usage function for the flags package.
