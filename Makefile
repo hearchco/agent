@@ -4,7 +4,7 @@ install:
 	go generate ./...
 
 build:
-	go build -o brzaguza-bin ./src
+	go build ./...
 
 test:
 	go test ./... -count=1
