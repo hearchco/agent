@@ -6,6 +6,9 @@ install:
 build:
 	go build -o brzaguza-bin ./src
 
+build-win:
+	go build -o brzaguza.exe ./src
+
 test:
 	go test ./... -count=1
 
