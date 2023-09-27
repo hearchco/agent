@@ -154,7 +154,7 @@ func (g *Generator) addPackage(pkg *packages.Package) {
 
 // generate produces imports and the NewEngineStarter method for the named type.
 func (g *Generator) generate(typeName string) {
-	values := make(Values, 0, 100)
+	values := make([]Value, 0, 100)
 	for _, file := range g.pkg.files {
 		// Set the state for this run of the walker.
 		file.typeName = typeName
@@ -172,7 +172,7 @@ func (g *Generator) generate(typeName string) {
 	// Generate code for importing engines
 	for _, v := range values {
 		if validConst(v) {
-			g.Printf("import \"%s/%s\"\n", *enginesImport, strings.ToLower(v.originalName))
+			g.Printf("import \"%s/%s\"\n", *enginesImport, strings.ToLower(v.name))
 		}
 	}
 
@@ -184,7 +184,7 @@ func (g *Generator) generate(typeName string) {
 	for _, v := range values {
 		origName := v.originalName
 		if *packageName != "" {
-			origName = fmt.Sprintf("%s.%s", g.pkg.name, v.originalName)
+			origName = fmt.Sprintf("%s.%s", g.pkg.name, v.name)
 		}
 		g.Printf("\t_ = x[%s - (%s)]\n", origName, v.str)
 	}
@@ -306,14 +306,16 @@ func (f *File) genDecl(node ast.Node) bool {
 }
 
 // buildOneRun generates the variables and NewEngineStarter func for a single run of contiguous values.
-func (g *Generator) buildOneRun(values Values, typeName string) {
+func (g *Generator) buildOneRun(values []Value, typeName string) {
 	g.Printf("\n")
 	// The generated code is simple enough to write as a Printf format.
-	g.Printf("\nfunc NewEngineStarter() []EngineSearch {\n\tmm := make([]EngineSearch, %d)", len(values))
+	g.Printf("\nfunc NewEngineStarter() []EngineSearch {")
+	g.Printf("\n\tmm := make([]EngineSearch, %d)", len(values))
 	for _, v := range values {
 		if validConst(v) {
 			g.Printf("\n\tmm[%s.%s] = %s.Search", g.pkg.name, v.name, strings.ToLower(v.name))
 		}
 	}
-	g.Printf("\n\treturn mm\n}")
+	g.Printf("\n\treturn mm")
+	g.Printf("\n}")
 }
