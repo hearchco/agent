@@ -10,9 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # prepare
+      # git
       - uses: actions/checkout@v3
 
+      # go
       - uses: actions/setup-go@v4
         with:
           go-version: stable
@@ -28,18 +29,3 @@ jobs:
       # go:test
       - name: Test units
         run: make test
-
-      # cache
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-cache-mod
-
-      - uses: actions/cache@v3
-        with:
-          path: .task/**/*
-          key: ${{ runner.os }}-go-task
