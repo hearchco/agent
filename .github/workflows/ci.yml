@@ -1,0 +1,45 @@
+name: Testing CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '37 13 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # prepare
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: stable
+
+      # go:generate
+      - name: Generate go code from go:generate comments
+        run: make install
+
+      # go:build
+      - name: Build project
+        run: make build
+
+      # go:test
+      - name: Test units
+        run: make test
+
+      # cache
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-cache-mod
+
+      - uses: actions/cache@v3
+        with:
+          path: .task/**/*
+          key: ${{ runner.os }}-go-task

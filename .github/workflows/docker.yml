@@ -1,12 +1,10 @@
-name: CI/CD for Docker
+name: Docker CI/CD
 
 on:
   push:
     branches: [ "main" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "*" ]
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -45,12 +43,11 @@ jobs:
 
       # go:generate
       - name: Generate go code from go:generate comments
-        run: |
-          make install
+        run: make install
 
-      # build
+      # snapshot and test
       - name: Snapshot on non-tag
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         if: startsWith(github.ref, 'refs/tags/') == false
         with:
           version: latest
@@ -58,19 +55,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Test units
+        if: startsWith(github.ref, 'refs/tags/') == false
+        run: make test
+
+      # release
       - name: Release on tag
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         if: startsWith(github.ref, 'refs/tags/')
         with:
           version: latest
           args: release --clean --config goreleaser/release.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # go:test
-      - name: Test units
-        run: |
-          make test
 
       # cache
       - uses: actions/cache@v3
