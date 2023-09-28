@@ -12,70 +12,53 @@ import (
 	"github.com/tminaorg/brzaguza/src/search"
 )
 
-func Search(config *config.Config) {
-	searchRoute := router.Group("/search")
+func Search(c *gin.Context, config *config.Config) {
+	var query, pages, deepSearch string
 
-	searchRoute.GET("", func(c *gin.Context) {
-		query := c.Query("q")
-
-		pages := c.DefaultQuery("pages", "1")
-		maxPages, err := strconv.Atoi(pages)
-		if err != nil {
-			log.Error().Err(err).Msgf("cannot convert \"%v\" to int, reverting to default value of 1", pages)
-			maxPages = 1
+	switch c.Request.Method {
+	case "":
+		{
+			query = c.Query("q")
+			pages = c.DefaultQuery("pages", "1")
+			deepSearch = c.DefaultQuery("deep", "false")
 		}
-
-		deepSearch := c.DefaultQuery("deep", "false")
-		visitPages := false
-		if deepSearch != "false" {
-			log.Trace().Msgf("doing a deep search because deep is: %v", deepSearch)
-			visitPages = true
+	case "GET":
+		{
+			query = c.Query("q")
+			pages = c.DefaultQuery("pages", "1")
+			deepSearch = c.DefaultQuery("deep", "false")
 		}
-
-		options := engines.Options{
-			MaxPages:   maxPages,
-			VisitPages: visitPages,
+	case "POST":
+		{
+			query = c.PostForm("q")
+			pages = c.DefaultPostForm("pages", "1")
+			deepSearch = c.DefaultPostForm("deep", "false")
 		}
+	}
 
-		results := search.PerformSearch(query, options, config)
+	maxPages, err := strconv.Atoi(pages)
+	if err != nil {
+		log.Error().Err(err).Msgf("cannot convert \"%v\" to int, reverting to default value of 1", pages)
+		maxPages = 1
+	}
 
-		if resultsJson, err := json.Marshal(results); err != nil {
-			log.Error().Err(err).Msg("failed marshalling results")
-			c.String(http.StatusInternalServerError, "")
-		} else {
-			c.String(http.StatusOK, string(resultsJson))
-		}
-	})
+	visitPages := false
+	if deepSearch != "false" {
+		log.Trace().Msgf("doing a deep search because deep is: %v", deepSearch)
+		visitPages = true
+	}
 
-	searchRoute.POST("", func(c *gin.Context) {
-		query := c.PostForm("q")
+	options := engines.Options{
+		MaxPages:   maxPages,
+		VisitPages: visitPages,
+	}
 
-		pages := c.DefaultPostForm("pages", "1")
-		maxPages, err := strconv.Atoi(pages)
-		if err != nil {
-			log.Error().Err(err).Msgf("cannot convert \"%v\" to int, reverting to default value of 1", pages)
-			maxPages = 1
-		}
+	results := search.PerformSearch(query, options, config)
 
-		deepSearch := c.DefaultPostForm("deep", "false")
-		visitPages := false
-		if deepSearch != "false" {
-			log.Trace().Msgf("doing a deep search because deep is: %v", deepSearch)
-			visitPages = true
-		}
-
-		options := engines.Options{
-			MaxPages:   maxPages,
-			VisitPages: visitPages,
-		}
-
-		results := search.PerformSearch(query, options, config)
-
-		if resultsJson, err := json.Marshal(results); err != nil {
-			log.Error().Err(err).Msg("failed marshalling results")
-			c.String(http.StatusInternalServerError, "")
-		} else {
-			c.String(http.StatusOK, string(resultsJson))
-		}
-	})
+	if resultsJson, err := json.Marshal(results); err != nil {
+		log.Error().Err(err).Msg("failed marshalling results")
+		c.String(http.StatusInternalServerError, "")
+	} else {
+		c.String(http.StatusOK, string(resultsJson))
+	}
 }

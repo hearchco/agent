@@ -1,0 +1,22 @@
+app = "brzaguza"
+primary_region = "otp"
+
+[build]
+  image = "ghcr.io/tminaorg/brzaguza:latest"
+
+[http_service]
+  internal_port = 3030
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["api"]
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 20
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/healthz"

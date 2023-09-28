@@ -1,0 +1,86 @@
+name: Fly CD
+
+on:
+  push:
+    tags: [ 'v*.*.*' ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      issues: write
+    steps:
+      # git
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+  
+      - run: git fetch --force --tags
+
+      # go
+      - uses: actions/setup-go@v4
+        with:
+          go-version: stable
+      
+      # qemu
+      - uses: docker/setup-qemu-action@v2
+      
+      # registry
+      - uses: docker/login-action@v2
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # go:generate
+      - name: Generate go code from go:generate comments
+        run: make install
+
+      # release
+      - name: Release on tag
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          version: latest
+          args: release --clean --config goreleaser/release.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      ## artifacts
+      - name: Artifact Linux
+        uses: actions/upload-artifact@v3
+        with:
+          name: build_linux
+          path: dist/*linux*
+
+      - name: Artifact Darwin
+        uses: actions/upload-artifact@v3
+        with:
+          name: build_darwin
+          path: dist/*darwin*
+      
+      - name: Artifact Windows
+        uses: actions/upload-artifact@v3
+        with:
+          name: build_windows
+          path: dist/*windows*
+
+  fly:
+    runs-on: ubuntu-latest
+    steps:
+      # git
+      - uses: actions/checkout@v3
+
+      # flyctl
+      - uses: superfly/flyctl-actions/setup-flyctl@v1
+
+      # deploy
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
