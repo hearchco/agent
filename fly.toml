@@ -10,7 +10,7 @@ primary_region = "otp"
   auto_stop_machines = true
   auto_start_machines = true
   min_machines_running = 1
-  processes = ["api"]
+  processes = ["app"]
   [http_service.concurrency]
     type = "requests"
     soft_limit = 20
