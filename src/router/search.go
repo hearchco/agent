@@ -16,13 +16,7 @@ func Search(c *gin.Context, config *config.Config) {
 	var query, pages, deepSearch string
 
 	switch c.Request.Method {
-	case "":
-		{
-			query = c.Query("q")
-			pages = c.DefaultQuery("pages", "1")
-			deepSearch = c.DefaultQuery("deep", "false")
-		}
-	case "GET":
+	case "", "GET":
 		{
 			query = c.Query("q")
 			pages = c.DefaultQuery("pages", "1")
