@@ -1,4 +1,4 @@
-name: Fly CD
+name: Docker Fly CD
 
 on:
   push:
