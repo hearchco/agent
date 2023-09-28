@@ -4,7 +4,9 @@ WORKDIR /app
 
 COPY brzaguza .
 
-ENV BRZAGUZA_CONFIG="/config"
+ENV \
+    GIN_MODE="release" \
+    BRZAGUZA_CONFIG="/config"
 
 ENTRYPOINT [ "./brzaguza" ]
 

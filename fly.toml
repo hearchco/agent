@@ -4,9 +4,6 @@ primary_region = "otp"
 [build]
   image = "ghcr.io/tminaorg/brzaguza:latest"
 
-[env]
-  GIN_MODE = "release"
-
 [http_service]
   internal_port = 3030
   force_https = true
