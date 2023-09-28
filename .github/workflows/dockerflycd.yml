@@ -1,15 +1,11 @@
-name: Docker CI/CD
+name: Docker Fly CD
 
 on:
   push:
-    branches: [ "main" ]
-    # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
 
 env:
-  # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
-  # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
@@ -47,25 +43,9 @@ jobs:
       - name: Generate go code from go:generate comments
         run: make install
 
-      # snapshot
-      - name: Snapshot on non-tag
-        uses: goreleaser/goreleaser-action@v5
-        if: startsWith(github.ref, 'refs/tags/') == false
-        with:
-          version: latest
-          args: release --snapshot --clean --config goreleaser/develop.yml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      ## go:test
-      - name: Test units
-        if: startsWith(github.ref, 'refs/tags/') == false
-        run: make test
-
       # release
       - name: Release on tag
         uses: goreleaser/goreleaser-action@v5
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           version: latest
           args: release --clean --config goreleaser/release.yml
@@ -75,21 +55,32 @@ jobs:
       ## artifacts
       - name: Artifact Linux
         uses: actions/upload-artifact@v3
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           name: build_linux
           path: dist/*linux*
 
       - name: Artifact Darwin
         uses: actions/upload-artifact@v3
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           name: build_darwin
           path: dist/*darwin*
       
       - name: Artifact Windows
         uses: actions/upload-artifact@v3
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           name: build_windows
           path: dist/*windows*
+
+  fly:
+    runs-on: ubuntu-latest
+    steps:
+      # git
+      - uses: actions/checkout@v3
+
+      # flyctl
+      - uses: superfly/flyctl-actions/setup-flyctl@v1
+
+      # deploy
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

@@ -4,7 +4,8 @@ WORKDIR /app
 
 COPY brzaguza-bin .
 
-ENV BRZAGUZA_CONFIG="/config"
+ENV \
+    BRZAGUZA_CONFIG="/config"
 
 ENTRYPOINT [ "sh" ]
 

@@ -10,6 +10,17 @@ import (
 var router = gin.Default()
 
 func Setup(config *config.Config) {
-	Search(config)
+	// health
+	router.GET("/healthz", HealthCheck)
+
+	// search
+	router.GET("/search", func(c *gin.Context) {
+		Search(c, config)
+	})
+	router.POST("/search", func(c *gin.Context) {
+		Search(c, config)
+	})
+
+	// startup
 	router.Run(fmt.Sprintf(":%v", config.Server.Port))
 }

@@ -1,0 +1,41 @@
+name: Docker CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      issues: write
+    steps:
+      # git
+      - uses: actions/checkout@v3
+
+      # go
+      - uses: actions/setup-go@v4
+        with:
+          go-version: stable
+      
+      # qemu
+      - uses: docker/setup-qemu-action@v2
+
+      # go:generate
+      - name: Generate go code from go:generate comments
+        run: make install
+
+      # snapshot
+      - name: Snapshot on non-tag
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          version: latest
+          args: release --snapshot --clean --config goreleaser/develop.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      ## go:test
+      - name: Test units
+        run: make test
