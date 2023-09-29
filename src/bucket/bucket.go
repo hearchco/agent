@@ -12,9 +12,8 @@ import (
 )
 
 type Relay struct {
-	ResultMap         map[string]*result.Result
-	Mutex             sync.RWMutex
-	EngineDoneChannel chan bool
+	ResultMap map[string]*result.Result
+	Mutex     sync.RWMutex
 }
 
 func AddSEResult(seResult *engines.RetrievedResult, seName engines.Name, relay *Relay, options *engines.Options, pagesCol *colly.Collector) {

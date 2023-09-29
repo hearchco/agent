@@ -16,8 +16,7 @@ import (
 
 func PerformSearch(query string, options engines.Options, config *config.Config) []result.Result {
 	relay := bucket.Relay{
-		ResultMap:         make(map[string]*result.Result),
-		EngineDoneChannel: make(chan bool),
+		ResultMap: make(map[string]*result.Result),
 	}
 
 	query = url.QueryEscape(query)
