@@ -24,6 +24,7 @@ func PerformSearch(query string, options engines.Options, config *config.Config)
 
 	var worker conc.WaitGroup
 	runEngines(config.Engines, query, &worker, &relay, options)
+	log.Debug().Msg("Waiting for results from engines...")
 	worker.Wait()
 
 	results := make([]result.Result, 0, len(relay.ResultMap))
@@ -33,10 +34,7 @@ func PerformSearch(query string, options engines.Options, config *config.Config)
 
 	sort.Sort(rank.ByRank(results))
 
-	log.Debug().Msg("All processing done, waiting for closing of goroutines.")
-	worker.Wait()
-
-	log.Debug().Msg("Done! Received All Engines!")
+	log.Debug().Msg("All processing done!")
 
 	return results
 }
@@ -55,9 +53,10 @@ func runEngines(engineMap map[string]config.Engine, query string, worker *conc.W
 			return
 		}
 
-		err := engineStarter[engineName](context.Background(), query, relay, options, engine.Settings)
-		if err != nil {
-			log.Error().Err(err).Msgf("failed searching %v", engineName)
-		}
+		worker.Go(func() {
+			if err := engineStarter[engineName](context.Background(), query, relay, options, engine.Settings); err != nil {
+				log.Error().Err(err).Msgf("failed searching %v", engineName)
+			}
+		})
 	}
 }
