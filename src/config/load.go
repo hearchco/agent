@@ -62,5 +62,4 @@ func (c *Config) Load(path string) {
 	}
 }
 
-const InsertDefaultRank bool = true       // this should be moved to config
 const LogDumpLocation string = "logdump/" // this should be moved to config

@@ -74,13 +74,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			log.Error().Err(err).Msgf("%v: Failed body unmarshall to json:\n%v", Info.Name, string(r.Body))
 		}
 
-		counter := 0
+		counter := 1
 		for _, result := range parsedResponse.Items {
 			goodURL := parse.ParseURL(result.URL)
 			title := parse.ParseTextWithHTML(result.Title)
 			desc := parse.ParseTextWithHTML(result.Desc)
 
-			res := bucket.MakeSEResult(goodURL, title, desc, Info.Name, -1, page, counter%Info.ResultsPerPage+1)
+			res := bucket.MakeSEResult(goodURL, title, desc, Info.Name, page, counter)
 			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 			counter += 1
 		}

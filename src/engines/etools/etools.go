@@ -32,6 +32,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
 	sedefaults.ColError(Info.Name, col, &retError)
 
+	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
+
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
 
@@ -53,17 +55,10 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		if linkText != "" && linkText != "#" && titleText != "" {
 			var pageStr string = e.Request.Ctx.Get("page")
 			page, _ := strconv.Atoi(pageStr)
-			seRankString := strings.TrimSpace(dom.Find("td[class=\"count help\"]").Text())
-			seRank, convErr := strconv.Atoi(seRankString)
-			if convErr != nil {
-				log.Error().Err(convErr).Msgf("%v: SERank string to int conversion error. URL: %v, SERank string: %v", Info.Name, linkText, seRankString)
-			}
 
-			//var onPageRank int = e.Index // this should also work, but is a bit more volatile
-			var onPageRank int = (seRank-1)%Info.ResultsPerPage + 1
-
-			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, seRank, page, onPageRank)
+			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
 			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+			pageRankCounter[page]++
 		}
 	})
 

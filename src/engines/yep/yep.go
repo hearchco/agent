@@ -34,7 +34,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	col.OnResponse(func(r *colly.Response) {
 		content := parseJSON(r.Body)
 
-		counter := 0
+		counter := 1
 		for _, result := range content.Results {
 			if result.TType != "Organic" {
 				continue
@@ -44,7 +44,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			goodTitle := parse.ParseTextWithHTML(result.Title)
 			goodDescription := parse.ParseTextWithHTML(result.Snippet)
 
-			res := bucket.MakeSEResult(goodURL, goodTitle, goodDescription, Info.Name, counter, counter/Info.ResultsPerPage+1, counter%Info.ResultsPerPage+1)
+			res := bucket.MakeSEResult(goodURL, goodTitle, goodDescription, Info.Name, 1, counter)
 			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 			counter += 1
 		}

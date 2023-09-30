@@ -1,33 +1,61 @@
 package rank
 
 import (
-	"sync"
+	"sort"
 
-	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket/result"
+	"github.com/tminaorg/brzaguza/src/engines"
 )
 
-// TLDR: you must mutex.Lock when changing *rankAddr, you probably dont need to mutex.RLock() when reading result
-// (in reality even *rankAddr shouldnt need a lock, but go would definately complain about simultanious read/write because of it)
-func SetRank(result *result.Result, rankAddr *int, mutex *sync.RWMutex) {
-
-	//mutex.RLock()
-	reqUrl := result.Response.Request.URL.String() //dummy code, if error here, uncomment lock
-	//mutex.RUnlock()
-
-	if reqUrl != result.URL { //dummy code
-		log.Trace().Msgf("(This is ok) Request URL not same as result.URL \\/ %v | %v", reqUrl, result.URL)
-	}
-
-	rrank := result.EngineRanks[0].Page*100 + result.EngineRanks[0].OnPageRank
-
-	mutex.Lock()
-	*rankAddr = rrank
-	mutex.Unlock()
-
-	log.Trace().Msgf("Set rank to %v for %v: %v", rrank, result.Title, result.URL)
+func SetRank(result *result.Result) {
+	result.Rank = result.EngineRanks[0].Rank
 }
 
-func DefaultRank(seRank int, sePage int, seOnPageRank int) int {
-	return sePage*100 + seOnPageRank
+func Rank(resMap map[string]*result.Result) []result.Result {
+	results := make([]result.Result, 0, len(resMap))
+	for _, res := range resMap {
+		results = append(results, *res)
+	}
+
+	//setup retrieved rank here
+	FillRetrievedRank(results)
+
+	for ind := range results {
+		SetRank(&(results[ind]))
+	}
+
+	sort.Sort(ByRank(results))
+
+	return results
+}
+
+type RankFiller struct {
+	ArrInd  int
+	RetRank engines.RetrievedRank
+	RRInd   int
+}
+
+func FillRetrievedRank(results []result.Result) {
+	engResults := make([][]RankFiller, 100) //TODO. need as many elements as there are implemented engines. the value used for len in searcher/buildOneRun
+	for arrind, res := range results {
+		for rrind, er := range res.EngineRanks {
+			rf := RankFiller{
+				ArrInd:  arrind,
+				RetRank: er,
+				RRInd:   rrind,
+			}
+			if er.SearchEngine == engines.Undefined { //this should be fixed. TODO
+				continue
+			}
+			engResults[er.SearchEngine] = append(engResults[er.SearchEngine], rf)
+		}
+	}
+
+	for _, engRes := range engResults {
+		sort.Sort(ByRetrievedRank(engRes))
+
+		for rnk, el := range engRes {
+			results[el.ArrInd].EngineRanks[el.RRInd].Rank = rnk + 1
+		}
+	}
 }
