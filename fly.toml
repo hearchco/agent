@@ -1,5 +1,5 @@
 app = "brzaguza"
-primary_region = "otp"
+primary_region = "cdg"
 
 [build]
   image = "ghcr.io/tminaorg/brzaguza:latest"
