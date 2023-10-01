@@ -33,7 +33,7 @@ func PerformSearch(query string, options engines.Options, config *config.Config)
 	results := rank.Rank(relay.ResultMap)
 	log.Debug().Msgf("Finished ranking in %v", time.Since(rankTiming).Milliseconds())
 
-	log.Debug().Msg("Search Done!")
+	log.Debug().Msg("Search done!")
 
 	return results
 }
