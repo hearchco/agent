@@ -36,7 +36,7 @@ type RankFiller struct {
 }
 
 func FillRetrievedRank(results []result.Result) {
-	engResults := make([][]RankFiller, 100) //TODO. need as many elements as there are implemented engines. the value used for len in searcher/buildOneRun
+	engResults := make([][]RankFiller, len(engines.NameValues()))
 	for arrind, res := range results {
 		for rrind, er := range res.EngineRanks {
 			rf := RankFiller{

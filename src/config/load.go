@@ -14,8 +14,12 @@ import (
 )
 
 var EnabledEngines []engines.Name = make([]engines.Name, 0)
+var LogDumpLocation string = "dump/"
 
-func (c *Config) Load(path string) {
+func (c *Config) Load(path string, logPath string) {
+	// Load vars
+	loadVars(logPath)
+
 	// Use "." as the key path delimiter. This can be "/" or any character.
 	k := koanf.New(".")
 
@@ -62,4 +66,6 @@ func (c *Config) Load(path string) {
 	}
 }
 
-const LogDumpLocation string = "logdump/" // this should be moved to config
+func loadVars(logPath string) {
+	LogDumpLocation = logPath + "/" + LogDumpLocation
+}
