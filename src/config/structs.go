@@ -25,9 +25,9 @@ type Engine struct {
 
 // Server config
 type Server struct {
-	Port        int    `koanf:"port"`
-	FrontendUrl string `koanf:"frontendUrl"`
-	RedisUrl    string `koanf:"redisUrl"`
+	Port         int      `koanf:"port"`
+	FrontendUrls []string `koanf:"frontendUrls"`
+	RedisUrl     string   `koanf:"redisUrl"`
 }
 
 type EngineRanking struct {
