@@ -8,7 +8,7 @@ func New() *Config {
 	return &Config{
 		Server: Server{
 			Port:         3030,
-			FrontendUrls: []string{"*"},
+			FrontendUrls: []string{"http://localhost:8000"},
 			RedisUrl:     "http://localhost:6379",
 		},
 		Engines: map[string]Engine{
