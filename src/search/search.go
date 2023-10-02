@@ -3,7 +3,7 @@ package search
 import (
 	"context"
 	"net/url"
-	"sort"
+	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/sourcegraph/conc"
@@ -21,19 +21,19 @@ func PerformSearch(query string, options engines.Options, config *config.Config)
 
 	query = url.QueryEscape(query)
 
+	resTiming := time.Now()
+	log.Debug().Msg("Waiting for results from engines...")
 	var worker conc.WaitGroup
 	runEngines(config.Engines, query, &worker, &relay, options)
-	log.Debug().Msg("Waiting for results from engines...")
 	worker.Wait()
+	log.Debug().Msgf("Got results in %v", time.Since(resTiming).Milliseconds())
 
-	results := make([]result.Result, 0, len(relay.ResultMap))
-	for _, res := range relay.ResultMap {
-		results = append(results, *res)
-	}
+	rankTiming := time.Now()
+	log.Debug().Msg("Ranking...")
+	results := rank.Rank(relay.ResultMap)
+	log.Debug().Msgf("Finished ranking in %v", time.Since(rankTiming).Milliseconds())
 
-	sort.Sort(rank.ByRank(results))
-
-	log.Debug().Msg("All processing done!")
+	log.Debug().Msg("Search done!")
 
 	return results
 }

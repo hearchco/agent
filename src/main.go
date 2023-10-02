@@ -36,7 +36,7 @@ func main() {
 
 	// load config file
 	config := config.New()
-	config.Load(cli.Config)
+	config.Load(cli.Config, cli.Log)
 
 	if cli.Cli {
 		log.Info().

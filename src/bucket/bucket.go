@@ -8,7 +8,6 @@ import (
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
-	"github.com/tminaorg/brzaguza/src/rank"
 )
 
 type Relay struct {
@@ -34,10 +33,6 @@ func AddSEResult(seResult *engines.RetrievedResult, seName engines.Name, relay *
 			EngineRanks:   engineRanks,
 			TimesReturned: 1,
 			Response:      nil,
-		}
-
-		if config.InsertDefaultRank {
-			result.Rank = rank.DefaultRank(seResult.Rank.Rank, seResult.Rank.Page, seResult.Rank.OnPageRank)
 		}
 
 		relay.Mutex.Lock()
@@ -83,17 +78,13 @@ func SetResultResponse(link string, response *colly.Response, relay *Relay, seNa
 	}
 
 	mapRes.Response = response
-
-	resCopy := *mapRes
-	rankAddr := &(mapRes.Rank)
 	relay.Mutex.Unlock()
-	rank.SetRank(&resCopy, rankAddr, &(relay.Mutex)) //copy contains pointer to response
 }
 
-func MakeSEResult(urll string, title string, description string, searchEngineName engines.Name, seRank int, sePage int, seOnPageRank int) *engines.RetrievedResult {
+func MakeSEResult(urll string, title string, description string, searchEngineName engines.Name, sePage int, seOnPageRank int) *engines.RetrievedResult {
 	ser := engines.RetrievedRank{
 		SearchEngine: searchEngineName,
-		Rank:         seRank,
+		Rank:         -1,
 		Page:         sePage,
 		OnPageRank:   seOnPageRank,
 	}

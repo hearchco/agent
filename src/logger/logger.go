@@ -18,7 +18,7 @@ func DateString() string {
 func Setup(path string, verbosity int) {
 	// Generate logfile name
 	datetime := DateString()
-	filepath := fmt.Sprintf("%v/log/brzaguza_%v.log", path, datetime)
+	filepath := fmt.Sprintf("%v/brzaguza_%v.log", path, datetime)
 
 	// Setup logger
 	logger := log.Output(io.MultiWriter(zerolog.ConsoleWriter{

@@ -55,7 +55,7 @@ func setupCli() {
 		kong.Vars{
 			"version":      fmt.Sprintf("%v (%v@%v)", Version, GitCommit, Timestamp),
 			"config_path":  ".",
-			"log_path":     ".",
+			"log_path":     "./log",
 			"query_string": "banana death",
 		},
 	)

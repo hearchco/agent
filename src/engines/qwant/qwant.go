@@ -49,7 +49,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 
 		mainline := parsedResponse.Data.Res.Items.Mainline
-		counter := 0
+		counter := 1
 		for _, group := range mainline {
 			if group.Type != "web" {
 				continue
@@ -57,7 +57,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			for _, result := range group.Items {
 				goodURL := parse.ParseURL(result.URL)
 
-				res := bucket.MakeSEResult(goodURL, result.Title, result.Description, Info.Name, (page-1)*Info.ResultsPerPage+counter, page, counter%Info.ResultsPerPage+1)
+				res := bucket.MakeSEResult(goodURL, result.Title, result.Description, Info.Name, page, counter)
 				bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 				counter += 1
 			}
