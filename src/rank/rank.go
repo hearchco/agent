@@ -14,10 +14,10 @@ func SetRank(result *result.Result) {
 func Rank(resMap map[string]*result.Result) []result.Result {
 	results := make([]result.Result, 0, len(resMap))
 	for _, res := range resMap {
+		res.EngineRanks = res.EngineRanks[0:res.TimesReturned:res.TimesReturned]
 		results = append(results, *res)
 	}
 
-	//setup retrieved rank here
 	FillRetrievedRank(results)
 
 	for ind := range results {
@@ -43,9 +43,6 @@ func FillRetrievedRank(results []result.Result) {
 				ArrInd:  arrind,
 				RetRank: er,
 				RRInd:   rrind,
-			}
-			if er.SearchEngine == engines.Undefined { //this should be fixed. TODO
-				continue
 			}
 			engResults[er.SearchEngine] = append(engResults[er.SearchEngine], rf)
 		}
