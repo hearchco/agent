@@ -9,10 +9,11 @@ import (
 // The URL is the primary key
 type Result struct {
 	URL           string
-	Rank          int
+	Rank          uint
+	Score         float64
 	Title         string
 	Description   string
 	EngineRanks   []engines.RetrievedRank
-	TimesReturned int
+	TimesReturned uint8
 	Response      *colly.Response
 }

@@ -4,9 +4,9 @@ package engines
 // Information about what Rank a result was on some Search Engine
 type RetrievedRank struct {
 	SearchEngine Name
-	Rank         int
-	Page         int
-	OnPageRank   int
+	Rank         uint
+	Page         uint
+	OnPageRank   uint
 }
 
 // The info a Search Engine returned about some Result

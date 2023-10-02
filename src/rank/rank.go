@@ -1,17 +1,30 @@
 package rank
 
 import (
+	"math"
 	"sort"
 
 	"github.com/tminaorg/brzaguza/src/bucket/result"
+	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
 )
 
-func SetRank(result *result.Result) {
-	result.Rank = result.EngineRanks[0].Rank
+func GetScore(result *result.Result, rconf *config.Ranking) float64 {
+	retRankScore := float64(0)
+	for _, er := range result.EngineRanks {
+		seMul := rconf.Engines[er.SearchEngine.ToLower()].Mul
+		seConst := rconf.Engines[er.SearchEngine.ToLower()].Const //these 2 could be preproced into array
+		retRankScore += (100*fastInvSqrt64(float64(er.Rank)*rconf.A+rconf.B)*rconf.C+rconf.D)*seMul + seConst
+	}
+	retRankScore /= float64(result.TimesReturned)
+
+	timesReturnedScore := math.Log(float64(result.TimesReturned)*rconf.TRA+rconf.TRB)*10*rconf.TRC + rconf.TRD
+
+	score := retRankScore + timesReturnedScore
+	return score
 }
 
-func Rank(resMap map[string]*result.Result) []result.Result {
+func Rank(resMap map[string]*result.Result, rconf *config.Ranking) []result.Result {
 	results := make([]result.Result, 0, len(resMap))
 	for _, res := range resMap {
 		res.EngineRanks = res.EngineRanks[0:res.TimesReturned:res.TimesReturned]
@@ -21,10 +34,12 @@ func Rank(resMap map[string]*result.Result) []result.Result {
 	FillRetrievedRank(results)
 
 	for ind := range results {
-		SetRank(&(results[ind]))
+		results[ind].Score = GetScore(&(results[ind]), rconf)
 	}
-
-	sort.Sort(ByRank(results))
+	sort.Sort(ByScore(results))
+	for ind := range results {
+		results[ind].Rank = uint(ind + 1)
+	}
 
 	return results
 }
@@ -52,7 +67,7 @@ func FillRetrievedRank(results []result.Result) {
 		sort.Sort(ByRetrievedRank(engRes))
 
 		for rnk, el := range engRes {
-			results[el.ArrInd].EngineRanks[el.RRInd].Rank = rnk + 1
+			results[el.ArrInd].EngineRanks[el.RRInd].Rank = uint(rnk + 1)
 		}
 	}
 }
