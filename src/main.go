@@ -16,7 +16,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/search"
 )
 
-func printResults(results []result.Result) {
+func printResults(results result.Results) {
 	fmt.Print("\n\tThe Search Results:\n\n")
 	for _, r := range results {
 		fmt.Printf("%v (%.2f) -----\n\t\"%v\"\n\t\"%v\"\n\t\"%v\"\n\t-", r.Rank, r.Score, r.Title, r.URL, r.Description)
@@ -70,13 +70,23 @@ func main() {
 		}
 
 		start := time.Now()
-		results := search.PerformSearch(cli.Query, options, config)
+
+		var results result.Results
+		resultsValue := db.Get(cli.Query)
+		if resultsValue == nil {
+			results = search.PerformSearch(cli.Query, options, config)
+			db.Set(cli.Query, &results)
+		} else if err := results.UnmarshalJSON(resultsValue); err != nil {
+			log.Error().Msgf("Failed unmarshaling results from cache: %v", err)
+		}
+
 		duration := time.Since(start)
+
 		if !cli.Silent {
 			printResults(results)
 		}
 		log.Info().Msgf("Found %v results in %vms", len(results), duration.Milliseconds())
 	} else {
-		router.Setup(config)
+		router.Setup(config, db)
 	}
 }

@@ -24,8 +24,8 @@ func GetScore(result *result.Result, rconf *config.Ranking) float64 {
 	return score
 }
 
-func Rank(resMap map[string]*result.Result, rconf *config.Ranking) []result.Result {
-	results := make([]result.Result, 0, len(resMap))
+func Rank(resMap map[string]*result.Result, rconf *config.Ranking) result.Results {
+	results := make(result.Results, 0, len(resMap))
 	for _, res := range resMap {
 		res.EngineRanks = res.EngineRanks[0:res.TimesReturned:res.TimesReturned]
 		results = append(results, *res)
@@ -50,7 +50,7 @@ type RankFiller struct {
 	RRInd   int
 }
 
-func FillRetrievedRank(results []result.Result) {
+func FillRetrievedRank(results result.Results) {
 	engResults := make([][]RankFiller, len(engines.NameValues()))
 	for arrind, res := range results {
 		for rrind, er := range res.EngineRanks {

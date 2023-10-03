@@ -7,12 +7,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
+	"github.com/tminaorg/brzaguza/src/cache"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
 	"github.com/tminaorg/brzaguza/src/search"
 )
 
-func Search(c *gin.Context, config *config.Config) {
+func Search(c *gin.Context, config *config.Config, db cache.DB) {
 	var query, pages, deepSearch string
 
 	switch c.Request.Method {
@@ -55,4 +56,6 @@ func Search(c *gin.Context, config *config.Config) {
 	} else {
 		c.String(http.StatusOK, string(resultsJson))
 	}
+
+	db.Set(query, &results)
 }

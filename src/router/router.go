@@ -6,12 +6,13 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/tminaorg/brzaguza/src/cache"
 	"github.com/tminaorg/brzaguza/src/config"
 )
 
 var router = gin.Default()
 
-func Setup(config *config.Config) {
+func Setup(config *config.Config, db cache.DB) {
 	// CORS
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     config.Server.FrontendUrls,
@@ -26,10 +27,10 @@ func Setup(config *config.Config) {
 
 	// search
 	router.GET("/search", func(c *gin.Context) {
-		Search(c, config)
+		Search(c, config, db)
 	})
 	router.POST("/search", func(c *gin.Context) {
-		Search(c, config)
+		Search(c, config, db)
 	})
 
 	// startup
