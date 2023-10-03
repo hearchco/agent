@@ -76,4 +76,4 @@ require (
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )
 
-replace github.com/gocolly/colly/v2 => github.com/tminaorg/colly/v2 v2.0.0-20231003131318-18d765d9d072
+replace github.com/gocolly/colly/v2 => github.com/tminaorg/colly/v2 v2.0.0-20231003134351-b4b3d1746def
