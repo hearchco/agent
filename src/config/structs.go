@@ -23,14 +23,24 @@ type Engine struct {
 	Settings Settings `koanf:"settings"`
 }
 
-// Server config
+type Redis struct {
+	Host     string `koanf:"host"`
+	Port     uint16 `koanf:"port"`
+	Password string `koanf:"password"`
+	Database uint8  `koanf:"database"`
+}
+
+type Cache struct {
+	Type  string `koanf:"type"`
+	Redis Redis  `koanf:"redis"`
+}
+
 type Server struct {
 	Port         int      `koanf:"port"`
 	FrontendUrls []string `koanf:"frontendUrls"`
-	RedisUrl     string   `koanf:"redisUrl"`
+	Cache        Cache    `koanf:"cache"`
 }
 
-// Config struct for Koanf
 type Config struct {
 	Server  Server            `koanf:"server"`
 	Engines map[string]Engine `koanf:"engines"`

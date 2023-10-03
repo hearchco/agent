@@ -6,6 +6,9 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket/result"
+	"github.com/tminaorg/brzaguza/src/cache"
+	"github.com/tminaorg/brzaguza/src/cache/pebble"
+	"github.com/tminaorg/brzaguza/src/cache/redis"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
 	"github.com/tminaorg/brzaguza/src/logger"
@@ -37,6 +40,16 @@ func main() {
 	// load config file
 	config := config.New()
 	config.Load(cli.Config, cli.Log)
+
+	// cache database
+	var db cache.DB
+	switch config.Server.Cache.Type {
+	case "pebble":
+		db = pebble.New(cli.Config)
+	case "redis":
+		db = redis.New(config.Server.Cache.Redis)
+	}
+	defer db.Close()
 
 	if cli.Cli {
 		log.Info().
