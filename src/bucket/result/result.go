@@ -13,7 +13,7 @@ import (
 type Result struct {
 	URL           string                  `json:"url"`
 	Rank          uint                    `json:"rank"`
-  Score         float64                 `json:"score"`
+	Score         float64                 `json:"score"`
 	Title         string                  `json:"title"`
 	Description   string                  `json:"description"`
 	EngineRanks   []engines.RetrievedRank `json:"engineRanks"`
