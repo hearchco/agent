@@ -56,6 +56,7 @@ func main() {
 		defer db.Close()
 	}
 
+	// startup
 	if cli.Cli {
 		log.Info().
 			Str("query", cli.Query).
