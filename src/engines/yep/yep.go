@@ -31,6 +31,10 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
 	sedefaults.ColError(Info.Name, col, &retError)
 
+	col.OnRequest(func(r *colly.Request) {
+		r.Headers.Del("Accept")
+	})
+
 	col.OnResponse(func(r *colly.Response) {
 		content := parseJSON(r.Body)
 
