@@ -24,6 +24,8 @@ func New(path string) *DB {
 func (db *DB) Close() {
 	if err := db.pdb.Close(); err != nil {
 		log.Panic().Msgf("error closing pebble: %v", err)
+	} else {
+		log.Debug().Msg("successfully disconnected from pebble")
 	}
 }
 

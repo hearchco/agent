@@ -48,8 +48,13 @@ func main() {
 		db = pebble.New(cli.Config)
 	case "redis":
 		db = redis.New(config.Server.Cache.Redis)
+	default:
+		log.Warn().Msg("Running without caching!")
 	}
-	defer db.Close()
+
+	if db != nil {
+		defer db.Close()
+	}
 
 	if cli.Cli {
 		log.Info().

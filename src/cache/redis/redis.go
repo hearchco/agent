@@ -26,7 +26,9 @@ func New(config config.Redis) *DB {
 }
 
 // needed to comply with interface
-func (db *DB) Close() {}
+func (db *DB) Close() {
+	log.Debug().Msg("successfully disconnected from redis")
+}
 
 func (db *DB) Set(k string, v interface{}) {
 	if err := db.rdb.Set(ctx, k, v, 0).Err(); err != nil {
