@@ -6,7 +6,7 @@ require (
 	github.com/alecthomas/kong v0.8.0
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/gocolly/colly/v2 v2.1.0
+	github.com/gocolly/colly/v2 v2.0.0-00010101000000-000000000000
 	github.com/knadh/koanf/parsers/yaml v0.1.0
 	github.com/knadh/koanf/providers/env v0.1.0
 	github.com/knadh/koanf/providers/file v0.1.0
@@ -19,6 +19,7 @@ require (
 )
 
 require (
+	github.com/bits-and-blooms/bitset v1.2.2-0.20220111210104-dfa3e347c392 // indirect
 	github.com/bytedance/sonic v1.10.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.0 // indirect
@@ -40,6 +41,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/nlnwa/whatwg-url v0.1.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
@@ -73,3 +75,5 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )
+
+replace github.com/gocolly/colly/v2 => github.com/tminaorg/colly/v2 v2.0.0-20231003134351-b4b3d1746def
