@@ -12,11 +12,12 @@ import (
 // The URL is the primary key
 type Result struct {
 	URL           string                  `json:"url"`
-	Rank          int                     `json:"rank"`
+	Rank          uint                    `json:"rank"`
+  Score         float64                 `json:"score"`
 	Title         string                  `json:"title"`
 	Description   string                  `json:"description"`
 	EngineRanks   []engines.RetrievedRank `json:"engineRanks"`
-	TimesReturned int                     `json:"timesReturned"`
+	TimesReturned uint8                   `json:"timesReturned"`
 	Response      *colly.Response         `json:"response"`
 }
 
