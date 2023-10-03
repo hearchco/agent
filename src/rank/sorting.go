@@ -5,11 +5,11 @@ import (
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 )
 
-type ByRank []result.Result
+type ByScore []result.Result
 
-func (r ByRank) Len() int           { return len(r) }
-func (r ByRank) Swap(i, j int)      { r[i], r[j] = r[j], r[i] }
-func (r ByRank) Less(i, j int) bool { return r[i].Rank < r[j].Rank }
+func (r ByScore) Len() int           { return len(r) }
+func (r ByScore) Swap(i, j int)      { r[i], r[j] = r[j], r[i] }
+func (r ByScore) Less(i, j int) bool { return r[i].Score > r[j].Score }
 
 type ByRetrievedRank []RankFiller
 

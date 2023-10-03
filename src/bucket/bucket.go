@@ -27,7 +27,7 @@ func AddSEResult(seResult *engines.RetrievedResult, seName engines.Name, relay *
 		engineRanks[0] = seResult.Rank
 		result := result.Result{
 			URL:           seResult.URL,
-			Rank:          -1,
+			Rank:          0,
 			Title:         seResult.Title,
 			Description:   seResult.Description,
 			EngineRanks:   engineRanks,
@@ -84,9 +84,9 @@ func SetResultResponse(link string, response *colly.Response, relay *Relay, seNa
 func MakeSEResult(urll string, title string, description string, searchEngineName engines.Name, sePage int, seOnPageRank int) *engines.RetrievedResult {
 	ser := engines.RetrievedRank{
 		SearchEngine: searchEngineName,
-		Rank:         -1,
-		Page:         sePage,
-		OnPageRank:   seOnPageRank,
+		Rank:         0,
+		Page:         uint(sePage),
+		OnPageRank:   uint(seOnPageRank),
 	}
 	res := engines.RetrievedResult{
 		URL:         urll,

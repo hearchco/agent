@@ -73,5 +73,70 @@ func New() *Config {
 				},
 			},
 		},
+		Ranking: Ranking{
+			REXP: 0.5,
+			A:    1,
+			B:    0,
+			C:    1,
+			D:    0,
+			TRA:  1,
+			TRB:  0,
+			TRC:  1,
+			TRD:  0,
+			Engines: map[string]EngineRanking{
+				engines.Bing.ToLower(): {
+					Mul:   1,
+					Const: 0,
+				},
+				engines.Brave.ToLower(): {
+					Mul:   1,
+					Const: 0,
+				},
+				engines.DuckDuckGo.ToLower(): {
+					Mul:   1,
+					Const: 0,
+				},
+				engines.Etools.ToLower(): {
+					Mul:   1,
+					Const: 0,
+				},
+				engines.Google.ToLower(): {
+					Mul:   1,
+					Const: 0,
+				},
+				engines.Mojeek.ToLower(): {
+					Mul:   1,
+					Const: 0,
+				},
+				engines.Presearch.ToLower(): {
+					Mul:   1,
+					Const: 0,
+				},
+				engines.Qwant.ToLower(): {
+					Mul:   1,
+					Const: 0,
+				},
+				engines.Startpage.ToLower(): {
+					Mul:   1,
+					Const: 0,
+				},
+				engines.Swisscows.ToLower(): {
+					Mul:   1,
+					Const: 0,
+				},
+				engines.Yahoo.ToLower(): {
+					Mul:   1,
+					Const: 0,
+				},
+				engines.Yandex.ToLower(): {
+					Mul:   1,
+					Const: 0,
+				},
+				engines.Yep.ToLower(): {
+					Mul:   1,
+					Const: 0,
+				},
+			},
+		},
 	}
 }
