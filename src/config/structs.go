@@ -36,6 +36,7 @@ type EngineRanking struct {
 }
 
 type Ranking struct {
+	REXP    float64                  `koanf:"rexp"`
 	A       float64                  `koanf:"a"`
 	B       float64                  `koanf:"b"`
 	C       float64                  `koanf:"c"`

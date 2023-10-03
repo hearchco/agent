@@ -74,14 +74,15 @@ func New() *Config {
 			},
 		},
 		Ranking: Ranking{
-			A:   1,
-			B:   0,
-			C:   1,
-			D:   0,
-			TRA: 1,
-			TRB: 0,
-			TRC: 1,
-			TRD: 0,
+			REXP: 0.5,
+			A:    1,
+			B:    0,
+			C:    1,
+			D:    0,
+			TRA:  1,
+			TRB:  0,
+			TRC:  1,
+			TRD:  0,
 			Engines: map[string]EngineRanking{
 				engines.Bing.ToLower(): {
 					Mul:   1,
