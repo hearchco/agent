@@ -30,17 +30,6 @@ func printResults(results result.Results) {
 	}
 }
 
-func cleanSearch(results *result.Results, options engines.Options, config *config.Config, db cache.DB) {
-	searchTiming := time.Now()
-	*results = search.PerformSearch(cli.Query, options, config)
-	log.Debug().Msgf("Found results in %vms, caching...", time.Since(searchTiming).Milliseconds())
-
-	cacheTiming := time.Now()
-	log.Debug().Msg("Caching...")
-	db.Set(cli.Query, results)
-	log.Debug().Msgf("Cached results in %vms", time.Since(cacheTiming).Milliseconds())
-}
-
 func main() {
 	// parse cli arguments
 	setupCli()
@@ -88,7 +77,14 @@ func main() {
 			log.Debug().Msgf("Found results for query (%v) in cache", cli.Query)
 		} else {
 			log.Debug().Msg("Nothing found in cache, doing a clean search")
-			cleanSearch(&results, options, config, db)
+			searchTiming := time.Now()
+			results = search.PerformSearch(cli.Query, options, config)
+			log.Debug().Msgf("Found results in %vms", time.Since(searchTiming).Milliseconds())
+
+			log.Debug().Msg("Caching...")
+			cacheTiming := time.Now()
+			db.Set(cli.Query, &results)
+			log.Debug().Msgf("Cached results in %vms", time.Since(cacheTiming).Milliseconds())
 		}
 
 		duration := time.Since(start)
