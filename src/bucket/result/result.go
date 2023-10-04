@@ -20,7 +20,7 @@ type Result struct {
 	Response      *colly.Response         `json:"response"`
 }
 
-// MarshalJSON implements the json.Marshaler interface for Results
+// MarshalJSON implements the json.Marshaler interface for Result
 func (r *Result) MarshalJSON() ([]byte, error) {
 	return json.Marshal(*r)
 }
@@ -28,6 +28,6 @@ func (r *Result) MarshalJSON() ([]byte, error) {
 type Results []Result
 
 // MarshalJSON implements the json.Marshaler interface for Results
-func (r Results) MarshalJSON() ([]byte, error) {
-	return json.Marshal([]Result(r))
+func (r *Results) MarshalJSON() ([]byte, error) {
+	return json.Marshal([]Result(*r))
 }
