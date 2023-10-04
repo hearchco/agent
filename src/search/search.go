@@ -15,6 +15,8 @@ import (
 )
 
 func PerformSearch(query string, options engines.Options, config *config.Config) result.Results {
+	searchTiming := time.Now()
+
 	relay := bucket.Relay{
 		ResultMap: make(map[string]*result.Result),
 	}
@@ -33,7 +35,7 @@ func PerformSearch(query string, options engines.Options, config *config.Config)
 	results := rank.Rank(relay.ResultMap, &(config.Ranking))
 	log.Debug().Msgf("Finished ranking in %vms", time.Since(rankTiming).Milliseconds())
 
-	log.Debug().Msg("Search done!")
+	log.Debug().Msgf("Found results in %vms", time.Since(searchTiming).Milliseconds())
 
 	return results
 }

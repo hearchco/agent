@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -56,14 +55,8 @@ func Search(c *gin.Context, config *config.Config, db cache.DB) {
 		log.Debug().Msgf("Found results for query (%v) in cache", query)
 	} else {
 		log.Debug().Msg("Nothing found in cache, doing a clean search")
-		searchTiming := time.Now()
 		results = search.PerformSearch(query, options, config)
-		log.Debug().Msgf("Found results in %vms", time.Since(searchTiming).Milliseconds())
-
-		log.Debug().Msg("Caching...")
-		cacheTiming := time.Now()
-		db.Set(query, &results)
-		log.Debug().Msgf("Cached results in %vms", time.Since(cacheTiming).Milliseconds())
+		defer cache.Save(db, query, &results)
 	}
 
 	if resultsJson, err := json.Marshal(results); err != nil {
@@ -72,6 +65,4 @@ func Search(c *gin.Context, config *config.Config, db cache.DB) {
 	} else {
 		c.String(http.StatusOK, string(resultsJson))
 	}
-
-	db.Set(query, &results)
 }

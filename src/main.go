@@ -77,14 +77,8 @@ func main() {
 			log.Debug().Msgf("Found results for query (%v) in cache", cli.Query)
 		} else {
 			log.Debug().Msg("Nothing found in cache, doing a clean search")
-			searchTiming := time.Now()
 			results = search.PerformSearch(cli.Query, options, config)
-			log.Debug().Msgf("Found results in %vms", time.Since(searchTiming).Milliseconds())
-
-			log.Debug().Msg("Caching...")
-			cacheTiming := time.Now()
-			db.Set(cli.Query, &results)
-			log.Debug().Msgf("Cached results in %vms", time.Since(cacheTiming).Milliseconds())
+			cache.Save(db, cli.Query, &results)
 		}
 
 		duration := time.Since(start)
