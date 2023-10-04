@@ -34,24 +34,18 @@ func (db *DB) Close() {
 
 func (db *DB) Set(k string, v cache.Value) {
 	if val, err := cbor.Marshal(v); err != nil {
-		log.Error().Msgf("Error marshalling value: %v", err)
+		log.Error().Msgf("Error marshaling value: %v", err)
 	} else if err := db.rdb.Set(ctx, k, val, 0).Err(); err != nil {
-		// log.Trace().Msgf("key = %v, value = %v", k, v)
 		log.Panic().Msgf("Error setting KV to redis: %v", err)
-	} // else {
-	// log.Trace().Msgf("success: key = %v, value = %v", k, v)
-	// }
+	}
 }
 
 func (db *DB) Get(k string, o cache.Value) {
 	v, err := db.rdb.Get(ctx, k).Result()
 	val := []byte(v) // copy data before closing, casting needed for json.Unmarshal()
-
 	if err == redis.Nil {
-		// log.Trace().Msgf("warn: key = %v, value = %v", k, val)
 		log.Trace().Msgf("Found no value in redis for key (%v): %v", k, err)
 	} else if err != nil {
-		// log.Trace().Msgf("error: key = %v, value = %v", k, val)
 		log.Panic().Msgf("Error getting value from redis for key (%v): %v", k, err)
 	} else if err := cbor.Unmarshal(val, o); err != nil {
 		log.Error().Msgf("Failed unmarshaling value from redis for key (%v): %v", k, err)
