@@ -14,7 +14,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/rank"
 )
 
-func PerformSearch(query string, options engines.Options, config *config.Config) result.Results {
+func PerformSearch(query string, options engines.Options, config *config.Config) []result.Result {
 	searchTiming := time.Now()
 
 	relay := bucket.Relay{

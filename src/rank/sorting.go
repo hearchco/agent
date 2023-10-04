@@ -5,7 +5,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 )
 
-type ByScore result.Results
+type ByScore []result.Result
 
 func (r ByScore) Len() int           { return len(r) }
 func (r ByScore) Swap(i, j int)      { r[i], r[j] = r[j], r[i] }

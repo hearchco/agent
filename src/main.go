@@ -16,7 +16,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/search"
 )
 
-func printResults(results result.Results) {
+func printResults(results []result.Result) {
 	fmt.Print("\n\tThe Search Results:\n\n")
 	for _, r := range results {
 		fmt.Printf("%v (%.2f) -----\n\t\"%v\"\n\t\"%v\"\n\t\"%v\"\n\t-", r.Rank, r.Score, r.Title, r.URL, r.Description)
@@ -71,14 +71,14 @@ func main() {
 
 		start := time.Now()
 
-		var results result.Results
+		var results []result.Result
 		db.Get(cli.Query, &results)
 		if results != nil {
 			log.Debug().Msgf("Found results for query (%v) in cache", cli.Query)
 		} else {
 			log.Debug().Msg("Nothing found in cache, doing a clean search")
 			results = search.PerformSearch(cli.Query, options, config)
-			cache.Save(db, cli.Query, &results)
+			cache.Save(db, cli.Query, results)
 		}
 
 		duration := time.Since(start)

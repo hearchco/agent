@@ -17,5 +17,3 @@ type Result struct {
 	TimesReturned uint8                   `json:"timesReturned"`
 	Response      *colly.Response         `json:"response"`
 }
-
-type Results []Result

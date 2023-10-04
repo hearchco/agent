@@ -7,7 +7,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 )
 
-func Save(db DB, query string, results *result.Results) {
+func Save(db DB, query string, results []result.Result) {
 	log.Debug().Msg("Caching...")
 	cacheTiming := time.Now()
 	db.Set(query, results)
