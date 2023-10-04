@@ -30,6 +30,17 @@ func printResults(results result.Results) {
 	}
 }
 
+func cleanSearch(results *result.Results, options engines.Options, config *config.Config, db cache.DB) {
+	searchTiming := time.Now()
+	*results = search.PerformSearch(cli.Query, options, config)
+	log.Debug().Msgf("Found results in %vms, caching...", time.Since(searchTiming).Milliseconds())
+
+	cacheTiming := time.Now()
+	log.Debug().Msg("Caching...")
+	db.Set(cli.Query, results)
+	log.Debug().Msgf("Cached results in %vms", time.Since(cacheTiming).Milliseconds())
+}
+
 func main() {
 	// parse cli arguments
 	setupCli()
@@ -72,12 +83,12 @@ func main() {
 		start := time.Now()
 
 		var results result.Results
-		resultsValue := db.Get(cli.Query)
-		if resultsValue == nil {
-			results = search.PerformSearch(cli.Query, options, config)
-			db.Set(cli.Query, &results)
-		} else if err := results.UnmarshalJSON(resultsValue); err != nil {
-			log.Error().Msgf("Failed unmarshaling results from cache: %v", err)
+		db.Get(cli.Query, &results)
+		if results != nil {
+			log.Debug().Msgf("Found results for query (%v) in cache", cli.Query)
+		} else {
+			log.Debug().Msg("Nothing found in cache, doing a clean search")
+			cleanSearch(&results, options, config, db)
 		}
 
 		duration := time.Since(start)

@@ -2,7 +2,6 @@ package result
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/tminaorg/brzaguza/src/engines"
@@ -22,35 +21,13 @@ type Result struct {
 }
 
 // MarshalJSON implements the json.Marshaler interface for Results
-func (r Result) MarshalJSON() ([]byte, error) {
-	return json.Marshal(fmt.Sprintf("%v", r))
-}
-
-// UnmarshalJSON implements the json.Unmarshaler interface for Results
-func (r *Result) UnmarshalJSON(data []byte) error {
-	var s Result
-	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("data should be of type Result, got %s", data)
-	}
-
-	*r = s
-	return nil
+func (r *Result) MarshalJSON() ([]byte, error) {
+	return json.Marshal(*r)
 }
 
 type Results []Result
 
 // MarshalJSON implements the json.Marshaler interface for Results
 func (r Results) MarshalJSON() ([]byte, error) {
-	return json.Marshal(fmt.Sprintf("%v", r))
-}
-
-// UnmarshalJSON implements the json.Unmarshaler interface for Results
-func (r *Results) UnmarshalJSON(data []byte) error {
-	var s Results
-	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("data should be of type Results, got %s", data)
-	}
-
-	*r = s
-	return nil
+	return json.Marshal([]Result(r))
 }

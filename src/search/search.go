@@ -26,12 +26,12 @@ func PerformSearch(query string, options engines.Options, config *config.Config)
 	var worker conc.WaitGroup
 	runEngines(config.Engines, query, &worker, &relay, options)
 	worker.Wait()
-	log.Debug().Msgf("Got results in %v", time.Since(resTiming).Milliseconds())
+	log.Debug().Msgf("Got results in %vms", time.Since(resTiming).Milliseconds())
 
 	rankTiming := time.Now()
 	log.Debug().Msg("Ranking...")
 	results := rank.Rank(relay.ResultMap, &(config.Ranking))
-	log.Debug().Msgf("Finished ranking in %v", time.Since(rankTiming).Milliseconds())
+	log.Debug().Msgf("Finished ranking in %vms", time.Since(rankTiming).Milliseconds())
 
 	log.Debug().Msg("Search done!")
 

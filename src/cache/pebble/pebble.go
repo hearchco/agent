@@ -1,6 +1,7 @@
 package pebble
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/cockroachdb/pebble"
@@ -31,7 +32,9 @@ func (db *DB) Close() {
 }
 
 func (db *DB) Set(k string, v cache.Value) {
-	if err := db.pdb.Set([]byte(k), []byte(fmt.Sprint(v)), pebble.Sync); err != nil {
+	if val, err := v.MarshalJSON(); err != nil {
+		log.Error().Msgf("Error marshalling value: %v", err)
+	} else if err := db.pdb.Set([]byte(k), val, pebble.Sync); err != nil {
 		// log.Trace().Msgf("key = %v, value = %v", k, v)
 		log.Panic().Msgf("Error setting KV to pebble: %v", err)
 	} // else {
@@ -39,21 +42,17 @@ func (db *DB) Set(k string, v cache.Value) {
 	// }
 }
 
-func (db *DB) Get(k string) []byte {
+func (db *DB) Get(k string, o cache.Value) {
 	v, c, err := db.pdb.Get([]byte(k))
 	val := []byte(v) // copy data before closing, casting needed for json.Unmarshal()
 
 	if err == pebble.ErrNotFound {
-		// log.Trace().Msgf("warn: key = %v, value = %s", k, val)
 		log.Trace().Msgf("Found no value in pebble for key (%v): %v", k, err)
 	} else if err != nil {
-		// log.Trace().Msgf("error: key = %v, value = %s", k, val)
 		log.Panic().Msgf("Error getting value from pebble for key (%v): %v", k, err)
 	} else if err := c.Close(); err != nil {
-		// log.Trace().Msgf("error: key = %v, value = %s", k, val)
 		log.Panic().Msgf("Error closing connection to pebble for key (%v): %v", k, err)
+	} else if err := json.Unmarshal(val, o); err != nil {
+		log.Error().Msgf("Failed unmarshaling value from pebble for key (%v): %v", k, err)
 	}
-
-	// log.Trace().Msgf("success: key = %v, value = %s", k, val)
-	return val
 }

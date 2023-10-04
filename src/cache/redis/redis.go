@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/redis/go-redis/v9"
@@ -32,7 +33,9 @@ func (db *DB) Close() {
 }
 
 func (db *DB) Set(k string, v cache.Value) {
-	if err := db.rdb.Set(ctx, k, v, 0).Err(); err != nil {
+	if val, err := v.MarshalJSON(); err != nil {
+		log.Error().Msgf("Error marshalling value: %v", err)
+	} else if err := db.rdb.Set(ctx, k, val, 0).Err(); err != nil {
 		// log.Trace().Msgf("key = %v, value = %v", k, v)
 		log.Panic().Msgf("Error setting KV to redis: %v", err)
 	} // else {
@@ -40,7 +43,7 @@ func (db *DB) Set(k string, v cache.Value) {
 	// }
 }
 
-func (db *DB) Get(k string) []byte {
+func (db *DB) Get(k string, o cache.Value) {
 	v, err := db.rdb.Get(ctx, k).Result()
 	val := []byte(v) // copy data before closing, casting needed for json.Unmarshal()
 
@@ -50,8 +53,7 @@ func (db *DB) Get(k string) []byte {
 	} else if err != nil {
 		// log.Trace().Msgf("error: key = %v, value = %v", k, val)
 		log.Panic().Msgf("Error getting value from redis for key (%v): %v", k, err)
+	} else if err := json.Unmarshal(val, o); err != nil {
+		log.Error().Msgf("Failed unmarshaling value from redis for key (%v): %v", k, err)
 	}
-
-	// log.Trace().Msgf("success: key = %v, value = %v", k, val)
-	return val
 }
