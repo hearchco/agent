@@ -6,6 +6,4 @@ type DB interface {
 	Get(k string, o Value)
 }
 
-type Value interface {
-	MarshalJSON() ([]byte, error)
-}
+type Value interface{}

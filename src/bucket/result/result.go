@@ -1,8 +1,6 @@
 package result
 
 import (
-	"encoding/json"
-
 	"github.com/gocolly/colly/v2"
 	"github.com/tminaorg/brzaguza/src/engines"
 )
@@ -20,14 +18,4 @@ type Result struct {
 	Response      *colly.Response         `json:"response"`
 }
 
-// MarshalJSON implements the json.Marshaler interface for Result
-func (r *Result) MarshalJSON() ([]byte, error) {
-	return json.Marshal(*r)
-}
-
 type Results []Result
-
-// MarshalJSON implements the json.Marshaler interface for Results
-func (r *Results) MarshalJSON() ([]byte, error) {
-	return json.Marshal([]Result(*r))
-}

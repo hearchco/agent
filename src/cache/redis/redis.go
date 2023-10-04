@@ -33,7 +33,7 @@ func (db *DB) Close() {
 }
 
 func (db *DB) Set(k string, v cache.Value) {
-	if val, err := v.MarshalJSON(); err != nil {
+	if val, err := json.Marshal(v); err != nil {
 		log.Error().Msgf("Error marshalling value: %v", err)
 	} else if err := db.rdb.Set(ctx, k, val, 0).Err(); err != nil {
 		// log.Trace().Msgf("key = %v, value = %v", k, v)
