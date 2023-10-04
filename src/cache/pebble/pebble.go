@@ -1,10 +1,10 @@
 package pebble
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/cockroachdb/pebble"
+	"github.com/fxamacker/cbor/v2"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/cache"
 )
@@ -32,7 +32,7 @@ func (db *DB) Close() {
 }
 
 func (db *DB) Set(k string, v cache.Value) {
-	if val, err := json.Marshal(v); err != nil {
+	if val, err := cbor.Marshal(v); err != nil {
 		log.Error().Msgf("Error marshalling value: %v", err)
 	} else if err := db.pdb.Set([]byte(k), val, pebble.Sync); err != nil {
 		// log.Trace().Msgf("key = %v, value = %v", k, v)
@@ -52,7 +52,7 @@ func (db *DB) Get(k string, o cache.Value) {
 		log.Panic().Msgf("Error getting value from pebble for key (%v): %v", k, err)
 	} else if err := c.Close(); err != nil {
 		log.Panic().Msgf("Error closing connection to pebble for key (%v): %v", k, err)
-	} else if err := json.Unmarshal(val, o); err != nil {
+	} else if err := cbor.Unmarshal(val, o); err != nil {
 		log.Error().Msgf("Failed unmarshaling value from pebble for key (%v): %v", k, err)
 	}
 }

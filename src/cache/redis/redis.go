@@ -2,9 +2,9 @@ package redis
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
+	"github.com/fxamacker/cbor/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/cache"
@@ -33,7 +33,7 @@ func (db *DB) Close() {
 }
 
 func (db *DB) Set(k string, v cache.Value) {
-	if val, err := json.Marshal(v); err != nil {
+	if val, err := cbor.Marshal(v); err != nil {
 		log.Error().Msgf("Error marshalling value: %v", err)
 	} else if err := db.rdb.Set(ctx, k, val, 0).Err(); err != nil {
 		// log.Trace().Msgf("key = %v, value = %v", k, v)
@@ -53,7 +53,7 @@ func (db *DB) Get(k string, o cache.Value) {
 	} else if err != nil {
 		// log.Trace().Msgf("error: key = %v, value = %v", k, val)
 		log.Panic().Msgf("Error getting value from redis for key (%v): %v", k, err)
-	} else if err := json.Unmarshal(val, o); err != nil {
+	} else if err := cbor.Unmarshal(val, o); err != nil {
 		log.Error().Msgf("Failed unmarshaling value from redis for key (%v): %v", k, err)
 	}
 }
