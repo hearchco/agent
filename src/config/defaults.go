@@ -9,7 +9,13 @@ func New() *Config {
 		Server: Server{
 			Port:         3030,
 			FrontendUrls: []string{"http://localhost:8000"},
-			RedisUrl:     "http://localhost:6379",
+			Cache: Cache{
+				Type: "pebble",
+				Redis: Redis{
+					Host: "localhost",
+					Port: 6379,
+				},
+			},
 		},
 		Engines: map[string]Engine{
 			engines.Bing.ToLower(): {

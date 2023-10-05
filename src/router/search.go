@@ -7,12 +7,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
+	"github.com/tminaorg/brzaguza/src/bucket/result"
+	"github.com/tminaorg/brzaguza/src/cache"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
 	"github.com/tminaorg/brzaguza/src/search"
 )
 
-func Search(c *gin.Context, config *config.Config) {
+func Search(c *gin.Context, config *config.Config, db cache.DB) {
 	var query, pages, deepSearch string
 
 	switch c.Request.Method {
@@ -47,7 +49,15 @@ func Search(c *gin.Context, config *config.Config) {
 		VisitPages: visitPages,
 	}
 
-	results := search.PerformSearch(query, options, config)
+	var results []result.Result
+	db.Get(query, &results)
+	if results != nil {
+		log.Debug().Msgf("Found results for query (%v) in cache", query)
+	} else {
+		log.Debug().Msg("Nothing found in cache, doing a clean search")
+		results = search.PerformSearch(query, options, config)
+		defer cache.Save(db, query, results)
+	}
 
 	if resultsJson, err := json.Marshal(results); err != nil {
 		log.Error().Err(err).Msg("failed marshalling results")

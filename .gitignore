@@ -30,6 +30,7 @@ src/engines/*/site/*
 
 logdump/*.html
 log/*.log
+database/
 
 # go generate
 *_stringer.go

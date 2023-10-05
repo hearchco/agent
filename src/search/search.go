@@ -15,25 +15,27 @@ import (
 )
 
 func PerformSearch(query string, options engines.Options, config *config.Config) []result.Result {
+	searchTimer := time.Now()
+
 	relay := bucket.Relay{
 		ResultMap: make(map[string]*result.Result),
 	}
 
 	query = url.QueryEscape(query)
 
-	resTiming := time.Now()
+	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")
 	var worker conc.WaitGroup
 	runEngines(config.Engines, query, &worker, &relay, options)
 	worker.Wait()
-	log.Debug().Msgf("Got results in %v", time.Since(resTiming).Milliseconds())
+	log.Debug().Msgf("Got results in %vms", time.Since(resTimer).Milliseconds())
 
-	rankTiming := time.Now()
+	rankTimer := time.Now()
 	log.Debug().Msg("Ranking...")
 	results := rank.Rank(relay.ResultMap, &(config.Ranking))
-	log.Debug().Msgf("Finished ranking in %v", time.Since(rankTiming).Milliseconds())
+	log.Debug().Msgf("Finished ranking in %vns", time.Since(rankTimer).Nanoseconds())
 
-	log.Debug().Msg("Search done!")
+	log.Debug().Msgf("Found results in %vms", time.Since(searchTimer).Milliseconds())
 
 	return results
 }

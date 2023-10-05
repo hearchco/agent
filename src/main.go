@@ -6,6 +6,9 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket/result"
+	"github.com/tminaorg/brzaguza/src/cache"
+	"github.com/tminaorg/brzaguza/src/cache/pebble"
+	"github.com/tminaorg/brzaguza/src/cache/redis"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
 	"github.com/tminaorg/brzaguza/src/logger"
@@ -28,6 +31,8 @@ func printResults(results []result.Result) {
 }
 
 func main() {
+	mainTimer := time.Now()
+
 	// parse cli arguments
 	setupCli()
 
@@ -38,6 +43,18 @@ func main() {
 	config := config.New()
 	config.Load(cli.Config, cli.Log)
 
+	// cache database
+	var db cache.DB
+	switch config.Server.Cache.Type {
+	case "pebble":
+		db = pebble.New(cli.Config)
+	case "redis":
+		db = redis.New(config.Server.Cache.Redis)
+	default:
+		log.Warn().Msg("Running without caching!")
+	}
+
+	// startup
 	if cli.Cli {
 		log.Info().
 			Str("query", cli.Query).
@@ -51,13 +68,32 @@ func main() {
 		}
 
 		start := time.Now()
-		results := search.PerformSearch(cli.Query, options, config)
+
+		var results []result.Result
+		if db != nil {
+			db.Get(cli.Query, &results)
+		}
+		if results != nil {
+			log.Debug().Msgf("Found results for query (%v) in cache", cli.Query)
+		} else {
+			log.Debug().Msg("Nothing found in cache, doing a clean search")
+			results = search.PerformSearch(cli.Query, options, config)
+			cache.Save(db, cli.Query, results)
+		}
+
 		duration := time.Since(start)
+
 		if !cli.Silent {
 			printResults(results)
 		}
 		log.Info().Msgf("Found %v results in %vms", len(results), duration.Milliseconds())
 	} else {
-		router.Setup(config)
+		router.Setup(config, db)
 	}
+
+	if db != nil {
+		db.Close()
+	}
+
+	log.Debug().Msgf("Program finished in %vms", time.Since(mainTimer).Milliseconds())
 }
