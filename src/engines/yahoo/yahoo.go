@@ -75,5 +75,5 @@ func removeTelemetry(link string) string {
 	}
 	suff := strings.SplitAfterN(link, "/RU=http", 2)[1]
 	newLink := "http" + strings.SplitN(suff, "/RK=", 2)[0]
-	return newLink
+	return parse.ParseURL(newLink)
 }
