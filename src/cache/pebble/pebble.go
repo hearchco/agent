@@ -18,7 +18,7 @@ func New(path string) *DB {
 	if err != nil {
 		log.Panic().Msgf("Error opening pebble: %v (path: %v)", err, path)
 	} else {
-		log.Info().Msgf("Successful connection to pebble (path: %v)", path)
+		log.Info().Msgf("Successfully opened pebble (path: %v)", path)
 	}
 	return &DB{pdb: pdb}
 }
@@ -27,7 +27,7 @@ func (db *DB) Close() {
 	if err := db.pdb.Close(); err != nil {
 		log.Panic().Msgf("Error closing pebble: %v", err)
 	} else {
-		log.Debug().Msg("Successfully disconnected from pebble")
+		log.Debug().Msg("Successfully closed pebble")
 	}
 }
 
@@ -47,7 +47,7 @@ func (db *DB) Get(k string, o cache.Value) {
 	} else if err != nil {
 		log.Panic().Msgf("Error getting value from pebble for key (%v): %v", k, err)
 	} else if err := c.Close(); err != nil {
-		log.Panic().Msgf("Error closing connection to pebble for key (%v): %v", k, err)
+		log.Panic().Msgf("Error closing io to pebble for key (%v): %v", k, err)
 	} else if err := cbor.Unmarshal(val, o); err != nil {
 		log.Error().Msgf("Failed unmarshaling value from pebble for key (%v): %v", k, err)
 	}
