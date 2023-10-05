@@ -31,6 +31,8 @@ func printResults(results []result.Result) {
 }
 
 func main() {
+	mainTimer := time.Now()
+
 	// parse cli arguments
 	setupCli()
 
@@ -50,10 +52,6 @@ func main() {
 		db = redis.New(config.Server.Cache.Redis)
 	default:
 		log.Warn().Msg("Running without caching!")
-	}
-
-	if db != nil {
-		defer db.Close()
 	}
 
 	// startup
@@ -92,4 +90,10 @@ func main() {
 	} else {
 		router.Setup(config, db)
 	}
+
+	if db != nil {
+		db.Close()
+	}
+
+	log.Debug().Msgf("Program finished in %vms", time.Since(mainTimer).Milliseconds())
 }

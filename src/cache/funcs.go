@@ -9,7 +9,7 @@ import (
 
 func Save(db DB, query string, results []result.Result) {
 	log.Debug().Msg("Caching...")
-	cacheTiming := time.Now()
+	cacheTimer := time.Now()
 	db.Set(query, results)
-	log.Debug().Msgf("Cached results in %vms", time.Since(cacheTiming).Milliseconds())
+	log.Debug().Msgf("Cached results in %vms", time.Since(cacheTimer).Milliseconds())
 }
