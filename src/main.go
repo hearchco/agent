@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"runtime/pprof"
 	"time"
 
+	"github.com/pkg/profile"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/cache"
@@ -32,21 +34,93 @@ func printResults(results []result.Result) {
 	}
 }
 
+func runProfiler() func() {
+	/*
+		goroutine — stack traces of all current goroutines
+		heap — a sampling of memory allocations of live objects
+		allocs — a sampling of all past memory allocations
+		threadcreate — stack traces that led to the creation of new OS threads
+		block — stack traces that led to blocking on synchronization primitives
+		mutex — stack traces of holders of contended mutexes
+	*/
+
+	var cpup interface{}
+	var gorp interface{}
+	var blockp interface{}
+	var threadp interface{}
+	var heapp interface{}
+	var allocp interface{}
+	var mutexp interface{}
+
+	cpup = profile.Start(profile.CPUProfile)
+	gorp = profile.Start(profile.GoroutineProfile)
+	blockp = profile.Start(profile.BlockProfile)
+	threadp = profile.Start(profile.ThreadcreationProfile)
+	heapp = profile.Start(profile.MemProfileHeap)
+	allocp = profile.Start(profile.MemProfileAllocs)
+	mutexp = profile.Start(profile.MutexProfile)
+
+	var cpuFile *os.File
+	if cli.CPUProfile != "" {
+		cpuFile, err := os.Create("profiling/" + cli.CPUProfile)
+		if err != nil {
+			log.Fatal().Err(err).Msgf("couldn't create cpu profile. couldn't create file.")
+		}
+		if err := pprof.StartCPUProfile(cpuFile); err != nil {
+			log.Fatal().Err(err).Msgf("couldn't create cpu profile. couldn't run StartCPUProfile")
+		}
+	}
+
+	profile.Start(profile.CPUProfile)
+
+	return func() {
+		if cli.CPUProfile != "" {
+			pprof.StopCPUProfile()
+			if err := cpuFile.Close(); err != nil {
+				log.Fatal().Err(err).Msgf("couldn't create cpu profile. couldn't close file.")
+			}
+		}
+
+		if cli.MEMProfile != "" {
+			f, err := os.Create("profiling/" + cli.MEMProfile)
+			if err != nil {
+				log.Fatal().Err(err).Msgf("couldn't create memory profile. couldn't create file.")
+			}
+			runtime.GC()
+			if err := pprof.WriteHeapProfile(f); err != nil {
+				log.Fatal().Err(err).Msgf("couldn't create memory profile. couldn't WriteHeapProfile.")
+			}
+			if err := f.Close(); err != nil {
+				log.Fatal().Err(err).Msgf("couldn't create memory profile. couldn't close file.")
+			}
+		}
+
+		if cli.GORProfile != "" {
+			f, err := os.Create("profiling/" + cli.MEMProfile)
+			if err != nil {
+				log.Fatal().Err(err).Msgf("couldn't create goroutine profile. couldn't create file.")
+			}
+			if err := pprof.Lookup("goroutine").WriteTo(f, 0); err != nil {
+				log.Fatal().Err(err).Msgf("couldn't create goroutine profile. failed profile write.")
+			}
+			if err := f.Close(); err != nil {
+				log.Fatal().Err(err).Msgf("couldn't create goroutine profile. couldn't close file.")
+			}
+		}
+
+		if cli.ThreadProfile != "" {
+
+		}
+	}
+}
+
 func main() {
 	mainTimer := time.Now()
 
 	// parse cli arguments
 	setupCli()
 
-	// start profiler
-	if cli.CPUProfile {
-		f, err := os.Create("brzaguza.prof")
-		if err != nil {
-			log.Fatal().Err(err).Msgf("couldn't create cpuprofile.")
-		}
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
-	}
+	defer runProfiler()() //runs the profiler, and defers the closing
 
 	// configure logging
 	logger.Setup(cli.Log, cli.Verbosity)
@@ -107,5 +181,6 @@ func main() {
 		db.Close()
 	}
 
+	//closeProfiler(cli.CPUProfile, cli.MEMProfile)
 	log.Debug().Msgf("Program finished in %vms", time.Since(mainTimer).Milliseconds())
 }

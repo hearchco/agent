@@ -18,15 +18,18 @@ var (
 		globals
 
 		// flags
-		Query      string `type:"string" default:"${query_string}" env:"BRZAGUZA_QUERY" help:"Query string used for search"`
-		MaxPages   int    `type:"counter" default:"1" env:"BRZAGUZA_MAX_PAGES" help:"Number of pages to search"`
-		Cli        bool   `type:"bool" default:"false" env:"BRZAGUZA_CLI" help:"Use CLI mode"`
-		Visit      bool   `type:"bool" default:"false" env:"BRZAGUZA_VISIT" help:"Should results be visited"`
-		Silent     bool   `type:"bool" default:"false" short:"s" env:"BRZAGUZA_SILENT" help:"Should results be printed"`
-		Config     string `type:"path" default:"${config_path}" env:"BRZAGUZA_CONFIG" help:"Config folder path"`
-		Log        string `type:"path" default:"${log_path}" env:"BRZAGUZA_LOG" help:"Log file path"`
-		Verbosity  int    `type:"counter" default:"0" short:"v" env:"BRZAGUZA_VERBOSITY" help:"Log level verbosity"`
-		CPUProfile bool   `type:"bool" default:"false" short:"p" env:"BRZAGUZA_CPUPROFILE" help:"Creates brzaguza.prof for go tool pprof"`
+		Query         string `type:"string" default:"${query_string}" env:"BRZAGUZA_QUERY" help:"Query string used for search"`
+		MaxPages      int    `type:"counter" default:"1" env:"BRZAGUZA_MAX_PAGES" help:"Number of pages to search"`
+		Cli           bool   `type:"bool" default:"false" env:"BRZAGUZA_CLI" help:"Use CLI mode"`
+		Visit         bool   `type:"bool" default:"false" env:"BRZAGUZA_VISIT" help:"Should results be visited"`
+		Silent        bool   `type:"bool" default:"false" short:"s" env:"BRZAGUZA_SILENT" help:"Should results be printed"`
+		Config        string `type:"path" default:"${config_path}" env:"BRZAGUZA_CONFIG" help:"Config folder path"`
+		Log           string `type:"path" default:"${log_path}" env:"BRZAGUZA_LOG" help:"Log file path"`
+		Verbosity     int    `type:"counter" default:"0" short:"v" env:"BRZAGUZA_VERBOSITY" help:"Log level verbosity"`
+		CPUProfile    string `type:"string" default:"" env:"BRZAGUZA_CPUPROFILE" help:"Filename for the cpu profile. Saved in profiling/ . If not specified, program is not cpu profiled."`
+		MEMProfile    string `type:"string" default:"" env:"BRZAGUZA_MEMPROFILE" help:"Filename for the memory profile. Saved in profiling/ . If not specified, program is not memory profiled."`
+		GORProfile    string `type:"string" default:"" env:"BRZAGUZA_GORPROFILE" help:"Filename for the goroutine profile. Saved in profiling/ . If not specified, program is not goroutine profiled."`
+		ThreadProfile string `type:"string" default:"" env:"BRZAGUZA_THREADPROFILE" help:"Filename for the threadcreate profile. Saved in profiling/ . If not specified, program is not threadcreate profiled."`
 	}
 )
 

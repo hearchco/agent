@@ -31,6 +31,7 @@ src/engines/*/site/*
 logdump/*.html
 log/*.log
 database/
+profiling/
 
 # go generate
 *_stringer.go
