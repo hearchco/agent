@@ -42,7 +42,7 @@ func (db *DB) Set(k string, v cache.Value) {
 
 func (db *DB) Get(k string, o cache.Value) {
 	v, err := db.rdb.Get(ctx, k).Result()
-	val := []byte(v) // copy data before closing, casting needed for json.Unmarshal()
+	val := []byte(v) // copy data before closing, casting needed for unmarshal
 	if err == redis.Nil {
 		log.Trace().Msgf("Found no value in redis for key (%v): %v", k, err)
 	} else if err != nil {

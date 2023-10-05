@@ -34,14 +34,14 @@ func (db *DB) Close() {
 func (db *DB) Set(k string, v cache.Value) {
 	if val, err := cbor.Marshal(v); err != nil {
 		log.Error().Msgf("Error marshaling value: %v", err)
-	} else if err := db.pdb.Set([]byte(k), val, pebble.Sync); err != nil {
+	} else if err := db.pdb.Set([]byte(k), val, pebble.Sync); err != nil { // should be set to NoSync when router gets graceful shutdown
 		log.Panic().Msgf("Error setting KV to pebble: %v", err)
 	}
 }
 
 func (db *DB) Get(k string, o cache.Value) {
 	v, c, err := db.pdb.Get([]byte(k))
-	val := []byte(v) // copy data before closing, casting needed for json.Unmarshal()
+	val := []byte(v) // copy data before closing, casting needed for unmarshal
 	if err == pebble.ErrNotFound {
 		log.Trace().Msgf("Found no value in pebble for key (%v): %v", k, err)
 	} else if err != nil {
