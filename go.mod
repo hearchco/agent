@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/alecthomas/kong v0.8.0
-	github.com/cockroachdb/pebble v0.0.0-20231003211828-a05b0192e750
+	github.com/cockroachdb/pebble v0.0.0-20231004191855-d4bf20c546d3
 	github.com/fxamacker/cbor/v2 v2.5.0
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.1
@@ -37,7 +37,7 @@ require (
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
-	github.com/getsentry/sentry-go v0.24.1 // indirect
+	github.com/getsentry/sentry-go v0.25.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
