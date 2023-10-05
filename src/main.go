@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"runtime/pprof"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -35,6 +37,16 @@ func main() {
 
 	// parse cli arguments
 	setupCli()
+
+	// start profiler
+	if cli.CPUProfile {
+		f, err := os.Create("brzaguza.prof")
+		if err != nil {
+			log.Fatal().Err(err).Msgf("couldn't create cpuprofile.")
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
 
 	// configure logging
 	logger.Setup(cli.Log, cli.Verbosity)
