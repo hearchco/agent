@@ -70,9 +70,7 @@ func main() {
 		start := time.Now()
 
 		var results []result.Result
-		if db != nil {
-			db.Get(cli.Query, &results)
-		}
+		db.Get(cli.Query, &results)
 		if results != nil {
 			log.Debug().Msgf("Found results for query (%v) in cache", cli.Query)
 		} else {
@@ -88,12 +86,14 @@ func main() {
 		}
 		log.Info().Msgf("Found %v results in %vms", len(results), duration.Milliseconds())
 	} else {
-		router.Start(config, db)
+		if router, err := router.New(config); err != nil {
+			log.Error().Msgf("Failed creating a router: %v", err)
+		} else {
+			router.Start(db)
+		}
 	}
 
-	if db != nil {
-		db.Close()
-	}
+	db.Close()
 
 	log.Debug().Msgf("Program finished in %vms", time.Since(mainTimer).Milliseconds())
 }

@@ -16,17 +16,19 @@ import (
 	"github.com/tminaorg/brzaguza/src/config"
 )
 
-func createRouter(config *config.Config) *graceful.Graceful {
-	router, err := graceful.Default(graceful.WithAddr(fmt.Sprintf(":%v", config.Server.Port)))
-	if err != nil {
-		log.Error().Msgf("Failed creating a router: %v", err)
-	}
-	return router
+type Router struct {
+	router *graceful.Graceful
+	config *config.Config
 }
 
-func addCors(config *config.Config, router *graceful.Graceful) {
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     config.Server.FrontendUrls,
+func New(config *config.Config) (*Router, error) {
+	router, err := graceful.Default(graceful.WithAddr(fmt.Sprintf(":%v", config.Server.Port)))
+	return &Router{router: router, config: config}, err
+}
+
+func (r *Router) addCors() {
+	r.router.Use(cors.New(cors.Config{
+		AllowOrigins:     r.config.Server.FrontendUrls,
 		AllowMethods:     []string{"HEAD", "GET", "POST"},
 		AllowHeaders:     []string{"Origin", "X-Requested-With", "Content-Length", "Content-Type", "Accept"},
 		AllowCredentials: false,
@@ -34,38 +36,35 @@ func addCors(config *config.Config, router *graceful.Graceful) {
 	}))
 }
 
-func startRouter(ctx context.Context, stopRouter context.CancelFunc, router *graceful.Graceful) {
-	if err := router.RunWithContext(ctx); err != context.Canceled {
+func (r *Router) runWithContext(ctx context.Context, stopRouter context.CancelFunc) {
+	if err := r.router.RunWithContext(ctx); err != context.Canceled {
 		log.Error().Msgf("Failed starting router: %v", err)
 	} else if err != nil {
 		log.Info().Msgf("Stopping router...")
 		stopRouter()
-		router.Close()
+		r.router.Close()
 		log.Debug().Msgf("Successfully stopped router")
 	}
 }
 
-func Start(config *config.Config, db cache.DB) {
+func (r *Router) Start(db cache.DB) {
 	// signal interrupt
 	ctx, stopRouter := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 
-	// create router with configured port
-	router := createRouter(config)
-
 	// CORS
-	addCors(config, router)
+	r.addCors()
 
 	// health
-	router.GET("/healthz", HealthCheck)
+	r.router.GET("/healthz", HealthCheck)
 
 	// search
-	router.GET("/search", func(c *gin.Context) {
-		Search(c, config, db)
+	r.router.GET("/search", func(c *gin.Context) {
+		Search(c, r.config, db)
 	})
-	router.POST("/search", func(c *gin.Context) {
-		Search(c, config, db)
+	r.router.POST("/search", func(c *gin.Context) {
+		Search(c, r.config, db)
 	})
 
 	// startup
-	startRouter(ctx, stopRouter, router)
+	r.runWithContext(ctx, stopRouter)
 }
