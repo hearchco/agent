@@ -9,6 +9,10 @@ primary_region = "cdg"
   BRZAGUZA_ENGINES_STARTPAGE_ENABLED = "false"
   BRZAGUZA_ENGINES_YEP_ENABLED = "false"
 
+[mounts]
+  source="data"
+  destination="/config"
+
 [http_service]
   internal_port = 3030
   force_https = true
