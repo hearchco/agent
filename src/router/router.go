@@ -16,18 +16,15 @@ import (
 	"github.com/tminaorg/brzaguza/src/config"
 )
 
-func Setup(config *config.Config, db cache.DB) {
-	// signal interrupt
-	ctx, stopRouter := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-
-	// create router with configured port
+func createRouter(config *config.Config) *graceful.Graceful {
 	router, err := graceful.Default(graceful.WithAddr(fmt.Sprintf(":%v", config.Server.Port)))
 	if err != nil {
 		log.Error().Msgf("Failed creating a router: %v", err)
-		return
 	}
+	return router
+}
 
-	// CORS
+func addCors(config *config.Config, router *graceful.Graceful) {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     config.Server.FrontendUrls,
 		AllowMethods:     []string{"HEAD", "GET", "POST"},
@@ -35,6 +32,28 @@ func Setup(config *config.Config, db cache.DB) {
 		AllowCredentials: false,
 		MaxAge:           12 * time.Hour,
 	}))
+}
+
+func startRouter(ctx context.Context, stopRouter context.CancelFunc, router *graceful.Graceful) {
+	if err := router.RunWithContext(ctx); err != context.Canceled {
+		log.Error().Msgf("Failed starting router: %v", err)
+	} else if err != nil {
+		log.Info().Msgf("Stopping router...")
+		stopRouter()
+		router.Close()
+		log.Debug().Msgf("Successfully stopped router")
+	}
+}
+
+func Start(config *config.Config, db cache.DB) {
+	// signal interrupt
+	ctx, stopRouter := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+
+	// create router with configured port
+	router := createRouter(config)
+
+	// CORS
+	addCors(config, router)
 
 	// health
 	router.GET("/healthz", HealthCheck)
@@ -48,12 +67,5 @@ func Setup(config *config.Config, db cache.DB) {
 	})
 
 	// startup
-	if err := router.RunWithContext(ctx); err != context.Canceled {
-		log.Error().Msgf("Failed starting router: %v", err)
-	} else if err != nil {
-		log.Info().Msgf("Stopping router...")
-		stopRouter()
-		router.Close()
-		log.Debug().Msgf("Successfully stopped router")
-	}
+	startRouter(ctx, stopRouter, router)
 }

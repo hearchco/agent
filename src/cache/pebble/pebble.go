@@ -34,7 +34,7 @@ func (db *DB) Close() {
 func (db *DB) Set(k string, v cache.Value) {
 	if val, err := cbor.Marshal(v); err != nil {
 		log.Error().Msgf("Error marshaling value: %v", err)
-	} else if err := db.pdb.Set([]byte(k), val, pebble.Sync); err != nil { // should be set to NoSync when router gets graceful shutdown
+	} else if err := db.pdb.Set([]byte(k), val, pebble.NoSync); err != nil {
 		log.Panic().Msgf("Error setting KV to pebble: %v", err)
 	}
 }

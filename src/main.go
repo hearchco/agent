@@ -88,7 +88,7 @@ func main() {
 		}
 		log.Info().Msgf("Found %v results in %vms", len(results), duration.Milliseconds())
 	} else {
-		router.Setup(config, db)
+		router.Start(config, db)
 	}
 
 	if db != nil {
