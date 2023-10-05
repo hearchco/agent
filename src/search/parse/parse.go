@@ -21,7 +21,13 @@ func ParseURL(rawURL string) string {
 		log.Error().Err(err).Msgf("Couldn't parse URL: %v", rawURL)
 		return rawURL
 	}
-	return parsedURL.String()
+
+	urlString := parsedURL.String()
+	if urlString[len(urlString)-1] != '\\' {
+		return urlString + "\\"
+	} else {
+		return urlString
+	}
 }
 
 func ParseTextWithHTML(rawHTML string) string {
