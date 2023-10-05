@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"fmt"
 	"os/signal"
 	"syscall"
 	"time"
@@ -17,16 +18,14 @@ import (
 
 func Setup(config *config.Config, db cache.DB) {
 	// signal interrupt
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
+	ctx, stopRouter := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 
-	// create router
-	router, err := graceful.Default()
+	// create router with configured port
+	router, err := graceful.Default(graceful.WithAddr(fmt.Sprintf(":%v", config.Server.Port)))
 	if err != nil {
 		log.Error().Msgf("Failed creating a router: %v", err)
 		return
 	}
-	defer router.Close()
 
 	// CORS
 	router.Use(cors.New(cors.Config{
@@ -49,10 +48,12 @@ func Setup(config *config.Config, db cache.DB) {
 	})
 
 	// startup
-	//router.Run(fmt.Sprintf(":%v", config.Server.Port))
 	if err := router.RunWithContext(ctx); err != nil {
-		log.Error().Msgf("Failed creating a router: %v", err)
+		log.Error().Msgf("Failed starting router: %v", err)
 	} else if err != context.Canceled {
-		log.Info().Msgf("Stopped router")
+		log.Info().Msgf("Stopping router...")
+		stopRouter()
+		router.Close()
+		log.Info().Msgf("Successfully stopped router")
 	}
 }
