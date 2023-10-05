@@ -72,7 +72,9 @@ func main() {
 		start := time.Now()
 
 		var results []result.Result
-		db.Get(cli.Query, &results)
+		if db != nil {
+			db.Get(cli.Query, &results)
+		}
 		if results != nil {
 			log.Debug().Msgf("Found results for query (%v) in cache", cli.Query)
 		} else {
