@@ -1,18 +1,33 @@
 package router
 
 import (
-	"fmt"
+	"context"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/graceful"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
+
 	"github.com/tminaorg/brzaguza/src/cache"
 	"github.com/tminaorg/brzaguza/src/config"
 )
 
-var router = gin.Default()
-
 func Setup(config *config.Config, db cache.DB) {
+	// signal interrupt
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
+	// create router
+	router, err := graceful.Default()
+	if err != nil {
+		log.Error().Msgf("Failed creating a router: %v", err)
+		return
+	}
+	defer router.Close()
+
 	// CORS
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     config.Server.FrontendUrls,
@@ -34,5 +49,10 @@ func Setup(config *config.Config, db cache.DB) {
 	})
 
 	// startup
-	router.Run(fmt.Sprintf(":%v", config.Server.Port))
+	//router.Run(fmt.Sprintf(":%v", config.Server.Port))
+	if err := router.RunWithContext(ctx); err != nil {
+		log.Error().Msgf("Failed creating a router: %v", err)
+	} else if err != context.Canceled {
+		log.Info().Msgf("Stopped router")
+	}
 }
