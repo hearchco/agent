@@ -27,9 +27,12 @@ var (
 		Log           string `type:"path" default:"${log_path}" env:"BRZAGUZA_LOG" help:"Log file path"`
 		Verbosity     int    `type:"counter" default:"0" short:"v" env:"BRZAGUZA_VERBOSITY" help:"Log level verbosity"`
 		CPUProfile    string `type:"string" default:"" env:"BRZAGUZA_CPUPROFILE" help:"Filename for the cpu profile. Saved in profiling/ . If not specified, program is not cpu profiled."`
-		MEMProfile    string `type:"string" default:"" env:"BRZAGUZA_MEMPROFILE" help:"Filename for the memory profile. Saved in profiling/ . If not specified, program is not memory profiled."`
+		HeapProfile   string `type:"string" default:"" env:"BRZAGUZA_HEAPPROFILE" help:"Filename for the heap profile. Saved in profiling/ . If not specified, program is not heap profiled."`
 		GORProfile    string `type:"string" default:"" env:"BRZAGUZA_GORPROFILE" help:"Filename for the goroutine profile. Saved in profiling/ . If not specified, program is not goroutine profiled."`
 		ThreadProfile string `type:"string" default:"" env:"BRZAGUZA_THREADPROFILE" help:"Filename for the threadcreate profile. Saved in profiling/ . If not specified, program is not threadcreate profiled."`
+		AllocProfile  string `type:"string" default:"" env:"BRZAGUZA_MEMALLOCPROFILE" help:"Filename for the alloc profile. Saved in profiling/ . If not specified, program is not alloc profiled."`
+		BlockProfile  string `type:"string" default:"" env:"BRZAGUZA_BLOCKPROFILE" help:"Filename for the block profile. Saved in profiling/ . If not specified, program is not block profiled."`
+		MutexProfile  string `type:"string" default:"" env:"BRZAGUZA_MUTEXPROFILE" help:"Filename for the mutex profile. Saved in profiling/ . If not specified, program is not mutex profiled."`
 	}
 )
 

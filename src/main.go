@@ -2,9 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"runtime"
-	"runtime/pprof"
 	"time"
 
 	"github.com/pkg/profile"
@@ -44,72 +41,57 @@ func runProfiler() func() {
 		mutex — stack traces of holders of contended mutexes
 	*/
 
-	var cpup interface{}
-	var gorp interface{}
-	var blockp interface{}
-	var threadp interface{}
-	var heapp interface{}
-	var allocp interface{}
-	var mutexp interface{}
+	var cpup interface{ Stop() }
+	var gorp interface{ Stop() }
+	var blockp interface{ Stop() }
+	var threadp interface{ Stop() }
+	var heapp interface{ Stop() }
+	var allocp interface{ Stop() }
+	var mutexp interface{ Stop() }
 
-	cpup = profile.Start(profile.CPUProfile)
-	gorp = profile.Start(profile.GoroutineProfile)
-	blockp = profile.Start(profile.BlockProfile)
-	threadp = profile.Start(profile.ThreadcreationProfile)
-	heapp = profile.Start(profile.MemProfileHeap)
-	allocp = profile.Start(profile.MemProfileAllocs)
-	mutexp = profile.Start(profile.MutexProfile)
-
-	var cpuFile *os.File
 	if cli.CPUProfile != "" {
-		cpuFile, err := os.Create("profiling/" + cli.CPUProfile)
-		if err != nil {
-			log.Fatal().Err(err).Msgf("couldn't create cpu profile. couldn't create file.")
-		}
-		if err := pprof.StartCPUProfile(cpuFile); err != nil {
-			log.Fatal().Err(err).Msgf("couldn't create cpu profile. couldn't run StartCPUProfile")
-		}
+		cpup = profile.Start(profile.CPUProfile, profile.ProfilePath("./profiling/"+cli.CPUProfile))
 	}
-
-	profile.Start(profile.CPUProfile)
+	if cli.HeapProfile != "" {
+		heapp = profile.Start(profile.MemProfileHeap, profile.ProfilePath("./profiling/"+cli.HeapProfile))
+	}
+	if cli.GORProfile != "" {
+		gorp = profile.Start(profile.GoroutineProfile, profile.ProfilePath("./profiling/"+cli.GORProfile))
+	}
+	if cli.ThreadProfile != "" {
+		threadp = profile.Start(profile.ThreadcreationProfile, profile.ProfilePath("./profiling/"+cli.ThreadProfile))
+	}
+	if cli.BlockProfile != "" {
+		blockp = profile.Start(profile.BlockProfile, profile.ProfilePath("./profiling/"+cli.BlockProfile))
+	}
+	if cli.AllocProfile != "" {
+		allocp = profile.Start(profile.MemProfileAllocs, profile.ProfilePath("./profiling/"+cli.AllocProfile))
+	}
+	if cli.MutexProfile != "" {
+		mutexp = profile.Start(profile.MutexProfile, profile.ProfilePath("./profiling/"+cli.MutexProfile))
+	}
 
 	return func() {
 		if cli.CPUProfile != "" {
-			pprof.StopCPUProfile()
-			if err := cpuFile.Close(); err != nil {
-				log.Fatal().Err(err).Msgf("couldn't create cpu profile. couldn't close file.")
-			}
+			cpup.Stop()
 		}
-
-		if cli.MEMProfile != "" {
-			f, err := os.Create("profiling/" + cli.MEMProfile)
-			if err != nil {
-				log.Fatal().Err(err).Msgf("couldn't create memory profile. couldn't create file.")
-			}
-			runtime.GC()
-			if err := pprof.WriteHeapProfile(f); err != nil {
-				log.Fatal().Err(err).Msgf("couldn't create memory profile. couldn't WriteHeapProfile.")
-			}
-			if err := f.Close(); err != nil {
-				log.Fatal().Err(err).Msgf("couldn't create memory profile. couldn't close file.")
-			}
+		if cli.HeapProfile != "" {
+			heapp.Stop()
 		}
-
 		if cli.GORProfile != "" {
-			f, err := os.Create("profiling/" + cli.MEMProfile)
-			if err != nil {
-				log.Fatal().Err(err).Msgf("couldn't create goroutine profile. couldn't create file.")
-			}
-			if err := pprof.Lookup("goroutine").WriteTo(f, 0); err != nil {
-				log.Fatal().Err(err).Msgf("couldn't create goroutine profile. failed profile write.")
-			}
-			if err := f.Close(); err != nil {
-				log.Fatal().Err(err).Msgf("couldn't create goroutine profile. couldn't close file.")
-			}
+			gorp.Stop()
 		}
-
 		if cli.ThreadProfile != "" {
-
+			threadp.Stop()
+		}
+		if cli.BlockProfile != "" {
+			blockp.Stop()
+		}
+		if cli.AllocProfile != "" {
+			allocp.Stop()
+		}
+		if cli.MutexProfile != "" {
+			mutexp.Stop()
 		}
 	}
 }
