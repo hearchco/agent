@@ -48,12 +48,12 @@ func Setup(config *config.Config, db cache.DB) {
 	})
 
 	// startup
-	if err := router.RunWithContext(ctx); err != nil {
+	if err := router.RunWithContext(ctx); err != context.Canceled {
 		log.Error().Msgf("Failed starting router: %v", err)
-	} else if err != context.Canceled {
+	} else if err != nil {
 		log.Info().Msgf("Stopping router...")
 		stopRouter()
 		router.Close()
-		log.Info().Msgf("Successfully stopped router")
+		log.Debug().Msgf("Successfully stopped router")
 	}
 }
