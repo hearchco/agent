@@ -57,7 +57,7 @@ func Search(c *gin.Context, config *config.Config, db cache.DB) {
 	} else {
 		log.Debug().Msg("Nothing found in cache, doing a clean search")
 		results = search.PerformSearch(query, options, config)
-		defer cache.Save(db, query, results)
+		defer db.Set(query, results)
 	}
 
 	if resultsJson, err := json.Marshal(results); err != nil {

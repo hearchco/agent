@@ -2,6 +2,7 @@ package pebble
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/cockroachdb/pebble"
 	"github.com/fxamacker/cbor/v2"
@@ -32,10 +33,14 @@ func (db *DB) Close() {
 }
 
 func (db *DB) Set(k string, v cache.Value) {
+	log.Debug().Msg("Caching...")
+	cacheTimer := time.Now()
 	if val, err := cbor.Marshal(v); err != nil {
 		log.Error().Msgf("Error marshaling value: %v", err)
 	} else if err := db.pdb.Set([]byte(k), val, pebble.NoSync); err != nil {
 		log.Panic().Msgf("Error setting KV to pebble: %v", err)
+	} else {
+		log.Debug().Msgf("Cached results in %vns", time.Since(cacheTimer).Nanoseconds())
 	}
 }
 

@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/fxamacker/cbor/v2"
 	"github.com/redis/go-redis/v9"
@@ -33,10 +34,14 @@ func (db *DB) Close() {
 }
 
 func (db *DB) Set(k string, v cache.Value) {
+	log.Debug().Msg("Caching...")
+	cacheTimer := time.Now()
 	if val, err := cbor.Marshal(v); err != nil {
 		log.Error().Msgf("Error marshaling value: %v", err)
 	} else if err := db.rdb.Set(ctx, k, val, 0).Err(); err != nil {
 		log.Panic().Msgf("Error setting KV to redis: %v", err)
+	} else {
+		log.Debug().Msgf("Cached results in %vns", time.Since(cacheTimer).Nanoseconds())
 	}
 }
 
