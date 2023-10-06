@@ -78,7 +78,10 @@ func main() {
 		} else {
 			log.Debug().Msg("Nothing found in cache, doing a clean search")
 			results = search.PerformSearch(cli.Query, options, config)
-			cache.Save(db, cli.Query, results)
+			fmt.Printf("\nThe results:\n%v", results)
+			if db != nil {
+				cache.Save(db, cli.Query, results)
+			}
 		}
 
 		duration := time.Since(start)

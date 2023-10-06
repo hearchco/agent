@@ -35,7 +35,7 @@ func CheckTestCases(tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResult
 				}
 
 				if !found {
-					defer t.Errorf("Couldn't find %v (%v)", rURL, tc.Query)
+					defer t.Errorf("Couldn't find %v (%v).\nThe results: %v", rURL, tc.Query, results)
 				}
 			}
 		}
@@ -51,7 +51,7 @@ func CheckTestCases(tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResult
 		} else {
 			for i, rURL := range tc.ResultURL {
 				if !strings.Contains(results[i].URL, rURL) {
-					defer t.Errorf("Wrong result on position %v: %v (%v)", i, rURL, tc.Query)
+					defer t.Errorf("Wrong result on rank %v: %v (%v).\nThe results: %v", i+1, rURL, tc.Query, results)
 				}
 			}
 		}
