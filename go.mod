@@ -7,6 +7,7 @@ require (
 	github.com/cockroachdb/pebble v0.0.0-20231004191855-d4bf20c546d3
 	github.com/fxamacker/cbor/v2 v2.5.0
 	github.com/gin-contrib/cors v1.4.0
+	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/gocolly/colly/v2 v2.1.0
 	github.com/knadh/koanf/parsers/yaml v0.1.0

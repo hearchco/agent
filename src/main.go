@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/profile"
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/cache"
@@ -31,78 +30,14 @@ func printResults(results []result.Result) {
 	}
 }
 
-func runProfiler() func() {
-	/*
-		goroutine — stack traces of all current goroutines
-		heap — a sampling of memory allocations of live objects
-		allocs — a sampling of all past memory allocations
-		threadcreate — stack traces that led to the creation of new OS threads
-		block — stack traces that led to blocking on synchronization primitives
-		mutex — stack traces of holders of contended mutexes
-	*/
-
-	var cpup interface{ Stop() }
-	var gorp interface{ Stop() }
-	var blockp interface{ Stop() }
-	var threadp interface{ Stop() }
-	var heapp interface{ Stop() }
-	var allocp interface{ Stop() }
-	var mutexp interface{ Stop() }
-
-	if cli.CPUProfile != "" {
-		cpup = profile.Start(profile.CPUProfile, profile.ProfilePath("./profiling/"+cli.CPUProfile))
-	}
-	if cli.HeapProfile != "" {
-		heapp = profile.Start(profile.MemProfileHeap, profile.ProfilePath("./profiling/"+cli.HeapProfile))
-	}
-	if cli.GORProfile != "" {
-		gorp = profile.Start(profile.GoroutineProfile, profile.ProfilePath("./profiling/"+cli.GORProfile))
-	}
-	if cli.ThreadProfile != "" {
-		threadp = profile.Start(profile.ThreadcreationProfile, profile.ProfilePath("./profiling/"+cli.ThreadProfile))
-	}
-	if cli.BlockProfile != "" {
-		blockp = profile.Start(profile.BlockProfile, profile.ProfilePath("./profiling/"+cli.BlockProfile))
-	}
-	if cli.AllocProfile != "" {
-		allocp = profile.Start(profile.MemProfileAllocs, profile.ProfilePath("./profiling/"+cli.AllocProfile))
-	}
-	if cli.MutexProfile != "" {
-		mutexp = profile.Start(profile.MutexProfile, profile.ProfilePath("./profiling/"+cli.MutexProfile))
-	}
-
-	return func() {
-		if cli.CPUProfile != "" {
-			cpup.Stop()
-		}
-		if cli.HeapProfile != "" {
-			heapp.Stop()
-		}
-		if cli.GORProfile != "" {
-			gorp.Stop()
-		}
-		if cli.ThreadProfile != "" {
-			threadp.Stop()
-		}
-		if cli.BlockProfile != "" {
-			blockp.Stop()
-		}
-		if cli.AllocProfile != "" {
-			allocp.Stop()
-		}
-		if cli.MutexProfile != "" {
-			mutexp.Stop()
-		}
-	}
-}
-
 func main() {
 	mainTimer := time.Now()
 
 	// parse cli arguments
 	setupCli()
 
-	defer runProfiler()() //runs the profiler, and defers the closing
+	amProfiling := false              // not used currently
+	defer runProfiler(&amProfiling)() //runs the profiler, and defers the closing
 
 	// configure logging
 	logger.Setup(cli.Log, cli.Verbosity)
@@ -146,7 +81,9 @@ func main() {
 		} else {
 			log.Debug().Msg("Nothing found in cache, doing a clean search")
 			results = search.PerformSearch(cli.Query, options, config)
-			cache.Save(db, cli.Query, results)
+			if db != nil {
+				cache.Save(db, cli.Query, results)
+			}
 		}
 
 		duration := time.Since(start)
@@ -156,13 +93,12 @@ func main() {
 		}
 		log.Info().Msgf("Found %v results in %vms", len(results), duration.Milliseconds())
 	} else {
-		router.Setup(config, db)
+		router.Setup(config, db, cli.ServeProfiler)
 	}
 
 	if db != nil {
 		db.Close()
 	}
 
-	//closeProfiler(cli.CPUProfile, cli.MEMProfile)
 	log.Debug().Msgf("Program finished in %vms", time.Since(mainTimer).Milliseconds())
 }

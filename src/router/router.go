@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/tminaorg/brzaguza/src/cache"
 	"github.com/tminaorg/brzaguza/src/config"
@@ -12,7 +13,7 @@ import (
 
 var router = gin.Default()
 
-func Setup(config *config.Config, db cache.DB) {
+func Setup(config *config.Config, db cache.DB, serveProfiler bool) {
 	// CORS
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     config.Server.FrontendUrls,
@@ -33,6 +34,8 @@ func Setup(config *config.Config, db cache.DB) {
 		Search(c, config, db)
 	})
 
-	// startup
+	if serveProfiler {
+		pprof.Register(router)
+	}
 	router.Run(fmt.Sprintf(":%v", config.Server.Port))
 }

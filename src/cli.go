@@ -26,13 +26,16 @@ var (
 		Config        string `type:"path" default:"${config_path}" env:"BRZAGUZA_CONFIG" help:"Config folder path"`
 		Log           string `type:"path" default:"${log_path}" env:"BRZAGUZA_LOG" help:"Log file path"`
 		Verbosity     int    `type:"counter" default:"0" short:"v" env:"BRZAGUZA_VERBOSITY" help:"Log level verbosity"`
-		CPUProfile    string `type:"string" default:"" env:"BRZAGUZA_CPUPROFILE" help:"Filename for the cpu profile. Saved in profiling/ . If not specified, program is not cpu profiled."`
-		HeapProfile   string `type:"string" default:"" env:"BRZAGUZA_HEAPPROFILE" help:"Filename for the heap profile. Saved in profiling/ . If not specified, program is not heap profiled."`
-		GORProfile    string `type:"string" default:"" env:"BRZAGUZA_GORPROFILE" help:"Filename for the goroutine profile. Saved in profiling/ . If not specified, program is not goroutine profiled."`
-		ThreadProfile string `type:"string" default:"" env:"BRZAGUZA_THREADPROFILE" help:"Filename for the threadcreate profile. Saved in profiling/ . If not specified, program is not threadcreate profiled."`
-		AllocProfile  string `type:"string" default:"" env:"BRZAGUZA_MEMALLOCPROFILE" help:"Filename for the alloc profile. Saved in profiling/ . If not specified, program is not alloc profiled."`
-		BlockProfile  string `type:"string" default:"" env:"BRZAGUZA_BLOCKPROFILE" help:"Filename for the block profile. Saved in profiling/ . If not specified, program is not block profiled."`
-		MutexProfile  string `type:"string" default:"" env:"BRZAGUZA_MUTEXPROFILE" help:"Filename for the mutex profile. Saved in profiling/ . If not specified, program is not mutex profiled."`
+		CPUProfile    bool   `type:"bool" default:"false" env:"BRZAGUZA_CPUPROFILE" help:"Use cpu profiling"`
+		HeapProfile   bool   `type:"bool" default:"false" env:"BRZAGUZA_HEAPPROFILE" help:"Use heap profiling"`
+		GORProfile    bool   `type:"bool" default:"false" env:"BRZAGUZA_GORPROFILE" help:"Use goroutine profiling"`
+		ThreadProfile bool   `type:"bool" default:"false" env:"BRZAGUZA_THREADPROFILE" help:"Use threadcreate profiling"`
+		AllocProfile  bool   `type:"bool" default:"false" env:"BRZAGUZA_MEMALLOCPROFILE" help:"Use alloc profiling"`
+		BlockProfile  bool   `type:"bool" default:"false" env:"BRZAGUZA_BLOCKPROFILE" help:"Use block profiling"`
+		MutexProfile  bool   `type:"bool" default:"false" env:"BRZAGUZA_MUTEXPROFILE" help:"Use mutex profiling"`
+		ClockProfile  bool   `type:"bool" default:"false" env:"BRZAGUZA_CLOCKPROFILE" help:"Use clock profiling"`
+		TraceProfile  bool   `type:"bool" default:"false" env:"BRZAGUZA_TRACEPROFILE" help:"Use trace profiling"`
+		ServeProfiler bool   `type:"bool" default:"false" env:"BRZAGUZA_SERVEPROFILER" help:"Run the profiler and serve at /debug/pprof/ http endpoint"`
 	}
 )
 

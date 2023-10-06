@@ -50,13 +50,17 @@ func Search(c *gin.Context, config *config.Config, db cache.DB) {
 	}
 
 	var results []result.Result
-	db.Get(query, &results)
+	if db != nil {
+		db.Get(query, &results)
+	}
 	if results != nil {
 		log.Debug().Msgf("Found results for query (%v) in cache", query)
 	} else {
 		log.Debug().Msg("Nothing found in cache, doing a clean search")
 		results = search.PerformSearch(query, options, config)
-		defer cache.Save(db, query, results)
+		if db != nil {
+			defer cache.Save(db, query, results)
+		}
 	}
 
 	if resultsJson, err := json.Marshal(results); err != nil {
