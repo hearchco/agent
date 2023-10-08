@@ -1,12 +1,13 @@
 package router
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
+
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/cache"
 	"github.com/tminaorg/brzaguza/src/config"
