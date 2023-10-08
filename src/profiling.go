@@ -60,7 +60,12 @@ func runProfiler(amProfiling *bool) func() {
 			profilerToRun = p
 		}
 	}
-	*amProfiling = true
+
+	if profilerToRun.enabled {
+		*amProfiling = true
+	} else {
+		return func() {}
+	}
 
 	return func() {
 		profile.Start(profilerToRun.profile, profile.ProfilePath("./profiling/")).Stop()
