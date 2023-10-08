@@ -25,7 +25,7 @@ var (
 		Silent    bool   `type:"bool" default:"false" short:"s" env:"BRZAGUZA_SILENT" help:"Should results be printed"`
 		Config    string `type:"path" default:"${config_path}" env:"BRZAGUZA_CONFIG" help:"Config folder path"`
 		Log       string `type:"path" default:"${log_path}" env:"BRZAGUZA_LOG" help:"Log file path"`
-		Verbosity int    `type:"counter" default:"0" short:"v" env:"BRZAGUZA_VERBOSITY" help:"Log level verbosity"`
+		Verbosity int8   `type:"counter" default:"0" short:"v" env:"BRZAGUZA_VERBOSITY" help:"Log level verbosity"`
 	}
 )
 

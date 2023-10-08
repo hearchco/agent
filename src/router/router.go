@@ -19,7 +19,10 @@ type RouterWrapper struct {
 	config *config.Config
 }
 
-func New(config *config.Config) (*RouterWrapper, error) {
+func New(config *config.Config, verbosity int8) (*RouterWrapper, error) {
+	if verbosity == 0 {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	router, err := graceful.Default(graceful.WithAddr(fmt.Sprintf(":%v", config.Server.Port)))
 	return &RouterWrapper{router: router, config: config}, err
 }

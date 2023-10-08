@@ -10,7 +10,7 @@ ENV \
 ENTRYPOINT [ "sh" ]
 
 # -c is needed because entrypoint is sh
-CMD [ "-c", "./brzaguza-bin" ]
+CMD [ "-c", "./brzaguza-bin", "-vv" ]
 
 VOLUME [ "/config" ]
 
