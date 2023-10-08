@@ -49,9 +49,7 @@ func runProfiler(amProfiling *bool) func() {
 		profile: profile.TraceProfile,
 	}}
 
-	profilerToRun := profiler{
-		enabled: false,
-	}
+	profilerToRun := profiler{enabled: false}
 	for _, p := range profilers {
 		if profilerToRun.enabled && p.enabled {
 			log.Fatal().Msg("Only one profiler can be run at a time.")
