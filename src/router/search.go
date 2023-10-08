@@ -1,12 +1,13 @@
 package router
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
+
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/cache"
 	"github.com/tminaorg/brzaguza/src/config"
@@ -58,9 +59,7 @@ func Search(c *gin.Context, config *config.Config, db cache.DB) {
 	} else {
 		log.Debug().Msg("Nothing found in cache, doing a clean search")
 		results = search.PerformSearch(query, options, config)
-		if db != nil {
-			defer cache.Save(db, query, results)
-		}
+		defer db.Set(query, results)
 	}
 
 	if resultsJson, err := json.Marshal(results); err != nil {

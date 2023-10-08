@@ -1,41 +1,67 @@
 package router
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/graceful"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
+
 	"github.com/tminaorg/brzaguza/src/cache"
 	"github.com/tminaorg/brzaguza/src/config"
 )
 
-var router = gin.Default()
+type RouterWrapper struct {
+	router *graceful.Graceful
+	config *config.Config
+}
 
-func Setup(config *config.Config, db cache.DB, serveProfiler bool) {
-	// CORS
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     config.Server.FrontendUrls,
+func New(config *config.Config) (*RouterWrapper, error) {
+	router, err := graceful.Default(graceful.WithAddr(fmt.Sprintf(":%v", config.Server.Port)))
+	return &RouterWrapper{router: router, config: config}, err
+}
+
+func (rw *RouterWrapper) addCors() {
+	rw.router.Use(cors.New(cors.Config{
+		AllowOrigins:     rw.config.Server.FrontendUrls,
 		AllowMethods:     []string{"HEAD", "GET", "POST"},
 		AllowHeaders:     []string{"Origin", "X-Requested-With", "Content-Length", "Content-Type", "Accept"},
 		AllowCredentials: false,
 		MaxAge:           12 * time.Hour,
 	}))
+}
+
+func (rw *RouterWrapper) runWithContext(ctx context.Context) {
+	if err := rw.router.RunWithContext(ctx); err != context.Canceled {
+		log.Error().Msgf("Failed starting router: %v", err)
+	} else if err != nil {
+		log.Info().Msgf("Stopping router...")
+		rw.router.Close()
+		log.Debug().Msgf("Successfully stopped router")
+	}
+}
+
+func (rw *RouterWrapper) Start(ctx context.Context, db cache.DB, serveProfiler bool) {
+	// CORS
+	rw.addCors()
 
 	// health
-	router.GET("/healthz", HealthCheck)
+	rw.router.GET("/healthz", HealthCheck)
 
 	// search
-	router.GET("/search", func(c *gin.Context) {
-		Search(c, config, db)
+	rw.router.GET("/search", func(c *gin.Context) {
+		Search(c, rw.config, db)
 	})
-	router.POST("/search", func(c *gin.Context) {
-		Search(c, config, db)
+	rw.router.POST("/search", func(c *gin.Context) {
+		Search(c, rw.config, db)
 	})
 
 	if serveProfiler {
-		pprof.Register(router)
+		pprof.Register(rw.router.Engine)
 	}
-	router.Run(fmt.Sprintf(":%v", config.Server.Port))
+	rw.runWithContext(ctx)
 }

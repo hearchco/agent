@@ -24,6 +24,7 @@ brzaguza-bin
 brzaguza.*
 
 .vscode/*
+test.go
 
 src/engines/*/site/*
 !src/engines/_engines_test
