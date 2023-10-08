@@ -22,10 +22,6 @@ func TestSearch(t *testing.T) {
 		},
 	}}
 
-	//tccr := [...]_engines_test.TestCaseContainsResults{}
-	//tcrr := [...]_engines_test.TestCaseRankedResults{}
-
-	//bing has hard telemetry links, solved by UA overwrite
 	tccr := [...]_engines_test.TestCaseContainsResults{{
 		Query:     "facebook",
 		ResultURL: []string{"facebook.com"},

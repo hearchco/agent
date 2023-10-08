@@ -10,13 +10,14 @@ import (
 )
 
 func ParseURL(rawURL string) string {
-	//rawURL may be empty string, function should return empty string then.
+	// rawURL may be empty string, function should return empty string then.
 	rawURL = strings.TrimSpace(rawURL)
 	rawURL, unescErr := url.QueryUnescape(rawURL) // if the url was part of a telemetry link, this will help.
 	if unescErr != nil {
 		log.Error().Err(unescErr).Msgf("Couldn't unescape URL: %v", rawURL)
 		return rawURL
 	}
+
 	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
 		log.Error().Err(err).Msgf("Couldn't parse URL: %v", rawURL)
