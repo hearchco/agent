@@ -30,5 +30,6 @@ func NewConfig(engineName engines.Name) *config.Config {
 				Enabled: true,
 			},
 		},
+		Ranking: config.NewRanking(),
 	}
 }

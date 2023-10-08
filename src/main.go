@@ -102,7 +102,7 @@ func main() {
 			router.Start(ctx, db)
 		}
 	}
-  
+
 	// program cleanup
 	db.Close()
 	stopCtx()
