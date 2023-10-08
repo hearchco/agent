@@ -34,9 +34,12 @@ func New(config config.Redis) *DB {
 	return &DB{rdb: rdb}
 }
 
-// needed to comply with interface
 func (db *DB) Close() {
-	log.Debug().Msg("Successfully disconnected from redis")
+	if err := db.rdb.Close(); err != nil {
+		log.Fatal().Msgf("Error disconnecting from redis: %v", err)
+	} else {
+		log.Debug().Msg("Successfully disconnected from redis")
+	}
 }
 
 func (db *DB) Set(k string, v cache.Value) {
