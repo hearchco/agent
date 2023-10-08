@@ -21,6 +21,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/search"
 )
 
+// todo: this should be refactor to cliMode package
 func printResults(results []result.Result) {
 	fmt.Print("\n\tThe Search Results:\n\n")
 	for _, r := range results {
@@ -45,19 +46,19 @@ func main() {
 	logger.Setup(cli.Log, cli.Verbosity)
 
 	// load config file
-	config := config.New()
-	config.Load(cli.Config, cli.Log)
+	conf := config.New()
+	conf.Load(cli.Config, cli.Log)
 
 	// signal interrupt (CTRL+C)
 	ctx, stopCtx := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// cache database
 	var db cache.DB
-	switch config.Server.Cache.Type {
+	switch conf.Server.Cache.Type {
 	case "pebble":
 		db = pebble.New(cli.Config)
 	case "redis":
-		db = redis.New(ctx, config.Server.Cache.Redis)
+		db = redis.New(ctx, conf.Server.Cache.Redis)
 	default:
 		db = nocache.New()
 		log.Warn().Msg("Running without caching!")
@@ -78,14 +79,14 @@ func main() {
 
 		start := time.Now()
 
-		// todo: this should be refactor to cliStartup package with ctx cancelling as well
+		// todo: this should be refactor to cliMode package with ctx cancelling as well
 		var results []result.Result
 		db.Get(cli.Query, &results)
 		if results != nil {
 			log.Debug().Msgf("Found results for query (%v) in cache", cli.Query)
 		} else {
 			log.Debug().Msg("Nothing found in cache, doing a clean search")
-			results = search.PerformSearch(cli.Query, options, config)
+			results = search.PerformSearch(cli.Query, options, conf)
 			db.Set(cli.Query, results)
 		}
 
@@ -96,10 +97,10 @@ func main() {
 		}
 		log.Info().Msgf("Found %v results in %vms", len(results), duration.Milliseconds())
 	} else {
-		if router, err := router.New(config); err != nil {
+		if rw, err := router.New(conf, cli.Verbosity); err != nil {
 			log.Error().Msgf("Failed creating a router: %v", err)
 		} else {
-			router.Start(ctx, db)
+			rw.Start(ctx, db)
 		}
 	}
 
