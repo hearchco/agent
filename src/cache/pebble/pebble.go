@@ -37,6 +37,7 @@ func (db *DB) Close() {
 func (db *DB) Set(k string, v cache.Value) {
 	log.Debug().Msg("Caching...")
 	cacheTimer := time.Now()
+
 	if val, err := cbor.Marshal(v); err != nil {
 		log.Error().Msgf("Error marshaling value: %v", err)
 	} else if err := db.pdb.Set([]byte(k), val, pebble.NoSync); err != nil {
@@ -49,6 +50,7 @@ func (db *DB) Set(k string, v cache.Value) {
 func (db *DB) Get(k string, o cache.Value) {
 	v, c, err := db.pdb.Get([]byte(k))
 	val := []byte(v) // copy data before closing, casting needed for unmarshal
+
 	if err == pebble.ErrNotFound {
 		log.Trace().Msgf("Found no value in pebble for key (%v): %v", k, err)
 	} else if err != nil {

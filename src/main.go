@@ -48,20 +48,20 @@ func main() {
 	config := config.New()
 	config.Load(cli.Config, cli.Log)
 
+	// signal interrupt (CTRL+C)
+	ctx, stopCtx := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
 	// cache database
 	var db cache.DB
 	switch config.Server.Cache.Type {
 	case "pebble":
 		db = pebble.New(cli.Config)
 	case "redis":
-		db = redis.New(config.Server.Cache.Redis)
+		db = redis.New(ctx, config.Server.Cache.Redis)
 	default:
 		db = nocache.New()
 		log.Warn().Msg("Running without caching!")
 	}
-
-	// signal interrupt (CTRL+C)
-	ctx, stopCtx := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// startup
 	if cli.Cli {
