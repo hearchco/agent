@@ -24,9 +24,6 @@ func main() {
 	// parse cli arguments
 	setupCli()
 
-	amProfiling := false              // not used currently
-	defer runProfiler(&amProfiling)() //runs the profiler, and defers the closing
-
 	// configure logging
 	logger.Setup(cli.Log, cli.Verbosity)
 
@@ -36,6 +33,10 @@ func main() {
 
 	// signal interrupt (CTRL+C)
 	ctx, stopCtx := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	// profiler
+	amProfiling := false              // not used currently
+	defer runProfiler(&amProfiling)() // runs the profiler, and defers the closing
 
 	// cache database
 	var db cache.DB

@@ -5,6 +5,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type profiler struct {
+	enabled bool
+	profile func(p *profile.Profile)
+}
+
 func runProfiler(amProfiling *bool) func() {
 	/*
 		goroutine — stack traces of all current goroutines
@@ -15,109 +20,49 @@ func runProfiler(amProfiling *bool) func() {
 		mutex — stack traces of holders of contended mutexes
 	*/
 
-	var cpup interface{ Stop() }
-	var gorp interface{ Stop() }
-	var blockp interface{ Stop() }
-	var threadp interface{ Stop() }
-	var heapp interface{ Stop() }
-	var allocp interface{ Stop() }
-	var mutexp interface{ Stop() }
-	var tracep interface{ Stop() }
-	var clockp interface{ Stop() }
+	profilers := [...]profiler{{
+		enabled: cli.CPUProfile,
+		profile: profile.CPUProfile,
+	}, {
+		enabled: cli.HeapProfile,
+		profile: profile.MemProfileHeap,
+	}, {
+		enabled: cli.GORProfile,
+		profile: profile.GoroutineProfile,
+	}, {
+		enabled: cli.ThreadProfile,
+		profile: profile.ThreadcreationProfile,
+	}, {
+		enabled: cli.BlockProfile,
+		profile: profile.BlockProfile,
+	}, {
+		enabled: cli.AllocProfile,
+		profile: profile.MemProfileAllocs,
+	}, {
+		enabled: cli.MutexProfile,
+		profile: profile.MutexProfile,
+	}, {
+		enabled: cli.ClockProfile,
+		profile: profile.ClockProfile,
+	}, {
+		enabled: cli.TraceProfile,
+		profile: profile.TraceProfile,
+	}}
 
-	profileCnt := uint(0)
-	if cli.CPUProfile {
-		profileCnt += 1
+	profilerToRun := profiler{
+		enabled: false,
 	}
-	if cli.HeapProfile {
-		profileCnt += 1
+	for _, p := range profilers {
+		if profilerToRun.enabled && p.enabled {
+			log.Fatal().Msg("Only one profiler can be run at a time.")
+			return func() {}
+		} else if p.enabled {
+			profilerToRun = p
+		}
 	}
-	if cli.GORProfile {
-		profileCnt += 1
-	}
-	if cli.ThreadProfile {
-		profileCnt += 1
-	}
-	if cli.BlockProfile {
-		profileCnt += 1
-	}
-	if cli.AllocProfile {
-		profileCnt += 1
-	}
-	if cli.MutexProfile {
-		profileCnt += 1
-	}
-	if cli.ClockProfile {
-		profileCnt += 1
-	}
-	if cli.TraceProfile {
-		profileCnt += 1
-	}
-
-	if profileCnt > 1 {
-		log.Fatal().Msg("only one profiler can be run at a time.")
-		return func() {}
-	}
-
-	if cli.CPUProfile {
-		cpup = profile.Start(profile.CPUProfile, profile.ProfilePath("./profiling/"))
-	}
-	if cli.HeapProfile {
-		heapp = profile.Start(profile.MemProfileHeap, profile.ProfilePath("./profiling/"))
-	}
-	if cli.GORProfile {
-		gorp = profile.Start(profile.GoroutineProfile, profile.ProfilePath("./profiling/"))
-	}
-	if cli.ThreadProfile {
-		threadp = profile.Start(profile.ThreadcreationProfile, profile.ProfilePath("./profiling/"))
-	}
-	if cli.BlockProfile {
-		blockp = profile.Start(profile.BlockProfile, profile.ProfilePath("./profiling/"))
-	}
-	if cli.AllocProfile {
-		allocp = profile.Start(profile.MemProfileAllocs, profile.ProfilePath("./profiling/"))
-	}
-	if cli.MutexProfile {
-		mutexp = profile.Start(profile.MutexProfile, profile.ProfilePath("./profiling/"))
-	}
-	if cli.ClockProfile {
-		clockp = profile.Start(profile.ClockProfile, profile.ProfilePath("./profiling/"))
-	}
-	if cli.TraceProfile {
-		tracep = profile.Start(profile.TraceProfile, profile.ProfilePath("./profiling/"))
-	}
-
-	if profileCnt == 1 {
-		*amProfiling = true
-	}
+	*amProfiling = true
 
 	return func() {
-		if cli.CPUProfile {
-			cpup.Stop()
-		}
-		if cli.HeapProfile {
-			heapp.Stop()
-		}
-		if cli.GORProfile {
-			gorp.Stop()
-		}
-		if cli.ThreadProfile {
-			threadp.Stop()
-		}
-		if cli.BlockProfile {
-			blockp.Stop()
-		}
-		if cli.AllocProfile {
-			allocp.Stop()
-		}
-		if cli.MutexProfile {
-			mutexp.Stop()
-		}
-		if cli.ClockProfile {
-			clockp.Stop()
-		}
-		if cli.TraceProfile {
-			tracep.Stop()
-		}
+		profile.Start(profilerToRun.profile, profile.ProfilePath("./profiling/")).Stop()
 	}
 }
