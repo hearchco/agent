@@ -10,6 +10,7 @@ import (
 )
 
 func ParseURL(rawURL string) string {
+	//rawURL may be empty string, function should return empty string then.
 	rawURL = strings.TrimSpace(rawURL)
 	rawURL, unescErr := url.QueryUnescape(rawURL) // if the url was part of a telemetry link, this will help.
 	if unescErr != nil {
@@ -21,7 +22,12 @@ func ParseURL(rawURL string) string {
 		log.Error().Err(err).Msgf("Couldn't parse URL: %v", rawURL)
 		return rawURL
 	}
-	return parsedURL.String()
+
+	urlString := parsedURL.String()
+	if len(urlString) != 0 && len(parsedURL.Path) == 0 { // https://example.org -> https://example.org/
+		urlString += "/"
+	}
+	return urlString
 }
 
 func ParseTextWithHTML(rawHTML string) string {

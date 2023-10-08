@@ -1,12 +1,17 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/cache"
+	"github.com/tminaorg/brzaguza/src/cache/nocache"
 	"github.com/tminaorg/brzaguza/src/cache/pebble"
 	"github.com/tminaorg/brzaguza/src/cache/redis"
 	"github.com/tminaorg/brzaguza/src/config"
@@ -43,14 +48,18 @@ func main() {
 	config := config.New()
 	config.Load(cli.Config, cli.Log)
 
+	// signal interrupt (CTRL+C)
+	ctx, stopCtx := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
 	// cache database
 	var db cache.DB
 	switch config.Server.Cache.Type {
 	case "pebble":
 		db = pebble.New(cli.Config)
 	case "redis":
-		db = redis.New(config.Server.Cache.Redis)
+		db = redis.New(ctx, config.Server.Cache.Redis)
 	default:
+		db = nocache.New()
 		log.Warn().Msg("Running without caching!")
 	}
 
@@ -69,6 +78,7 @@ func main() {
 
 		start := time.Now()
 
+		// todo: this should be refactor to cliStartup package with ctx cancelling as well
 		var results []result.Result
 		db.Get(cli.Query, &results)
 		if results != nil {
@@ -76,8 +86,7 @@ func main() {
 		} else {
 			log.Debug().Msg("Nothing found in cache, doing a clean search")
 			results = search.PerformSearch(cli.Query, options, config)
-			fmt.Printf("\nThe results:\n%v", results)
-			cache.Save(db, cli.Query, results)
+			db.Set(cli.Query, results)
 		}
 
 		duration := time.Since(start)
@@ -87,10 +96,16 @@ func main() {
 		}
 		log.Info().Msgf("Found %v results in %vms", len(results), duration.Milliseconds())
 	} else {
-		router.Setup(config, db)
+		if router, err := router.New(config); err != nil {
+			log.Error().Msgf("Failed creating a router: %v", err)
+		} else {
+			router.Start(ctx, db)
+		}
 	}
 
+	// program cleanup
 	db.Close()
+	stopCtx()
 
 	log.Debug().Msgf("Program finished in %vms", time.Since(mainTimer).Milliseconds())
 }
