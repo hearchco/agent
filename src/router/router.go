@@ -2,7 +2,7 @@ package router
 
 import (
 	"context"
-	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -24,7 +24,7 @@ func New(config *config.Config, verbosity int8) (*RouterWrapper, error) {
 	if verbosity == 0 {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	router, err := graceful.Default(graceful.WithAddr(fmt.Sprintf(":%v", config.Server.Port)))
+	router, err := graceful.Default(graceful.WithAddr(":" + strconv.Itoa(config.Server.Port)))
 	return &RouterWrapper{router: router, config: config}, err
 }
 

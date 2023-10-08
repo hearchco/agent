@@ -24,18 +24,18 @@ func main() {
 	// parse cli arguments
 	setupCli()
 
+	_, stopProfiler := runProfiler()
+	defer stopProfiler()
+
+	// signal interrupt (CTRL+C)
+	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
 	// configure logging
 	logger.Setup(cli.Log, cli.Verbosity)
-
-	// profiler (needs cli and log)
-	_, stopProfiler := runProfiler() // not used currently
 
 	// load config file
 	conf := config.New()
 	conf.Load(cli.Config, cli.Log)
-
-	// signal interrupt (CTRL+C)
-	ctx, stopCtx := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// cache database
 	var db cache.DB
@@ -62,8 +62,6 @@ func main() {
 
 	// program cleanup
 	db.Close()
-	stopCtx()
-	stopProfiler()
 
 	log.Debug().Msgf("Program finished in %vms", time.Since(mainTimer).Milliseconds())
 }

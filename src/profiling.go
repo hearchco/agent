@@ -1,16 +1,15 @@
 package main
 
 import (
+	"log"
+
 	"github.com/pkg/profile"
-	"github.com/rs/zerolog/log"
 )
 
 type profiler struct {
 	enabled bool
 	profile func(p *profile.Profile)
 }
-
-var emptyFunc = func() {}
 
 func runProfiler() (bool, func()) {
 	/*
@@ -54,17 +53,17 @@ func runProfiler() (bool, func()) {
 	profilerToRun := profiler{enabled: false}
 	for _, p := range profilers {
 		if profilerToRun.enabled && p.enabled {
-			log.Fatal().Msg("Only one profiler can be run at a time.")
-			return false, emptyFunc
+			log.Fatal("Only one profiler can be run at a time.")
+			return false, func() {}
 		} else if p.enabled {
 			profilerToRun = p
 		}
 	}
 	if !profilerToRun.enabled {
-		return false, emptyFunc
+		return false, func() {}
 	}
 
-	p := profile.Start(profilerToRun.profile, profile.ProfilePath("./profiling/"))
+	p := profile.Start(profilerToRun.profile, profile.ProfilePath("./profiling/"), profile.NoShutdownHook)
 	return true, func() {
 		p.Stop()
 	}
