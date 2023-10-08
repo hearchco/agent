@@ -70,18 +70,14 @@ func main() {
 		start := time.Now()
 
 		var results []result.Result
-		if db != nil {
-			db.Get(cli.Query, &results)
-		}
+		db.Get(cli.Query, &results)
 		if results != nil {
 			log.Debug().Msgf("Found results for query (%v) in cache", cli.Query)
 		} else {
 			log.Debug().Msg("Nothing found in cache, doing a clean search")
 			results = search.PerformSearch(cli.Query, options, config)
 			fmt.Printf("\nThe results:\n%v", results)
-			if db != nil {
-				cache.Save(db, cli.Query, results)
-			}
+			cache.Save(db, cli.Query, results)
 		}
 
 		duration := time.Since(start)
@@ -94,9 +90,7 @@ func main() {
 		router.Setup(config, db)
 	}
 
-	if db != nil {
-		db.Close()
-	}
+	db.Close()
 
 	log.Debug().Msgf("Program finished in %vms", time.Since(mainTimer).Milliseconds())
 }
