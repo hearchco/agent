@@ -35,8 +35,7 @@ func main() {
 	ctx, stopCtx := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// profiler
-	amProfiling := false              // not used currently
-	defer runProfiler(&amProfiling)() // runs the profiler, and defers the closing
+	amProfiling, stopProfiler := runProfiler() // not used currently
 
 	// cache database
 	var db cache.DB
@@ -64,6 +63,7 @@ func main() {
 	// program cleanup
 	db.Close()
 	stopCtx()
+	stopProfiler()
 
 	log.Debug().Msgf("Program finished in %vms", time.Since(mainTimer).Milliseconds())
 }

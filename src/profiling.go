@@ -12,7 +12,7 @@ type profiler struct {
 
 var emptyFunc = func() {}
 
-func runProfiler(amProfiling *bool) func() {
+func runProfiler() (bool, func()) {
 	/*
 		goroutine — stack traces of all current goroutines
 		heap — a sampling of memory allocations of live objects
@@ -55,20 +55,17 @@ func runProfiler(amProfiling *bool) func() {
 	for _, p := range profilers {
 		if profilerToRun.enabled && p.enabled {
 			log.Fatal().Msg("Only one profiler can be run at a time.")
-			return emptyFunc
+			return false, emptyFunc
 		} else if p.enabled {
 			profilerToRun = p
 		}
 	}
-
-	p := profile.Start(profilerToRun.profile, profile.ProfilePath("./profiling/"))
-	if profilerToRun.enabled {
-		*amProfiling = true
-	} else {
-		return emptyFunc
+	if !profilerToRun.enabled {
+		return false, emptyFunc
 	}
 
-	return func() {
+	p := profile.Start(profilerToRun.profile, profile.ProfilePath("./profiling/"))
+	return true, func() {
 		p.Stop()
 	}
 }
