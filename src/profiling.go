@@ -10,6 +10,8 @@ type profiler struct {
 	profile func(p *profile.Profile)
 }
 
+var emptyFunc = func() {}
+
 func runProfiler(amProfiling *bool) func() {
 	/*
 		goroutine — stack traces of all current goroutines
@@ -53,7 +55,7 @@ func runProfiler(amProfiling *bool) func() {
 	for _, p := range profilers {
 		if profilerToRun.enabled && p.enabled {
 			log.Fatal().Msg("Only one profiler can be run at a time.")
-			return func() {}
+			return emptyFunc
 		} else if p.enabled {
 			profilerToRun = p
 		}
@@ -63,7 +65,7 @@ func runProfiler(amProfiling *bool) func() {
 	if profilerToRun.enabled {
 		*amProfiling = true
 	} else {
-		return func() {}
+		return emptyFunc
 	}
 
 	return func() {
