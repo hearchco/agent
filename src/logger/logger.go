@@ -15,7 +15,7 @@ func DateString() string {
 	return time.Now().Format("20060102")
 }
 
-func Setup(path string, verbosity int) {
+func Setup(path string, verbosity int8) {
 	// Generate logfile name
 	datetime := DateString()
 	filepath := fmt.Sprintf("%v/brzaguza_%v.log", path, datetime)
