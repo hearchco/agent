@@ -3,8 +3,6 @@ package router
 import (
 	"context"
 	"fmt"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -36,21 +34,17 @@ func (rw *RouterWrapper) addCors() {
 	}))
 }
 
-func (rw *RouterWrapper) runWithContext(ctx context.Context, stopRouter context.CancelFunc) {
+func (rw *RouterWrapper) runWithContext(ctx context.Context) {
 	if err := rw.router.RunWithContext(ctx); err != context.Canceled {
 		log.Error().Msgf("Failed starting router: %v", err)
 	} else if err != nil {
 		log.Info().Msgf("Stopping router...")
-		stopRouter()
 		rw.router.Close()
 		log.Debug().Msgf("Successfully stopped router")
 	}
 }
 
-func (rw *RouterWrapper) Start(db cache.DB) {
-	// signal interrupt
-	ctx, stopRouter := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-
+func (rw *RouterWrapper) Start(ctx context.Context, db cache.DB) {
 	// CORS
 	rw.addCors()
 
@@ -66,5 +60,5 @@ func (rw *RouterWrapper) Start(db cache.DB) {
 	})
 
 	// startup
-	rw.runWithContext(ctx, stopRouter)
+	rw.runWithContext(ctx)
 }
