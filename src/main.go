@@ -24,11 +24,11 @@ func main() {
 	// parse cli arguments
 	setupCli()
 
-	amProfiling := false              // not used currently
-	defer runProfiler(&amProfiling)() //runs the profiler, and defers the closing
-
 	// configure logging
 	logger.Setup(cli.Log, cli.Verbosity)
+
+	// profiler (needs cli and log)
+	_, stopProfiler := runProfiler() // not used currently
 
 	// load config file
 	conf := config.New()
@@ -63,6 +63,7 @@ func main() {
 	// program cleanup
 	db.Close()
 	stopCtx()
+	stopProfiler()
 
 	log.Debug().Msgf("Program finished in %vms", time.Since(mainTimer).Milliseconds())
 }
