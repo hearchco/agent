@@ -24,7 +24,7 @@ func ParseURL(rawURL string) string {
 	}
 
 	urlString := parsedURL.String()
-	if len(urlString) != 0 && len(parsedURL.Path) == 0 { // https://fast.com -> https://fast.com/
+	if len(urlString) != 0 && len(parsedURL.Path) == 0 { // https://example.org -> https://example.org/
 		urlString += "/"
 	}
 	return urlString
