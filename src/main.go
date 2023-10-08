@@ -35,7 +35,7 @@ func main() {
 	ctx, stopCtx := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// profiler
-	amProfiling, stopProfiler := runProfiler() // not used currently
+	_, stopProfiler := runProfiler() // not used currently
 
 	// cache database
 	var db cache.DB
