@@ -1,7 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -56,6 +60,9 @@ func main() {
 		log.Warn().Msg("Running without caching!")
 	}
 
+	// signal interrupt (CTRL+C)
+	ctx, stopCtx := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
 	// startup
 	if cli.Cli {
 		log.Info().
@@ -71,6 +78,7 @@ func main() {
 
 		start := time.Now()
 
+		// todo: this should be refactor to cliStartup package with ctx cancelling as well
 		var results []result.Result
 		db.Get(cli.Query, &results)
 		if results != nil {
@@ -91,11 +99,13 @@ func main() {
 		if router, err := router.New(config); err != nil {
 			log.Error().Msgf("Failed creating a router: %v", err)
 		} else {
-			router.Start(db)
+			router.Start(ctx, db)
 		}
 	}
 
+	// program cleanup
 	db.Close()
+	stopCtx()
 
 	log.Debug().Msgf("Program finished in %vms", time.Since(mainTimer).Milliseconds())
 }
