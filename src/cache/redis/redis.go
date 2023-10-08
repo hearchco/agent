@@ -24,7 +24,13 @@ func New(config config.Redis) *DB {
 		Password: config.Password,
 		DB:       int(config.Database),
 	})
-	log.Info().Msgf("Successful connection to redis (addr: %v:%v/%v)", config.Host, config.Port, config.Database)
+
+	if err := rdb.Ping(ctx); err != nil {
+		log.Fatal().Msgf("Error connecting to redis (addr: %v:%v/%v): %v", config.Host, config.Port, config.Database, err)
+	} else {
+		log.Info().Msgf("Successful connection to redis (addr: %v:%v/%v)", config.Host, config.Port, config.Database)
+	}
+
 	return &DB{rdb: rdb}
 }
 
@@ -39,7 +45,7 @@ func (db *DB) Set(k string, v cache.Value) {
 	if val, err := cbor.Marshal(v); err != nil {
 		log.Error().Msgf("Error marshaling value: %v", err)
 	} else if err := db.rdb.Set(ctx, k, val, 0).Err(); err != nil {
-		log.Panic().Msgf("Error setting KV to redis: %v", err)
+		log.Fatal().Msgf("Error setting KV to redis: %v", err)
 	} else {
 		log.Debug().Msgf("Cached results in %vns", time.Since(cacheTimer).Nanoseconds())
 	}
@@ -51,7 +57,7 @@ func (db *DB) Get(k string, o cache.Value) {
 	if err == redis.Nil {
 		log.Trace().Msgf("Found no value in redis for key (%v): %v", k, err)
 	} else if err != nil {
-		log.Panic().Msgf("Error getting value from redis for key (%v): %v", k, err)
+		log.Fatal().Msgf("Error getting value from redis for key (%v): %v", k, err)
 	} else if err := cbor.Unmarshal(val, o); err != nil {
 		log.Error().Msgf("Failed unmarshaling value from redis for key (%v): %v", k, err)
 	}
