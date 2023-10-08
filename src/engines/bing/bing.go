@@ -2,6 +2,8 @@ package bing
 
 import (
 	"context"
+	"encoding/base64"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -18,9 +20,6 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
-
-	// Removes Telemetry. Acknowladge this overwrite user-side.
-	options.UserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
 
 	var col *colly.Collector
 	var pagesCol *colly.Collector
@@ -42,6 +41,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 		linkHref, _ := dom.Find(dompaths.Link).Attr("href")
 		linkText := parse.ParseURL(linkHref)
+		linkText = removeTelemetry(linkText)
+
 		titleText := strings.TrimSpace(dom.Find(dompaths.Title).Text())
 		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
 
@@ -77,4 +78,24 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	pagesCol.Wait()
 
 	return retError
+}
+
+func removeTelemetry(link string) string {
+	if strings.HasPrefix(link, "https://www.bing.com/ck/a?") {
+		//log.Trace().Msg("Bing returned telemetry links")
+		parsedUrl, err := url.Parse(link)
+		if err != nil {
+			log.Error().Err(err).Msg("error parsing url")
+		}
+
+		// get the first value of u parameter and remove "a1" in front
+		encodedUrl := parsedUrl.Query().Get("u")[2:]
+
+		cleanUrl, err := base64.RawURLEncoding.DecodeString(encodedUrl)
+		if err != nil {
+			log.Error().Err(err).Msg("failed decoding string from base64")
+		}
+		return parse.ParseURL(string(cleanUrl))
+	}
+	return link
 }
