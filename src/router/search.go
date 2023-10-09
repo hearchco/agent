@@ -51,9 +51,7 @@ func Search(c *gin.Context, config *config.Config, db cache.DB) {
 	}
 
 	var results []result.Result
-	if db != nil {
-		db.Get(query, &results)
-	}
+	db.Get(query, &results)
 	if results != nil {
 		log.Debug().Msgf("Found results for query (%v) in cache", query)
 	} else {
