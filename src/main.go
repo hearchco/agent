@@ -24,15 +24,18 @@ func main() {
 	// parse cli arguments
 	setupCli()
 
+	_, stopProfiler := runProfiler()
+	defer stopProfiler()
+
+	// signal interrupt (CTRL+C)
+	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
 	// configure logging
 	logger.Setup(cli.Log, cli.Verbosity)
 
 	// load config file
 	conf := config.New()
 	conf.Load(cli.Config, cli.Log)
-
-	// signal interrupt (CTRL+C)
-	ctx, stopCtx := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// cache database
 	var db cache.DB
@@ -53,13 +56,12 @@ func main() {
 		if rw, err := router.New(conf, cli.Verbosity); err != nil {
 			log.Error().Msgf("Failed creating a router: %v", err)
 		} else {
-			rw.Start(ctx, db)
+			rw.Start(ctx, db, cli.ServeProfiler)
 		}
 	}
 
 	// program cleanup
 	db.Close()
-	stopCtx()
 
 	log.Debug().Msgf("Program finished in %vms", time.Since(mainTimer).Milliseconds())
 }

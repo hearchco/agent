@@ -2,11 +2,12 @@ package router
 
 import (
 	"context"
-	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/graceful"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
@@ -23,7 +24,7 @@ func New(config *config.Config, verbosity int8) (*RouterWrapper, error) {
 	if verbosity == 0 {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	router, err := graceful.Default(graceful.WithAddr(fmt.Sprintf(":%v", config.Server.Port)))
+	router, err := graceful.Default(graceful.WithAddr(":" + strconv.Itoa(config.Server.Port)))
 	return &RouterWrapper{router: router, config: config}, err
 }
 
@@ -47,7 +48,7 @@ func (rw *RouterWrapper) runWithContext(ctx context.Context) {
 	}
 }
 
-func (rw *RouterWrapper) Start(ctx context.Context, db cache.DB) {
+func (rw *RouterWrapper) Start(ctx context.Context, db cache.DB, serveProfiler bool) {
 	// CORS
 	rw.addCors()
 
@@ -62,6 +63,8 @@ func (rw *RouterWrapper) Start(ctx context.Context, db cache.DB) {
 		Search(c, rw.config, db)
 	})
 
-	// startup
+	if serveProfiler {
+		pprof.Register(rw.router.Engine)
+	}
 	rw.runWithContext(ctx)
 }
