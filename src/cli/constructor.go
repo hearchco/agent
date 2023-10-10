@@ -2,12 +2,12 @@ package cli
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/alecthomas/kong"
+	"github.com/rs/zerolog/log"
 )
 
-func Setup() Flags {
+func New() Flags {
 	var cli Flags
 	ctx := kong.Parse(&cli,
 		kong.Name("brzaguza"),
@@ -25,9 +25,8 @@ func Setup() Flags {
 		},
 	)
 
-	if err := ctx.Validate(); err != nil {
-		fmt.Println("Failed parsing cli:", err)
-		os.Exit(1)
+	if err := ctx.Validate(); err == nil {
+		log.Fatal().Err(err).Msg("Failed parsing cli")
 	}
 
 	return cli

@@ -22,7 +22,7 @@ func main() {
 	mainTimer := time.Now()
 
 	// parse cli arguments
-	cliFlags := cli.Setup()
+	cliFlags := cli.New()
 
 	_, stopProfiler := runProfiler(&cliFlags)
 	defer stopProfiler()

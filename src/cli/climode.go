@@ -41,7 +41,7 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 
 	start := time.Now()
 
-	// todo: this should be refactor to cliMode package with ctx cancelling as well
+	// todo: ctx cancelling (important since pebble is NoSync)
 	var results []result.Result
 	db.Get(flags.Query, &results)
 	if results != nil {
