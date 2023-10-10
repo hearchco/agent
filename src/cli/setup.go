@@ -2,9 +2,9 @@ package cli
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/alecthomas/kong"
+	"github.com/rs/zerolog/log"
 )
 
 func Setup() Flags {
@@ -26,8 +26,7 @@ func Setup() Flags {
 	)
 
 	if err := ctx.Validate(); err != nil {
-		fmt.Println("Failed parsing cli:", err)
-		os.Exit(1)
+		log.Fatal().Err(err).Msg("Failed parsing cli")
 	}
 
 	return cli
