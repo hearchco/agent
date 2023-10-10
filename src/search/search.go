@@ -3,6 +3,7 @@ package search
 import (
 	"context"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -20,6 +21,8 @@ func PerformSearch(query string, options engines.Options, config *config.Config)
 	relay := bucket.Relay{
 		ResultMap: make(map[string]*result.Result),
 	}
+
+	setCategory(query, &options)
 
 	query = url.QueryEscape(query)
 	log.Debug().Msg(query)
@@ -61,4 +64,34 @@ func runEngines(engineMap map[string]config.Engine, query string, worker *conc.W
 			}
 		})
 	}
+}
+
+func setCategory(query string, options *engines.Options) {
+	category := extractCategory(query)
+	if category != "" {
+		options.Category = category
+	}
+}
+
+func extractCategory(query string) string {
+	valid := []string{"info", "science", "news", "blog", "surf", "newnews", "wiki", "sci", "nnews"}
+	// info[/wiki], science[/sci], newnews[/nnews]
+
+	if query[0] != '!' {
+		return ""
+	}
+	cat := strings.SplitN(query, " ", 2)[0][1:]
+
+	ok := false
+	for i := range valid {
+		if valid[i] == cat {
+			ok = true
+			break
+		}
+	}
+
+	if ok {
+		return cat
+	}
+	return ""
 }
