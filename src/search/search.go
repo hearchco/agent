@@ -22,6 +22,7 @@ func PerformSearch(query string, options engines.Options, config *config.Config)
 	}
 
 	query = url.QueryEscape(query)
+	log.Debug().Msg(query)
 
 	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")

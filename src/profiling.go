@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/pkg/profile"
+	"github.com/tminaorg/brzaguza/src/cli"
 )
 
 type profiler struct {
@@ -11,7 +12,7 @@ type profiler struct {
 	profile func(p *profile.Profile)
 }
 
-func runProfiler() (bool, func()) {
+func runProfiler(cliFlags *cli.Flags) (bool, func()) {
 	/*
 		goroutine — stack traces of all current goroutines
 		heap — a sampling of memory allocations of live objects
@@ -22,31 +23,31 @@ func runProfiler() (bool, func()) {
 	*/
 
 	profilers := [...]profiler{{
-		enabled: cli.CPUProfile,
+		enabled: cliFlags.CPUProfile,
 		profile: profile.CPUProfile,
 	}, {
-		enabled: cli.HeapProfile,
+		enabled: cliFlags.HeapProfile,
 		profile: profile.MemProfileHeap,
 	}, {
-		enabled: cli.GORProfile,
+		enabled: cliFlags.GORProfile,
 		profile: profile.GoroutineProfile,
 	}, {
-		enabled: cli.ThreadProfile,
+		enabled: cliFlags.ThreadProfile,
 		profile: profile.ThreadcreationProfile,
 	}, {
-		enabled: cli.BlockProfile,
+		enabled: cliFlags.BlockProfile,
 		profile: profile.BlockProfile,
 	}, {
-		enabled: cli.AllocProfile,
+		enabled: cliFlags.AllocProfile,
 		profile: profile.MemProfileAllocs,
 	}, {
-		enabled: cli.MutexProfile,
+		enabled: cliFlags.MutexProfile,
 		profile: profile.MutexProfile,
 	}, {
-		enabled: cli.ClockProfile,
+		enabled: cliFlags.ClockProfile,
 		profile: profile.ClockProfile,
 	}, {
-		enabled: cli.TraceProfile,
+		enabled: cliFlags.TraceProfile,
 		profile: profile.TraceProfile,
 	}}
 

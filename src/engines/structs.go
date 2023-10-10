@@ -49,4 +49,5 @@ type Options struct {
 	Locale        string //format: en-US
 	SafeSearch    bool
 	Mobile        bool
+	Category      string
 }
