@@ -25,7 +25,7 @@ func New() Flags {
 		},
 	)
 
-	if err := ctx.Validate(); err == nil {
+	if err := ctx.Validate(); err != nil {
 		log.Fatal().Err(err).Msg("Failed parsing cli")
 	}
 
