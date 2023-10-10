@@ -1,4 +1,4 @@
-package climode
+package cli
 
 import (
 	"fmt"
@@ -26,34 +26,35 @@ func printResults(results []result.Result) {
 	}
 }
 
-func Run(query string, maxPages int, visit bool, silent bool, db cache.DB, conf *config.Config) {
+func Run(flags Flags, db cache.DB, conf *config.Config) {
 	log.Info().
-		Str("query", query).
-		Str("max-pages", fmt.Sprintf("%v", maxPages)).
-		Str("visit", fmt.Sprintf("%v", visit)).
+		Str("query", flags.Query).
+		Str("max-pages", fmt.Sprintf("%v", flags.MaxPages)).
+		Str("visit", fmt.Sprintf("%v", flags.Visit)).
 		Msg("Started searching")
 
 	options := engines.Options{
-		MaxPages:   maxPages,
-		VisitPages: visit,
+		MaxPages:   flags.MaxPages,
+		VisitPages: flags.Visit,
+		Category:   flags.Category,
 	}
 
 	start := time.Now()
 
-	// todo: this should be refactor to cliMode package with ctx cancelling as well
+	// todo: ctx cancelling (important since pebble is NoSync)
 	var results []result.Result
-	db.Get(query, &results)
+	db.Get(flags.Query, &results)
 	if results != nil {
-		log.Debug().Msgf("Found results for query (%v) in cache", query)
+		log.Debug().Msgf("Found results for query (%v) in cache", flags.Query)
 	} else {
 		log.Debug().Msg("Nothing found in cache, doing a clean search")
-		results = search.PerformSearch(query, options, conf)
-		db.Set(query, results)
+		results = search.PerformSearch(flags.Query, options, conf)
+		db.Set(flags.Query, results)
 	}
 
 	duration := time.Since(start)
 
-	if !silent {
+	if !flags.Silent {
 		printResults(results)
 	}
 	log.Info().Msgf("Found %v results in %vms", len(results), duration.Milliseconds())
