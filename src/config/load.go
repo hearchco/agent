@@ -52,16 +52,28 @@ func (c *Config) Load(path string, logPath string) {
 	// Unmarshal config into struct
 	k.Unmarshal("", &c)
 
-	// Add enabled engines names and remove disabled ones
-	for name, engine := range c.Engines {
-		if engine.Enabled {
-			if engineName, err := engines.NameString(name); err == nil {
-				EnabledEngines = append(EnabledEngines, engineName)
+	/*
+		// Add enabled engines names and remove disabled ones
+		for name, engine := range c.Engines {
+			if engine.Enabled {
+				if engineName, err := engines.NameString(name); err == nil {
+					EnabledEngines = append(EnabledEngines, engineName)
+				} else {
+					log.Panic().Err(err).Msgf("failed converting string %v to engine name", name)
+				}
 			} else {
-				log.Panic().Err(err).Msgf("failed converting string %v to engine name", name)
+				delete(c.Engines, name)
 			}
+		}
+	*/
+
+	// Add all engines to EnabledEngines.
+	// TODO: don't need all of them, but I may need more than in "general"
+	for name := range c.Categories["general"].Engines {
+		if engineName, err := engines.NameString(name); err == nil {
+			EnabledEngines = append(EnabledEngines, engineName)
 		} else {
-			delete(c.Engines, name)
+			log.Panic().Err(err).Msgf("failed converting string %v to engine name", name)
 		}
 	}
 }

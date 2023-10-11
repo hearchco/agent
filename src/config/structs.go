@@ -59,8 +59,12 @@ type Server struct {
 	Cache        Cache    `koanf:"cache"`
 }
 
-type Config struct {
-	Server  Server            `koanf:"server"`
+type Category struct {
 	Engines map[string]Engine `koanf:"engines"`
-	Ranking Ranking           `koanf:"ranking"`
+}
+
+type Config struct {
+	Server     Server              `koanf:"server"`
+	Categories map[string]Category `koanf:"categories"`
+	Ranking    Ranking             `koanf:"ranking"`
 }

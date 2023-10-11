@@ -30,7 +30,7 @@ func PerformSearch(query string, options engines.Options, config *config.Config)
 	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")
 	var worker conc.WaitGroup
-	runEngines(config.Engines, query, &worker, &relay, options)
+	runEngines(config.Categories[options.Category].Engines, query, &worker, &relay, options)
 	worker.Wait()
 	log.Debug().Msgf("Got results in %vms", time.Since(resTimer).Milliseconds())
 
@@ -70,6 +70,9 @@ func setCategory(query string, options *engines.Options) {
 	category := extractCategory(query)
 	if category != "" {
 		options.Category = category
+	}
+	if options.Category == "" {
+		options.Category = "general"
 	}
 }
 
