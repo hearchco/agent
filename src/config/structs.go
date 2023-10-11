@@ -1,6 +1,10 @@
 package config
 
-import "time"
+import (
+	"time"
+
+	"github.com/tminaorg/brzaguza/src/category"
+)
 
 type EngineRanking struct {
 	Mul   float64 `koanf:"mul"`
@@ -37,8 +41,7 @@ type Settings struct {
 }
 
 type Engine struct {
-	Enabled  bool     `koanf:"enabled"`
-	Settings Settings `koanf:"settings"`
+	Enabled bool `koanf:"enabled"`
 }
 
 type Redis struct {
@@ -60,11 +63,12 @@ type Server struct {
 }
 
 type Category struct {
-	Engines map[string]Engine `koanf:"engines"`
+	Engines map[string]Engine `koanf:"engines"` //just use an array here?
+	Ranking Ranking           `koanf:"ranking"`
 }
 
 type Config struct {
-	Server     Server              `koanf:"server"`
-	Categories map[string]Category `koanf:"categories"`
-	Ranking    Ranking             `koanf:"ranking"`
+	Server     Server                     `koanf:"server"`
+	Categories map[category.Name]Category `koanf:"categories"`
+	Settings   map[string]Settings        `koanf:"settings"`
 }

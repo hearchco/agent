@@ -1,6 +1,9 @@
 package config
 
-import "github.com/tminaorg/brzaguza/src/engines"
+import (
+	"github.com/tminaorg/brzaguza/src/category"
+	"github.com/tminaorg/brzaguza/src/engines"
+)
 
 const DefaultLocale string = "en-US"
 
@@ -72,6 +75,129 @@ func NewRanking() Ranking {
 	}
 }
 
+func NewSettings() map[string]Settings {
+	return map[string]Settings{
+		engines.Bing.ToLower(): {
+			Shortcut: "bi",
+		},
+		engines.Brave.ToLower(): {
+			Shortcut: "br",
+		},
+		engines.DuckDuckGo.ToLower(): {
+			Shortcut: "ddg",
+		},
+		engines.Etools.ToLower(): {
+			Shortcut: "ets",
+		},
+		engines.Google.ToLower(): {
+			Shortcut: "go",
+		},
+		engines.Mojeek.ToLower(): {
+			Shortcut: "mjk",
+		},
+		engines.Presearch.ToLower(): {
+			Shortcut: "ps",
+		},
+		engines.Qwant.ToLower(): {
+			Shortcut: "qw",
+		},
+		engines.Startpage.ToLower(): {
+			Shortcut: "sp",
+		},
+		engines.Swisscows.ToLower(): {
+			Shortcut: "sc",
+		},
+		engines.Yahoo.ToLower(): {
+			Shortcut: "yh",
+		},
+		engines.Yep.ToLower(): {
+			Shortcut: "yep",
+		},
+	}
+}
+
+func NewAllEnabled() map[string]Engine {
+	return map[string]Engine{
+		engines.Bing.ToLower(): {
+			Enabled: true,
+		},
+		engines.Brave.ToLower(): {
+			Enabled: true,
+		},
+		engines.DuckDuckGo.ToLower(): {
+			Enabled: true,
+		},
+		engines.Etools.ToLower(): {
+			Enabled: true,
+		},
+		engines.Google.ToLower(): {
+			Enabled: true,
+		},
+		engines.Mojeek.ToLower(): {
+			Enabled: true,
+		},
+		engines.Presearch.ToLower(): {
+			Enabled: true,
+		},
+		engines.Qwant.ToLower(): {
+			Enabled: true,
+		},
+		engines.Startpage.ToLower(): {
+			Enabled: true,
+		},
+		engines.Swisscows.ToLower(): {
+			Enabled: true,
+		},
+		engines.Yahoo.ToLower(): {
+			Enabled: true,
+		},
+		engines.Yep.ToLower(): {
+			Enabled: true,
+		},
+	}
+}
+
+func NewInfo() map[string]Engine {
+	return map[string]Engine{
+		engines.Bing.ToLower(): {
+			Enabled: true,
+		},
+		engines.Brave.ToLower(): {
+			Enabled: false,
+		},
+		engines.DuckDuckGo.ToLower(): {
+			Enabled: false,
+		},
+		engines.Etools.ToLower(): {
+			Enabled: false,
+		},
+		engines.Google.ToLower(): {
+			Enabled: true,
+		},
+		engines.Mojeek.ToLower(): {
+			Enabled: true,
+		},
+		engines.Presearch.ToLower(): {
+			Enabled: false,
+		},
+		engines.Qwant.ToLower(): {
+			Enabled: false,
+		},
+		engines.Startpage.ToLower(): {
+			Enabled: false,
+		},
+		engines.Swisscows.ToLower(): {
+			Enabled: false,
+		},
+		engines.Yahoo.ToLower(): {
+			Enabled: false,
+		},
+		engines.Yep.ToLower(): {
+			Enabled: false,
+		},
+	}
+}
+
 func New() *Config {
 	return &Config{
 		Server: Server{
@@ -85,72 +211,36 @@ func New() *Config {
 				},
 			},
 		},
-		Categories: map[string]Category{
-			"general": {
-				Engines: map[string]Engine{
-					engines.Bing.ToLower(): {
-						Enabled: true,
-						Settings: Settings{
-							Shortcut: "bi",
-						},
-					},
-					engines.Brave.ToLower(): {
-						Enabled: true,
-						Settings: Settings{
-							Shortcut: "br",
-						},
-					},
-					engines.DuckDuckGo.ToLower(): {
-						Enabled: true,
-						Settings: Settings{
-							Shortcut: "ddg",
-						},
-					},
-					engines.Etools.ToLower(): {
-						Enabled: true,
-						Settings: Settings{
-							Shortcut: "ets",
-						},
-					},
-					engines.Google.ToLower(): {
-						Enabled: true,
-						Settings: Settings{
-							Shortcut: "go",
-						},
-					},
-					engines.Mojeek.ToLower(): {
-						Enabled: true,
-						Settings: Settings{
-							Shortcut: "mjk",
-						},
-					},
-					engines.Qwant.ToLower(): {
-						Enabled: true,
-						Settings: Settings{
-							Shortcut: "qw",
-						},
-					},
-					engines.Startpage.ToLower(): {
-						Enabled: true,
-						Settings: Settings{
-							Shortcut: "sp",
-						},
-					},
-					engines.Swisscows.ToLower(): {
-						Enabled: true,
-						Settings: Settings{
-							Shortcut: "sc",
-						},
-					},
-					engines.Yep.ToLower(): {
-						Enabled: true,
-						Settings: Settings{
-							Shortcut: "yep",
-						},
-					},
-				},
+		Settings: NewSettings(),
+		Categories: map[category.Name]Category{
+			category.GENERAL: {
+				Engines: NewAllEnabled(),
+				Ranking: NewRanking(),
+			},
+			category.INFO: {
+				Engines: NewInfo(),
+				Ranking: NewRanking(),
+			},
+			category.SCIENCE: {
+				Engines: NewAllEnabled(),
+				Ranking: NewRanking(),
+			},
+			category.NEWS: {
+				Engines: NewAllEnabled(),
+				Ranking: NewRanking(),
+			},
+			category.BLOG: {
+				Engines: NewAllEnabled(),
+				Ranking: NewRanking(),
+			},
+			category.SURF: {
+				Engines: NewAllEnabled(),
+				Ranking: NewRanking(),
+			},
+			category.NEWNEWS: {
+				Engines: NewAllEnabled(),
+				Ranking: NewRanking(),
 			},
 		},
-		Ranking: NewRanking(),
 	}
 }

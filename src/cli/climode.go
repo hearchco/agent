@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/cache"
+	"github.com/tminaorg/brzaguza/src/category"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
 	"github.com/tminaorg/brzaguza/src/search"
@@ -36,7 +37,7 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 	options := engines.Options{
 		MaxPages:   flags.MaxPages,
 		VisitPages: flags.Visit,
-		Category:   flags.Category,
+		Category:   category.FromString[flags.Category],
 	}
 
 	start := time.Now()
