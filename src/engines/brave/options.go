@@ -4,7 +4,7 @@ import "github.com/tminaorg/brzaguza/src/engines"
 
 var Info engines.Info = engines.Info{
 	Domain:         "search.brave.com",
-	Name:           engines.Brave,
+	Name:           engines.BRAVE,
 	URL:            "https://search.brave.com/search?q=",
 	ResultsPerPage: 20,
 }

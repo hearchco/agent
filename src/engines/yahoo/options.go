@@ -8,10 +8,10 @@ import "github.com/tminaorg/brzaguza/src/engines"
 
 var Info engines.Info = engines.Info{
 	Domain:         "search.yahoo.com",
-	Name:           engines.Yahoo,
+	Name:           engines.YAHOO,
 	URL:            "https://search.yahoo.com/search?p=",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.Yahoo},
+	Crawlers:       []engines.Name{engines.YAHOO},
 }
 
 var dompaths engines.DOMPaths = engines.DOMPaths{

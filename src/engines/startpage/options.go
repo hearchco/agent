@@ -4,10 +4,10 @@ import "github.com/tminaorg/brzaguza/src/engines"
 
 var Info engines.Info = engines.Info{
 	Domain:         "www.startpage.com",
-	Name:           engines.Startpage,
+	Name:           engines.STARTPAGE,
 	URL:            "https://www.startpage.com/sp/search?q=",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.Google},
+	Crawlers:       []engines.Name{engines.GOOGLE},
 }
 
 var dompaths engines.DOMPaths = engines.DOMPaths{

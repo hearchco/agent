@@ -19,55 +19,55 @@ func NewRanking() Ranking {
 		TRC:  1,
 		TRD:  0,
 		Engines: map[string]EngineRanking{
-			engines.Bing.ToLower(): {
+			engines.BING.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Brave.ToLower(): {
+			engines.BRAVE.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.DuckDuckGo.ToLower(): {
+			engines.DUCKDUCKGO.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Etools.ToLower(): {
+			engines.ETOOLS.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Google.ToLower(): {
+			engines.GOOGLE.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Mojeek.ToLower(): {
+			engines.MOJEEK.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Presearch.ToLower(): {
+			engines.PRESEARCH.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Qwant.ToLower(): {
+			engines.QWANT.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Startpage.ToLower(): {
+			engines.STARTPAGE.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Swisscows.ToLower(): {
+			engines.SWISSCOWS.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Yahoo.ToLower(): {
+			engines.YAHOO.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Yandex.ToLower(): {
+			engines.YANDEX.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Yep.ToLower(): {
+			engines.YEP.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
@@ -77,40 +77,40 @@ func NewRanking() Ranking {
 
 func NewSettings() map[string]Settings {
 	return map[string]Settings{
-		engines.Bing.ToLower(): {
+		engines.BING.ToLower(): {
 			Shortcut: "bi",
 		},
-		engines.Brave.ToLower(): {
+		engines.BRAVE.ToLower(): {
 			Shortcut: "br",
 		},
-		engines.DuckDuckGo.ToLower(): {
+		engines.DUCKDUCKGO.ToLower(): {
 			Shortcut: "ddg",
 		},
-		engines.Etools.ToLower(): {
+		engines.ETOOLS.ToLower(): {
 			Shortcut: "ets",
 		},
-		engines.Google.ToLower(): {
+		engines.GOOGLE.ToLower(): {
 			Shortcut: "go",
 		},
-		engines.Mojeek.ToLower(): {
+		engines.MOJEEK.ToLower(): {
 			Shortcut: "mjk",
 		},
-		engines.Presearch.ToLower(): {
+		engines.PRESEARCH.ToLower(): {
 			Shortcut: "ps",
 		},
-		engines.Qwant.ToLower(): {
+		engines.QWANT.ToLower(): {
 			Shortcut: "qw",
 		},
-		engines.Startpage.ToLower(): {
+		engines.STARTPAGE.ToLower(): {
 			Shortcut: "sp",
 		},
-		engines.Swisscows.ToLower(): {
+		engines.SWISSCOWS.ToLower(): {
 			Shortcut: "sc",
 		},
-		engines.Yahoo.ToLower(): {
+		engines.YAHOO.ToLower(): {
 			Shortcut: "yh",
 		},
-		engines.Yep.ToLower(): {
+		engines.YEP.ToLower(): {
 			Shortcut: "yep",
 		},
 	}
@@ -118,40 +118,40 @@ func NewSettings() map[string]Settings {
 
 func NewAllEnabled() map[string]Engine {
 	return map[string]Engine{
-		engines.Bing.ToLower(): {
+		engines.BING.ToLower(): {
 			Enabled: true,
 		},
-		engines.Brave.ToLower(): {
+		engines.BRAVE.ToLower(): {
 			Enabled: true,
 		},
-		engines.DuckDuckGo.ToLower(): {
+		engines.DUCKDUCKGO.ToLower(): {
 			Enabled: true,
 		},
-		engines.Etools.ToLower(): {
+		engines.ETOOLS.ToLower(): {
 			Enabled: true,
 		},
-		engines.Google.ToLower(): {
+		engines.GOOGLE.ToLower(): {
 			Enabled: true,
 		},
-		engines.Mojeek.ToLower(): {
+		engines.MOJEEK.ToLower(): {
 			Enabled: true,
 		},
-		engines.Presearch.ToLower(): {
+		engines.PRESEARCH.ToLower(): {
 			Enabled: true,
 		},
-		engines.Qwant.ToLower(): {
+		engines.QWANT.ToLower(): {
 			Enabled: true,
 		},
-		engines.Startpage.ToLower(): {
+		engines.STARTPAGE.ToLower(): {
 			Enabled: true,
 		},
-		engines.Swisscows.ToLower(): {
+		engines.SWISSCOWS.ToLower(): {
 			Enabled: true,
 		},
-		engines.Yahoo.ToLower(): {
+		engines.YAHOO.ToLower(): {
 			Enabled: true,
 		},
-		engines.Yep.ToLower(): {
+		engines.YEP.ToLower(): {
 			Enabled: true,
 		},
 	}
@@ -159,40 +159,40 @@ func NewAllEnabled() map[string]Engine {
 
 func NewInfo() map[string]Engine {
 	return map[string]Engine{
-		engines.Bing.ToLower(): {
+		engines.BING.ToLower(): {
 			Enabled: true,
 		},
-		engines.Brave.ToLower(): {
+		engines.BRAVE.ToLower(): {
 			Enabled: false,
 		},
-		engines.DuckDuckGo.ToLower(): {
+		engines.DUCKDUCKGO.ToLower(): {
 			Enabled: false,
 		},
-		engines.Etools.ToLower(): {
+		engines.ETOOLS.ToLower(): {
 			Enabled: false,
 		},
-		engines.Google.ToLower(): {
+		engines.GOOGLE.ToLower(): {
 			Enabled: true,
 		},
-		engines.Mojeek.ToLower(): {
+		engines.MOJEEK.ToLower(): {
 			Enabled: true,
 		},
-		engines.Presearch.ToLower(): {
+		engines.PRESEARCH.ToLower(): {
 			Enabled: false,
 		},
-		engines.Qwant.ToLower(): {
+		engines.QWANT.ToLower(): {
 			Enabled: false,
 		},
-		engines.Startpage.ToLower(): {
+		engines.STARTPAGE.ToLower(): {
 			Enabled: false,
 		},
-		engines.Swisscows.ToLower(): {
+		engines.SWISSCOWS.ToLower(): {
 			Enabled: false,
 		},
-		engines.Yahoo.ToLower(): {
+		engines.YAHOO.ToLower(): {
 			Enabled: false,
 		},
-		engines.Yep.ToLower(): {
+		engines.YEP.ToLower(): {
 			Enabled: false,
 		},
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 func TestSearch(t *testing.T) {
-	engineName := engines.Yahoo
+	engineName := engines.YAHOO
 
 	// testing config
 	conf := _engines_test.NewConfig(engineName)
