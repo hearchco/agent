@@ -2,7 +2,6 @@ package search
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 	"time"
 
@@ -23,7 +22,7 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 		ResultMap: make(map[string]*result.Result),
 	}
 
-	setCategory(query, &options)
+	procCategory(&query, &options)
 
 	query = url.QueryEscape(query)
 	log.Debug().Msg(query)
@@ -49,33 +48,30 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings) error
 
 func runEngines(engs []engines.Name, settings map[string]config.Settings, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
-	config.EnabledEngines = make([]engines.Name, 20)
+	config.EnabledEngines = engs
 	log.Info().Msgf("Enabled engines (%v): %v", len(config.EnabledEngines), config.EnabledEngines)
 
 	engineStarter := NewEngineStarter()
 	for i := range engs {
-		fmt.Printf("the eng: %v\n", engs[i])
+		eng := engs[i] // dont change for to `for _, eng := range engs {`, eng retains the same address throughout the whole loop
 		worker.Go(func() {
-
-			fmt.Printf("the eng worker: %v\n", engs[i])
-			strt := engineStarter[engs[i]]
-			fmt.Printf("the function!: %v\n", strt)
-			err := strt(context.Background(), query, relay, options, settings[engs[i].ToLower()])
-
+			strt := engineStarter[eng]
+			err := strt(context.Background(), query, relay, options, settings[eng.ToLower()])
 			if err != nil {
-				log.Error().Err(err).Msgf("failed searching %v", engs[i])
+				log.Error().Err(err).Msgf("failed searching %v", eng)
 				// TODO: should remove this engines results from relay, since sort may mangle them
 			}
 		})
 	}
 }
 
-func setCategory(query string, options *engines.Options) {
-	cat := category.FromQuery(query)
+func procCategory(query *string, options *engines.Options) {
+	cat, q := category.FromQuery(*query)
 	if cat != "" {
 		options.Category = cat
 	}
 	if options.Category == "" {
 		options.Category = category.GENERAL
 	}
+	*query = q
 }

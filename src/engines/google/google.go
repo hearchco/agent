@@ -2,7 +2,6 @@ package google
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -15,8 +14,6 @@ import (
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings) error {
-	fmt.Printf("\n\nING OOGLE YEAEHHH BABYYY\n\n\n\n")
-
 	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}

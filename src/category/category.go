@@ -1,6 +1,10 @@
 package category
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/rs/zerolog/log"
+)
 
 var FromString map[string]Name = map[string]Name{
 	//main
@@ -17,14 +21,18 @@ var FromString map[string]Name = map[string]Name{
 	"nnews": NEWNEWS,
 }
 
-func FromQuery(query string) Name {
+// returns category, rest of query
+func FromQuery(query string) (Name, string) {
 	if query[0] != '!' {
-		return ""
+		return "", query
 	}
-	cat := strings.SplitN(query, " ", 2)[0][1:]
+	sp := strings.SplitN(query, " ", 2)
+	cat := sp[0][1:]
+	q := sp[1]
 	val, ok := FromString[cat]
 	if ok {
-		return val
+		return val, q
 	}
-	return ""
+	log.Debug().Msgf("invalid category in query: %v", query)
+	return "", q
 }
