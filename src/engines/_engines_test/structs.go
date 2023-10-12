@@ -28,11 +28,7 @@ func NewConfig(engineName engines.Name) *config.Config {
 	return &config.Config{
 		Categories: map[category.Name]config.Category{
 			category.GENERAL: {
-				Engines: map[string]config.Engine{
-					engineName.ToLower(): {
-						Enabled: true,
-					},
-				},
+				Engines: []engines.Name{engineName},
 				Ranking: config.NewRanking(),
 			},
 		},
