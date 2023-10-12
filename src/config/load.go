@@ -10,13 +10,63 @@ import (
 	"github.com/knadh/koanf/providers/structs"
 	"github.com/knadh/koanf/v2"
 	"github.com/rs/zerolog/log"
+	"github.com/tminaorg/brzaguza/src/category"
 	"github.com/tminaorg/brzaguza/src/engines"
 )
 
 var EnabledEngines []engines.Name = make([]engines.Name, 0)
 var LogDumpLocation string = "dump/"
 
+func (c *Config) FromReader(rc *ReaderConfig) {
+	nc := Config{
+		Server:   rc.Server,
+		Settings: rc.Settings,
+	}
+	nc.Categories = map[category.Name]Category{}
+	for key, val := range rc.RCategories {
+		engArr := []engines.Name{}
+		for name, eng := range val.REngines {
+			if eng.Enabled {
+				engineName, nameErr := engines.NameString(name)
+				if nameErr != nil {
+					log.Panic().Err(nameErr).Msg("failed converting string to engine name")
+					return
+				}
+
+				engArr = append(engArr, engineName)
+			}
+		}
+		nc.Categories[key] = Category{
+			Ranking: val.Ranking,
+			Engines: engArr,
+		}
+	}
+
+	*c = nc
+}
+
+func ReaderFromConfig(c *Config) ReaderConfig {
+	rc := ReaderConfig{
+		Server:   c.Server,
+		Settings: c.Settings,
+	}
+	rc.RCategories = map[category.Name]ReaderCategory{}
+	for key, val := range c.Categories {
+		rc.RCategories[key] = ReaderCategory{
+			Ranking:  val.Ranking,
+			REngines: map[string]ReaderEngine{},
+		}
+		for _, eng := range val.Engines {
+			rc.RCategories[key].REngines[eng.ToLower()] = ReaderEngine{Enabled: true}
+		}
+	}
+
+	return rc
+}
+
 func (c *Config) Load(path string, logPath string) {
+	rc := ReaderFromConfig(c)
+
 	// Load vars
 	loadVars(logPath)
 
@@ -26,7 +76,7 @@ func (c *Config) Load(path string, logPath string) {
 	// Load default values using the structs provider.
 	// We provide a struct along with the struct tag `koanf` to the
 	// provider.
-	k.Load(structs.Provider(c, "koanf"), nil)
+	k.Load(structs.Provider(&rc, "koanf"), nil)
 
 	// Load YAML config
 	yamlPath := path + "/brzaguza.yaml"
@@ -50,7 +100,9 @@ func (c *Config) Load(path string, logPath string) {
 	}
 
 	// Unmarshal config into struct
-	k.Unmarshal("", &c)
+	k.Unmarshal("", &rc)
+
+	c.FromReader(&rc)
 }
 
 func loadVars(logPath string) {

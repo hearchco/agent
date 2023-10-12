@@ -116,85 +116,28 @@ func NewSettings() map[string]Settings {
 	}
 }
 
-func NewAllEnabled() map[string]Engine {
-	return map[string]Engine{
-		engines.BING.ToLower(): {
-			Enabled: true,
-		},
-		engines.BRAVE.ToLower(): {
-			Enabled: true,
-		},
-		engines.DUCKDUCKGO.ToLower(): {
-			Enabled: true,
-		},
-		engines.ETOOLS.ToLower(): {
-			Enabled: true,
-		},
-		engines.GOOGLE.ToLower(): {
-			Enabled: true,
-		},
-		engines.MOJEEK.ToLower(): {
-			Enabled: true,
-		},
-		engines.PRESEARCH.ToLower(): {
-			Enabled: true,
-		},
-		engines.QWANT.ToLower(): {
-			Enabled: true,
-		},
-		engines.STARTPAGE.ToLower(): {
-			Enabled: true,
-		},
-		engines.SWISSCOWS.ToLower(): {
-			Enabled: true,
-		},
-		engines.YAHOO.ToLower(): {
-			Enabled: true,
-		},
-		engines.YEP.ToLower(): {
-			Enabled: true,
-		},
+func NewAllEnabled() []engines.Name {
+	return []engines.Name{
+		engines.BING,
+		engines.BRAVE,
+		engines.DUCKDUCKGO,
+		engines.ETOOLS,
+		engines.GOOGLE,
+		engines.MOJEEK,
+		engines.PRESEARCH,
+		engines.QWANT,
+		engines.STARTPAGE,
+		engines.SWISSCOWS,
+		engines.YAHOO,
+		engines.YEP,
 	}
 }
 
-func NewInfo() map[string]Engine {
-	return map[string]Engine{
-		engines.BING.ToLower(): {
-			Enabled: true,
-		},
-		engines.BRAVE.ToLower(): {
-			Enabled: false,
-		},
-		engines.DUCKDUCKGO.ToLower(): {
-			Enabled: false,
-		},
-		engines.ETOOLS.ToLower(): {
-			Enabled: false,
-		},
-		engines.GOOGLE.ToLower(): {
-			Enabled: true,
-		},
-		engines.MOJEEK.ToLower(): {
-			Enabled: true,
-		},
-		engines.PRESEARCH.ToLower(): {
-			Enabled: false,
-		},
-		engines.QWANT.ToLower(): {
-			Enabled: false,
-		},
-		engines.STARTPAGE.ToLower(): {
-			Enabled: false,
-		},
-		engines.SWISSCOWS.ToLower(): {
-			Enabled: false,
-		},
-		engines.YAHOO.ToLower(): {
-			Enabled: false,
-		},
-		engines.YEP.ToLower(): {
-			Enabled: false,
-		},
+func NewInfo() []engines.Name {
+	return []engines.Name{
+		engines.BING,
+		engines.GOOGLE,
+		engines.MOJEEK,
 	}
 }
 

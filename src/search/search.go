@@ -2,6 +2,7 @@ package search
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"time"
 
@@ -47,29 +48,26 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 // engine_searcher, NewEngineStarter()  use this.
 type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings) error
 
-func runEngines(engineMap map[string]config.Engine, settings map[string]config.Settings, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
+func runEngines(engs []engines.Name, settings map[string]config.Settings, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
+	config.EnabledEngines = make([]engines.Name, 20)
+	log.Info().Msgf("Enabled engines (%v): %v", len(config.EnabledEngines), config.EnabledEngines)
+
 	engineStarter := NewEngineStarter()
-	for name, engine := range engineMap {
-		if !engine.Enabled {
-			continue
-		}
-
-		engineName, nameErr := engines.NameString(name)
-		if nameErr != nil {
-			log.Panic().Err(nameErr).Msg("failed converting string to engine name")
-			return
-		}
-
-		config.EnabledEngines = append(config.EnabledEngines, engineName)
-
+	for i := range engs {
+		fmt.Printf("the eng: %v\n", engs[i])
 		worker.Go(func() {
-			if err := engineStarter[engineName](context.Background(), query, relay, options, settings[name]); err != nil {
-				log.Error().Err(err).Msgf("failed searching %v", engineName)
+
+			fmt.Printf("the eng worker: %v\n", engs[i])
+			strt := engineStarter[engs[i]]
+			fmt.Printf("the function!: %v\n", strt)
+			err := strt(context.Background(), query, relay, options, settings[engs[i].ToLower()])
+
+			if err != nil {
+				log.Error().Err(err).Msgf("failed searching %v", engs[i])
+				// TODO: should remove this engines results from relay, since sort may mangle them
 			}
 		})
 	}
-
-	log.Info().Msgf("Enabled engines (%v): %v", len(config.EnabledEngines), config.EnabledEngines)
 }
 
 func setCategory(query string, options *engines.Options) {
