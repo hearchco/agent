@@ -3,7 +3,7 @@ module github.com/tminaorg/brzaguza
 go 1.20
 
 require (
-	github.com/alecthomas/kong v0.8.0
+	github.com/alecthomas/kong v0.8.1
 	github.com/cockroachdb/pebble v0.0.0-20231009150004-a678d0968383
 	github.com/fxamacker/cbor/v2 v2.5.0
 	github.com/gin-contrib/cors v1.4.0
