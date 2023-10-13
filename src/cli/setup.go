@@ -26,7 +26,7 @@ func Setup() Flags {
 	)
 
 	if err := ctx.Validate(); err != nil {
-		log.Fatal().Err(err).Msg("Failed parsing cli")
+		log.Panic().Err(err).Msg("Failed parsing cli")
 	}
 
 	return cli
