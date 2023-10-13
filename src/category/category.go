@@ -29,8 +29,7 @@ func FromQuery(query string) (Name, string) {
 	sp := strings.SplitN(query, " ", 2)
 	cat := sp[0][1:]
 	q := sp[1]
-	val, ok := FromString[cat]
-	if ok {
+	if val, ok := FromString[cat]; ok {
 		return val, q
 	}
 	log.Debug().Msgf("invalid category in query: %v", query)

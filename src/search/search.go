@@ -55,11 +55,10 @@ func runEngines(engs []engines.Name, settings map[string]config.Settings, query 
 	for i := range engs {
 		eng := engs[i] // dont change for to `for _, eng := range engs {`, eng retains the same address throughout the whole loop
 		worker.Go(func() {
-			strt := engineStarter[eng]
-			err := strt(context.Background(), query, relay, options, settings[eng.ToLower()])
+			// todo: create context with deadlines for each engine run #115
+			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng.ToLower()])
 			if err != nil {
 				log.Error().Err(err).Msgf("failed searching %v", eng)
-				// TODO: should remove this engines results from relay, since sort may mangle them
 			}
 		})
 	}
