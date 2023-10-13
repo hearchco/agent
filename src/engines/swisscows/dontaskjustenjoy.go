@@ -17,10 +17,10 @@ func performMagic(input string) string {
 		if value_str, err := value.ToString(); err == nil {
 			result = value_str
 		} else {
-			log.Error().Msgf("Swisscows: MagicPerformer - couldn't convert returned value to string. Error: %v", err)
+			log.Error().Err(err).Msg("Swisscows: MagicPerformer - couldn't convert returned value to string.")
 		}
 	} else {
-		log.Error().Msgf("Swisscows: MagicPerformer - couldn't get result from javascript VM. Error: %v", err)
+		log.Error().Err(err).Msg("Swisscows: MagicPerformer - couldn't get result from javascript VM.")
 	}
 
 	return result

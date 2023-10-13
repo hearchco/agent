@@ -50,7 +50,7 @@ func ColRequest(seName engines.Name, col *colly.Collector, ctx *context.Context,
 
 func ColError(seName engines.Name, col *colly.Collector, retError *error) {
 	col.OnError(func(r *colly.Response, err error) {
-		log.Error().Msgf("%v: SE Collector - OnError.\nURL: %v\nError: %v", seName, r.Request.URL.String(), err)
+		log.Error().Err(err).Msgf("%v: SE Collector - OnError.\nURL: %v", seName, r.Request.URL.String())
 		log.Debug().Msgf("%v: HTML Response written to %v%v_col.log.html", seName, config.LogDumpLocation, seName)
 		writeErr := os.WriteFile(config.LogDumpLocation+string(seName)+"_col.log.html", r.Body, 0644)
 		if writeErr != nil {

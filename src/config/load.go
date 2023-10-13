@@ -29,7 +29,7 @@ func (c *Config) FromReader(rc *ReaderConfig) {
 			if eng.Enabled {
 				engineName, nameErr := engines.NameString(name)
 				if nameErr != nil {
-					log.Panic().Err(nameErr).Msg("failed converting string to engine name")
+					log.Fatal().Err(nameErr).Msg("failed converting string to engine name")
 					return
 				}
 
@@ -86,17 +86,17 @@ func (c *Config) Load(path string, logPath string) {
 		if _, errr := os.Stat(yamlPath); errr != nil {
 			log.Trace().Msgf("no yaml config present at path: %v", yamlPath)
 		} else if errr := k.Load(file.Provider(yamlPath), yaml.Parser()); errr != nil {
-			log.Panic().Msgf("error loading yaml config: %v", err)
+			log.Fatal().Err(err).Msg("error loading yaml config")
 		}
 	} else if err := k.Load(file.Provider(yamlPath), yaml.Parser()); err != nil {
-		log.Panic().Msgf("error loading yaml config: %v", err)
+		log.Fatal().Err(err).Msg("error loading yaml config")
 	}
 
 	// Load ENV config
 	if err := k.Load(env.Provider("BRZAGUZA_", ".", func(s string) string {
 		return strings.Replace(strings.ToLower(strings.TrimPrefix(s, "BRZAGUZA_")), "_", ".", -1)
 	}), nil); err != nil {
-		log.Panic().Msgf("error loading env config: %v", err)
+		log.Fatal().Err(err).Msg("error loading env config")
 	}
 
 	// Unmarshal config into struct

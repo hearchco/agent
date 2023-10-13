@@ -40,7 +40,7 @@ func (rw *RouterWrapper) addCors() {
 
 func (rw *RouterWrapper) runWithContext(ctx context.Context) {
 	if err := rw.router.RunWithContext(ctx); err != context.Canceled {
-		log.Error().Msgf("Failed starting router: %v", err)
+		log.Error().Err(err).Msg("Failed starting router")
 	} else if err != nil {
 		log.Info().Msgf("Stopping router...")
 		rw.router.Close()
