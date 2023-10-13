@@ -75,42 +75,42 @@ func NewRanking() Ranking {
 	}
 }
 
-func NewSettings() map[string]Settings {
-	return map[string]Settings{
-		engines.BING.ToLower(): {
+func NewSettings() map[engines.Name]Settings {
+	return map[engines.Name]Settings{
+		engines.BING: {
 			Shortcut: "bi",
 		},
-		engines.BRAVE.ToLower(): {
+		engines.BRAVE: {
 			Shortcut: "br",
 		},
-		engines.DUCKDUCKGO.ToLower(): {
+		engines.DUCKDUCKGO: {
 			Shortcut: "ddg",
 		},
-		engines.ETOOLS.ToLower(): {
+		engines.ETOOLS: {
 			Shortcut: "ets",
 		},
-		engines.GOOGLE.ToLower(): {
+		engines.GOOGLE: {
 			Shortcut: "go",
 		},
-		engines.MOJEEK.ToLower(): {
+		engines.MOJEEK: {
 			Shortcut: "mjk",
 		},
-		engines.PRESEARCH.ToLower(): {
+		engines.PRESEARCH: {
 			Shortcut: "ps",
 		},
-		engines.QWANT.ToLower(): {
+		engines.QWANT: {
 			Shortcut: "qw",
 		},
-		engines.STARTPAGE.ToLower(): {
+		engines.STARTPAGE: {
 			Shortcut: "sp",
 		},
-		engines.SWISSCOWS.ToLower(): {
+		engines.SWISSCOWS: {
 			Shortcut: "sc",
 		},
-		engines.YAHOO.ToLower(): {
+		engines.YAHOO: {
 			Shortcut: "yh",
 		},
-		engines.YEP.ToLower(): {
+		engines.YEP: {
 			Shortcut: "yep",
 		},
 	}

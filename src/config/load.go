@@ -17,12 +17,22 @@ import (
 var EnabledEngines []engines.Name = make([]engines.Name, 0)
 var LogDumpLocation string = "dump/"
 
-func (c *Config) FromReader(rc *ReaderConfig) {
+func (c *Config) fromReader(rc *ReaderConfig) {
 	nc := Config{
-		Server:   rc.Server,
-		Settings: rc.Settings,
+		Server:     rc.Server,
+		Settings:   map[engines.Name]Settings{},
+		Categories: map[category.Name]Category{},
 	}
-	nc.Categories = map[category.Name]Category{}
+
+	for key, val := range rc.Settings {
+		keyName, err := engines.NameString(key)
+		if err != nil {
+			log.Panic().Err(err).Msgf("failed reading config. invalid engine name: %v", key)
+			return
+		}
+		nc.Settings[keyName] = val
+	}
+
 	for key, val := range rc.RCategories {
 		engArr := []engines.Name{}
 		for name, eng := range val.REngines {
@@ -45,12 +55,17 @@ func (c *Config) FromReader(rc *ReaderConfig) {
 	*c = nc
 }
 
-func ReaderFromConfig(c *Config) ReaderConfig {
+func (c *Config) getReader() ReaderConfig {
 	rc := ReaderConfig{
-		Server:   c.Server,
-		Settings: c.Settings,
+		Server:      c.Server,
+		Settings:    map[string]Settings{},
+		RCategories: map[category.Name]ReaderCategory{},
 	}
-	rc.RCategories = map[category.Name]ReaderCategory{}
+
+	for key, val := range c.Settings {
+		rc.Settings[key.ToLower()] = val
+	}
+
 	for key, val := range c.Categories {
 		rc.RCategories[key] = ReaderCategory{
 			Ranking:  val.Ranking,
@@ -65,7 +80,7 @@ func ReaderFromConfig(c *Config) ReaderConfig {
 }
 
 func (c *Config) Load(path string, logPath string) {
-	rc := ReaderFromConfig(c)
+	rc := c.getReader()
 
 	// Load vars
 	loadVars(logPath)
@@ -106,7 +121,7 @@ func (c *Config) Load(path string, logPath string) {
 		log.Fatal().Err(err).Msg("failed unmarshaling koanf config")
 	}
 
-	c.FromReader(&rc)
+	c.fromReader(&rc)
 }
 
 func loadVars(logPath string) {
