@@ -1,5 +1,7 @@
 package engines
 
+import "github.com/tminaorg/brzaguza/src/category"
+
 // variables are 1-indexed
 // Information about what Rank a result was on some Search Engine
 type RetrievedRank struct {
@@ -49,5 +51,5 @@ type Options struct {
 	Locale        string //format: en-US
 	SafeSearch    bool
 	Mobile        bool
-	Category      string
+	Category      category.Name
 }

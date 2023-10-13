@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket/result"
 	"github.com/tminaorg/brzaguza/src/cache"
+	"github.com/tminaorg/brzaguza/src/category"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
 	"github.com/tminaorg/brzaguza/src/search"
@@ -17,7 +18,7 @@ func printResults(results []result.Result) {
 	for _, r := range results {
 		fmt.Printf("%v (%.2f) -----\n\t\"%v\"\n\t\"%v\"\n\t\"%v\"\n\t-", r.Rank, r.Score, r.Title, r.URL, r.Description)
 		for seInd := uint8(0); seInd < r.TimesReturned; seInd++ {
-			fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine)
+			fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine.ToLower())
 			if seInd != r.TimesReturned-1 {
 				fmt.Print(", ")
 			}
@@ -36,7 +37,7 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 	options := engines.Options{
 		MaxPages:   flags.MaxPages,
 		VisitPages: flags.Visit,
-		Category:   flags.Category,
+		Category:   category.FromString[flags.Category],
 	}
 
 	start := time.Now()

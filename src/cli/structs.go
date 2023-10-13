@@ -18,7 +18,7 @@ type Flags struct {
 	Config    string `type:"path" default:"${config_path}" env:"BRZAGUZA_CONFIG" help:"Config folder path"`
 	Log       string `type:"path" default:"${log_path}" env:"BRZAGUZA_LOG" help:"Log file path"`
 	Verbosity int8   `type:"counter" default:"0" short:"v" env:"BRZAGUZA_VERBOSITY" help:"Log level verbosity"`
-	Category  string `type:"string" default:"" short:"c" env:"BRZAGUZA_CATEGORY" help:"Search result category. Can also be supplied through the query (e.g. \"!info smartphone\"). Supported values: info[/wiki], science[/sci], news, blog, surf, new news[/nnews]"`
+	Category  string `type:"string" default:"" short:"c" env:"BRZAGUZA_CATEGORY" help:"Search result category. Can also be supplied through the query (e.g. \"!info smartphone\"). Supported values: info[/wiki], science[/sci], news, blog, surf, newnews[/nnews]"`
 	// profiler
 	CPUProfile    bool `type:"bool" default:"false" env:"BRZAGUZA_CPUPROFILE" help:"Use cpu profiling"`
 	HeapProfile   bool `type:"bool" default:"false" env:"BRZAGUZA_HEAPPROFILE" help:"Use heap profiling"`

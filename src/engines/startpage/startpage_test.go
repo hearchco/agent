@@ -8,7 +8,7 @@ import (
 )
 
 func TestSearch(t *testing.T) {
-	engineName := engines.Startpage
+	engineName := engines.STARTPAGE
 
 	// testing config
 	conf := _engines_test.NewConfig(engineName)

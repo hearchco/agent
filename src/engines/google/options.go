@@ -9,10 +9,10 @@ import (
 
 var Info engines.Info = engines.Info{
 	Domain:         "www.google.com",
-	Name:           engines.Google,
+	Name:           engines.GOOGLE,
 	URL:            "https://www.google.com/search?q=",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.Google},
+	Crawlers:       []engines.Name{engines.GOOGLE},
 }
 
 // This should be in Settings

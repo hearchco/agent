@@ -6,10 +6,10 @@ const pageURL string = "https://www.etools.ch/search.do?page="
 
 var Info engines.Info = engines.Info{
 	Domain:         "www.etools.ch",
-	Name:           engines.Etools,
+	Name:           engines.ETOOLS,
 	URL:            "https://www.etools.ch/searchSubmit.do",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.Bing, engines.Google, engines.Mojeek, engines.Yandex},
+	Crawlers:       []engines.Name{engines.BING, engines.GOOGLE, engines.MOJEEK, engines.YANDEX},
 }
 
 var dompaths engines.DOMPaths = engines.DOMPaths{

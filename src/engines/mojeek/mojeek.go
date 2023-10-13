@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
@@ -54,11 +55,15 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
-	col.Request("GET", Info.URL+query, nil, colCtx, nil)
+	if err := col.Request("GET", Info.URL+query, nil, colCtx, nil); err != nil {
+		log.Error().Err(err).Msg("mojeek: failed requesting with GET method")
+	}
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		col.Request("GET", Info.URL+query+"&s="+strconv.Itoa(i*10+1), nil, colCtx, nil)
+		if err := col.Request("GET", Info.URL+query+"&s="+strconv.Itoa(i*10+1), nil, colCtx, nil); err != nil {
+			log.Error().Err(err).Msg("mojeek: failed requesting with GET method on page")
+		}
 	}
 
 	col.Wait()

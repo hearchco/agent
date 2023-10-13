@@ -94,7 +94,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		colCtx.Put("page", strconv.Itoa(i+1))
 		//col.Request("OPTIONS", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
 		//col.Wait()
-		col.Request("GET", Info.URL+"freshness=All&itemsCount="+strconv.Itoa(settings.RequestedResultsPerPage)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
+		if err := col.Request("GET", Info.URL+"freshness=All&itemsCount="+strconv.Itoa(settings.RequestedResultsPerPage)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil); err != nil {
+			log.Error().Err(err).Msg("swisscows: failed requesting with GET method")
+		}
 	}
 
 	col.Wait()

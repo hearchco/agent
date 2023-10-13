@@ -1,6 +1,11 @@
 package config
 
-import "time"
+import (
+	"time"
+
+	"github.com/tminaorg/brzaguza/src/category"
+	"github.com/tminaorg/brzaguza/src/engines"
+)
 
 type EngineRanking struct {
 	Mul   float64 `koanf:"mul"`
@@ -36,11 +41,6 @@ type Settings struct {
 	Timings                 Timings `koanf:"timings"`
 }
 
-type Engine struct {
-	Enabled  bool     `koanf:"enabled"`
-	Settings Settings `koanf:"settings"`
-}
-
 type Redis struct {
 	Host     string `koanf:"host"`
 	Port     uint16 `koanf:"port"`
@@ -59,8 +59,28 @@ type Server struct {
 	Cache        Cache    `koanf:"cache"`
 }
 
+type ReaderEngine struct {
+	Enabled bool `koanf:"enabled"`
+}
+
+type ReaderCategory struct {
+	REngines map[string]ReaderEngine `koanf:"engines"`
+	Ranking  Ranking                 `koanf:"ranking"`
+}
+
+type ReaderConfig struct {
+	Server      Server                           `koanf:"server"`
+	RCategories map[category.Name]ReaderCategory `koanf:"categories"`
+	Settings    map[string]Settings              `koanf:"settings"`
+}
+
+type Category struct {
+	Engines []engines.Name
+	Ranking Ranking
+}
+
 type Config struct {
-	Server  Server            `koanf:"server"`
-	Engines map[string]Engine `koanf:"engines"`
-	Ranking Ranking           `koanf:"ranking"`
+	Server     Server
+	Categories map[category.Name]Category
+	Settings   map[engines.Name]Settings
 }
