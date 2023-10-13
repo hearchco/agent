@@ -3,23 +3,27 @@ package search
 import (
 	"context"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
 	"github.com/sourcegraph/conc"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/bucket/result"
+	"github.com/tminaorg/brzaguza/src/category"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
 	"github.com/tminaorg/brzaguza/src/rank"
 )
 
-func PerformSearch(query string, options engines.Options, config *config.Config) []result.Result {
+func PerformSearch(query string, options engines.Options, conf *config.Config) []result.Result {
 	searchTimer := time.Now()
 
 	relay := bucket.Relay{
 		ResultMap: make(map[string]*result.Result),
 	}
+
+	toRun := procBang(&query, &options, conf)
 
 	query = url.QueryEscape(query)
 	log.Debug().Msg(query)
@@ -27,13 +31,13 @@ func PerformSearch(query string, options engines.Options, config *config.Config)
 	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")
 	var worker conc.WaitGroup
-	runEngines(config.Engines, query, &worker, &relay, options)
+	runEngines(toRun, conf.Settings, query, &worker, &relay, options)
 	worker.Wait()
 	log.Debug().Msgf("Got results in %vms", time.Since(resTimer).Milliseconds())
 
 	rankTimer := time.Now()
 	log.Debug().Msg("Ranking...")
-	results := rank.Rank(relay.ResultMap, &(config.Ranking))
+	results := rank.Rank(relay.ResultMap, conf.Categories[options.Category].Ranking) // have to make copy, since its a map value
 	log.Debug().Msgf("Finished ranking in %vns", time.Since(rankTimer).Nanoseconds())
 
 	log.Debug().Msgf("Found results in %vms", time.Since(searchTimer).Milliseconds())
@@ -44,21 +48,66 @@ func PerformSearch(query string, options engines.Options, config *config.Config)
 // engine_searcher, NewEngineStarter()  use this.
 type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings) error
 
-func runEngines(engineMap map[string]config.Engine, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
+func runEngines(engs []engines.Name, settings map[engines.Name]config.Settings, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
+	config.EnabledEngines = engs
 	log.Info().Msgf("Enabled engines (%v): %v", len(config.EnabledEngines), config.EnabledEngines)
 
 	engineStarter := NewEngineStarter()
-	for name, engine := range engineMap {
-		engineName, nameErr := engines.NameString(name)
-		if nameErr != nil {
-			log.Panic().Err(nameErr).Msg("failed converting string to engine name")
-			return
-		}
-
+	for i := range engs {
+		eng := engs[i] // dont change for to `for _, eng := range engs {`, eng retains the same address throughout the whole loop
 		worker.Go(func() {
-			if err := engineStarter[engineName](context.Background(), query, relay, options, engine.Settings); err != nil {
-				log.Error().Err(err).Msgf("failed searching %v", engineName)
+			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng])
+			if err != nil {
+				log.Error().Err(err).Msgf("failed searching %v", eng)
 			}
 		})
 	}
+}
+
+func procBang(query *string, options *engines.Options, conf *config.Config) []engines.Name {
+	useSpec, specEng := procSpecificEngine(*query, options, conf)
+	goodCat := procCategory(*query, options)
+	if !goodCat && !useSpec && (*query)[0] == '!' {
+		log.Error().Msgf("invalid bang (not category or engine shortcut). query: %v", *query)
+	}
+
+	trimBang(query)
+
+	if useSpec {
+		return []engines.Name{specEng}
+	} else {
+		return conf.Categories[options.Category].Engines
+	}
+}
+
+func trimBang(query *string) {
+	if (*query)[0] == '!' {
+		*query = strings.SplitN(*query, " ", 2)[1]
+	}
+}
+
+func procSpecificEngine(query string, options *engines.Options, conf *config.Config) (bool, engines.Name) {
+	if query[0] != '!' {
+		return false, engines.UNDEFINED
+	}
+	sp := strings.SplitN(query, " ", 2)
+	specE := sp[0][1:]
+	for key, val := range conf.Settings {
+		if val.Shortcut == specE {
+			return true, key
+		}
+	}
+
+	return false, engines.UNDEFINED
+}
+
+func procCategory(query string, options *engines.Options) bool {
+	cat := category.FromQuery(query)
+	if cat != "" {
+		options.Category = cat
+	}
+	if options.Category == "" {
+		options.Category = category.GENERAL
+	}
+	return cat != ""
 }

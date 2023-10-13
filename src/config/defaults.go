@@ -1,6 +1,9 @@
 package config
 
-import "github.com/tminaorg/brzaguza/src/engines"
+import (
+	"github.com/tminaorg/brzaguza/src/category"
+	"github.com/tminaorg/brzaguza/src/engines"
+)
 
 const DefaultLocale string = "en-US"
 
@@ -16,59 +19,125 @@ func NewRanking() Ranking {
 		TRC:  1,
 		TRD:  0,
 		Engines: map[string]EngineRanking{
-			engines.Bing.ToLower(): {
+			engines.BING.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Brave.ToLower(): {
+			engines.BRAVE.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.DuckDuckGo.ToLower(): {
+			engines.DUCKDUCKGO.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Etools.ToLower(): {
+			engines.ETOOLS.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Google.ToLower(): {
+			engines.GOOGLE.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Mojeek.ToLower(): {
+			engines.MOJEEK.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Presearch.ToLower(): {
+			engines.PRESEARCH.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Qwant.ToLower(): {
+			engines.QWANT.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Startpage.ToLower(): {
+			engines.STARTPAGE.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Swisscows.ToLower(): {
+			engines.SWISSCOWS.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Yahoo.ToLower(): {
+			engines.YAHOO.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Yandex.ToLower(): {
+			engines.YANDEX.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
-			engines.Yep.ToLower(): {
+			engines.YEP.ToLower(): {
 				Mul:   1,
 				Const: 0,
 			},
 		},
+	}
+}
+
+func NewSettings() map[engines.Name]Settings {
+	return map[engines.Name]Settings{
+		engines.BING: {
+			Shortcut: "bi",
+		},
+		engines.BRAVE: {
+			Shortcut: "br",
+		},
+		engines.DUCKDUCKGO: {
+			Shortcut: "ddg",
+		},
+		engines.ETOOLS: {
+			Shortcut: "ets",
+		},
+		engines.GOOGLE: {
+			Shortcut: "go",
+		},
+		engines.MOJEEK: {
+			Shortcut: "mjk",
+		},
+		engines.PRESEARCH: {
+			Shortcut: "ps",
+		},
+		engines.QWANT: {
+			Shortcut: "qw",
+		},
+		engines.STARTPAGE: {
+			Shortcut: "sp",
+		},
+		engines.SWISSCOWS: {
+			Shortcut: "sc",
+		},
+		engines.YAHOO: {
+			Shortcut: "yh",
+		},
+		engines.YEP: {
+			Shortcut: "yep",
+		},
+	}
+}
+
+func NewAllEnabled() []engines.Name {
+	return []engines.Name{
+		engines.BING,
+		engines.BRAVE,
+		engines.DUCKDUCKGO,
+		engines.ETOOLS,
+		engines.GOOGLE,
+		engines.MOJEEK,
+		engines.PRESEARCH,
+		engines.QWANT,
+		engines.STARTPAGE,
+		engines.SWISSCOWS,
+		engines.YAHOO,
+		engines.YEP,
+	}
+}
+
+func NewInfo() []engines.Name {
+	return []engines.Name{
+		engines.BING,
+		engines.GOOGLE,
+		engines.MOJEEK,
 	}
 }
 
@@ -85,68 +154,36 @@ func New() *Config {
 				},
 			},
 		},
-		Engines: map[string]Engine{
-			engines.Bing.ToLower(): {
-				Enabled: true,
-				Settings: Settings{
-					Shortcut: "bi",
-				},
+		Settings: NewSettings(),
+		Categories: map[category.Name]Category{
+			category.GENERAL: {
+				Engines: NewAllEnabled(),
+				Ranking: NewRanking(),
 			},
-			engines.Brave.ToLower(): {
-				Enabled: true,
-				Settings: Settings{
-					Shortcut: "br",
-				},
+			category.INFO: {
+				Engines: NewInfo(),
+				Ranking: NewRanking(),
 			},
-			engines.DuckDuckGo.ToLower(): {
-				Enabled: true,
-				Settings: Settings{
-					Shortcut: "ddg",
-				},
+			category.SCIENCE: {
+				Engines: NewAllEnabled(),
+				Ranking: NewRanking(),
 			},
-			engines.Etools.ToLower(): {
-				Enabled: true,
-				Settings: Settings{
-					Shortcut: "ets",
-				},
+			category.NEWS: {
+				Engines: NewAllEnabled(),
+				Ranking: NewRanking(),
 			},
-			engines.Google.ToLower(): {
-				Enabled: true,
-				Settings: Settings{
-					Shortcut: "go",
-				},
+			category.BLOG: {
+				Engines: NewAllEnabled(),
+				Ranking: NewRanking(),
 			},
-			engines.Mojeek.ToLower(): {
-				Enabled: true,
-				Settings: Settings{
-					Shortcut: "mjk",
-				},
+			category.SURF: {
+				Engines: NewAllEnabled(),
+				Ranking: NewRanking(),
 			},
-			engines.Qwant.ToLower(): {
-				Enabled: true,
-				Settings: Settings{
-					Shortcut: "qw",
-				},
-			},
-			engines.Startpage.ToLower(): {
-				Enabled: true,
-				Settings: Settings{
-					Shortcut: "sp",
-				},
-			},
-			engines.Swisscows.ToLower(): {
-				Enabled: true,
-				Settings: Settings{
-					Shortcut: "sc",
-				},
-			},
-			engines.Yep.ToLower(): {
-				Enabled: true,
-				Settings: Settings{
-					Shortcut: "yep",
-				},
+			category.NEWNEWS: {
+				Engines: NewAllEnabled(),
+				Ranking: NewRanking(),
 			},
 		},
-		Ranking: NewRanking(),
 	}
 }

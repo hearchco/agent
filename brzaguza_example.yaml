@@ -1,21 +1,19 @@
-engines:
-  bing:
-    enabled: false
-  brave:
-    enabled: false
-  duckduckgo:
-    enabled: false
-  etools:
-    enabled: false
-  google:
-    enabled: false
-  mojeek:
-    enabled: false
-  qwant:
-    enabled: false
-  startpage:
-    enabled: false
-  swisscows:
-    enabled: false
-  yep:
-    enabled: false
+categories:
+  science:
+    engines:
+      startpage:
+        enabled: true
+      duckduckgo:
+        enabled: false
+    ranking:
+      engines:
+        mojeek:
+          mul: 1
+  general:
+    engines:
+      google:
+        enabled: true
+
+server:
+  cache:
+    type: none

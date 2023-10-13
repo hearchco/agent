@@ -10,13 +10,78 @@ import (
 	"github.com/knadh/koanf/providers/structs"
 	"github.com/knadh/koanf/v2"
 	"github.com/rs/zerolog/log"
+	"github.com/tminaorg/brzaguza/src/category"
 	"github.com/tminaorg/brzaguza/src/engines"
 )
 
 var EnabledEngines []engines.Name = make([]engines.Name, 0)
 var LogDumpLocation string = "dump/"
 
+func (c *Config) fromReader(rc *ReaderConfig) {
+	nc := Config{
+		Server:     rc.Server,
+		Settings:   map[engines.Name]Settings{},
+		Categories: map[category.Name]Category{},
+	}
+
+	for key, val := range rc.Settings {
+		keyName, err := engines.NameString(key)
+		if err != nil {
+			log.Panic().Err(err).Msgf("failed reading config. invalid engine name: %v", key)
+			return
+		}
+		nc.Settings[keyName] = val
+	}
+
+	for key, val := range rc.RCategories {
+		engArr := []engines.Name{}
+		for name, eng := range val.REngines {
+			if eng.Enabled {
+				engineName, nameErr := engines.NameString(name)
+				if nameErr != nil {
+					log.Panic().Err(nameErr).Msg("failed converting string to engine name")
+					return
+				}
+
+				engArr = append(engArr, engineName)
+			}
+		}
+		nc.Categories[key] = Category{
+			Ranking: val.Ranking,
+			Engines: engArr,
+		}
+	}
+
+	*c = nc
+}
+
+func (c *Config) getReader() ReaderConfig {
+	rc := ReaderConfig{
+		Server:      c.Server,
+		Settings:    map[string]Settings{},
+		RCategories: map[category.Name]ReaderCategory{},
+	}
+
+	for key, val := range c.Settings {
+		rc.Settings[key.ToLower()] = val
+	}
+
+	for key, val := range c.Categories {
+		rc.RCategories[key] = ReaderCategory{
+			Ranking:  val.Ranking,
+			REngines: map[string]ReaderEngine{},
+		}
+		for _, eng := range val.Engines {
+			rc.RCategories[key].REngines[eng.ToLower()] = ReaderEngine{Enabled: true}
+		}
+	}
+
+	return rc
+}
+
 func (c *Config) Load(path string, logPath string) {
+	rc := c.getReader()
+
 	// Load vars
 	loadVars(logPath)
 
@@ -26,7 +91,7 @@ func (c *Config) Load(path string, logPath string) {
 	// Load default values using the structs provider.
 	// We provide a struct along with the struct tag `koanf` to the
 	// provider.
-	k.Load(structs.Provider(c, "koanf"), nil)
+	k.Load(structs.Provider(&rc, "koanf"), nil)
 
 	// Load YAML config
 	yamlPath := path + "/brzaguza.yaml"
@@ -50,20 +115,9 @@ func (c *Config) Load(path string, logPath string) {
 	}
 
 	// Unmarshal config into struct
-	k.Unmarshal("", &c)
+	k.Unmarshal("", &rc)
 
-	// Add enabled engines names and remove disabled ones
-	for name, engine := range c.Engines {
-		if engine.Enabled {
-			if engineName, err := engines.NameString(name); err == nil {
-				EnabledEngines = append(EnabledEngines, engineName)
-			} else {
-				log.Panic().Err(err).Msgf("failed converting string %v to engine name", name)
-			}
-		} else {
-			delete(c.Engines, name)
-		}
-	}
+	c.fromReader(&rc)
 }
 
 func loadVars(logPath string) {

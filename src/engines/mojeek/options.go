@@ -4,10 +4,10 @@ import "github.com/tminaorg/brzaguza/src/engines"
 
 var Info engines.Info = engines.Info{
 	Domain:         "www.mojeek.com",
-	Name:           engines.Mojeek,
+	Name:           engines.MOJEEK,
 	URL:            "https://www.mojeek.com/search?q=",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.Mojeek},
+	Crawlers:       []engines.Name{engines.MOJEEK},
 }
 
 var dompaths engines.DOMPaths = engines.DOMPaths{

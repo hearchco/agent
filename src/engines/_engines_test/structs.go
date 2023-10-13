@@ -1,6 +1,7 @@
 package _engines_test
 
 import (
+	"github.com/tminaorg/brzaguza/src/category"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
 )
@@ -25,11 +26,11 @@ type TestCaseRankedResults struct {
 func NewConfig(engineName engines.Name) *config.Config {
 	config.EnabledEngines = append(config.EnabledEngines, engineName)
 	return &config.Config{
-		Engines: map[string]config.Engine{
-			engineName.ToLower(): {
-				Enabled: true,
+		Categories: map[category.Name]config.Category{
+			category.GENERAL: {
+				Engines: []engines.Name{engineName},
+				Ranking: config.NewRanking(),
 			},
 		},
-		Ranking: config.NewRanking(),
 	}
 }
