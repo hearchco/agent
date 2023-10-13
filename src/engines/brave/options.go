@@ -7,6 +7,7 @@ var Info engines.Info = engines.Info{
 	Name:           engines.BRAVE,
 	URL:            "https://search.brave.com/search?q=",
 	ResultsPerPage: 20,
+	Crawlers:       []engines.Name{engines.BRAVE, engines.GOOGLE},
 }
 
 var dompaths engines.DOMPaths = engines.DOMPaths{
