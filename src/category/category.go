@@ -25,8 +25,7 @@ func FromQuery(query string) Name {
 		return ""
 	}
 	cat := strings.SplitN(query, " ", 2)[0][1:]
-	val, ok := FromString[cat]
-	if ok {
+	if val, ok := FromString[cat]; ok {
 		return val
 	}
 	return ""

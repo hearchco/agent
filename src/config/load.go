@@ -17,7 +17,7 @@ import (
 var EnabledEngines []engines.Name = make([]engines.Name, 0)
 var LogDumpLocation string = "dump/"
 
-func (c *Config) FromReader(rc *ReaderConfig) {
+func (c *Config) fromReader(rc *ReaderConfig) {
 	nc := Config{
 		Server:     rc.Server,
 		Settings:   map[engines.Name]Settings{},
@@ -55,7 +55,7 @@ func (c *Config) FromReader(rc *ReaderConfig) {
 	*c = nc
 }
 
-func ReaderFromConfig(c *Config) ReaderConfig {
+func (c *Config) getReader() ReaderConfig {
 	rc := ReaderConfig{
 		Server:      c.Server,
 		Settings:    map[string]Settings{},
@@ -80,7 +80,7 @@ func ReaderFromConfig(c *Config) ReaderConfig {
 }
 
 func (c *Config) Load(path string, logPath string) {
-	rc := ReaderFromConfig(c)
+	rc := c.getReader()
 
 	// Load vars
 	loadVars(logPath)
@@ -117,7 +117,7 @@ func (c *Config) Load(path string, logPath string) {
 	// Unmarshal config into struct
 	k.Unmarshal("", &rc)
 
-	c.FromReader(&rc)
+	c.fromReader(&rc)
 }
 
 func loadVars(logPath string) {
