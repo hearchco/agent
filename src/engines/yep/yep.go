@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
@@ -65,7 +66,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		apiURL = Info.URL + "client=web&gl=" + locale + "&limit=" + strconv.Itoa(nRequested) + "&no_correct=false&q=" + query + "&safeSearch=" + safeSearch + "&type=web"
 	}
 
-	col.Request("GET", apiURL, nil, nil, nil)
+	if err := col.Request("GET", apiURL, nil, nil, nil); err != nil {
+		log.Error().Err(err).Msg("yep: failed requesting with GET method")
+	}
 
 	col.Wait()
 	pagesCol.Wait()

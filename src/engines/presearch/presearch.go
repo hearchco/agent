@@ -80,19 +80,25 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			nextCtx := colly.NewContext()
 			nextCtx.Put("page", strconv.Itoa(page))
 			nextCtx.Put("isAPI", "true")
-			col.Request("GET", "https://presearch.com/results?id="+searchId, nil, nextCtx, nil)
+			if err := col.Request("GET", "https://presearch.com/results?id="+searchId, nil, nextCtx, nil); err != nil {
+				log.Error().Err(err).Msg("presearch: failed requesting with API")
+			}
 		}
 	})
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 	colCtx.Put("isAPI", "false")
-	col.Request("GET", Info.URL+query, nil, colCtx, nil)
+	if err := col.Request("GET", Info.URL+query, nil, colCtx, nil); err != nil {
+		log.Error().Err(err).Msg("presearch: failed requesting with GET method")
+	}
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 		colCtx.Put("isAPI", "false")
-		col.Request("GET", Info.URL+query+"&page="+strconv.Itoa(i+1), nil, colCtx, nil)
+		if err := col.Request("GET", Info.URL+query+"&page="+strconv.Itoa(i+1), nil, colCtx, nil); err != nil {
+			log.Error().Err(err).Msg("presearch: failed requesting with GET method on page")
+		}
 	}
 
 	col.Wait()

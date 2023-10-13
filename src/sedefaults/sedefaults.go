@@ -115,7 +115,9 @@ func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collecto
 			Parallelism: timings.Parallelism,
 		}
 
-		(*colPtr).Limit(limitRule)
+		if err := (*colPtr).Limit(limitRule); err != nil {
+			log.Error().Err(err).Msg("sedefaults: failed adding a new limit rule")
+		}
 		if timings.Timeout != 0 {
 			(*colPtr).SetRequestTimeout(timings.Timeout)
 		}

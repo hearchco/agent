@@ -71,14 +71,18 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
-	col.Request("POST", Info.URL, strings.NewReader("query="+query+"&country=web&language=all"), colCtx, nil)
+	if err := col.Request("POST", Info.URL, strings.NewReader("query="+query+"&country=web&language=all"), colCtx, nil); err != nil {
+		log.Error().Err(err).Msg("etools: failed requesting with POST method")
+	}
 	col.Wait() //wait so I can get the JSESSION cookie back
 
 	for i := 1; i < options.MaxPages; i++ {
 		pageStr := strconv.Itoa(i + 1)
 		colCtx = colly.NewContext()
 		colCtx.Put("page", pageStr)
-		col.Request("GET", pageURL+pageStr, nil, colCtx, nil)
+		if err := col.Request("GET", pageURL+pageStr, nil, colCtx, nil); err != nil {
+			log.Error().Err(err).Msg("etools: failed requesting with GET method on page")
+		}
 	}
 
 	col.Wait()

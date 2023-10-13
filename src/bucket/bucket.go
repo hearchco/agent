@@ -61,7 +61,9 @@ func AddSEResult(seResult *engines.RetrievedResult, seName engines.Name, relay *
 	}
 
 	if !exists && options.VisitPages {
-		pagesCol.Visit(seResult.URL)
+		if err := pagesCol.Visit(seResult.URL); err != nil {
+			log.Error().Err(err).Msgf("bucket: failed visiting %v", seResult.URL)
+		}
 	}
 }
 

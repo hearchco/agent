@@ -73,7 +73,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 		reqString := Info.URL + query + "&count=" + strconv.Itoa(nRequested) + "&locale=" + locale + "&offset=" + strconv.Itoa(i*nRequested) + "&device=" + device + "&safesearch=" + safeSearch
-		col.Request("GET", reqString, nil, colCtx, nil)
+		if err := col.Request("GET", reqString, nil, colCtx, nil); err != nil {
+			log.Error().Err(err).Msg("qwant: failed requesting with GET method")
+		}
 	}
 
 	col.Wait()
