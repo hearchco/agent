@@ -50,7 +50,8 @@ func (db *DB) Set(k string, v cache.Value) {
 	} else if err := db.rdb.Set(db.ctx, k, val, 0).Err(); err != nil {
 		log.Fatal().Msgf("Error setting KV to redis: %v", err)
 	} else {
-		log.Debug().Msgf("Cached results in %vns", time.Since(cacheTimer).Nanoseconds())
+		cacheTimeSince := time.Since(cacheTimer)
+		log.Debug().Msgf("Cached results in %vms (%vns)", cacheTimeSince.Milliseconds(), cacheTimeSince.Nanoseconds())
 	}
 }
 

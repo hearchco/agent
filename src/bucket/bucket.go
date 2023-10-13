@@ -72,12 +72,11 @@ func SetResultResponse(link string, response *colly.Response, relay *Relay, seNa
 	mapRes, exists := relay.ResultMap[link]
 
 	if !exists {
-		relay.Mutex.Unlock()
 		log.Error().Msgf("URL not in map when adding response! Should not be possible. URL: %v", link)
-		return
+	} else {
+		mapRes.Response = response
 	}
 
-	mapRes.Response = response
 	relay.Mutex.Unlock()
 }
 
