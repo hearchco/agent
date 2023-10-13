@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/alecthomas/kong v0.8.1
-	github.com/cockroachdb/pebble v0.0.0-20231011191824-ede31f1a8e4b
+	github.com/cockroachdb/pebble v0.0.0-20231013194213-bbbf3df1d265
 	github.com/fxamacker/cbor/v2 v2.5.0
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/graceful v0.0.0-20230904152018-e56ed94cd808
