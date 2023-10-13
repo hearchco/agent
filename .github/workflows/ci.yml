@@ -30,8 +30,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      # Optional: allow read access to pull request. Use with `only-new-issues` option.
-      # pull-requests: read
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v4
@@ -43,8 +41,6 @@ jobs:
         run: make install
 
       # lint
-        uses: golangci/golangci-lint-action@v3
+      - uses: golangci/golangci-lint-action@v3
         with:
           version: latest
-          # Optional: show only new issues if it's a pull request. The default value is `false`.
-          # only-new-issues: true
