@@ -6,7 +6,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var FromString map[string]Name = map[string]Name{
+var FromString = map[string]Name{
 	//main
 	"general": GENERAL,
 	"info":    INFO,
