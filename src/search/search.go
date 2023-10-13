@@ -68,11 +68,23 @@ func runEngines(engs []engines.Name, settings map[engines.Name]config.Settings, 
 
 func procBang(query *string, options *engines.Options, conf *config.Config) []engines.Name {
 	useSpec, specEng := procSpecificEngine(*query, options, conf)
+	goodCat := procCategory(*query, options)
+	if !goodCat && !useSpec && (*query)[0] == '!' {
+		log.Error().Msgf("invalid bang (not category or engine shortcut). query: %v", *query)
+	}
+
+	trimBang(query)
+
 	if useSpec {
 		return []engines.Name{specEng}
 	} else {
-		procCategory(query, options)
 		return conf.Categories[options.Category].Engines
+	}
+}
+
+func trimBang(query *string) {
+	if (*query)[0] == '!' {
+		*query = strings.SplitN(*query, " ", 2)[1]
 	}
 }
 
@@ -88,17 +100,16 @@ func procSpecificEngine(query string, options *engines.Options, conf *config.Con
 		}
 	}
 
-	log.Trace().Msgf("not a specific engine in query: %v", query)
 	return false, engines.UNDEFINED
 }
 
-func procCategory(query *string, options *engines.Options) {
-	cat, q := category.FromQuery(*query)
+func procCategory(query string, options *engines.Options) bool {
+	cat := category.FromQuery(query)
 	if cat != "" {
 		options.Category = cat
 	}
 	if options.Category == "" {
 		options.Category = category.GENERAL
 	}
-	*query = q
+	return cat != ""
 }
