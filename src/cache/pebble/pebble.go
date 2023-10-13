@@ -53,7 +53,7 @@ func (db *DB) Get(k string, o cache.Value) {
 	val := []byte(v) // copy data before closing, casting needed for unmarshal
 
 	if err == pebble.ErrNotFound {
-		log.Trace().Err(err).Msgf("Found no value in pebble for key %v", k)
+		log.Trace().Msgf("Found no value in pebble for key %v", k)
 	} else if err != nil {
 		log.Fatal().Err(err).Msgf("Error getting value from pebble for key %v", k)
 	} else if err := c.Close(); err != nil {

@@ -60,7 +60,7 @@ func (db *DB) Get(k string, o cache.Value) {
 	val := []byte(v) // copy data before closing, casting needed for unmarshal
 
 	if err == redis.Nil {
-		log.Trace().Err(err).Msgf("Found no value in redis for key %v", k)
+		log.Trace().Msgf("Found no value in redis for key %v", k)
 	} else if err != nil {
 		log.Fatal().Err(err).Msgf("Error getting value from redis for key %v", k)
 	} else if err := cbor.Unmarshal(val, o); err != nil {
