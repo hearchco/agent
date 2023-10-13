@@ -82,5 +82,5 @@ type Category struct {
 type Config struct {
 	Server     Server
 	Categories map[category.Name]Category
-	Settings   map[string]Settings
+	Settings   map[engines.Name]Settings
 }

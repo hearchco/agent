@@ -3,6 +3,7 @@ package search
 import (
 	"context"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -22,7 +23,7 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 		ResultMap: make(map[string]*result.Result),
 	}
 
-	procCategory(&query, &options)
+	toRun := procBang(&query, &options, conf)
 
 	query = url.QueryEscape(query)
 	log.Debug().Msg(query)
@@ -30,7 +31,7 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")
 	var worker conc.WaitGroup
-	runEngines(conf.Categories[options.Category].Engines, conf.Settings, query, &worker, &relay, options)
+	runEngines(toRun, conf.Settings, query, &worker, &relay, options)
 	worker.Wait()
 	log.Debug().Msgf("Got results in %vms", time.Since(resTimer).Milliseconds())
 
@@ -47,7 +48,7 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 // engine_searcher, NewEngineStarter()  use this.
 type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings) error
 
-func runEngines(engs []engines.Name, settings map[string]config.Settings, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
+func runEngines(engs []engines.Name, settings map[engines.Name]config.Settings, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
 	config.EnabledEngines = engs
 	log.Info().Msgf("Enabled engines (%v): %v", len(config.EnabledEngines), config.EnabledEngines)
 
@@ -55,8 +56,7 @@ func runEngines(engs []engines.Name, settings map[string]config.Settings, query 
 	for i := range engs {
 		eng := engs[i] // dont change for to `for _, eng := range engs {`, eng retains the same address throughout the whole loop
 		worker.Go(func() {
-			// todo: create context with deadlines for each engine run #115
-			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng.ToLower()])
+			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng])
 			if err != nil {
 				log.Error().Err(err).Msgf("failed searching %v", eng)
 			}
@@ -64,13 +64,50 @@ func runEngines(engs []engines.Name, settings map[string]config.Settings, query 
 	}
 }
 
-func procCategory(query *string, options *engines.Options) {
-	cat, q := category.FromQuery(*query)
+func procBang(query *string, options *engines.Options, conf *config.Config) []engines.Name {
+	useSpec, specEng := procSpecificEngine(*query, options, conf)
+	goodCat := procCategory(*query, options)
+	if !goodCat && !useSpec && (*query)[0] == '!' {
+		log.Error().Msgf("invalid bang (not category or engine shortcut). query: %v", *query)
+	}
+
+	trimBang(query)
+
+	if useSpec {
+		return []engines.Name{specEng}
+	} else {
+		return conf.Categories[options.Category].Engines
+	}
+}
+
+func trimBang(query *string) {
+	if (*query)[0] == '!' {
+		*query = strings.SplitN(*query, " ", 2)[1]
+	}
+}
+
+func procSpecificEngine(query string, options *engines.Options, conf *config.Config) (bool, engines.Name) {
+	if query[0] != '!' {
+		return false, engines.UNDEFINED
+	}
+	sp := strings.SplitN(query, " ", 2)
+	specE := sp[0][1:]
+	for key, val := range conf.Settings {
+		if val.Shortcut == specE {
+			return true, key
+		}
+	}
+
+	return false, engines.UNDEFINED
+}
+
+func procCategory(query string, options *engines.Options) bool {
+	cat := category.FromQuery(query)
 	if cat != "" {
 		options.Category = cat
 	}
 	if options.Category == "" {
 		options.Category = category.GENERAL
 	}
-	*query = q
+	return cat != ""
 }
