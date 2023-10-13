@@ -10,10 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # git
       - uses: actions/checkout@v3
-
-      # go
       - uses: actions/setup-go@v4
         with:
           go-version: stable
@@ -29,3 +26,20 @@ jobs:
       # go:test
       - name: Test units
         run: make test
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: stable
+
+      # go:generate
+      - name: Generate go code from go:generate comments
+        run: make install
+
+      # lint
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
