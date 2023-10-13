@@ -25,7 +25,7 @@ func New(ctx context.Context, config config.Redis) *DB {
 	})
 
 	if err := rdb.Ping(ctx).Err(); err != nil {
-		log.Fatal().Msgf("Error connecting to redis (addr: %v:%v/%v): %v", config.Host, config.Port, config.Database, err)
+		log.Fatal().Err(err).Msgf("Error connecting to redis with addr: %v:%v/%v", config.Host, config.Port, config.Database)
 	} else {
 		log.Info().Msgf("Successful connection to redis (addr: %v:%v/%v)", config.Host, config.Port, config.Database)
 	}
@@ -35,7 +35,7 @@ func New(ctx context.Context, config config.Redis) *DB {
 
 func (db *DB) Close() {
 	if err := db.rdb.Close(); err != nil {
-		log.Fatal().Msgf("Error disconnecting from redis: %v", err)
+		log.Fatal().Err(err).Msg("Error disconnecting from redis")
 	} else {
 		log.Debug().Msg("Successfully disconnected from redis")
 	}
@@ -46,11 +46,12 @@ func (db *DB) Set(k string, v cache.Value) {
 	cacheTimer := time.Now()
 
 	if val, err := cbor.Marshal(v); err != nil {
-		log.Error().Msgf("Error marshaling value: %v", err)
+		log.Error().Err(err).Msg("Error marshaling value")
 	} else if err := db.rdb.Set(db.ctx, k, val, 0).Err(); err != nil {
-		log.Fatal().Msgf("Error setting KV to redis: %v", err)
+		log.Fatal().Err(err).Msg("Error setting KV to redis")
 	} else {
-		log.Debug().Msgf("Cached results in %vns", time.Since(cacheTimer).Nanoseconds())
+		cacheTimeSince := time.Since(cacheTimer)
+		log.Debug().Msgf("Cached results in %vms (%vns)", cacheTimeSince.Milliseconds(), cacheTimeSince.Nanoseconds())
 	}
 }
 
@@ -59,10 +60,10 @@ func (db *DB) Get(k string, o cache.Value) {
 	val := []byte(v) // copy data before closing, casting needed for unmarshal
 
 	if err == redis.Nil {
-		log.Trace().Msgf("Found no value in redis for key (%v): %v", k, err)
+		log.Trace().Msgf("Found no value in redis for key %v", k)
 	} else if err != nil {
-		log.Fatal().Msgf("Error getting value from redis for key (%v): %v", k, err)
+		log.Fatal().Err(err).Msgf("Error getting value from redis for key %v", k)
 	} else if err := cbor.Unmarshal(val, o); err != nil {
-		log.Error().Msgf("Failed unmarshaling value from redis for key (%v): %v", k, err)
+		log.Error().Err(err).Msgf("Failed unmarshaling value from redis for key %v", k)
 	}
 }

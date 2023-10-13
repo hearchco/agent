@@ -92,7 +92,7 @@ func (c *Config) Load(path string, logPath string) {
 	// We provide a struct along with the struct tag `koanf` to the
 	// provider.
 	if err := k.Load(structs.Provider(&rc, "koanf"), nil); err != nil {
-		log.Fatal().Err(err).Msg("failed loading default values")
+		log.Panic().Err(err).Msg("failed loading default values")
 	}
 
 	// Load YAML config
@@ -103,22 +103,22 @@ func (c *Config) Load(path string, logPath string) {
 		if _, errr := os.Stat(yamlPath); errr != nil {
 			log.Trace().Msgf("no yaml config present at path: %v", yamlPath)
 		} else if errr := k.Load(file.Provider(yamlPath), yaml.Parser()); errr != nil {
-			log.Panic().Msgf("error loading yaml config: %v", err)
+			log.Panic().Err(err).Msg("error loading yaml config")
 		}
 	} else if err := k.Load(file.Provider(yamlPath), yaml.Parser()); err != nil {
-		log.Panic().Msgf("error loading yaml config: %v", err)
+		log.Panic().Err(err).Msg("error loading yaml config")
 	}
 
 	// Load ENV config
 	if err := k.Load(env.Provider("BRZAGUZA_", ".", func(s string) string {
 		return strings.Replace(strings.ToLower(strings.TrimPrefix(s, "BRZAGUZA_")), "_", ".", -1)
 	}), nil); err != nil {
-		log.Panic().Msgf("error loading env config: %v", err)
+		log.Panic().Err(err).Msg("error loading env config")
 	}
 
 	// Unmarshal config into struct
 	if err := k.Unmarshal("", &rc); err != nil {
-		log.Fatal().Err(err).Msg("failed unmarshaling koanf config")
+		log.Panic().Err(err).Msg("failed unmarshaling koanf config")
 	}
 
 	c.fromReader(&rc)

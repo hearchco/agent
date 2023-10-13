@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-var FromString map[string]Name = map[string]Name{
+var FromString = map[string]Name{
 	//main
 	"general": GENERAL,
 	"info":    INFO,

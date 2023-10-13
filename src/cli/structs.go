@@ -15,8 +15,8 @@ type Flags struct {
 	Cli       bool   `type:"bool" default:"false" env:"BRZAGUZA_CLI" help:"Use CLI mode"`
 	Visit     bool   `type:"bool" default:"false" env:"BRZAGUZA_VISIT" help:"Should results be visited"`
 	Silent    bool   `type:"bool" default:"false" short:"s" env:"BRZAGUZA_SILENT" help:"Should results be printed"`
-	Config    string `type:"path" default:"${config_path}" env:"BRZAGUZA_CONFIG" help:"Config folder path"`
-	Log       string `type:"path" default:"${log_path}" env:"BRZAGUZA_LOG" help:"Log file path"`
+	Data      string `type:"path" default:"${data_folder}" env:"BRZAGUZA_DATA" help:"Data folder path"`
+	Log       string `type:"path" default:"${log_folder}" env:"BRZAGUZA_LOG" help:"Log folder path"`
 	Verbosity int8   `type:"counter" default:"0" short:"v" env:"BRZAGUZA_VERBOSITY" help:"Log level verbosity"`
 	Category  string `type:"string" default:"" short:"c" env:"BRZAGUZA_CATEGORY" help:"Search result category. Can also be supplied through the query (e.g. \"!info smartphone\"). Supported values: info[/wiki], science[/sci], news, blog, surf, newnews[/nnews]"`
 	// profiler
