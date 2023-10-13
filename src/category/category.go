@@ -33,6 +33,6 @@ func FromQuery(query string) (Name, string) {
 	if ok {
 		return val, q
 	}
-	log.Debug().Msgf("invalid category in query: %v", query)
+	log.Trace().Msgf("not a category in query: %v", query)
 	return "", q
 }
