@@ -91,7 +91,9 @@ func (c *Config) Load(path string, logPath string) {
 	// Load default values using the structs provider.
 	// We provide a struct along with the struct tag `koanf` to the
 	// provider.
-	k.Load(structs.Provider(&rc, "koanf"), nil)
+	if err := k.Load(structs.Provider(&rc, "koanf"), nil); err != nil {
+		log.Fatal().Err(err).Msg("failed loading default values")
+	}
 
 	// Load YAML config
 	yamlPath := path + "/brzaguza.yaml"
@@ -115,7 +117,9 @@ func (c *Config) Load(path string, logPath string) {
 	}
 
 	// Unmarshal config into struct
-	k.Unmarshal("", &rc)
+	if err := k.Unmarshal("", &rc); err != nil {
+		log.Fatal().Err(err).Msg("failed unmarshaling koanf config")
+	}
 
 	c.fromReader(&rc)
 }

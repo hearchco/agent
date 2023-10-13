@@ -66,11 +66,15 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
-	col.Request("GET", Info.URL+query+safeSearch, nil, colCtx, nil)
+	if err := col.Request("GET", Info.URL+query+safeSearch, nil, colCtx, nil); err != nil {
+		log.Error().Err(err).Msg("startpage: failed requesting with GET method")
+	}
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		col.Request("GET", Info.URL+query+"&page="+strconv.Itoa(i+1)+safeSearch, nil, colCtx, nil)
+		if err := col.Request("GET", Info.URL+query+"&page="+strconv.Itoa(i+1)+safeSearch, nil, colCtx, nil); err != nil {
+			log.Error().Err(err).Msg("startpage: failed requesting with GET method on page")
+		}
 	}
 
 	col.Wait()
