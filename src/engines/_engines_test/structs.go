@@ -28,8 +28,9 @@ func NewConfig(engineName engines.Name) *config.Config {
 	return &config.Config{
 		Categories: map[category.Name]config.Category{
 			category.GENERAL: {
-				Engines: []engines.Name{engineName},
-				Ranking: config.NewRanking(),
+				Engines:  []engines.Name{engineName},
+				Ranking:  config.NewRanking(),
+				Deadline: 10000,
 			},
 		},
 	}
