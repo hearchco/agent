@@ -157,32 +157,39 @@ func New() *Config {
 		Settings: NewSettings(),
 		Categories: map[category.Name]Category{
 			category.GENERAL: {
-				Engines: NewAllEnabled(),
-				Ranking: NewRanking(),
+				Engines:  NewAllEnabled(),
+				Ranking:  NewRanking(),
+				Deadline: 1000,
 			},
 			category.INFO: {
-				Engines: NewInfo(),
-				Ranking: NewRanking(),
+				Engines:  NewInfo(),
+				Ranking:  NewRanking(),
+				Deadline: 1000,
 			},
 			category.SCIENCE: {
-				Engines: NewAllEnabled(),
-				Ranking: NewRanking(),
+				Engines:  NewAllEnabled(),
+				Ranking:  NewRanking(),
+				Deadline: 3000,
 			},
 			category.NEWS: {
-				Engines: NewAllEnabled(),
-				Ranking: NewRanking(),
+				Engines:  NewAllEnabled(),
+				Ranking:  NewRanking(),
+				Deadline: 1000,
 			},
 			category.BLOG: {
-				Engines: NewAllEnabled(),
-				Ranking: NewRanking(),
+				Engines:  NewAllEnabled(),
+				Ranking:  NewRanking(),
+				Deadline: 2500,
 			},
 			category.SURF: {
-				Engines: NewAllEnabled(),
-				Ranking: NewRanking(),
+				Engines:  NewAllEnabled(),
+				Ranking:  NewRanking(),
+				Deadline: 2000,
 			},
 			category.NEWNEWS: {
-				Engines: NewAllEnabled(),
-				Ranking: NewRanking(),
+				Engines:  NewAllEnabled(),
+				Ranking:  NewRanking(),
+				Deadline: 1000,
 			},
 		},
 	}

@@ -66,6 +66,7 @@ type ReaderEngine struct {
 type ReaderCategory struct {
 	REngines map[string]ReaderEngine `koanf:"engines"`
 	Ranking  Ranking                 `koanf:"ranking"`
+	Deadline uint16                  `koanf:"deadline"`
 }
 
 type ReaderConfig struct {
@@ -75,8 +76,9 @@ type ReaderConfig struct {
 }
 
 type Category struct {
-	Engines []engines.Name
-	Ranking Ranking
+	Engines  []engines.Name
+	Ranking  Ranking
+	Deadline uint16
 }
 
 type Config struct {

@@ -23,7 +23,7 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 		ResultMap: make(map[string]*result.Result),
 	}
 
-	toRun := procBang(&query, &options, conf)
+	deadline, toRun := procBang(&query, &options, conf)
 
 	query = url.QueryEscape(query)
 	log.Debug().Msg(query)
@@ -31,7 +31,7 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")
 	var worker conc.WaitGroup
-	runEngines(toRun, conf.Settings, query, &worker, &relay, options)
+	runEngines(deadline, toRun, conf.Settings, query, &worker, &relay, options)
 	worker.Wait()
 	log.Debug().Msgf("Got results in %vms", time.Since(resTimer).Milliseconds())
 
@@ -49,7 +49,7 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 // engine_searcher, NewEngineStarter()  use this.
 type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings) error
 
-func runEngines(engs []engines.Name, settings map[engines.Name]config.Settings, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
+func runEngines(deadline time.Duration, engs []engines.Name, settings map[engines.Name]config.Settings, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
 	config.EnabledEngines = engs
 	log.Info().Msgf("Enabled engines (%v): %v", len(config.EnabledEngines), config.EnabledEngines)
 
@@ -57,15 +57,26 @@ func runEngines(engs []engines.Name, settings map[engines.Name]config.Settings, 
 	for i := range engs {
 		eng := engs[i] // dont change for to `for _, eng := range engs {`, eng retains the same address throughout the whole loop
 		worker.Go(func() {
-			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng])
-			if err != nil {
-				log.Error().Err(err).Msgf("failed searching %v", eng)
-			}
+			ctxTimer := time.Now()
+
+			deadline := 1000 * time.Millisecond
+			ctx, cancelCtx := context.WithTimeout(context.Background(), deadline)
+
+			worker.Go(func() {
+				err := engineStarter[eng](ctx, query, relay, options, settings[eng])
+				if err != nil {
+					log.Error().Err(err).Msgf("failed searching %v", eng)
+				}
+				cancelCtx()
+			})
+
+			<-ctx.Done()
+			log.Trace().Msgf("%v: context done in %vms (deadline: %vms)", eng, time.Since(ctxTimer).Milliseconds(), deadline.Milliseconds())
 		})
 	}
 }
 
-func procBang(query *string, options *engines.Options, conf *config.Config) []engines.Name {
+func procBang(query *string, options *engines.Options, conf *config.Config) (time.Duration, []engines.Name) {
 	useSpec, specEng := procSpecificEngine(*query, options, conf)
 	goodCat := procCategory(*query, options)
 	if !goodCat && !useSpec && (*query)[0] == '!' {
@@ -75,9 +86,9 @@ func procBang(query *string, options *engines.Options, conf *config.Config) []en
 	trimBang(query)
 
 	if useSpec {
-		return []engines.Name{specEng}
+		return 5000 * time.Millisecond, []engines.Name{specEng}
 	} else {
-		return conf.Categories[options.Category].Engines
+		return time.Duration(conf.Categories[options.Category].Deadline) * time.Millisecond, conf.Categories[options.Category].Engines
 	}
 }
 

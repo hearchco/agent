@@ -99,13 +99,13 @@ func Prepare(seName engines.Name, options *engines.Options, settings *config.Set
 	return nil
 }
 
-func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collector, options *engines.Options, timings *config.Timings) {
+func InitializeCollectors(ctx context.Context, colPtr **colly.Collector, pagesColPtr **colly.Collector, options *engines.Options, timings *config.Timings) {
 	if options.MaxPages == 1 {
-		*colPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) // so there is no thread creation overhead
+		*colPtr = colly.NewCollector(colly.StdlibContext(ctx), colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) // so there is no thread creation overhead
 	} else {
-		*colPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
+		*colPtr = colly.NewCollector(colly.StdlibContext(ctx), colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 	}
-	*pagesColPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
+	*pagesColPtr = colly.NewCollector(colly.StdlibContext(ctx), colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 
 	if timings != nil {
 		var limitRule *colly.LimitRule = &colly.LimitRule{
