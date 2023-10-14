@@ -6,8 +6,6 @@ primary_region = "cdg"
 
 [env]
   BRZAGUZA_SERVER_FRONTENDURLS = "https://brzaguza.rs"
-  BRZAGUZA_ENGINES_STARTPAGE_ENABLED = "false"
-  BRZAGUZA_ENGINES_YEP_ENABLED = "false"
 
 [mounts]
   source="data"
