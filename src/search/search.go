@@ -58,8 +58,6 @@ func runEngines(deadline time.Duration, engs []engines.Name, settings map[engine
 		eng := engs[i] // dont change for to `for _, eng := range engs {`, eng retains the same address throughout the whole loop
 		worker.Go(func() {
 			ctxTimer := time.Now()
-
-			deadline := 1000 * time.Millisecond
 			ctx, cancelCtx := context.WithTimeout(context.Background(), deadline)
 
 			worker.Go(func() {
