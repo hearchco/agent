@@ -25,20 +25,9 @@ type Ranking struct {
 	Engines map[string]EngineRanking `koanf:"engines"`
 }
 
-// Delegates Timeout, PageTimeout to colly.Collector.SetRequestTimeout(); Note: See https://github.com/gocolly/colly/issues/644
-// Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit()
-type Timings struct {
-	Timeout     time.Duration `koanf:"timeout"`
-	PageTimeout time.Duration `koanf:"pageTimeout"`
-	Delay       time.Duration `koanf:"delay"`
-	RandomDelay time.Duration `koanf:"randomDelay"`
-	Parallelism int           `koanf:"parallelism"`
-}
-
 type Settings struct {
-	RequestedResultsPerPage int     `koanf:"requestedResults"`
-	Shortcut                string  `koanf:"shortcut"`
-	Timings                 Timings `koanf:"timings"`
+	RequestedResultsPerPage int    `koanf:"requestedResults"`
+	Shortcut                string `koanf:"shortcut"`
 }
 
 type Redis struct {
@@ -63,9 +52,31 @@ type ReaderEngine struct {
 	Enabled bool `koanf:"enabled"`
 }
 
+// in miliseconds
+type ReaderTimings struct {
+	// HardTimeout uint `koanf:"hardTimeout"`
+	Timeout     uint `koanf:"timeout"`
+	PageTimeout uint `koanf:"pageTimeout"`
+	Delay       uint `koanf:"delay"`
+	RandomDelay uint `koanf:"randomDelay"`
+	Parallelism int  `koanf:"parallelism"`
+}
+
+// Delegates Timeout, PageTimeout to colly.Collector.SetRequestTimeout(); Note: See https://github.com/gocolly/colly/issues/644
+// Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit()
+type Timings struct {
+	// HardTimeout time.Duration
+	Timeout     time.Duration
+	PageTimeout time.Duration
+	Delay       time.Duration
+	RandomDelay time.Duration
+	Parallelism int
+}
+
 type ReaderCategory struct {
 	REngines map[string]ReaderEngine `koanf:"engines"`
 	Ranking  Ranking                 `koanf:"ranking"`
+	RTimings ReaderTimings           `koanf:"timings"`
 }
 
 type ReaderConfig struct {
@@ -77,6 +88,7 @@ type ReaderConfig struct {
 type Category struct {
 	Engines []engines.Name
 	Ranking Ranking
+	Timings Timings
 }
 
 type Config struct {

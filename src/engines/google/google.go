@@ -14,7 +14,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings) error {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
 	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}

@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	"github.com/tminaorg/brzaguza/src/category"
 	"github.com/tminaorg/brzaguza/src/engines"
 )
@@ -159,30 +161,58 @@ func New() *Config {
 			category.GENERAL: {
 				Engines: NewAllEnabled(),
 				Ranking: NewRanking(),
+				Timings: Timings{
+					Timeout:     1000 * time.Millisecond,
+					PageTimeout: 1000 * time.Millisecond,
+				},
 			},
 			category.INFO: {
 				Engines: NewInfo(),
 				Ranking: NewRanking(),
+				Timings: Timings{
+					Timeout:     1000 * time.Millisecond,
+					PageTimeout: 1000 * time.Millisecond,
+				},
 			},
 			category.SCIENCE: {
 				Engines: NewAllEnabled(),
 				Ranking: NewRanking(),
+				Timings: Timings{
+					Timeout:     3000 * time.Millisecond,
+					PageTimeout: 1000 * time.Millisecond,
+				},
 			},
 			category.NEWS: {
 				Engines: NewAllEnabled(),
 				Ranking: NewRanking(),
+				Timings: Timings{
+					Timeout:     1000 * time.Millisecond,
+					PageTimeout: 1000 * time.Millisecond,
+				},
 			},
 			category.BLOG: {
 				Engines: NewAllEnabled(),
 				Ranking: NewRanking(),
+				Timings: Timings{
+					Timeout:     2500 * time.Millisecond,
+					PageTimeout: 1000 * time.Millisecond,
+				},
 			},
 			category.SURF: {
 				Engines: NewAllEnabled(),
 				Ranking: NewRanking(),
+				Timings: Timings{
+					Timeout:     2000 * time.Millisecond,
+					PageTimeout: 1000 * time.Millisecond,
+				},
 			},
 			category.NEWNEWS: {
 				Engines: NewAllEnabled(),
 				Ranking: NewRanking(),
+				Timings: Timings{
+					Timeout:     1000 * time.Millisecond,
+					PageTimeout: 1000 * time.Millisecond,
+				},
 			},
 		},
 	}

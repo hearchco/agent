@@ -15,7 +15,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings) error {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
 	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, &options, nil)
+	sedefaults.InitializeCollectors(&col, &pagesCol, &options, &timings)
 
 	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
 	sedefaults.PagesColError(Info.Name, pagesCol)
