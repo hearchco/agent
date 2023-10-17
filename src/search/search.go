@@ -38,7 +38,8 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 	rankTimer := time.Now()
 	log.Debug().Msg("Ranking...")
 	results := rank.Rank(relay.ResultMap, conf.Categories[options.Category].Ranking) // have to make copy, since its a map value
-	log.Debug().Msgf("Finished ranking in %vns", time.Since(rankTimer).Nanoseconds())
+	rankTimeSince := time.Since(rankTimer)
+	log.Debug().Msgf("Finished ranking in %vms (%vns)", rankTimeSince.Milliseconds(), rankTimeSince.Nanoseconds())
 
 	log.Debug().Msgf("Found results in %vms", time.Since(searchTimer).Milliseconds())
 

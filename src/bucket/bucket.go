@@ -76,11 +76,10 @@ func SetResultResponse(link string, response *colly.Response, relay *Relay, seNa
 	if !exists {
 		relay.Mutex.Unlock()
 		log.Error().Msgf("URL not in map when adding response! Should not be possible. URL: %v", link)
-		return
+	} else {
+		mapRes.Response = response
+		relay.Mutex.Unlock()
 	}
-
-	mapRes.Response = response
-	relay.Mutex.Unlock()
 }
 
 func MakeSEResult(urll string, title string, description string, searchEngineName engines.Name, sePage int, seOnPageRank int) *engines.RetrievedResult {

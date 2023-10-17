@@ -35,13 +35,13 @@ func main() {
 
 	// load config file
 	conf := config.New()
-	conf.Load(cliFlags.Config, cliFlags.Log)
+	conf.Load(cliFlags.Data, cliFlags.Log)
 
 	// cache database
 	var db cache.DB
 	switch conf.Server.Cache.Type {
 	case "pebble":
-		db = pebble.New(cliFlags.Config)
+		db = pebble.New(cliFlags.Data)
 	case "redis":
 		db = redis.New(ctx, conf.Server.Cache.Redis)
 	default:
@@ -54,7 +54,7 @@ func main() {
 		cli.Run(cliFlags, db, conf)
 	} else {
 		if rw, err := router.New(conf, cliFlags.Verbosity); err != nil {
-			log.Error().Msgf("Failed creating a router: %v", err)
+			log.Error().Err(err).Msg("Failed creating a router")
 		} else {
 			rw.Start(ctx, db, cliFlags.ServeProfiler)
 		}
