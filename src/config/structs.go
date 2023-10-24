@@ -54,9 +54,9 @@ type Cache struct {
 }
 
 type Server struct {
-	Port         int      `koanf:"port"`
-	FrontendUrls []string `koanf:"frontendUrls"`
-	Cache        Cache    `koanf:"cache"`
+	Port        int    `koanf:"port"`
+	FrontendUrl string `koanf:"frontendUrl"`
+	Cache       Cache  `koanf:"cache"`
 }
 
 type ReaderEngine struct {

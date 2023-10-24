@@ -30,7 +30,7 @@ func New(config *config.Config, verbosity int8) (*RouterWrapper, error) {
 
 func (rw *RouterWrapper) addCors() {
 	rw.router.Use(cors.New(cors.Config{
-		AllowOrigins:     rw.config.Server.FrontendUrls,
+		AllowOrigins:     []string{rw.config.Server.FrontendUrl},
 		AllowMethods:     []string{"HEAD", "GET", "POST"},
 		AllowHeaders:     []string{"Origin", "X-Requested-With", "Content-Length", "Content-Type", "Accept"},
 		AllowCredentials: false,
