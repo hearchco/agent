@@ -30,8 +30,10 @@ func Shorten(results []Result) []Result {
 	resultsShort := make([]Result, len(results))
 	copy(resultsShort, results)
 	for i := range resultsShort {
-		descShort := firstN(resultsShort[i].Description, 400)
-		resultsShort[i].Description = descShort + "..."
+		if len(resultsShort[i].Description) >= 400 {
+			descShort := firstN(resultsShort[i].Description, 397)
+			resultsShort[i].Description = descShort + "..."
+		}
 	}
 	return resultsShort
 }
