@@ -23,7 +23,8 @@ func Shorten(results []Result) []Result {
 	copy(resultsShort, results)
 	for _, r := range resultsShort {
 		if len(r.Description) > 400 {
-			r.Description = r.Description[0:399]
+			descShort := r.Description[:399]
+			r.Description = descShort
 		}
 	}
 	return resultsShort
