@@ -31,7 +31,7 @@ func Shorten(results []Result) []Result {
 	copy(resultsShort, results)
 	for i := range resultsShort {
 		descShort := firstN(resultsShort[i].Description, 400)
-		resultsShort[i].Description = descShort
+		resultsShort[i].Description = descShort + "..."
 	}
 	return resultsShort
 }
