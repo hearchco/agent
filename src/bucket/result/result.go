@@ -29,8 +29,9 @@ func firstN(str string, n int) string {
 func Shorten(results []Result) []Result {
 	resultsShort := make([]Result, len(results))
 	copy(resultsShort, results)
-	for _, r := range resultsShort {
-		r.Description = firstN(r.Description, 400)
+	for i := range resultsShort {
+		descShort := firstN(resultsShort[i].Description, 400)
+		resultsShort[i].Description = descShort
 	}
 	return resultsShort
 }
