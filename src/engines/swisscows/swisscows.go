@@ -3,6 +3,7 @@ package swisscows
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"os"
 	"strconv"
 
@@ -89,13 +90,16 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	var locale string = getLocale(&options)
 
 	var colCtx *colly.Context
+
 	for i := 0; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 		//col.Request("OPTIONS", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
 		//col.Wait()
-		if err := col.Request("GET", Info.URL+"freshness=All&itemsCount="+strconv.Itoa(settings.RequestedResultsPerPage)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil); err != nil {
-			log.Error().Err(err).Msg("swisscows: failed requesting with GET method")
+
+		err := col.Request("GET", Info.URL+"freshness=All&itemsCount="+strconv.Itoa(settings.RequestedResultsPerPage)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
+		if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+			log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 		}
 	}
 

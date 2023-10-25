@@ -3,6 +3,7 @@ package presearch
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"strconv"
 	"strings"
 
@@ -80,8 +81,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			nextCtx := colly.NewContext()
 			nextCtx.Put("page", strconv.Itoa(page))
 			nextCtx.Put("isAPI", "true")
-			if err := col.Request("GET", "https://presearch.com/results?id="+searchId, nil, nextCtx, nil); err != nil {
-				log.Error().Err(err).Msg("presearch: failed requesting with API")
+			err := col.Request("GET", "https://presearch.com/results?id="+searchId, nil, nextCtx, nil)
+			if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+				log.Error().Err(err).Msgf("%v: failed requesting with API", Info.Name)
 			}
 		}
 	})
@@ -89,15 +91,20 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 	colCtx.Put("isAPI", "false")
-	if err := col.Request("GET", Info.URL+query, nil, colCtx, nil); err != nil {
-		log.Error().Err(err).Msg("presearch: failed requesting with GET method")
+
+	err := col.Request("GET", Info.URL+query, nil, colCtx, nil)
+	if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 	}
+
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 		colCtx.Put("isAPI", "false")
-		if err := col.Request("GET", Info.URL+query+"&page="+strconv.Itoa(i+1), nil, colCtx, nil); err != nil {
-			log.Error().Err(err).Msg("presearch: failed requesting with GET method on page")
+
+		err := col.Request("GET", Info.URL+query+"&page="+strconv.Itoa(i+1), nil, colCtx, nil)
+		if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+			log.Error().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
 		}
 	}
 

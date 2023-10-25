@@ -3,6 +3,7 @@ package bing
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"net/url"
 	"strconv"
 	"strings"
@@ -67,14 +68,19 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
-	if err := col.Request("GET", Info.URL+query, nil, colCtx, nil); err != nil {
-		log.Error().Err(err).Msg("bing: failed requesting with GET method")
+
+	err := col.Request("GET", Info.URL+query, nil, colCtx, nil)
+	if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 	}
+
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		if err := col.Request("GET", Info.URL+query+"&first="+strconv.Itoa(i*10+1), nil, colCtx, nil); err != nil {
-			log.Error().Err(err).Msg("bing: failed requesting with GET method on page")
+
+		err := col.Request("GET", Info.URL+query+"&first="+strconv.Itoa(i*10+1), nil, colCtx, nil)
+		if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+			log.Error().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
 		}
 	}
 
@@ -86,7 +92,6 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 func removeTelemetry(link string) string {
 	if strings.HasPrefix(link, "https://www.bing.com/ck/a?") {
-		//log.Trace().Msg("Bing returned telemetry links")
 		parsedUrl, err := url.Parse(link)
 		if err != nil {
 			log.Error().Err(err).Msg("error parsing url")

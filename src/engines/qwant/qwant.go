@@ -3,6 +3,7 @@ package qwant
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"strconv"
 	"strings"
 
@@ -73,8 +74,10 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 		reqString := Info.URL + query + "&count=" + strconv.Itoa(nRequested) + "&locale=" + locale + "&offset=" + strconv.Itoa(i*nRequested) + "&device=" + device + "&safesearch=" + safeSearch
-		if err := col.Request("GET", reqString, nil, colCtx, nil); err != nil {
-			log.Error().Err(err).Msg("qwant: failed requesting with GET method")
+
+		err := col.Request("GET", reqString, nil, colCtx, nil)
+		if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+			log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 		}
 	}
 

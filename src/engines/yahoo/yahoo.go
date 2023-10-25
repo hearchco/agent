@@ -2,6 +2,7 @@ package yahoo
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"strings"
 
@@ -57,15 +58,19 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
-	if err := col.Request("GET", Info.URL+query, nil, colCtx, nil); err != nil {
-		log.Error().Err(err).Msg("yahoo: failed requesting with GET method")
+
+	err := col.Request("GET", Info.URL+query, nil, colCtx, nil)
+	if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 	}
+
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
+
 		err := col.Request("GET", Info.URL+query+"&b="+strconv.Itoa((i+1)*10), nil, colCtx, nil)
-		if err != nil {
-			log.Error().Err(err).Msg("yahoo: failed requesting with GET method on page")
+		if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+			log.Error().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
 		}
 	}
 

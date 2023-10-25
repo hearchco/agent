@@ -2,6 +2,7 @@ package yep
 
 import (
 	"context"
+	"errors"
 	"strconv"
 	"strings"
 
@@ -66,8 +67,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		apiURL = Info.URL + "client=web&gl=" + locale + "&limit=" + strconv.Itoa(nRequested) + "&no_correct=false&q=" + query + "&safeSearch=" + safeSearch + "&type=web"
 	}
 
-	if err := col.Request("GET", apiURL, nil, nil, nil); err != nil {
-		log.Error().Err(err).Msg("yep: failed requesting with GET method")
+	err := col.Request("GET", apiURL, nil, nil, nil)
+	if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 	}
 
 	col.Wait()

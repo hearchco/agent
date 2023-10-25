@@ -2,6 +2,7 @@ package duckduckgo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -72,14 +73,19 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
-	if err := col.Request("GET", Info.URL+"?q="+query, nil, colCtx, nil); err != nil {
-		log.Error().Err(err).Msg("duckduckgo: failed requesting with GET method")
+
+	err := col.Request("GET", Info.URL+"?q="+query, nil, colCtx, nil)
+	if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 	}
+
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		if err := col.Request("POST", Info.URL, strings.NewReader("q="+query+"&dc="+strconv.Itoa(i*20)), colCtx, nil); err != nil {
-			log.Error().Err(err).Msg("duckduckgo: failed requesting with POST method on page")
+
+		err := col.Request("POST", Info.URL, strings.NewReader("q="+query+"&dc="+strconv.Itoa(i*20)), colCtx, nil)
+		if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+			log.Error().Err(err).Msgf("%v: failed requesting with POST method on page", Info.Name)
 		}
 	}
 
