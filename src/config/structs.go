@@ -29,14 +29,14 @@ type Ranking struct {
 // Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit()
 type Timings struct {
 	Timeout     time.Duration `koanf:"timeout"`
-	PageTimeout time.Duration `koanf:"pageTimeout"`
+	PageTimeout time.Duration `koanf:"pagetimeout"`
 	Delay       time.Duration `koanf:"delay"`
-	RandomDelay time.Duration `koanf:"randomDelay"`
+	RandomDelay time.Duration `koanf:"randomdelay"`
 	Parallelism int           `koanf:"parallelism"`
 }
 
 type Settings struct {
-	RequestedResultsPerPage int     `koanf:"requestedResults"`
+	RequestedResultsPerPage int     `koanf:"requestedresults"`
 	Shortcut                string  `koanf:"shortcut"`
 	Timings                 Timings `koanf:"timings"`
 }
@@ -55,7 +55,7 @@ type Cache struct {
 
 type Server struct {
 	Port        int    `koanf:"port"`
-	FrontendUrl string `koanf:"frontendUrl"`
+	FrontendUrl string `koanf:"frontendurl"`
 	Cache       Cache  `koanf:"cache"`
 }
 
