@@ -18,14 +18,19 @@ type Result struct {
 	Response      *colly.Response
 }
 
+func firstN(str string, n int) string {
+	v := []rune(str)
+	if n >= len(v) {
+		return str
+	}
+	return string(v[:n])
+}
+
 func Shorten(results []Result) []Result {
 	resultsShort := make([]Result, len(results))
 	copy(resultsShort, results)
 	for _, r := range resultsShort {
-		if len(r.Description) > 400 {
-			descShort := r.Description[:399]
-			r.Description = descShort
-		}
+		r.Description = firstN(r.Description, 400)
 	}
 	return resultsShort
 }
