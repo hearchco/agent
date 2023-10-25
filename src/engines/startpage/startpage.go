@@ -2,7 +2,6 @@ package startpage
 
 import (
 	"context"
-	"errors"
 	"strconv"
 	"strings"
 
@@ -69,7 +68,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx.Put("page", strconv.Itoa(1))
 
 	err := col.Request("GET", Info.URL+query+safeSearch, nil, colCtx, nil)
-	if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+	if err != nil && !engines.IsTimeoutError(err) {
 		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 	}
 
@@ -78,7 +77,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		colCtx.Put("page", strconv.Itoa(i+1))
 
 		err := col.Request("GET", Info.URL+query+"&page="+strconv.Itoa(i+1)+safeSearch, nil, colCtx, nil)
-		if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+		if err != nil && !engines.IsTimeoutError(err) {
 			log.Error().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
 		}
 	}

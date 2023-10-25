@@ -2,7 +2,6 @@ package etools
 
 import (
 	"context"
-	"errors"
 	"strconv"
 	"strings"
 
@@ -73,7 +72,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx.Put("page", strconv.Itoa(1))
 
 	err := col.Request("POST", Info.URL, strings.NewReader("query="+query+"&country=web&language=all"), colCtx, nil)
-	if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+	if err != nil && !engines.IsTimeoutError(err) {
 		log.Error().Err(err).Msgf("%v: failed requesting with POST method", Info.Name)
 	}
 	col.Wait() //wait so I can get the JSESSION cookie back
@@ -84,7 +83,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		colCtx.Put("page", pageStr)
 
 		err := col.Request("GET", pageURL+pageStr, nil, colCtx, nil)
-		if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+		if err != nil && !engines.IsTimeoutError(err) {
 			log.Error().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
 		}
 	}

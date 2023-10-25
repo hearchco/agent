@@ -3,7 +3,6 @@ package swisscows
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"os"
 	"strconv"
 
@@ -98,7 +97,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		//col.Wait()
 
 		err := col.Request("GET", Info.URL+"freshness=All&itemsCount="+strconv.Itoa(settings.RequestedResultsPerPage)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
-		if err != nil && !errors.Is(err, context.DeadlineExceeded) {
+		if err != nil && !engines.IsTimeoutError(err) {
 			log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 		}
 	}
