@@ -17,3 +17,14 @@ type Result struct {
 	TimesReturned uint8
 	Response      *colly.Response
 }
+
+func Shorten(results []Result) []Result {
+	resultsShort := make([]Result, len(results))
+	copy(resultsShort, results)
+	for _, r := range resultsShort {
+		if len(r.Description) > 400 {
+			r.Description = r.Description[0:399]
+		}
+	}
+	return resultsShort
+}
