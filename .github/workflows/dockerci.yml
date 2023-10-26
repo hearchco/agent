@@ -1,8 +1,17 @@
 name: Docker CI
 
 on:
-  push:
-    branches: [ "main" ]
+  pull_request:
+    branches: ["main"]
+    types: ["closed"]
+    paths:
+      - ".github/workflows/dockerci.yml" # this file
+      - "go.mod"
+      - "go.sum"
+      - "Makefile"
+      - "generate/**/*"
+      - "src/**/*"
+      - "docker/**/*"
 
 env:
   REGISTRY: ghcr.io
@@ -15,19 +24,21 @@ jobs:
       contents: write
       packages: write
       issues: write
+
+    if: github.event.pull_request.merged == true
     steps:
       # git
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-  
+
       - run: git fetch --force --tags
 
       # go
       - uses: actions/setup-go@v4
         with:
           go-version: stable
-      
+
       # qemu
       - uses: docker/setup-qemu-action@v2
 
@@ -44,7 +55,7 @@ jobs:
         run: make install
 
       # snapshot
-      - name: Snapshot on non-tag
+      - name: Snapshot
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
