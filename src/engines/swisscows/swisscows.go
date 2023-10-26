@@ -97,7 +97,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		//col.Wait()
 
 		err := col.Request("GET", Info.URL+"freshness=All&itemsCount="+strconv.Itoa(settings.RequestedResultsPerPage)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
-		if err != nil && !engines.IsTimeoutError(err) {
+		if engines.IsTimeoutError(err) {
+			log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
+		} else if err != nil {
 			log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 		}
 	}

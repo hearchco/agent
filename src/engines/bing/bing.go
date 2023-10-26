@@ -69,7 +69,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx.Put("page", strconv.Itoa(1))
 
 	err := col.Request("GET", Info.URL+query, nil, colCtx, nil)
-	if err != nil && !engines.IsTimeoutError(err) {
+	if engines.IsTimeoutError(err) {
+		log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
+	} else if err != nil {
 		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 	}
 
@@ -78,7 +80,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		colCtx.Put("page", strconv.Itoa(i+1))
 
 		err := col.Request("GET", Info.URL+query+"&first="+strconv.Itoa(i*10+1), nil, colCtx, nil)
-		if err != nil && !engines.IsTimeoutError(err) {
+		if engines.IsTimeoutError(err) {
+			log.Trace().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
+		} else if err != nil {
 			log.Error().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
 		}
 	}

@@ -67,7 +67,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	}
 
 	err := col.Request("GET", apiURL, nil, nil, nil)
-	if err != nil && !engines.IsTimeoutError(err) {
+	if engines.IsTimeoutError(err) {
+		log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
+	} else if err != nil {
 		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 	}
 
