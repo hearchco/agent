@@ -12,9 +12,9 @@ import (
 	"github.com/tminaorg/brzaguza/src/search/useragent"
 )
 
-func PagesColRequest(seName engines.Name, pagesCol *colly.Collector, ctx *context.Context, retError *error) {
+func PagesColRequest(seName engines.Name, pagesCol *colly.Collector, ctx context.Context, retError *error) {
 	pagesCol.OnRequest(func(r *colly.Request) {
-		if err := (*ctx).Err(); err != nil { // dont fully understand this
+		if err := ctx.Err(); err != nil {
 			if engines.IsTimeoutError(err) {
 				log.Trace().Msgf("%v: Pages Collector; Error OnRequest %v", seName, r)
 			} else {
