@@ -26,7 +26,7 @@ type Ranking struct {
 }
 
 type Settings struct {
-	RequestedResultsPerPage int    `koanf:"requestedResults"`
+	RequestedResultsPerPage int    `koanf:"requestedresults"`
 	Shortcut                string `koanf:"shortcut"`
 }
 
@@ -56,9 +56,9 @@ type ReaderEngine struct {
 type ReaderTimings struct {
 	// HardTimeout uint `koanf:"hardTimeout"`
 	Timeout     uint `koanf:"timeout"`
-	PageTimeout uint `koanf:"pageTimeout"`
+	PageTimeout uint `koanf:"pagetimeout"`
 	Delay       uint `koanf:"delay"`
-	RandomDelay uint `koanf:"randomDelay"`
+	RandomDelay uint `koanf:"randomdelay"`
 	Parallelism int  `koanf:"parallelism"`
 }
 
