@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"strings"
+	"time"
 
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/env"
@@ -46,9 +47,18 @@ func (c *Config) fromReader(rc *ReaderConfig) {
 				engArr = append(engArr, engineName)
 			}
 		}
+		tim := Timings{
+			// HardTimeout: time.Duration(val.RTimings.HardTimeout) * time.Millisecond,
+			Timeout:     time.Duration(val.RTimings.Timeout) * time.Millisecond,
+			PageTimeout: time.Duration(val.RTimings.PageTimeout) * time.Millisecond,
+			Delay:       time.Duration(val.RTimings.Delay) * time.Millisecond,
+			RandomDelay: time.Duration(val.RTimings.RandomDelay) * time.Millisecond,
+			Parallelism: val.RTimings.Parallelism,
+		}
 		nc.Categories[key] = Category{
 			Ranking: val.Ranking,
 			Engines: engArr,
+			Timings: tim,
 		}
 	}
 
@@ -67,9 +77,18 @@ func (c *Config) getReader() ReaderConfig {
 	}
 
 	for key, val := range c.Categories {
+		tim := ReaderTimings{
+			// HardTimeout: uint(val.Timings.HardTimeout.Milliseconds()),
+			Timeout:     uint(val.Timings.Timeout.Milliseconds()),
+			PageTimeout: uint(val.Timings.PageTimeout.Milliseconds()),
+			Delay:       uint(val.Timings.Delay.Milliseconds()),
+			RandomDelay: uint(val.Timings.RandomDelay.Milliseconds()),
+			Parallelism: val.Timings.Parallelism,
+		}
 		rc.RCategories[key] = ReaderCategory{
 			Ranking:  val.Ranking,
 			REngines: map[string]ReaderEngine{},
+			RTimings: tim,
 		}
 		for _, eng := range val.Engines {
 			rc.RCategories[key].REngines[eng.ToLower()] = ReaderEngine{Enabled: true}
