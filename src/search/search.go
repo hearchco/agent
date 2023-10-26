@@ -58,7 +58,9 @@ func runEngines(engs []engines.Name, timings config.Timings, settings map[engine
 		eng := engs[i] // dont change for to `for _, eng := range engs {`, eng retains the same address throughout the whole loop
 		worker.Go(func() {
 			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng], timings)
-			if err != nil {
+			if engines.IsTimeoutError(err) {
+				log.Trace().Err(err).Msgf("failed searching %v", eng)
+			} else if err != nil {
 				log.Error().Err(err).Msgf("failed searching %v", eng)
 			}
 		})
