@@ -28,6 +28,8 @@ jobs:
 
       # build arm
       - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
 
       # registry
       - uses: docker/login-action@v3
