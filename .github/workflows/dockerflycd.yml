@@ -75,9 +75,12 @@ jobs:
   fly:
     needs: goreleaser
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
     steps:
       # git
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # flyctl
       - uses: superfly/flyctl-actions/setup-flyctl@v1

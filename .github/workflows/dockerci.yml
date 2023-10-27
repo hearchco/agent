@@ -21,9 +21,7 @@ jobs:
   goreleaser:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      packages: write
-      issues: write
+      contents: read
 
     if: github.event.pull_request.merged == true
     steps:
