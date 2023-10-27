@@ -16,7 +16,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings) error {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
 	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
@@ -25,9 +25,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, &options, nil)
+	sedefaults.InitializeCollectors(&col, &pagesCol, &options, &timings)
 
-	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
+	sedefaults.PagesColRequest(Info.Name, pagesCol, ctx, &retError)
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
@@ -72,14 +72,23 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
-	if err := col.Request("GET", Info.URL+"?q="+query, nil, colCtx, nil); err != nil {
-		log.Error().Err(err).Msg("duckduckgo: failed requesting with GET method")
+
+	err := col.Request("GET", Info.URL+"?q="+query, nil, colCtx, nil)
+	if engines.IsTimeoutError(err) {
+		log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
+	} else if err != nil {
+		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 	}
+
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		if err := col.Request("POST", Info.URL, strings.NewReader("q="+query+"&dc="+strconv.Itoa(i*20)), colCtx, nil); err != nil {
-			log.Error().Err(err).Msg("duckduckgo: failed requesting with POST method on page")
+
+		err := col.Request("POST", Info.URL, strings.NewReader("q="+query+"&dc="+strconv.Itoa(i*20)), colCtx, nil)
+		if engines.IsTimeoutError(err) {
+			log.Trace().Err(err).Msgf("%v: failed requesting with POST method on page", Info.Name)
+		} else if err != nil {
+			log.Error().Err(err).Msgf("%v: failed requesting with POST method on page", Info.Name)
 		}
 	}
 

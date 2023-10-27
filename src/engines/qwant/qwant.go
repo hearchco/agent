@@ -15,7 +15,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings) error {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
 	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
@@ -24,9 +24,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, &options, nil)
+	sedefaults.InitializeCollectors(&col, &pagesCol, &options, &timings)
 
-	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
+	sedefaults.PagesColRequest(Info.Name, pagesCol, ctx, &retError)
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
@@ -73,8 +73,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 		reqString := Info.URL + query + "&count=" + strconv.Itoa(nRequested) + "&locale=" + locale + "&offset=" + strconv.Itoa(i*nRequested) + "&device=" + device + "&safesearch=" + safeSearch
-		if err := col.Request("GET", reqString, nil, colCtx, nil); err != nil {
-			log.Error().Err(err).Msg("qwant: failed requesting with GET method")
+
+		err := col.Request("GET", reqString, nil, colCtx, nil)
+		if engines.IsTimeoutError(err) {
+			log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
+		} else if err != nil {
+			log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 		}
 	}
 

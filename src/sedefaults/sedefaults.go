@@ -12,10 +12,14 @@ import (
 	"github.com/tminaorg/brzaguza/src/search/useragent"
 )
 
-func PagesColRequest(seName engines.Name, pagesCol *colly.Collector, ctx *context.Context, retError *error) {
+func PagesColRequest(seName engines.Name, pagesCol *colly.Collector, ctx context.Context, retError *error) {
 	pagesCol.OnRequest(func(r *colly.Request) {
-		if err := (*ctx).Err(); err != nil { // dont fully understand this
-			log.Error().Msgf("%v: Pages Collector; Error OnRequest %v", seName, r)
+		if err := ctx.Err(); err != nil {
+			if engines.IsTimeoutError(err) {
+				log.Trace().Msgf("%v: Pages Collector; Error OnRequest %v", seName, r)
+			} else {
+				log.Error().Msgf("%v: Pages Collector; Error OnRequest %v", seName, r)
+			}
 			r.Abort()
 			*retError = err
 			return
@@ -26,7 +30,11 @@ func PagesColRequest(seName engines.Name, pagesCol *colly.Collector, ctx *contex
 
 func PagesColError(seName engines.Name, pagesCol *colly.Collector) {
 	pagesCol.OnError(func(r *colly.Response, err error) {
-		log.Debug().Msgf("%v: Pages Collector - OnError.\nURL: %v\nError: %v", seName, r.Ctx.Get("originalURL"), err)
+		if engines.IsTimeoutError(err) {
+			log.Trace().Err(err).Msgf("%v: Pages Collector - OnError.\nURL: %v", seName, r.Ctx.Get("originalURL"))
+		} else {
+			log.Error().Err(err).Msgf("%v: Pages Collector - OnError.\nURL: %v", seName, r.Ctx.Get("originalURL"))
+		}
 	})
 }
 
@@ -40,7 +48,11 @@ func PagesColResponse(seName engines.Name, pagesCol *colly.Collector, relay *buc
 func ColRequest(seName engines.Name, col *colly.Collector, ctx *context.Context, retError *error) {
 	col.OnRequest(func(r *colly.Request) {
 		if err := (*ctx).Err(); err != nil {
-			log.Error().Msgf("%v: SE Collector; Error OnRequest %v", seName, r)
+			if engines.IsTimeoutError(err) {
+				log.Trace().Msgf("%v: SE Collector; Error OnRequest %v", seName, r)
+			} else {
+				log.Error().Msgf("%v: SE Collector; Error OnRequest %v", seName, r)
+			}
 			r.Abort()
 			*retError = err
 			return
@@ -50,11 +62,15 @@ func ColRequest(seName engines.Name, col *colly.Collector, ctx *context.Context,
 
 func ColError(seName engines.Name, col *colly.Collector, retError *error) {
 	col.OnError(func(r *colly.Response, err error) {
-		log.Error().Err(err).Msgf("%v: SE Collector - OnError.\nURL: %v", seName, r.Request.URL.String())
-		log.Debug().Msgf("%v: HTML Response written to %v%v_col.log.html", seName, config.LogDumpLocation, seName)
-		writeErr := os.WriteFile(config.LogDumpLocation+string(seName)+"_col.log.html", r.Body, 0644)
-		if writeErr != nil {
-			log.Error().Err(writeErr)
+		if engines.IsTimeoutError(err) {
+			log.Trace().Err(err).Msgf("%v: SE Collector - OnError.\nURL: %v", seName, r.Request.URL.String())
+		} else {
+			log.Error().Err(err).Msgf("%v: SE Collector - OnError.\nURL: %v", seName, r.Request.URL.String())
+			log.Debug().Msgf("%v: HTML Response written to %v%v_col.log.html", seName, config.LogDumpLocation, seName)
+			writeErr := os.WriteFile(config.LogDumpLocation+string(seName)+"_col.log.html", r.Body, 0644)
+			if writeErr != nil {
+				log.Error().Err(writeErr)
+			}
 		}
 		*retError = err
 	})
