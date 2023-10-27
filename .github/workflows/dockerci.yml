@@ -12,6 +12,7 @@ on:
       - "generate/**/*"
       - "src/**/*"
       - "docker/**/*"
+      - ".dockerignore"
 
 env:
   REGISTRY: ghcr.io
