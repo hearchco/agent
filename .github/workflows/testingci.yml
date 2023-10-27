@@ -2,15 +2,25 @@ name: Testing CI
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+    paths:
+      - ".github/workflows/testingci.yml" # this file
+      - "go.mod"
+      - "go.sum"
+      - "Makefile"
+      - "generate/**/*"
+      - "src/**/*"
   schedule:
-    - cron: '37 13 * * *'
+    - cron: "37 13 * * *"
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
         with:
           go-version: stable
@@ -26,12 +36,14 @@ jobs:
       # go:test
       - name: Test units
         run: make test
+
   lint:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-go@v4
         with:
           go-version: stable
@@ -45,3 +57,4 @@ jobs:
         with:
           version: latest
           skip-pkg-cache: true
+          args: --timeout=5m

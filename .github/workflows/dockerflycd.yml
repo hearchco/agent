@@ -2,7 +2,7 @@ name: Docker Fly CD
 
 on:
   push:
-    tags: [ 'v*.*.*' ]
+    tags: ["v*.*.*"]
 
 env:
   REGISTRY: ghcr.io
@@ -15,22 +15,23 @@ jobs:
       contents: write
       packages: write
       issues: write
+
     steps:
       # git
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-  
+
       - run: git fetch --force --tags
 
       # go
       - uses: actions/setup-go@v4
         with:
           go-version: stable
-      
+
       # qemu
       - uses: docker/setup-qemu-action@v2
-      
+
       # registry
       - uses: docker/login-action@v2
         if: github.event_name != 'pull_request'
@@ -44,7 +45,7 @@ jobs:
         run: make install
 
       # release
-      - name: Release on tag
+      - name: Release
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
@@ -64,7 +65,7 @@ jobs:
         with:
           name: build_darwin
           path: dist/*darwin*
-      
+
       - name: Artifact Windows
         uses: actions/upload-artifact@v3
         with:
@@ -74,9 +75,12 @@ jobs:
   fly:
     needs: goreleaser
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
     steps:
       # git
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # flyctl
       - uses: superfly/flyctl-actions/setup-flyctl@v1

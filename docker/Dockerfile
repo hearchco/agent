@@ -5,7 +5,8 @@ WORKDIR /app
 COPY brzaguza .
 
 ENV \
-    BRZAGUZA_CONFIG="/config"
+    BRZAGUZA_DATA="/config" \
+    BRZAGUZA_LOG="/config/log"
 
 ENTRYPOINT [ "./brzaguza" ]
 
