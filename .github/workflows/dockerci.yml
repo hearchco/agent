@@ -1,9 +1,8 @@
 name: Docker CI
 
 on:
-  pull_request:
+  push:
     branches: ["main"]
-    types: ["closed"]
     paths:
       - ".github/workflows/dockerci.yml" # this file
       - "go.mod"
@@ -24,7 +23,6 @@ jobs:
     permissions:
       contents: read
 
-    if: github.event.pull_request.merged == true
     steps:
       - uses: actions/checkout@v4
         with:
