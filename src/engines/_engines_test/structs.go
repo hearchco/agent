@@ -1,6 +1,8 @@
 package _engines_test
 
 import (
+	"time"
+
 	"github.com/tminaorg/brzaguza/src/category"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
@@ -30,6 +32,9 @@ func NewConfig(engineName engines.Name) *config.Config {
 			category.GENERAL: {
 				Engines: []engines.Name{engineName},
 				Ranking: config.NewRanking(),
+				Timings: config.Timings{
+					Timeout: 10000 * time.Millisecond, // colly default
+				},
 			},
 		},
 	}

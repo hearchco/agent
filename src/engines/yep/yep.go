@@ -14,7 +14,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings) error {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
 	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
@@ -23,9 +23,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, &options, nil)
+	sedefaults.InitializeCollectors(&col, &pagesCol, &options, &timings)
 
-	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
+	sedefaults.PagesColRequest(Info.Name, pagesCol, ctx, &retError)
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
@@ -66,8 +66,11 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		apiURL = Info.URL + "client=web&gl=" + locale + "&limit=" + strconv.Itoa(nRequested) + "&no_correct=false&q=" + query + "&safeSearch=" + safeSearch + "&type=web"
 	}
 
-	if err := col.Request("GET", apiURL, nil, nil, nil); err != nil {
-		log.Error().Err(err).Msg("yep: failed requesting with GET method")
+	err := col.Request("GET", apiURL, nil, nil, nil)
+	if engines.IsTimeoutError(err) {
+		log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
+	} else if err != nil {
+		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 	}
 
 	col.Wait()

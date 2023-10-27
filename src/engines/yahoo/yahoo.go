@@ -14,7 +14,7 @@ import (
 	"github.com/tminaorg/brzaguza/src/sedefaults"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings) error {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
 	if err := sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
 		return err
 	}
@@ -23,9 +23,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	var pagesCol *colly.Collector
 	var retError error
 
-	sedefaults.InitializeCollectors(&col, &pagesCol, &options, nil)
+	sedefaults.InitializeCollectors(&col, &pagesCol, &options, &timings)
 
-	sedefaults.PagesColRequest(Info.Name, pagesCol, &ctx, &retError)
+	sedefaults.PagesColRequest(Info.Name, pagesCol, ctx, &retError)
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
@@ -57,15 +57,23 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
-	if err := col.Request("GET", Info.URL+query, nil, colCtx, nil); err != nil {
-		log.Error().Err(err).Msg("yahoo: failed requesting with GET method")
+
+	err := col.Request("GET", Info.URL+query, nil, colCtx, nil)
+	if engines.IsTimeoutError(err) {
+		log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
+	} else if err != nil {
+		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
 	}
+
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
+
 		err := col.Request("GET", Info.URL+query+"&b="+strconv.Itoa((i+1)*10), nil, colCtx, nil)
-		if err != nil {
-			log.Error().Err(err).Msg("yahoo: failed requesting with GET method on page")
+		if engines.IsTimeoutError(err) {
+			log.Trace().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
+		} else if err != nil {
+			log.Error().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
 		}
 	}
 
