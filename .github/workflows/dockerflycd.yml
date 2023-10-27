@@ -83,7 +83,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # flyctl
-      - uses: superfly/flyctl-actions/setup-flyctl@v1
+      - uses: superfly/flyctl-actions/setup-flyctl@v2
 
       # deploy
       - run: flyctl deploy --remote-only
