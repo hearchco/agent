@@ -9,6 +9,7 @@ on:
       - "go.mod"
       - "go.sum"
       - "Makefile"
+      - "goreleaser/develop.yml"
       - "generate/**/*"
       - "src/**/*"
       - "docker/**/*"
@@ -25,42 +26,47 @@ jobs:
 
     if: github.event.pull_request.merged == true
     steps:
-      # git
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - run: git fetch --force --tags
-
-      # go
       - uses: actions/setup-go@v4
         with:
           go-version: stable
 
-      # qemu
+      # build arm
       - uses: docker/setup-qemu-action@v3
-
-      # registry
-      - uses: docker/login-action@v3
-        if: github.event_name != 'pull_request'
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       # go:generate
       - name: Generate go code from go:generate comments
         run: make install
 
-      # snapshot
+      # goreleaser snapshot
       - name: Snapshot
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
           args: release --snapshot --clean --config goreleaser/develop.yml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      ## go:test
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: stable
+
+      # go:generate
+      - name: Generate go code from go:generate comments
+        run: make install
+
+      # go:build
+      - name: Build project
+        run: make build
+
+      # go:test
       - name: Test units
         run: make test

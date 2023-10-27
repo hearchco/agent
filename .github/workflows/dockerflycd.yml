@@ -17,19 +17,16 @@ jobs:
       issues: write
 
     steps:
-      # git
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - run: git fetch --force --tags
 
-      # go
       - uses: actions/setup-go@v4
         with:
           go-version: stable
 
-      # qemu
+      # build arm
       - uses: docker/setup-qemu-action@v3
 
       # registry
@@ -44,7 +41,7 @@ jobs:
       - name: Generate go code from go:generate comments
         run: make install
 
-      # release
+      # goreleaser release
       - name: Release
         uses: goreleaser/goreleaser-action@v5
         with:
@@ -79,10 +76,7 @@ jobs:
       contents: read
 
     steps:
-      # git
       - uses: actions/checkout@v4
-
-      # flyctl
       - uses: superfly/flyctl-actions/setup-flyctl@v2
 
       # deploy
