@@ -38,7 +38,7 @@ jobs:
           go-version: stable
 
       # qemu
-      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-qemu-action@v3
 
       # registry
       - uses: docker/login-action@v2
