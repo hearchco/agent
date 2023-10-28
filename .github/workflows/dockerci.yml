@@ -12,6 +12,7 @@ on:
       - "generate/**/*"
       - "src/**/*"
       - "docker/**/*"
+      - ".dockerignore"
 
 env:
   REGISTRY: ghcr.io
@@ -31,9 +32,6 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: stable
-
-      # build arm
-      - uses: docker/setup-qemu-action@v3
 
       # go:generate
       - name: Generate go code from go:generate comments
