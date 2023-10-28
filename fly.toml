@@ -9,7 +9,7 @@ primary_region = "cdg"
 
 [mounts]
   source="data"
-  destination="/config"
+  destination="/data"
 
 [http_service]
   internal_port = 3030
@@ -20,7 +20,7 @@ primary_region = "cdg"
   processes = ["app"]
   [http_service.concurrency]
     type = "requests"
-    soft_limit = 20
+    soft_limit = 1
   [[http_service.checks]]
     grace_period = "10s"
     interval = "30s"
