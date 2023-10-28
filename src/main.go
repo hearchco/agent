@@ -31,17 +31,17 @@ func main() {
 	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// configure logging
-	logger.Setup(cliFlags.Log, cliFlags.Verbosity)
+	logger.Setup(cliFlags.LogDirPath, cliFlags.Verbosity)
 
 	// load config file
 	conf := config.New()
-	conf.Load(cliFlags.Data, cliFlags.Log)
+	conf.Load(cliFlags.DataDirPath, cliFlags.LogDirPath)
 
 	// cache database
 	var db cache.DB
 	switch conf.Server.Cache.Type {
 	case "pebble":
-		db = pebble.New(cliFlags.Data)
+		db = pebble.New(cliFlags.DataDirPath)
 	case "redis":
 		db = redis.New(ctx, conf.Server.Cache.Redis)
 	default:

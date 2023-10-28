@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -98,11 +99,11 @@ func (c *Config) getReader() ReaderConfig {
 	return rc
 }
 
-func (c *Config) Load(path string, logPath string) {
+func (c *Config) Load(dataDirPath string, logDirPath string) {
 	rc := c.getReader()
 
 	// Load vars
-	loadVars(logPath)
+	loadVars(logDirPath)
 
 	// Use "." as the key path delimiter. This can be "/" or any character.
 	k := koanf.New(".")
@@ -115,10 +116,10 @@ func (c *Config) Load(path string, logPath string) {
 	}
 
 	// Load YAML config
-	yamlPath := path + "/brzaguza.yaml"
+	yamlPath := path.Join(dataDirPath, "brzaguza.yaml")
 	if _, err := os.Stat(yamlPath); err != nil {
 		log.Trace().Msgf("no yaml config present at path: %v, looking for .yml", yamlPath)
-		yamlPath = path + "/brzaguza.yml"
+		yamlPath = path.Join(dataDirPath, "brzaguza.yml")
 		if _, errr := os.Stat(yamlPath); errr != nil {
 			log.Trace().Msgf("no yaml config present at path: %v", yamlPath)
 		} else if errr := k.Load(file.Provider(yamlPath), yaml.Parser()); errr != nil {
@@ -143,6 +144,6 @@ func (c *Config) Load(path string, logPath string) {
 	c.fromReader(&rc)
 }
 
-func loadVars(logPath string) {
-	LogDumpLocation = logPath + "/" + LogDumpLocation
+func loadVars(logDirPath string) {
+	LogDumpLocation = path.Join(logDirPath, LogDumpLocation)
 }

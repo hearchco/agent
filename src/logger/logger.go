@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"time"
 
 	"github.com/natefinch/lumberjack"
@@ -15,10 +16,10 @@ func DateString() string {
 	return time.Now().Format("20060102")
 }
 
-func Setup(path string, verbosity int8) {
+func Setup(logDirPath string, verbosity int8) {
 	// Generate logfile name
 	datetime := DateString()
-	filepath := fmt.Sprintf("%v/brzaguza_%v.log", path, datetime)
+	logFilePath := path.Join(logDirPath, fmt.Sprintf("brzaguza_%v.log", datetime))
 
 	// Setup logger
 	logger := log.Output(io.MultiWriter(zerolog.ConsoleWriter{
@@ -27,7 +28,7 @@ func Setup(path string, verbosity int8) {
 	}, zerolog.ConsoleWriter{
 		TimeFormat: time.Stamp,
 		Out: &lumberjack.Logger{
-			Filename:   filepath,
+			Filename:   logFilePath,
 			MaxSize:    5,
 			MaxAge:     14,
 			MaxBackups: 5,
