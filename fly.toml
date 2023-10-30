@@ -5,6 +5,7 @@ primary_region = "cdg"
   image = "ghcr.io/tminaorg/brzaguza:latest"
 
 [env]
+  BRZAGUZA_SERVER_CACHE_TYPE = "none"
   BRZAGUZA_SERVER_FRONTENDURL = "https://brzaguza.rs"
 
 [mounts]
