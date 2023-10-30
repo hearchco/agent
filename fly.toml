@@ -8,8 +8,8 @@ primary_region = "cdg"
   BRZAGUZA_SERVER_FRONTENDURL = "https://brzaguza.rs"
 
 [mounts]
-  source="data"
-  destination="/data"
+  source = "data"
+  destination = "/data"
 
 [http_service]
   internal_port = 3030
