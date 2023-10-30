@@ -8,10 +8,6 @@ primary_region = "cdg"
   BRZAGUZA_SERVER_CACHE_TYPE = "none"
   BRZAGUZA_SERVER_FRONTENDURL = "https://brzaguza.rs"
 
-[mounts]
-  source = "data"
-  destination = "/config"
-
 [http_service]
   internal_port = 3030
   force_https = true
@@ -23,6 +19,7 @@ primary_region = "cdg"
     type = "requests"
     hard_limit = 5
     soft_limit = 1
+
   [[http_service.checks]]
     interval = "30s"
     timeout = "5s"
