@@ -1,4 +1,4 @@
-app = "brzaguza"
+app = "zadnjica"
 primary_region = "cdg"
 
 [build]
@@ -20,10 +20,11 @@ primary_region = "cdg"
   processes = ["app"]
   [http_service.concurrency]
     type = "requests"
+    hard_limit = 0
     soft_limit = 1
   [[http_service.checks]]
-    grace_period = "10s"
     interval = "30s"
-    method = "GET"
     timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
     path = "/healthz"
