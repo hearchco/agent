@@ -7,7 +7,7 @@ primary_region = "cdg"
 [env]
   BRZAGUZA_SERVER_FRONTENDURL = "https://brzaguza.rs"
 
-[[mounts]]
+[mounts]
   source = "data"
   destination = "/config"
 
@@ -20,8 +20,8 @@ primary_region = "cdg"
   processes = ["app"]
   [http_service.concurrency]
     type = "requests"
+    hard_limit = 0
     soft_limit = 1
-
   [[http_service.checks]]
     interval = "30s"
     timeout = "5s"
