@@ -79,7 +79,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: superfly/flyctl-actions/setup-flyctl@v2
+      - uses: superfly/flyctl-actions/setup-flyctl@master
 
       # deploy
       - run: flyctl deploy --remote-only
