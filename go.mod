@@ -1,10 +1,12 @@
 module github.com/tminaorg/brzaguza
 
-go 1.20
+go 1.21
+
+toolchain go1.21.3
 
 require (
 	github.com/alecthomas/kong v0.8.1
-	github.com/cockroachdb/pebble v0.0.0-20231027194153-ed45a7767175
+	github.com/cockroachdb/pebble v0.0.0-20231031205119-df07a1e1c42c
 	github.com/fxamacker/cbor/v2 v2.5.0
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-contrib/graceful v0.0.0-20230904152018-e56ed94cd808
@@ -19,7 +21,7 @@ require (
 	github.com/knadh/koanf/v2 v2.0.1
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/profile v1.7.0
-	github.com/redis/go-redis/v9 v9.2.1
+	github.com/redis/go-redis/v9 v9.3.0
 	github.com/robertkrimen/otto v0.2.1
 	github.com/rs/zerolog v1.31.0
 	golang.org/x/tools v0.14.0
