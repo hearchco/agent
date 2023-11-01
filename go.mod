@@ -19,7 +19,7 @@ require (
 	github.com/knadh/koanf/v2 v2.0.1
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/profile v1.7.0
-	github.com/redis/go-redis/v9 v9.2.1
+	github.com/redis/go-redis/v9 v9.3.0
 	github.com/robertkrimen/otto v0.2.1
 	github.com/rs/zerolog v1.31.0
 	golang.org/x/tools v0.14.0
