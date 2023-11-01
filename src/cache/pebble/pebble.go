@@ -1,6 +1,7 @@
 package pebble
 
 import (
+	"path"
 	"time"
 
 	"github.com/cockroachdb/pebble"
@@ -13,8 +14,8 @@ type DB struct {
 	pdb *pebble.DB
 }
 
-func New(path string) *DB {
-	pebblePath := path + "/database"
+func New(dataDirPath string) *DB {
+	pebblePath := path.Join(dataDirPath, "database")
 	pdb, err := pebble.Open(pebblePath, &pebble.Options{})
 
 	if err != nil {

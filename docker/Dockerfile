@@ -4,13 +4,12 @@ WORKDIR /app
 
 COPY brzaguza .
 
-ENV \
-    BRZAGUZA_DATA="/config" \
-    BRZAGUZA_LOG="/config/log"
+ENV BRZAGUZA_DATA_DIR="/data"
+ENV BRZAGUZA_LOG_DIR="/data/log"
 
 ENTRYPOINT [ "./brzaguza" ]
 
-VOLUME [ "/config" ]
+VOLUME [ "/data" ]
 
 EXPOSE 3030
 
