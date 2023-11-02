@@ -38,7 +38,7 @@ func Search(c *gin.Context, config *config.Config, db cache.DB) {
 	} else {
 		maxPages, err := strconv.Atoi(pages)
 		if err != nil {
-			log.Error().Err(err).Msgf("cannot convert \"%v\" to int, reverting to default value of 1", pages)
+			log.Error().Err(err).Msgf("router.Search(): cannot convert \"%v\" to int, reverting to default value of 1", pages)
 			maxPages = 1
 		}
 
@@ -65,7 +65,7 @@ func Search(c *gin.Context, config *config.Config, db cache.DB) {
 
 		resultsShort := result.Shorten(results)
 		if resultsJson, err := json.Marshal(resultsShort); err != nil {
-			log.Error().Err(err).Msg("failed marshalling results")
+			log.Error().Err(err).Msgf("router.Search(): failed marshalling results: %v", resultsShort)
 			c.String(http.StatusInternalServerError, "")
 		} else {
 			c.String(http.StatusOK, string(resultsJson))

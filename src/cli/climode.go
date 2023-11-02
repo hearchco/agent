@@ -49,7 +49,9 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		log.Debug().Msgf("Found results for query (%v) in cache", flags.Query)
 	} else {
 		log.Debug().Msg("Nothing found in cache, doing a clean search")
+
 		results = search.PerformSearch(flags.Query, options, conf)
+
 		db.Set(flags.Query, results)
 	}
 

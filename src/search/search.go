@@ -59,9 +59,9 @@ func runEngines(engs []engines.Name, timings config.Timings, settings map[engine
 		worker.Go(func() {
 			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng], timings)
 			if engines.IsTimeoutError(err) {
-				log.Trace().Err(err).Msgf("failed searching %v", eng)
+				log.Trace().Err(err).Msgf("search.runEngines(): failed searching %v", eng)
 			} else if err != nil {
-				log.Error().Err(err).Msgf("failed searching %v", eng)
+				log.Error().Err(err).Msgf("search.runEngines(): failed searching %v", eng)
 			}
 		})
 	}
@@ -71,8 +71,8 @@ func procBang(query *string, options *engines.Options, conf *config.Config) (con
 	useSpec, specEng := procSpecificEngine(*query, options, conf)
 	goodCat := procCategory(*query, options)
 	if !goodCat && !useSpec && (*query)[0] == '!' {
-		log.Error().Msgf("invalid bang (not category or engine shortcut). query: %v", *query)
-	}
+		log.Error().Msgf("search.procBang(): invalid bang (not category or engine shortcut). query: %v", *query)
+	} //IS THIS OK?!
 
 	trimBang(query)
 

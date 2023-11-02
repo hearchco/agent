@@ -54,7 +54,8 @@ func main() {
 		cli.Run(cliFlags, db, conf)
 	} else {
 		if rw, err := router.New(conf, cliFlags.Verbosity); err != nil {
-			log.Error().Err(err).Msg("Failed creating a router")
+			log.Fatal().Err(err).Msg("main.main(): failed creating a router")
+			return
 		} else {
 			rw.Start(ctx, db, cliFlags.ServeProfiler)
 		}

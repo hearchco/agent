@@ -54,7 +54,7 @@ func runProfiler(cliFlags *cli.Flags) (bool, func()) {
 	profilerToRun := profiler{enabled: false}
 	for _, p := range profilers {
 		if profilerToRun.enabled && p.enabled {
-			log.Fatal("Only one profiler can be run at a time.")
+			log.Fatal("main.runProfiler(): only one profiler can be run at a time.")
 			return false, func() {}
 		} else if p.enabled {
 			profilerToRun = p
