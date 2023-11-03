@@ -43,31 +43,33 @@ func (db *DB) Close() {
 	}
 }
 
-func (db *DB) Set(k string, v cache.Value) {
+func (db *DB) Set(k string, v cache.Value) error {
 	log.Debug().Msg("Caching...")
 	cacheTimer := time.Now()
 
 	if val, err := cbor.Marshal(v); err != nil {
-		log.Error().Err(err).Msg("redis.Set(): error marshaling value")
+		return fmt.Errorf("redis.Set(): error marshaling value: %w", err)
 	} else if err := db.rdb.Set(db.ctx, k, val, 0).Err(); err != nil {
 		log.Fatal().Err(err).Msg("redis.Set(): error setting KV to redis")
-		return
+		return nil
 	} else {
 		cacheTimeSince := time.Since(cacheTimer)
 		log.Debug().Msgf("Cached results in %vms (%vns)", cacheTimeSince.Milliseconds(), cacheTimeSince.Nanoseconds())
 	}
+	return nil
 }
 
-func (db *DB) Get(k string, o cache.Value) {
+func (db *DB) Get(k string, o cache.Value) error {
 	v, err := db.rdb.Get(db.ctx, k).Result()
 	val := []byte(v) // copy data before closing, casting needed for unmarshal
 
 	if err == redis.Nil {
-		log.Trace().Msgf("Found no value in redis for key %v", k)
+		log.Trace().Msgf("found no value in redis for key %v", k)
 	} else if err != nil {
 		log.Fatal().Err(err).Msgf("redis.Get(): error getting value from redis for key %v", k)
-		return
+		return nil
 	} else if err := cbor.Unmarshal(val, o); err != nil {
-		log.Error().Err(err).Msgf("redis.Set(): failed unmarshaling value from redis for key %v", k)
+		return fmt.Errorf("redis.Set(): failed unmarshaling value from redis for key %v: %w", k, err)
 	}
+	return nil
 }

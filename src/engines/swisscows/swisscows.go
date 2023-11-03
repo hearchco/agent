@@ -3,7 +3,6 @@ package swisscows
 import (
 	"context"
 	"encoding/json"
-	"os"
 	"strconv"
 
 	"github.com/gocolly/colly/v2"
@@ -31,19 +30,16 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
 	col.OnRequest(func(r *colly.Request) {
-		if err := (ctx).Err(); err != nil {
-			log.Error().Msgf("%v: SE Collector; Error OnRequest %v", Info.Name, r)
-			r.Abort()
-			retError = err
-			return
-		}
-
 		if r.Method == "OPTIONS" {
 			return
 		}
 
 		var qry string = "?" + r.URL.RawQuery
-		nonce, sig := generateAuth(qry)
+		nonce, sig, err := generateAuth(qry)
+		if err != nil {
+			log.Error().Err(err).Msgf("swisscows.Search() -> col.OnRequest: failed building request: failed generating auth")
+			return
+		}
 
 		//log.Debug().Msgf("qry: %v\nnonce: %v\nsignature: %v", qry, nonce, sig)
 
@@ -52,18 +48,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		r.Headers.Set("Pragma", "no-cache")
 	})
 
-	col.OnError(func(r *colly.Response, err error) {
-		log.Error().Err(err).Msgf("%v: SE Collector - OnError.\nMethod: %v\nURL: %v", Info.Name, r.Request.Method, r.Request.URL.String())
-		log.Error().Msgf("%v: HTML Response written to %v%v_col.log.html", Info.Name, config.LogDumpLocation, Info.Name)
-		writeErr := os.WriteFile(config.LogDumpLocation+string(Info.Name)+"_col.log.html", r.Body, 0644)
-		if writeErr != nil {
-			log.Error().Err(writeErr)
-		}
-		retError = err
-	})
-
 	col.OnResponse(func(r *colly.Response) {
-		log.Trace().Msgf("URL: %v\nNonce: %v\nSig: %v", r.Request.URL.String(), r.Request.Headers.Get("X-Request-Nonce"), r.Request.Headers.Get("X-Request-Signature"))
+		log.Trace().Msgf("swisscows.Search() -> col.OnResponse(): url: %v | nonce: %v | signature: %v", r.Request.URL.String(), r.Request.Headers.Get("X-Request-Nonce"), r.Request.Headers.Get("X-Request-Signature"))
 
 		var pageStr string = r.Ctx.Get("page")
 		page, _ := strconv.Atoi(pageStr)
@@ -71,7 +57,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		var parsedResponse SCResponse
 		err := json.Unmarshal(r.Body, &parsedResponse)
 		if err != nil {
-			log.Error().Err(err).Msgf("%v: Failed body unmarshall to json:\n%v", Info.Name, string(r.Body))
+			log.Error().Err(err).Msgf("swissco Failed body unmarshall to json:\n%v", string(r.Body))
+			return
 		}
 
 		counter := 1

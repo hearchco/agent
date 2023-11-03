@@ -44,7 +44,12 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 
 	// todo: ctx cancelling (important since pebble is NoSync)
 	var results []result.Result
-	db.Get(flags.Query, &results)
+	gerr := db.Get(flags.Query, &results)
+	if gerr != nil {
+		log.Fatal().Err(gerr).Msgf("cli.Run(): failed accessing cache for query %v", flags.Query)
+		return
+	}
+
 	if results != nil {
 		log.Debug().Msgf("Found results for query (%v) in cache", flags.Query)
 	} else {
@@ -52,7 +57,10 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 
 		results = search.PerformSearch(flags.Query, options, conf)
 
-		db.Set(flags.Query, results)
+		serr := db.Set(flags.Query, results)
+		if serr != nil {
+			log.Error().Err(serr).Msgf("cli.Run(): error updating database with search results")
+		}
 	}
 
 	duration := time.Since(start)

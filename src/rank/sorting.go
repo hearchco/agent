@@ -23,6 +23,6 @@ func (r ByRetrievedRank) Less(i, j int) bool {
 		return r[i].RetRank.OnPageRank < r[j].RetRank.OnPageRank
 	}
 
-	log.Error().Msgf("failed at ranking: %v, %v", r[i], r[j])
+	log.Error().Msgf("rank.(r ByRetrievedRank)Less(): failed at ranking: %v, %v", r[i], r[j])
 	return true
 }

@@ -58,10 +58,16 @@ func (rw *RouterWrapper) Start(ctx context.Context, db cache.DB, serveProfiler b
 
 	// search
 	rw.router.GET("/search", func(c *gin.Context) {
-		Search(c, rw.config, db)
+		err := Search(c, rw.config, db)
+		if err != nil {
+			log.Error().Err(err).Msgf("router.Start() (.GET): failed search")
+		}
 	})
 	rw.router.POST("/search", func(c *gin.Context) {
-		Search(c, rw.config, db)
+		err := Search(c, rw.config, db)
+		if err != nil {
+			log.Error().Err(err).Msgf("router.Start() (.POST): failed search")
+		}
 	})
 
 	if serveProfiler {

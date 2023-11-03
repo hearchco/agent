@@ -16,12 +16,11 @@ func PagesColRequest(seName engines.Name, pagesCol *colly.Collector, ctx context
 	pagesCol.OnRequest(func(r *colly.Request) {
 		if err := ctx.Err(); err != nil {
 			if engines.IsTimeoutError(err) {
-				log.Trace().Msgf("%v: Pages Collector; Error OnRequest %v", seName, r)
+				log.Trace().Err(err).Msgf("sedefaults.PagesColRequest() from %v -> pagesCol.OnRequest(): context timeout error", seName)
 			} else {
-				log.Error().Msgf("%v: Pages Collector; Error OnRequest %v", seName, r)
+				log.Error().Err(err).Msgf("sedefaults.PagesColRequest() from %v -> pagesCol.OnRequest(): context error", seName)
 			}
 			r.Abort()
-			*retError = err
 			return
 		}
 		r.Ctx.Put("originalURL", r.URL.String())
@@ -30,10 +29,11 @@ func PagesColRequest(seName engines.Name, pagesCol *colly.Collector, ctx context
 
 func PagesColError(seName engines.Name, pagesCol *colly.Collector) {
 	pagesCol.OnError(func(r *colly.Response, err error) {
+		urll := r.Ctx.Get("originalURL")
 		if engines.IsTimeoutError(err) {
-			log.Trace().Err(err).Msgf("%v: Pages Collector - OnError.\nURL: %v", seName, r.Ctx.Get("originalURL"))
+			log.Trace().Err(err).Msgf("sedefaults.PagesColError() from %v -> pagesCol.OnError(): request timeout error for %v", seName, urll)
 		} else {
-			log.Error().Err(err).Msgf("%v: Pages Collector - OnError.\nURL: %v", seName, r.Ctx.Get("originalURL"))
+			log.Trace().Err(err).Msgf("sedefaults.PagesColError() from %v -> pagesCol.OnError(): request error for %v\nresponse: %v", seName, urll, r)
 		}
 	})
 }
@@ -41,7 +41,10 @@ func PagesColError(seName engines.Name, pagesCol *colly.Collector) {
 func PagesColResponse(seName engines.Name, pagesCol *colly.Collector, relay *bucket.Relay) {
 	pagesCol.OnResponse(func(r *colly.Response) {
 		urll := r.Ctx.Get("originalURL")
-		bucket.SetResultResponse(urll, r, relay, seName)
+		err := bucket.SetResultResponse(urll, r, relay, seName)
+		if err != nil {
+			log.Error().Err(err).Msg("sedefaults.PagesColResponse(): error setting result")
+		}
 	})
 }
 
@@ -49,12 +52,11 @@ func ColRequest(seName engines.Name, col *colly.Collector, ctx *context.Context,
 	col.OnRequest(func(r *colly.Request) {
 		if err := (*ctx).Err(); err != nil {
 			if engines.IsTimeoutError(err) {
-				log.Trace().Msgf("%v: SE Collector; Error OnRequest %v", seName, r)
+				log.Trace().Err(err).Msgf("sedefaults.ColRequest() from %v -> col.OnRequest(): context timeout error", seName)
 			} else {
-				log.Error().Msgf("%v: SE Collector; Error OnRequest %v", seName, r)
+				log.Error().Err(err).Msgf("sedefaults.ColRequest() from %v -> col.OnRequest(): context error", seName)
 			}
 			r.Abort()
-			*retError = err
 			return
 		}
 	})
@@ -62,17 +64,18 @@ func ColRequest(seName engines.Name, col *colly.Collector, ctx *context.Context,
 
 func ColError(seName engines.Name, col *colly.Collector, retError *error) {
 	col.OnError(func(r *colly.Response, err error) {
+		urll := r.Request.URL.String()
 		if engines.IsTimeoutError(err) {
-			log.Trace().Err(err).Msgf("%v: SE Collector - OnError.\nURL: %v", seName, r.Request.URL.String())
+			log.Trace().Err(err).Msgf("sedefaults.ColError() from %v -> col.OnError(): request timeout error for %v", seName, urll)
 		} else {
-			log.Error().Err(err).Msgf("%v: SE Collector - OnError.\nURL: %v", seName, r.Request.URL.String())
-			log.Debug().Msgf("%v: HTML Response written to %v%v_col.log.html", seName, config.LogDumpLocation, seName)
+			log.Error().Err(err).Msgf("sedefaults.ColError() from %v -> col.OnError(): request error for %v\nresponse: %v", seName, urll, r)
+			log.Debug().Msgf("sedefaults.ColError() from %v -> col.OnError(): html response written to %v%v_col.log.html", seName, config.LogDumpLocation, seName)
+
 			writeErr := os.WriteFile(config.LogDumpLocation+string(seName)+"_col.log.html", r.Body, 0644)
 			if writeErr != nil {
-				log.Error().Err(writeErr)
+				log.Error().Err(writeErr).Msgf("sedefaults.ColError() from %v -> col.OnError(): error writing html response to file", seName)
 			}
 		}
-		*retError = err
 	})
 }
 
@@ -89,7 +92,7 @@ func Prepare(seName engines.Name, options *engines.Options, settings *config.Set
 	// These two ifs, could be moved to config.SetupConfig
 	if settings.RequestedResultsPerPage != 0 && !support.RequestedResultsPerPage {
 		log.Error().Msgf("%v: Variable settings.RequestedResultsPerPage is set, but not supported in this search engine. Its value is: %v", seName, settings.RequestedResultsPerPage)
-		panic("sedefaults.Prepare(): Setting not supported.")
+		panic("sedefaults.Prepare(): setting not supported")
 	}
 	if settings.RequestedResultsPerPage == 0 && support.RequestedResultsPerPage {
 		// If its used in the code but not set, give it the default value.
@@ -132,7 +135,7 @@ func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collecto
 		}
 
 		if err := (*colPtr).Limit(limitRule); err != nil {
-			log.Error().Err(err).Msg("sedefaults: failed adding a new limit rule")
+			log.Error().Err(err).Msgf("sedefaults.InitializeCollectors(): failed adding new limit rule: %v", limitRule)
 		}
 		if timings.Timeout != 0 {
 			(*colPtr).SetRequestTimeout(timings.Timeout)

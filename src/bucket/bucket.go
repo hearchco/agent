@@ -1,6 +1,7 @@
 package bucket
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/gocolly/colly/v2"
@@ -62,12 +63,12 @@ func AddSEResult(seResult *engines.RetrievedResult, seName engines.Name, relay *
 
 	if !exists && options.VisitPages {
 		if err := pagesCol.Visit(seResult.URL); err != nil {
-			log.Error().Err(err).Msgf("bucket: failed visiting %v", seResult.URL)
+			log.Error().Err(err).Msgf("bucket.AddSEResult(): failed visiting %v", seResult.URL)
 		}
 	}
 }
 
-func SetResultResponse(link string, response *colly.Response, relay *Relay, seName engines.Name) {
+func SetResultResponse(link string, response *colly.Response, relay *Relay, seName engines.Name) error {
 	log.Trace().Msgf("%v: Got Response -> %v", seName, link)
 
 	relay.Mutex.Lock()
@@ -76,12 +77,15 @@ func SetResultResponse(link string, response *colly.Response, relay *Relay, seNa
 	if !exists {
 		relay.Mutex.Unlock()
 		relay.Mutex.RLock()
-		log.Error().Msgf("URL not in map when adding response! Should not be possible. URL: %v.\nRelay: %v", link, relay)
+		err := fmt.Errorf("bucket.SetResultResponse(): URL not in map when adding response, should not be possible. URL: %v.\nRelay: %v", link, relay)
 		relay.Mutex.RUnlock()
+		return err
 	} else {
 		mapRes.Response = response
 		relay.Mutex.Unlock()
 	}
+
+	return nil
 }
 
 func MakeSEResult(urll string, title string, description string, searchEngineName engines.Name, sePage int, seOnPageRank int) *engines.RetrievedResult {

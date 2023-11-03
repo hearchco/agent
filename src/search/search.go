@@ -57,12 +57,9 @@ func runEngines(engs []engines.Name, timings config.Timings, settings map[engine
 	for i := range engs {
 		eng := engs[i] // dont change for to `for _, eng := range engs {`, eng retains the same address throughout the whole loop
 		worker.Go(func() {
+			// if an error can be handled inside, it wont be returned
 			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng], timings)
-			if engines.IsTimeoutError(err) {
-				log.Trace().Err(err).Msgf("search.runEngines(): failed searching %v", eng)
-			} else if err != nil {
-				log.Error().Err(err).Msgf("search.runEngines(): failed searching %v", eng)
-			}
+			log.Error().Err(err).Msgf("search.runEngines(): failed searching %v", eng)
 		})
 	}
 }
@@ -71,8 +68,9 @@ func procBang(query *string, options *engines.Options, conf *config.Config) (con
 	useSpec, specEng := procSpecificEngine(*query, options, conf)
 	goodCat := procCategory(*query, options)
 	if !goodCat && !useSpec && (*query)[0] == '!' {
-		log.Error().Msgf("search.procBang(): invalid bang (not category or engine shortcut). query: %v", *query)
-	} //IS THIS OK?!
+		// options.category is set to GENERAL
+		log.Debug().Msgf("search.procBang(): invalid bang (not category or engine shortcut). query: %v", *query)
+	}
 
 	trimBang(query)
 
