@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
@@ -29,7 +28,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
-	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
+	sedefaults.ColRequest(Info.Name, col, ctx, &retError)
 	sedefaults.ColError(Info.Name, col, &retError)
 
 	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
@@ -62,23 +61,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
-	err := col.Request("GET", Info.URL+query+"&source=web", nil, colCtx, nil)
-	if engines.IsTimeoutError(err) {
-		log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-	} else if err != nil {
-		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-	}
+	sedefaults.DoGetRequest(Info.URL+query+"&source=web", colCtx, col, Info.Name, &retError)
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
-		err := col.Request("GET", Info.URL+query+"&spellcheck=0&offset="+strconv.Itoa(i), nil, colCtx, nil)
-		if engines.IsTimeoutError(err) {
-			log.Trace().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
-		} else if err != nil {
-			log.Error().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
-		}
+		sedefaults.DoGetRequest(Info.URL+query+"&spellcheck=0&offset="+strconv.Itoa(i), colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()

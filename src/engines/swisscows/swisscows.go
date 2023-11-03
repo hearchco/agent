@@ -29,6 +29,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
+	sedefaults.ColRequest(Info.Name, col, ctx, &retError)
+	sedefaults.ColError(Info.Name, col, &retError)
+
 	col.OnRequest(func(r *colly.Request) {
 		if r.Method == "OPTIONS" {
 			return
@@ -83,12 +86,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		//col.Request("OPTIONS", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
 		//col.Wait()
 
-		err := col.Request("GET", Info.URL+"freshness=All&itemsCount="+strconv.Itoa(settings.RequestedResultsPerPage)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
-		if engines.IsTimeoutError(err) {
-			log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-		} else if err != nil {
-			log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-		}
+		reqURL := Info.URL + "freshness=All&itemsCount=" + strconv.Itoa(settings.RequestedResultsPerPage) + "&offset=" + strconv.Itoa(i*10) + "&query=" + query + "&region=" + locale
+		sedefaults.DoGetRequest(reqURL, colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()

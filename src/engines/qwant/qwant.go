@@ -30,7 +30,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
-	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
+	sedefaults.ColRequest(Info.Name, col, ctx, &retError)
 	sedefaults.ColError(Info.Name, col, &retError)
 
 	col.OnResponse(func(r *colly.Response) {
@@ -74,12 +74,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		colCtx.Put("page", strconv.Itoa(i+1))
 		reqString := Info.URL + query + "&count=" + strconv.Itoa(nRequested) + "&locale=" + locale + "&offset=" + strconv.Itoa(i*nRequested) + "&device=" + device + "&safesearch=" + safeSearch
 
-		err := col.Request("GET", reqString, nil, colCtx, nil)
-		if engines.IsTimeoutError(err) {
-			log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-		} else if err != nil {
-			log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-		}
+		sedefaults.DoGetRequest(reqString, colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()

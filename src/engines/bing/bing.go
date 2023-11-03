@@ -31,7 +31,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
-	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
+	sedefaults.ColRequest(Info.Name, col, ctx, &retError)
 	sedefaults.ColError(Info.Name, col, &retError)
 
 	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
@@ -68,23 +68,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
-	err := col.Request("GET", Info.URL+query, nil, colCtx, nil)
-	if engines.IsTimeoutError(err) {
-		log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-	} else if err != nil {
-		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-	}
+	sedefaults.DoGetRequest(Info.URL+query, colCtx, col, Info.Name, &retError)
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
-		err := col.Request("GET", Info.URL+query+"&first="+strconv.Itoa(i*10+1), nil, colCtx, nil)
-		if engines.IsTimeoutError(err) {
-			log.Trace().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
-		} else if err != nil {
-			log.Error().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
-		}
+		sedefaults.DoGetRequest(Info.URL+query+"&first="+strconv.Itoa(i*10+1), colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()

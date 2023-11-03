@@ -8,7 +8,6 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/tminaorg/brzaguza/src/bucket"
 	"github.com/tminaorg/brzaguza/src/config"
 	"github.com/tminaorg/brzaguza/src/engines"
@@ -31,7 +30,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
-	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
+	sedefaults.ColRequest(Info.Name, col, ctx, &retError)
 	sedefaults.ColError(Info.Name, col, &retError)
 
 	col.OnHTML(dompaths.ResultsContainer, func(e *colly.HTMLElement) {
@@ -73,23 +72,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
-	err := col.Request("GET", Info.URL+"?q="+query, nil, colCtx, nil)
-	if engines.IsTimeoutError(err) {
-		log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-	} else if err != nil {
-		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-	}
+	sedefaults.DoGetRequest(Info.URL+"?q="+query, colCtx, col, Info.Name, &retError)
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
-		err := col.Request("POST", Info.URL, strings.NewReader("q="+query+"&dc="+strconv.Itoa(i*20)), colCtx, nil)
-		if engines.IsTimeoutError(err) {
-			log.Trace().Err(err).Msgf("%v: failed requesting with POST method on page", Info.Name)
-		} else if err != nil {
-			log.Error().Err(err).Msgf("%v: failed requesting with POST method on page", Info.Name)
-		}
+		sedefaults.DoPostRequest(Info.URL, strings.NewReader("q="+query+"&dc="+strconv.Itoa(i*20)), colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()

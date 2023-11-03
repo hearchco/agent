@@ -29,7 +29,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
-	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
+	sedefaults.ColRequest(Info.Name, col, ctx, &retError)
 	sedefaults.ColError(Info.Name, col, &retError)
 
 	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
@@ -71,12 +71,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
-	err := col.Request("POST", Info.URL, strings.NewReader("query="+query+"&country=web&language=all"), colCtx, nil)
-	if engines.IsTimeoutError(err) {
-		log.Trace().Err(err).Msgf("%v: failed requesting with POST method", Info.Name)
-	} else if err != nil {
-		log.Error().Err(err).Msgf("%v: failed requesting with POST method", Info.Name)
-	}
+	sedefaults.DoPostRequest(Info.URL, strings.NewReader("query="+query+"&country=web&language=all"), colCtx, col, Info.Name, &retError)
 	col.Wait() //wait so I can get the JSESSION cookie back
 
 	for i := 1; i < options.MaxPages; i++ {
@@ -84,12 +79,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		colCtx = colly.NewContext()
 		colCtx.Put("page", pageStr)
 
-		err := col.Request("GET", pageURL+pageStr, nil, colCtx, nil)
-		if engines.IsTimeoutError(err) {
-			log.Trace().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
-		} else if err != nil {
-			log.Error().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
-		}
+		sedefaults.DoGetRequest(pageURL+pageStr, colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()

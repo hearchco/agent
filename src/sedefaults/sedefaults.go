@@ -2,6 +2,8 @@ package sedefaults
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"os"
 
 	"github.com/gocolly/colly/v2"
@@ -48,9 +50,9 @@ func PagesColResponse(seName engines.Name, pagesCol *colly.Collector, relay *buc
 	})
 }
 
-func ColRequest(seName engines.Name, col *colly.Collector, ctx *context.Context, retError *error) {
+func ColRequest(seName engines.Name, col *colly.Collector, ctx context.Context, retError *error) {
 	col.OnRequest(func(r *colly.Request) {
-		if err := (*ctx).Err(); err != nil {
+		if err := ctx.Err(); err != nil {
 			if engines.IsTimeoutError(err) {
 				log.Trace().Err(err).Msgf("sedefaults.ColRequest() from %v -> col.OnRequest(): context timeout error", seName)
 			} else {
@@ -82,7 +84,7 @@ func ColError(seName engines.Name, col *colly.Collector, retError *error) {
 func Prepare(seName engines.Name, options *engines.Options, settings *config.Settings, support *engines.SupportedSettings, info *engines.Info, ctx *context.Context) error {
 	if ctx == nil {
 		*ctx = context.Background()
-	} //^ not necessary as ctx is always passed in search.go, branch predictor will skip this if
+	}
 
 	if options.UserAgent == "" {
 		options.UserAgent = useragent.RandomUserAgent()
@@ -119,11 +121,7 @@ func Prepare(seName engines.Name, options *engines.Options, settings *config.Set
 }
 
 func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collector, options *engines.Options, timings *config.Timings) {
-	if options.MaxPages == 1 {
-		*colPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent)) // so there is no thread creation overhead
-	} else {
-		*colPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
-	}
+	*colPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 	*pagesColPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 
 	if timings != nil {
@@ -143,5 +141,19 @@ func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collecto
 		if timings.PageTimeout != 0 {
 			(*pagesColPtr).SetRequestTimeout(timings.PageTimeout)
 		}
+	}
+}
+
+func DoGetRequest(urll string, colCtx *colly.Context, collector *colly.Collector, packageName engines.Name, retError *error) {
+	err := collector.Request("GET", urll, nil, colCtx, nil)
+	if err != nil {
+		*retError = fmt.Errorf("%v.Search(): failed GET request to %v with %w", packageName.ToLower(), urll, err)
+	}
+}
+
+func DoPostRequest(urll string, requestData io.Reader, colCtx *colly.Context, collector *colly.Collector, packageName engines.Name, retError *error) {
+	err := collector.Request("POST", urll, requestData, colCtx, nil)
+	if err != nil {
+		*retError = fmt.Errorf("%v.Search(): failed POST request to %v and body %v. error %w", packageName.ToLower(), requestData, urll, err)
 	}
 }
