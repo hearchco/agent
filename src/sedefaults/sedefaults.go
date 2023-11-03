@@ -91,10 +91,10 @@ func Prepare(seName engines.Name, options *engines.Options, settings *config.Set
 	}
 	log.Trace().Msgf("%v: UserAgent: %v", seName, options.UserAgent)
 
-	// These two ifs, could be moved to config.SetupConfig
+	// TODO: move to config.SetupConfig
 	if settings.RequestedResultsPerPage != 0 && !support.RequestedResultsPerPage {
-		log.Error().Msgf("%v: Variable settings.RequestedResultsPerPage is set, but not supported in this search engine. Its value is: %v", seName, settings.RequestedResultsPerPage)
-		panic("sedefaults.Prepare(): setting not supported")
+		log.Panic().Msgf("sedefaults.Prepare() from %v: setting not supported. variable settings.RequestedResultsPerPage is set in the config for %v. that setting is not supported for this search engine. the settings value is: %v", seName, seName, settings.RequestedResultsPerPage)
+		return nil
 	}
 	if settings.RequestedResultsPerPage == 0 && support.RequestedResultsPerPage {
 		// If its used in the code but not set, give it the default value.
