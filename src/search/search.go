@@ -59,7 +59,7 @@ func runEngines(engs []engines.Name, timings config.Timings, settings map[engine
 		worker.Go(func() {
 			// if an error can be handled inside, it wont be returned
 			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng], timings)
-			log.Error().Err(err).Msgf("search.runEngines(): failed searching %v", eng)
+			log.Error().Err(err).Msgf("search.runEngines(): error while searching %v", eng)
 		})
 	}
 }
