@@ -29,8 +29,7 @@ test.go
 src/engines/*/site/*
 !src/engines/_engines_test
 
-logdump/*.html
-log/*.log
+log/
 database/
 profiling/
 
