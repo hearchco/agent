@@ -20,8 +20,8 @@ primary_region = "cdg"
   processes = ["app"]
   [http_service.concurrency]
     type = "requests"
-    hard_limit = 5
-    soft_limit = 1
+    hard_limit = 10
+    soft_limit = 5
 
   [[http_service.checks]]
     interval = "30s"
