@@ -62,13 +62,10 @@ func generateSignature(params string, nonce string) string {
 	var rot13Nonce string = rot13Switch(nonce)
 	var data string = "/web/search" + params + rot13Nonce
 
-	var encData string = performMagic(data)
-	//log.Debug().Msgf("Original: %v\nBase64 Encoded: %v", string(data), encData)
+	var encData string = hashToSHA256B64(data)
 	encData = strings.ReplaceAll(encData, "=", "")
 	encData = strings.ReplaceAll(encData, "+", "-")
 	encData = strings.ReplaceAll(encData, "/", "_")
-
-	//log.Debug().Msgf("Final: %v", encData)
 
 	return string(encData)
 }
