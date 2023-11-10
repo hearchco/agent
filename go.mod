@@ -23,7 +23,7 @@ require (
 	github.com/pkg/profile v1.7.0
 	github.com/redis/go-redis/v9 v9.3.0
 	github.com/rs/zerolog v1.31.0
-	golang.org/x/tools v0.14.0
+	golang.org/x/tools v0.15.0
 )
 
 require (
