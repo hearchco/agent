@@ -2,7 +2,7 @@ app = "zadnjica"
 primary_region = "cdg"
 
 [build]
-  image = "ghcr.io/tminaorg/brzaguza:latest"
+  image = "ghcr.io/brzaguza/zadnjica:latest"
 
 [env]
   BRZAGUZA_SERVER_CACHE_TYPE = "redis"
