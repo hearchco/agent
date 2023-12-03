@@ -1,13 +1,11 @@
-FROM gcr.io/distroless/static-debian12:nonroot
-
-WORKDIR /app
-
-COPY hearchco .
+FROM cgr.dev/chainguard/static:latest
 
 ENV HEARCHCO_DATA_DIR="/data"
 ENV HEARCHCO_LOG_DIR="/data/log"
 
-ENTRYPOINT [ "./hearchco" ]
+COPY hearchco .
+
+CMD [ "./hearchco" ]
 
 VOLUME [ "/data" ]
 

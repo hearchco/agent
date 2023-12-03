@@ -1,3 +1,8 @@
+# fly.toml app configuration file generated for hearchco on 2023-12-03T17:11:23+01:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
 app = "hearchco"
 primary_region = "cdg"
 
