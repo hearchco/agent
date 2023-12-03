@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/search"
+	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/search"
 )
 
 func CheckTestCases(tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResults,

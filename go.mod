@@ -1,4 +1,4 @@
-module github.com/tminaorg/brzaguza
+module github.com/hearchco/hearchco
 
 go 1.21
 
@@ -13,7 +13,7 @@ require (
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/goccy/go-json v0.10.2
-	github.com/gocolly/colly/v2 v2.1.0
+	github.com/gocolly/colly/v2 v2.1.1-0.20231020184023-3c987f1982ed
 	github.com/knadh/koanf/parsers/yaml v0.1.0
 	github.com/knadh/koanf/providers/env v0.1.0
 	github.com/knadh/koanf/providers/file v0.1.0
@@ -105,5 +105,3 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )
-
-replace github.com/gocolly/colly/v2 => github.com/tminaorg/colly/v2 v2.0.0-20231003134351-b4b3d1746def

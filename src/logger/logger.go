@@ -19,7 +19,7 @@ func DateString() string {
 func Setup(logDirPath string, verbosity int8) {
 	// Generate logfile name
 	datetime := DateString()
-	logFilePath := path.Join(logDirPath, fmt.Sprintf("brzaguza_%v.log", datetime))
+	logFilePath := path.Join(logDirPath, fmt.Sprintf("hearchco_%v.log", datetime))
 
 	// Setup logger
 	logger := log.Output(io.MultiWriter(zerolog.ConsoleWriter{

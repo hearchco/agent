@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/pkg/profile"
-	"github.com/tminaorg/brzaguza/src/cli"
+	"github.com/hearchco/hearchco/src/cli"
 )
 
 type profiler struct {

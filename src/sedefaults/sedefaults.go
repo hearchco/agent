@@ -6,10 +6,10 @@ import (
 
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
-	"github.com/tminaorg/brzaguza/src/bucket"
-	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/engines"
-	"github.com/tminaorg/brzaguza/src/search/useragent"
+	"github.com/hearchco/hearchco/src/bucket"
+	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/engines"
+	"github.com/hearchco/hearchco/src/search/useragent"
 )
 
 func PagesColRequest(seName engines.Name, pagesCol *colly.Collector, ctx context.Context, retError *error) {

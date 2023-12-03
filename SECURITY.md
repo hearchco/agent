@@ -1,6 +1,6 @@
 # Security Policy
 
-We love responsible reports of (potential) security issues in BrzaGuza.
+We love responsible reports of (potential) security issues in Hearchco.
 
 You can contact us at security@tmina.org.
 

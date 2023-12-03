@@ -1,6 +1,6 @@
 package engines
 
-import "github.com/tminaorg/brzaguza/src/category"
+import "github.com/hearchco/hearchco/src/category"
 
 // variables are 1-indexed
 // Information about what Rank a result was on some Search Engine

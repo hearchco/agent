@@ -4,9 +4,9 @@ import (
 	"math"
 	"sort"
 
-	"github.com/tminaorg/brzaguza/src/bucket/result"
-	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/engines"
+	"github.com/hearchco/hearchco/src/bucket/result"
+	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/engines"
 )
 
 func GetScore(result *result.Result, rconf *config.Ranking) float64 {

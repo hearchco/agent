@@ -20,8 +20,8 @@
 # Go workspace file
 go.work
 
-brzaguza-bin
-brzaguza.*
+hearchco-bin
+hearchco.*
 
 .vscode/*
 test.go
