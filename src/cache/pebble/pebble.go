@@ -7,8 +7,8 @@ import (
 
 	"github.com/cockroachdb/pebble"
 	"github.com/fxamacker/cbor/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/cache"
+	"github.com/rs/zerolog/log"
 )
 
 type DB struct {
@@ -59,7 +59,7 @@ func (db *DB) Get(k string, o cache.Value) error {
 	val := []byte(v) // copy data before closing, casting needed for unmarshal
 
 	if err == pebble.ErrNotFound {
-		log.Trace().Msgf("Found no value in pebble for key %v", k)
+		log.Trace().Msgf("Found no value in pebble for key: \"%v\"", k)
 	} else if err != nil {
 		log.Fatal().Err(err).Msgf("pebble.Get(): error getting value from pebble for key %v", k)
 		return nil

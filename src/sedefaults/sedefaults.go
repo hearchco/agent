@@ -67,21 +67,16 @@ func ColRequest(seName engines.Name, col *colly.Collector, ctx context.Context, 
 
 func ColError(seName engines.Name, col *colly.Collector, retError *error) {
 	col.OnError(func(r *colly.Response, err error) {
-		if err == nil {
-			log.Error().Msg("sedefaults.ColError() from %v -> col.OnError(): colly returned nil err. shouldn't ever happen")
-			return
-		}
-
 		urll := r.Request.URL.String()
 		if engines.IsTimeoutError(err) {
 			log.Trace().Err(err).Msgf("sedefaults.ColError() from %v -> col.OnError(): request timeout error for %v", seName, urll)
 		} else {
-			log.Error().Err(err).Msgf("sedefaults.ColError() from %v -> col.OnError(): request error for %v\nresponse: %v", seName, urll, r)
+			log.Error().Err(err).Msgf("sedefaults.ColError() from %v -> col.OnError(): request error for %v\nresponse(%v): %v", seName, urll, r.StatusCode, string(r.Body))
 			log.Debug().Msgf("sedefaults.ColError() from %v -> col.OnError(): html response written to %v%v_col.log.html", seName, config.LogDumpLocation, seName)
 
-			writeErr := os.WriteFile(config.LogDumpLocation+string(seName)+"_col.log.html", r.Body, 0644)
-			if writeErr != nil {
-				log.Error().Err(writeErr).Msgf("sedefaults.ColError() from %v -> col.OnError(): error writing html response to file", seName)
+			bodyWriteErr := os.WriteFile(config.LogDumpLocation+seName.String()+"_col.log.html", r.Body, 0644)
+			if bodyWriteErr != nil {
+				log.Error().Err(bodyWriteErr).Msgf("sedefaults.ColError() from %v -> col.OnError(): error writing html response body to file", seName)
 			}
 		}
 	})

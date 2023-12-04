@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/fxamacker/cbor/v2"
-	"github.com/redis/go-redis/v9"
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/config"
+	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog/log"
 )
 
 type DB struct {
@@ -64,7 +64,7 @@ func (db *DB) Get(k string, o cache.Value) error {
 	val := []byte(v) // copy data before closing, casting needed for unmarshal
 
 	if err == redis.Nil {
-		log.Trace().Msgf("found no value in redis for key %v", k)
+		log.Trace().Msgf("found no value in redis for key \"%v\"", k)
 	} else if err != nil {
 		log.Fatal().Err(err).Msgf("redis.Get(): error getting value from redis for key %v", k)
 		return nil
