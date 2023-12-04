@@ -112,7 +112,7 @@ col.OnHTML("div[data-testid=\"sectionWeb\"] > div > div", func(e *colly.HTMLElem
 	dom := e.DOM
 	baseDOM := dom.Find("div[data-testid=\"webResult\"] > div > div > div > div > div")
 	hrefElement := baseDOM.Find("a[data-testid=\"serTitle\"]")
-	linkHref, _ := hrefElement.Attr("href")
+	linkHref, hrefExists := hrefElement.Attr("href")
 	linkText := parse.ParseURL(linkHref)
 	titleText := strings.TrimSpace(hrefElement.Text())
 	descText := strings.TrimSpace(baseDOM.Find("div > span").Text())

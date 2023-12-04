@@ -43,8 +43,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
 
 		if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-			var pageStr string = e.Request.Ctx.Get("page")
-			page, _ := strconv.Atoi(pageStr)
+			page := sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 
 			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
 			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)

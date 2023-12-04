@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/hearchco/hearchco/src/bucket"
@@ -161,4 +162,13 @@ func DoPostRequest(urll string, requestData io.Reader, colCtx *colly.Context, co
 	if err != nil {
 		*retError = fmt.Errorf("%v.Search(): failed POST request to %v and body %v. error %w", packageName.ToLower(), requestData, urll, err)
 	}
+}
+
+func PageFromContext(ctx *colly.Context, seName engines.Name) int {
+	var pageStr string = ctx.Get("page")
+	page, converr := strconv.Atoi(pageStr)
+	if converr != nil {
+		log.Panic().Err(converr).Msgf("sedefaults.PageFromContext from %v: failed to convert page number to int. pageStr: %v", seName, pageStr)
+	}
+	return page
 }
