@@ -7,11 +7,11 @@ import (
 	"os"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/search/useragent"
+	"github.com/rs/zerolog/log"
 )
 
 func PagesColRequest(seName engines.Name, pagesCol *colly.Collector, ctx context.Context, retError *error) {
@@ -66,6 +66,11 @@ func ColRequest(seName engines.Name, col *colly.Collector, ctx context.Context, 
 
 func ColError(seName engines.Name, col *colly.Collector, retError *error) {
 	col.OnError(func(r *colly.Response, err error) {
+		if err == nil {
+			log.Error().Msg("sedefaults.ColError() from %v -> col.OnError(): colly returned nil err. shouldn't ever happen")
+			return
+		}
+
 		urll := r.Request.URL.String()
 		if engines.IsTimeoutError(err) {
 			log.Trace().Err(err).Msgf("sedefaults.ColError() from %v -> col.OnError(): request timeout error for %v", seName, urll)

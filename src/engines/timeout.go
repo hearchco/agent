@@ -1,12 +1,12 @@
 package engines
 
 import (
-	"errors"
 	"net"
 )
 
 func IsTimeoutError(err error) bool {
-	var netError *net.Error
-	is := errors.As(err, netError)
-	return is && (*netError).Timeout()
+	if perr, ok := err.(net.Error); ok && perr.Timeout() {
+		return true
+	}
+	return false
 }

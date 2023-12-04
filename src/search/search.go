@@ -6,14 +6,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rs/zerolog/log"
-	"github.com/sourcegraph/conc"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/bucket/result"
 	"github.com/hearchco/hearchco/src/category"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/rank"
+	"github.com/rs/zerolog/log"
+	"github.com/sourcegraph/conc"
 )
 
 func PerformSearch(query string, options engines.Options, conf *config.Config) []result.Result {
@@ -59,7 +59,9 @@ func runEngines(engs []engines.Name, timings config.Timings, settings map[engine
 		worker.Go(func() {
 			// if an error can be handled inside, it wont be returned
 			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng], timings)
-			log.Error().Err(err).Msgf("search.runEngines(): error while searching %v", eng)
+			if err != nil {
+				log.Error().Err(err).Msgf("search.runEngines(): error while searching %v", eng)
+			}
 		})
 	}
 }
