@@ -36,12 +36,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
 
-		linkHref, _ := dom.Find(dompaths.Link).Attr("href")
+		linkHref, hrefExists := dom.Find(dompaths.Link).Attr("href")
 		linkText := parse.ParseURL(linkHref)
 		titleText := strings.TrimSpace(dom.Find(dompaths.Title).Text())
 		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
 
-		if linkText != "" && linkText != "#" && titleText != "" {
+		if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
 			var pageStr string = e.Request.Ctx.Get("page")
 			page, _ := strconv.Atoi(pageStr)
 

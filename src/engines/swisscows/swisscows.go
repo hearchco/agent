@@ -6,12 +6,12 @@ import (
 	"strconv"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/hearchco/hearchco/src/sedefaults"
+	"github.com/rs/zerolog/log"
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
@@ -105,12 +105,12 @@ var pageRankCounter []int = make([]int, options.MaxPages*Info.ResPerPage)
 col.OnHTML("div.web-results > article.item-web", func(e *colly.HTMLElement) {
 	dom := e.DOM
 
-	linkHref, _ := dom.Find("a.site").Attr("href")
+	linkHref, hrefExists := dom.Find("a.site").Attr("href")
 	linkText := parse.ParseURL(linkHref)
 	titleText := strings.TrimSpace(dom.Find("h2.title").Text())
 	descText := strings.TrimSpace(dom.Find("p.description").Text())
 
-	if linkText != "" && linkText != "#" && titleText != "" {
+	if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
 		var pageStr string = e.Request.Ctx.Get("page")
 		page, _ := strconv.Atoi(pageStr)
 

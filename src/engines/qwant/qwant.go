@@ -7,12 +7,12 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/hearchco/hearchco/src/sedefaults"
+	"github.com/rs/zerolog/log"
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
@@ -117,7 +117,7 @@ col.OnHTML("div[data-testid=\"sectionWeb\"] > div > div", func(e *colly.HTMLElem
 	titleText := strings.TrimSpace(hrefElement.Text())
 	descText := strings.TrimSpace(baseDOM.Find("div > span").Text())
 
-	if linkText != "" && linkText != "#" && titleText != "" {
+	if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
 		var pageStr string = e.Request.Ctx.Get("page")
 		page, _ := strconv.Atoi(pageStr)
 

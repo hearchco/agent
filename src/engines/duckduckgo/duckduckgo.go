@@ -34,10 +34,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	sedefaults.ColError(Info.Name, col, &retError)
 
 	col.OnHTML(dompaths.ResultsContainer, func(e *colly.HTMLElement) {
-		var linkText string
-		var linkScheme string
-		var titleText string
-		var descText string
+		var linkText, linkScheme, titleText, descText string
+		var hrefExists bool
 		var rrank int
 
 		var pageStr string = e.Request.Ctx.Get("page")
@@ -48,7 +46,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			case 0:
 				rankText := strings.TrimSpace(row.Children().First().Text())
 				fmt.Sscanf(rankText, "%d", &rrank)
-				linkHref, _ := row.Find(dompaths.Link).Attr("href")
+				var linkHref string
+				linkHref, hrefExists = row.Find(dompaths.Link).Attr("href")
 				if strings.Contains(linkHref, "https") {
 					linkScheme = "https://"
 				} else {
@@ -61,7 +60,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				rawURL := linkScheme + row.Find("td > span.link-text").Text()
 				linkText = parse.ParseURL(rawURL)
 			case 3:
-				if linkText != "" && linkText != "#" && titleText != "" {
+				if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
 					res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, (i/4 + 1))
 					bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 				}

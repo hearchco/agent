@@ -6,12 +6,12 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/hearchco/hearchco/src/sedefaults"
+	"github.com/rs/zerolog/log"
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
@@ -38,7 +38,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		dom := e.DOM
 
 		linkEl := dom.Find(dompaths.Link)
-		linkHref, _ := linkEl.Attr("href")
+		linkHref, hrefExists := linkEl.Attr("href")
 		var linkText string
 
 		if linkHref[0] == 'h' {
@@ -52,7 +52,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		titleText := strings.TrimSpace(linkEl.Text())
 		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
 
-		if linkText != "" && linkText != "#" && titleText != "" {
+		if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
 			var pageStr string = e.Request.Ctx.Get("page")
 			page, _ := strconv.Atoi(pageStr)
 
