@@ -6,14 +6,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hearchco/hearchco/src/category"
+	"github.com/hearchco/hearchco/src/engines"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/providers/structs"
 	"github.com/knadh/koanf/v2"
 	"github.com/rs/zerolog/log"
-	"github.com/tminaorg/brzaguza/src/category"
-	"github.com/tminaorg/brzaguza/src/engines"
 )
 
 var EnabledEngines []engines.Name = make([]engines.Name, 0)
@@ -117,10 +117,10 @@ func (c *Config) Load(dataDirPath string, logDirPath string) {
 	}
 
 	// Load YAML config
-	yamlPath := path.Join(dataDirPath, "brzaguza.yaml")
+	yamlPath := path.Join(dataDirPath, "hearchco.yaml")
 	if _, err := os.Stat(yamlPath); err != nil {
 		log.Trace().Msgf("config.Load(): no yaml config present at path: %v, looking for .yml", yamlPath)
-		yamlPath = path.Join(dataDirPath, "brzaguza.yml")
+		yamlPath = path.Join(dataDirPath, "hearchco.yml")
 		if _, errr := os.Stat(yamlPath); errr != nil {
 			log.Trace().Msgf("config.Load(): no yaml config present at path: %v", yamlPath)
 		} else if errr := k.Load(file.Provider(yamlPath), yaml.Parser()); errr != nil {
@@ -133,8 +133,8 @@ func (c *Config) Load(dataDirPath string, logDirPath string) {
 	}
 
 	// Load ENV config
-	if err := k.Load(env.Provider("BRZAGUZA_", ".", func(s string) string {
-		return strings.Replace(strings.ToLower(strings.TrimPrefix(s, "BRZAGUZA_")), "_", ".", -1)
+	if err := k.Load(env.Provider("HEARCHCO_", ".", func(s string) string {
+		return strings.Replace(strings.ToLower(strings.TrimPrefix(s, "HEARCHCO_")), "_", ".", -1)
 	}), nil); err != nil {
 		log.Panic().Err(err).Msg("config.Load(): error loading env config")
 		return

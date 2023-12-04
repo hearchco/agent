@@ -8,8 +8,8 @@ import (
 	"github.com/fxamacker/cbor/v2"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
-	"github.com/tminaorg/brzaguza/src/cache"
-	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/hearchco/hearchco/src/cache"
+	"github.com/hearchco/hearchco/src/config"
 )
 
 type DB struct {

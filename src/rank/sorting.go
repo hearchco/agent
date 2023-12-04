@@ -2,7 +2,7 @@ package rank
 
 import (
 	"github.com/rs/zerolog/log"
-	"github.com/tminaorg/brzaguza/src/bucket/result"
+	"github.com/hearchco/hearchco/src/bucket/result"
 )
 
 type ByScore []result.Result

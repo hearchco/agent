@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
-	"github.com/tminaorg/brzaguza/src/bucket/result"
-	"github.com/tminaorg/brzaguza/src/cache"
-	"github.com/tminaorg/brzaguza/src/category"
-	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/engines"
-	"github.com/tminaorg/brzaguza/src/search"
+	"github.com/hearchco/hearchco/src/bucket/result"
+	"github.com/hearchco/hearchco/src/cache"
+	"github.com/hearchco/hearchco/src/category"
+	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/engines"
+	"github.com/hearchco/hearchco/src/search"
 )
 
 func printResults(results []result.Result) {

@@ -6,9 +6,9 @@ import (
 
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
-	"github.com/tminaorg/brzaguza/src/bucket/result"
-	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/engines"
+	"github.com/hearchco/hearchco/src/bucket/result"
+	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/engines"
 )
 
 type Relay struct {

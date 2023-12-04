@@ -1,6 +1,6 @@
 package etools
 
-import "github.com/tminaorg/brzaguza/src/engines"
+import "github.com/hearchco/hearchco/src/engines"
 
 const pageURL string = "https://www.etools.ch/search.do?page="
 

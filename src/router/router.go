@@ -11,8 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
-	"github.com/tminaorg/brzaguza/src/cache"
-	"github.com/tminaorg/brzaguza/src/config"
+	"github.com/hearchco/hearchco/src/cache"
+	"github.com/hearchco/hearchco/src/config"
 )
 
 type RouterWrapper struct {

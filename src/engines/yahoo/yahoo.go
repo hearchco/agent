@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/tminaorg/brzaguza/src/bucket"
-	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/engines"
-	"github.com/tminaorg/brzaguza/src/search/parse"
-	"github.com/tminaorg/brzaguza/src/sedefaults"
+	"github.com/hearchco/hearchco/src/bucket"
+	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/engines"
+	"github.com/hearchco/hearchco/src/search/parse"
+	"github.com/hearchco/hearchco/src/sedefaults"
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
