@@ -22,7 +22,6 @@ require (
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/profile v1.7.0
 	github.com/redis/go-redis/v9 v9.3.0
-	github.com/robertkrimen/otto v0.2.1
 	github.com/rs/zerolog v1.31.0
 	golang.org/x/tools v0.16.0
 )
@@ -81,7 +80,7 @@ require (
 	golang.org/x/exp v0.0.0-20231127185646-65229373498e // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect
-	gopkg.in/sourcemap.v1 v1.0.5 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
