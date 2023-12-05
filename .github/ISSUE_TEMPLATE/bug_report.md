@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 
 **What's your setup? (please complete the following information):**
  - Using monolith or micro service setup?: [e.g. monolith]
- - Version of BrzaGuza [e.g. 1.2.3]
+ - Version of Hearchco [e.g. 1.2.3]
  - Method of installation [e.g. docker]
 
 **Docker compose file if used**
@@ -33,7 +33,7 @@ If applicable, add screenshots to help explain your problem.
 Your compose goes here
 ```
 
-**BrzaGuza config file**
+**Hearchco config file**
 ```yaml
 Your config goes here
 ```

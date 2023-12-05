@@ -8,12 +8,12 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/sourcegraph/conc"
-	"github.com/tminaorg/brzaguza/src/bucket"
-	"github.com/tminaorg/brzaguza/src/bucket/result"
-	"github.com/tminaorg/brzaguza/src/category"
-	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/engines"
-	"github.com/tminaorg/brzaguza/src/rank"
+	"github.com/hearchco/hearchco/src/bucket"
+	"github.com/hearchco/hearchco/src/bucket/result"
+	"github.com/hearchco/hearchco/src/category"
+	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/engines"
+	"github.com/hearchco/hearchco/src/rank"
 )
 
 func PerformSearch(query string, options engines.Options, conf *config.Config) []result.Result {

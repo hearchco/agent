@@ -2,7 +2,7 @@ package result
 
 import (
 	"github.com/gocolly/colly/v2"
-	"github.com/tminaorg/brzaguza/src/engines"
+	"github.com/hearchco/hearchco/src/engines"
 )
 
 // Everything about some Result, calculated and compiled from multiple search engines

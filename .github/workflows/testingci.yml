@@ -27,7 +27,7 @@ jobs:
 
       # go:generate
       - name: Generate go code from go:generate comments
-        run: make install
+        run: make setup
 
       # go:build
       - name: Build project
@@ -50,7 +50,7 @@ jobs:
 
       # go:generate
       - name: Generate go code from go:generate comments
-        run: make install
+        run: make setup
 
       # lint
       - uses: golangci/golangci-lint-action@v3

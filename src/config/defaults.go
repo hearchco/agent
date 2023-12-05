@@ -3,8 +3,8 @@ package config
 import (
 	"time"
 
-	"github.com/tminaorg/brzaguza/src/category"
-	"github.com/tminaorg/brzaguza/src/engines"
+	"github.com/hearchco/hearchco/src/category"
+	"github.com/hearchco/hearchco/src/engines"
 )
 
 const DefaultLocale string = "en-US"

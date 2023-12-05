@@ -3,9 +3,9 @@ package _engines_test
 import (
 	"time"
 
-	"github.com/tminaorg/brzaguza/src/category"
-	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/engines"
+	"github.com/hearchco/hearchco/src/category"
+	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/engines"
 )
 
 type TestCaseHasAnyResults struct {

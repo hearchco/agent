@@ -8,14 +8,14 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
-	"github.com/tminaorg/brzaguza/src/cache"
-	"github.com/tminaorg/brzaguza/src/cache/nocache"
-	"github.com/tminaorg/brzaguza/src/cache/pebble"
-	"github.com/tminaorg/brzaguza/src/cache/redis"
-	"github.com/tminaorg/brzaguza/src/cli"
-	"github.com/tminaorg/brzaguza/src/config"
-	"github.com/tminaorg/brzaguza/src/logger"
-	"github.com/tminaorg/brzaguza/src/router"
+	"github.com/hearchco/hearchco/src/cache"
+	"github.com/hearchco/hearchco/src/cache/nocache"
+	"github.com/hearchco/hearchco/src/cache/pebble"
+	"github.com/hearchco/hearchco/src/cache/redis"
+	"github.com/hearchco/hearchco/src/cli"
+	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/logger"
+	"github.com/hearchco/hearchco/src/router"
 )
 
 func main() {

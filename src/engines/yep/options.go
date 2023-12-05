@@ -1,7 +1,7 @@
 package yep
 
 import (
-	"github.com/tminaorg/brzaguza/src/engines"
+	"github.com/hearchco/hearchco/src/engines"
 )
 
 var Info engines.Info = engines.Info{

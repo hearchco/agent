@@ -1,6 +1,6 @@
 package duckduckgo
 
-import "github.com/tminaorg/brzaguza/src/engines"
+import "github.com/hearchco/hearchco/src/engines"
 
 var Info engines.Info = engines.Info{
 	Domain:         "lite.duckduckgo.com",

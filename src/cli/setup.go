@@ -10,7 +10,7 @@ import (
 func Setup() Flags {
 	var cli Flags
 	ctx := kong.Parse(&cli,
-		kong.Name("brzaguza"),
+		kong.Name("hearchco"),
 		kong.Description("Fastasst metasearch engine"),
 		kong.UsageOnError(),
 		kong.ConfigureHelp(kong.HelpOptions{
