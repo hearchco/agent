@@ -8,7 +8,7 @@ require (
 	github.com/alecthomas/kong v0.8.1
 	github.com/cockroachdb/pebble v0.0.0-20231106144427-a0b01b62e8f9
 	github.com/fxamacker/cbor/v2 v2.5.0
-	github.com/gin-contrib/cors v1.4.0
+	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-contrib/graceful v0.0.0-20230904152018-e56ed94cd808
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.9.1
