@@ -22,7 +22,7 @@ var (
 	trimprefix    = flag.String("trimprefix", "", "trim the `prefix` from the generated constant names")
 	buildTags     = flag.String("tags", "", "comma-separated list of build tags to apply")
 	packageName   = flag.String("packagename", "", "name of the package for generated code; default current package")
-	enginesImport = flag.String("enginesimport", "github.com/tminaorg/brzaguza/src/engines", "source of the engines import, which is prefixed to imports for consts; default github.com/tminaorg/brzaguza/src/engines")
+	enginesImport = flag.String("enginesimport", "github.com/hearchco/hearchco/src/engines", "source of the engines import, which is prefixed to imports for consts; default github.com/hearchco/hearchco/src/engines")
 	linecomment   = flag.Bool("linecomment", false, "use line comment text as printed text when present")
 )
 

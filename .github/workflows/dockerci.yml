@@ -35,7 +35,7 @@ jobs:
 
       # go:generate
       - name: Generate go code from go:generate comments
-        run: make install
+        run: make setup
 
       # goreleaser snapshot
       - name: Snapshot
@@ -57,7 +57,7 @@ jobs:
 
       # go:generate
       - name: Generate go code from go:generate comments
-        run: make install
+        run: make setup
 
       # go:build
       - name: Build project

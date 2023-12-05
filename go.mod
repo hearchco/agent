@@ -1,4 +1,4 @@
-module github.com/tminaorg/brzaguza
+module github.com/hearchco/hearchco
 
 go 1.21
 
@@ -8,13 +8,12 @@ require (
 	github.com/alecthomas/kong v0.8.1
 	github.com/cockroachdb/pebble v0.0.0-20231106144427-a0b01b62e8f9
 	github.com/fxamacker/cbor/v2 v2.5.0
-	github.com/gin-contrib/cors v1.4.0
+	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-contrib/graceful v0.1.0
 	github.com/gin-contrib/pprof v1.4.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/goccy/go-json v0.10.2
 	github.com/gocolly/colly/v2 v2.1.1-0.20231020184023-3c987f1982ed
-	github.com/hearchco/hearchco v0.7.0
 	github.com/knadh/koanf/parsers/yaml v0.1.0
 	github.com/knadh/koanf/providers/env v0.1.0
 	github.com/knadh/koanf/providers/file v0.1.0
@@ -24,7 +23,7 @@ require (
 	github.com/pkg/profile v1.7.0
 	github.com/redis/go-redis/v9 v9.3.0
 	github.com/rs/zerolog v1.31.0
-	golang.org/x/tools v0.15.0
+	golang.org/x/tools v0.16.0
 )
 
 require (
@@ -77,10 +76,11 @@ require (
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	golang.org/x/arch v0.6.0 // indirect
-	golang.org/x/crypto v0.15.0 // indirect
+	golang.org/x/crypto v0.16.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
@@ -99,11 +99,9 @@ require (
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
 	github.com/sourcegraph/conc v0.3.0
 	github.com/temoto/robotstxt v1.1.2 // indirect
-	golang.org/x/net v0.18.0
-	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/net v0.19.0
+	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 )
-
-replace github.com/gocolly/colly/v2 => github.com/tminaorg/colly/v2 v2.0.0-20231003134351-b4b3d1746def

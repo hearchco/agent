@@ -1,16 +1,14 @@
-FROM gcr.io/distroless/static-debian12:nonroot
+FROM cgr.dev/chainguard/static:latest
 
-WORKDIR /app
+ENV HEARCHCO_DATA_DIR="/data"
+ENV HEARCHCO_LOG_DIR="/data/log"
 
-COPY brzaguza .
+COPY hearchco .
 
-ENV BRZAGUZA_DATA_DIR="/data"
-ENV BRZAGUZA_LOG_DIR="/data/log"
-
-ENTRYPOINT [ "./brzaguza" ]
+CMD [ "./hearchco" ]
 
 VOLUME [ "/data" ]
 
 EXPOSE 3030
 
-LABEL org.opencontainers.image.source="https://github.com/tminaorg/brzaguza"
+LABEL org.opencontainers.image.source="https://github.com/hearchco/hearchco"

@@ -3,8 +3,8 @@ package yep_test
 import (
 	"testing"
 
-	"github.com/tminaorg/brzaguza/src/engines"
-	"github.com/tminaorg/brzaguza/src/engines/_engines_test"
+	"github.com/hearchco/hearchco/src/engines"
+	"github.com/hearchco/hearchco/src/engines/_engines_test"
 )
 
 func TestSearch(t *testing.T) {

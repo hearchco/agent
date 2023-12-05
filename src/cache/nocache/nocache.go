@@ -1,7 +1,7 @@
 package nocache
 
 import (
-	"github.com/tminaorg/brzaguza/src/cache"
+	"github.com/hearchco/hearchco/src/cache"
 )
 
 type DB struct{}

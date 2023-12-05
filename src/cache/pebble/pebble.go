@@ -7,7 +7,7 @@ import (
 	"github.com/cockroachdb/pebble"
 	"github.com/fxamacker/cbor/v2"
 	"github.com/rs/zerolog/log"
-	"github.com/tminaorg/brzaguza/src/cache"
+	"github.com/hearchco/hearchco/src/cache"
 )
 
 type DB struct {

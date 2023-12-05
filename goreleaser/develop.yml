@@ -1,5 +1,5 @@
 # .goreleaser.yml
-project_name: brzaguza
+project_name: hearchco
 
 # Build
 builds:
