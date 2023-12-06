@@ -26,7 +26,7 @@ func New(ctx context.Context, config config.Redis) *DB {
 
 	if err := rdb.Ping(ctx).Err(); err != nil {
 		log.Fatal().Err(err).Msgf("redis.New(): error connecting to redis with addr: %v:%v/%v", config.Host, config.Port, config.Database)
-		return nil
+		// ^FATAL
 	} else {
 		log.Info().Msgf("Successful connection to redis (addr: %v:%v/%v)", config.Host, config.Port, config.Database)
 	}
@@ -37,7 +37,7 @@ func New(ctx context.Context, config config.Redis) *DB {
 func (db *DB) Close() {
 	if err := db.rdb.Close(); err != nil {
 		log.Fatal().Err(err).Msg("redis.Close(): error disconnecting from redis")
-		return
+		// ^FATAL
 	} else {
 		log.Debug().Msg("Successfully disconnected from redis")
 	}
@@ -51,7 +51,7 @@ func (db *DB) Set(k string, v cache.Value) error {
 		return fmt.Errorf("redis.Set(): error marshaling value: %w", err)
 	} else if err := db.rdb.Set(db.ctx, k, val, 0).Err(); err != nil {
 		log.Fatal().Err(err).Msg("redis.Set(): error setting KV to redis")
-		return nil
+		// ^FATAL
 	} else {
 		cacheTimeSince := time.Since(cacheTimer)
 		log.Debug().Msgf("Cached results in %vms (%vns)", cacheTimeSince.Milliseconds(), cacheTimeSince.Nanoseconds())
@@ -67,7 +67,7 @@ func (db *DB) Get(k string, o cache.Value) error {
 		log.Trace().Msgf("found no value in redis for key \"%v\"", k)
 	} else if err != nil {
 		log.Fatal().Err(err).Msgf("redis.Get(): error getting value from redis for key %v", k)
-		return nil
+		// ^FATAL
 	} else if err := cbor.Unmarshal(val, o); err != nil {
 		return fmt.Errorf("redis.Set(): failed unmarshaling value from redis for key %v: %w", k, err)
 	}

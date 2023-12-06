@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/bucket/result"
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/category"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/search"
+	"github.com/rs/zerolog/log"
 )
 
 func printResults(results []result.Result) {
@@ -47,7 +47,7 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 	gerr := db.Get(flags.Query, &results)
 	if gerr != nil {
 		log.Fatal().Err(gerr).Msgf("cli.Run(): failed accessing cache for query %v", flags.Query)
-		return
+		// ^FATAL
 	}
 
 	if results != nil {

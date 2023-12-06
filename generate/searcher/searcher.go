@@ -72,6 +72,7 @@ func main() {
 	} else {
 		if len(tags) != 0 {
 			log.Fatal("-tags option applies only to directories, not when files are specified")
+			// ^FATAL
 		}
 		dir = path.Dir(args[0])
 	}
@@ -108,6 +109,7 @@ func main() {
 	err := os.WriteFile(outputName, src, 0644)
 	if err != nil {
 		log.Fatalf("writing output: %s", err)
+		// ^FATAL
 	}
 }
 
@@ -127,9 +129,11 @@ func (g *Generator) parsePackage(patterns []string, tags []string) {
 	pkgs, err := packages.Load(cfg, patterns...)
 	if err != nil {
 		log.Fatal(err)
+		// ^FATAL
 	}
 	if len(pkgs) != 1 {
 		log.Fatalf("error: %d packages matching %v", len(pkgs), strings.Join(patterns, " "))
+		// ^FATAL
 	}
 	g.addPackage(pkgs[0])
 }
@@ -167,6 +171,7 @@ func (g *Generator) generate(typeName string) {
 
 	if len(values) == 0 {
 		log.Fatalf("no values defined for type %s", typeName)
+		// ^FATAL
 	}
 
 	// Generate code for importing engines
@@ -271,19 +276,23 @@ func (f *File) genDecl(node ast.Node) bool {
 			obj, ok := f.pkg.defs[name]
 			if !ok {
 				log.Fatalf("no value for constant %s", name)
+				// ^FATAL
 			}
 			info := obj.Type().Underlying().(*types.Basic).Info()
 			if info&types.IsInteger == 0 {
 				log.Fatalf("can't handle non-integer constant type %s", typ)
+				// ^FATAL
 			}
 			value := obj.(*types.Const).Val() // Guaranteed to succeed as this is CONST.
 			if value.Kind() != constant.Int {
 				log.Fatalf("can't happen: constant is not an integer %s", name)
+				// ^FATAL
 			}
 			i64, isInt := constant.Int64Val(value)
 			u64, isUint := constant.Uint64Val(value)
 			if !isInt && !isUint {
 				log.Fatalf("internal error: value of %s is not an integer: %s", name, value.String())
+				// ^FATAL
 			}
 			if !isInt {
 				u64 = uint64(i64)

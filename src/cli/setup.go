@@ -27,6 +27,7 @@ func Setup() Flags {
 
 	if err := ctx.Validate(); err != nil {
 		log.Panic().Err(err).Msg("cli.Setup(): failed parsing cli") // panic is also run inside the library. when does this happen?
+		// ^PANIC
 	}
 
 	return cli

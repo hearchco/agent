@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/pkg/profile"
 	"github.com/hearchco/hearchco/src/cli"
+	"github.com/pkg/profile"
 )
 
 type profiler struct {
@@ -55,7 +55,7 @@ func runProfiler(cliFlags *cli.Flags) (bool, func()) {
 	for _, p := range profilers {
 		if profilerToRun.enabled && p.enabled {
 			log.Fatal("main.runProfiler(): only one profiler can be run at a time.")
-			return false, func() {}
+			// ^FATAL
 		} else if p.enabled {
 			profilerToRun = p
 		}

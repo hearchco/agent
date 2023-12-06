@@ -30,7 +30,7 @@ func (c *Config) fromReader(rc *ReaderConfig) {
 		keyName, err := engines.NameString(key)
 		if err != nil {
 			log.Panic().Err(err).Msgf("failed reading config. invalid engine name: %v", key)
-			return
+			// ^PANIC
 		}
 		nc.Settings[keyName] = val
 	}
@@ -42,7 +42,7 @@ func (c *Config) fromReader(rc *ReaderConfig) {
 				engineName, nameErr := engines.NameString(name)
 				if nameErr != nil {
 					log.Panic().Err(nameErr).Msg("failed converting string to engine name")
-					return
+					// ^PANIC
 				}
 
 				engArr = append(engArr, engineName)
@@ -113,7 +113,7 @@ func (c *Config) Load(dataDirPath string, logDirPath string) {
 	// provider.
 	if err := k.Load(structs.Provider(&rc, "koanf"), nil); err != nil {
 		log.Panic().Err(err).Msg("config.Load(): failed loading default values")
-		return
+		// ^PANIC
 	}
 
 	// Load YAML config
@@ -125,11 +125,11 @@ func (c *Config) Load(dataDirPath string, logDirPath string) {
 			log.Trace().Msgf("config.Load(): no yaml config present at path: %v", yamlPath)
 		} else if errr := k.Load(file.Provider(yamlPath), yaml.Parser()); errr != nil {
 			log.Panic().Err(err).Msg("config.Load(): error loading yaml config")
-			return
+			// ^PANIC
 		}
 	} else if err := k.Load(file.Provider(yamlPath), yaml.Parser()); err != nil {
 		log.Panic().Err(err).Msg("config.Load(): error loading yaml config")
-		return
+		// ^PANIC
 	}
 
 	// Load ENV config
@@ -137,13 +137,13 @@ func (c *Config) Load(dataDirPath string, logDirPath string) {
 		return strings.Replace(strings.ToLower(strings.TrimPrefix(s, "HEARCHCO_")), "_", ".", -1)
 	}), nil); err != nil {
 		log.Panic().Err(err).Msg("config.Load(): error loading env config")
-		return
+		// ^PANIC
 	}
 
 	// Unmarshal config into struct
 	if err := k.Unmarshal("", &rc); err != nil {
 		log.Panic().Err(err).Msg("config.Load(): failed unmarshaling koanf config")
-		return
+		// ^PANIC
 	}
 
 	c.fromReader(&rc)

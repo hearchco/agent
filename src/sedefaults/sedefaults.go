@@ -95,7 +95,7 @@ func Prepare(seName engines.Name, options *engines.Options, settings *config.Set
 	// TODO: move to config.SetupConfig
 	if settings.RequestedResultsPerPage != 0 && !support.RequestedResultsPerPage {
 		log.Panic().Msgf("sedefaults.Prepare() from %v: setting not supported. variable settings.RequestedResultsPerPage is set in the config for %v. that setting is not supported for this search engine. the settings value is: %v", seName, seName, settings.RequestedResultsPerPage)
-		return nil
+		// ^PANIC
 	}
 	if settings.RequestedResultsPerPage == 0 && support.RequestedResultsPerPage {
 		// If its used in the code but not set, give it the default value.
@@ -164,6 +164,7 @@ func PageFromContext(ctx *colly.Context, seName engines.Name) int {
 	page, converr := strconv.Atoi(pageStr)
 	if converr != nil {
 		log.Panic().Err(converr).Msgf("sedefaults.PageFromContext from %v: failed to convert page number to int. pageStr: %v", seName, pageStr)
+		// ^PANIC
 	}
 	return page
 }

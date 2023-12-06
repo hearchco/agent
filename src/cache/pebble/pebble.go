@@ -21,7 +21,7 @@ func New(dataDirPath string) *DB {
 
 	if err != nil {
 		log.Fatal().Err(err).Msgf("pebble.New(): error opening pebble at path: %v", pebblePath)
-		return nil
+		// ^FATAL
 	} else {
 		log.Info().Msgf("Successfully opened pebble (path: %v)", pebblePath)
 	}
@@ -32,7 +32,7 @@ func New(dataDirPath string) *DB {
 func (db *DB) Close() {
 	if err := db.pdb.Close(); err != nil {
 		log.Fatal().Err(err).Msg("pebble.Close(): error closing pebble")
-		return
+		// ^FATAL
 	} else {
 		log.Debug().Msg("Successfully closed pebble")
 	}
@@ -46,7 +46,7 @@ func (db *DB) Set(k string, v cache.Value) error {
 		return fmt.Errorf("pebble.Set(): error marshaling value: %w", err)
 	} else if err := db.pdb.Set([]byte(k), val, pebble.NoSync); err != nil {
 		log.Fatal().Err(err).Msg("pebble.Set(): error setting KV to pebble")
-		return nil
+		// ^FATAL
 	} else {
 		cacheTimeSince := time.Since(cacheTimer)
 		log.Debug().Msgf("Cached results in %vms (%vns)", cacheTimeSince.Milliseconds(), cacheTimeSince.Nanoseconds())
@@ -62,10 +62,10 @@ func (db *DB) Get(k string, o cache.Value) error {
 		log.Trace().Msgf("Found no value in pebble for key: \"%v\"", k)
 	} else if err != nil {
 		log.Fatal().Err(err).Msgf("pebble.Get(): error getting value from pebble for key %v", k)
-		return nil
+		// ^FATAL
 	} else if err := c.Close(); err != nil {
 		log.Fatal().Err(err).Msgf("pebble.Get(): error closing io to pebble for key %v", k)
-		return nil
+		// ^FATAL
 	} else if err := cbor.Unmarshal(val, o); err != nil {
 		return fmt.Errorf("pebble.Get(): failed unmarshaling value from pebble for key %v: %w", k, err)
 	}
