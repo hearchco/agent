@@ -6,7 +6,7 @@ toolchain go1.21.3
 
 require (
 	github.com/alecthomas/kong v0.8.1
-	github.com/cockroachdb/pebble v0.0.0-20231130180345-51fca96df08f
+	github.com/cockroachdb/pebble v0.0.0-20231206044450-348b3a068f94
 	github.com/fxamacker/cbor/v2 v2.5.0
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-contrib/graceful v0.1.0
@@ -50,7 +50,7 @@ require (
 	github.com/go-playground/validator/v10 v10.16.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/pprof v0.0.0-20231203200248-ad67f76aa53d // indirect
+	github.com/google/pprof v0.0.0-20231205033806-a5a03c77bf08 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.6 // indirect
