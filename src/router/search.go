@@ -59,19 +59,14 @@ func Search(c *gin.Context, config *config.Config, db cache.DB) error {
 		if gerr != nil {
 			return fmt.Errorf("router.Search(): failed accessing cache for query %v. error: %w", query, gerr)
 		}
+		foundInDB := results != nil
 
-		if results != nil {
+		if foundInDB {
 			log.Debug().Msgf("Found results for query (%v) in cache", query)
 		} else {
 			log.Debug().Msg("Nothing found in cache, doing a clean search")
 
 			results = search.PerformSearch(query, options, config)
-
-			// is it ok not to defer this?
-			serr := db.Set(query, results)
-			if serr != nil {
-				log.Error().Err(serr).Msgf("router.Search(): error updating database with search results")
-			}
 		}
 
 		resultsShort := result.Shorten(results)
@@ -80,6 +75,13 @@ func Search(c *gin.Context, config *config.Config, db cache.DB) error {
 			return fmt.Errorf("router.Search(): failed marshalling results: %v\n with error: %w", resultsShort, err)
 		} else {
 			c.String(http.StatusOK, string(resultsJson))
+		}
+
+		if !foundInDB {
+			serr := db.Set(query, results)
+			if serr != nil {
+				log.Error().Err(serr).Msgf("router.Search(): error updating database with search results")
+			}
 		}
 	}
 	return nil
