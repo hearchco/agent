@@ -7,12 +7,12 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/hearchco/hearchco/src/sedefaults"
+	"github.com/rs/zerolog/log"
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
@@ -26,12 +26,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	sedefaults.InitializeCollectors(&col, &pagesCol, &options, &timings)
 
-	sedefaults.PagesColRequest(Info.Name, pagesCol, ctx, &retError)
+	sedefaults.PagesColRequest(Info.Name, pagesCol, ctx)
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
-	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
-	sedefaults.ColError(Info.Name, col, &retError)
+	sedefaults.ColRequest(Info.Name, col, ctx)
+	sedefaults.ColError(Info.Name, col)
 
 	col.OnResponse(func(r *colly.Response) {
 		var pageStr string = r.Ctx.Get("page")
@@ -74,12 +74,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		colCtx.Put("page", strconv.Itoa(i+1))
 		reqString := Info.URL + query + "&count=" + strconv.Itoa(nRequested) + "&locale=" + locale + "&offset=" + strconv.Itoa(i*nRequested) + "&device=" + device + "&safesearch=" + safeSearch
 
-		err := col.Request("GET", reqString, nil, colCtx, nil)
-		if engines.IsTimeoutError(err) {
-			log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-		} else if err != nil {
-			log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-		}
+		sedefaults.DoGetRequest(reqString, colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()
@@ -117,12 +112,12 @@ col.OnHTML("div[data-testid=\"sectionWeb\"] > div > div", func(e *colly.HTMLElem
 	dom := e.DOM
 	baseDOM := dom.Find("div[data-testid=\"webResult\"] > div > div > div > div > div")
 	hrefElement := baseDOM.Find("a[data-testid=\"serTitle\"]")
-	linkHref, _ := hrefElement.Attr("href")
+	linkHref, hrefExists := hrefElement.Attr("href")
 	linkText := parse.ParseURL(linkHref)
 	titleText := strings.TrimSpace(hrefElement.Text())
 	descText := strings.TrimSpace(baseDOM.Find("div > span").Text())
 
-	if linkText != "" && linkText != "#" && titleText != "" {
+	if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
 		var pageStr string = e.Request.Ctx.Get("page")
 		page, _ := strconv.Atoi(pageStr)
 

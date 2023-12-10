@@ -12,3 +12,6 @@ test:
 update:
 	go get -u ./...
 	go mod tidy
+
+lint:
+	golangci-lint run

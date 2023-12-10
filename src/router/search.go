@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -15,7 +16,7 @@ import (
 	"github.com/hearchco/hearchco/src/search"
 )
 
-func Search(c *gin.Context, config *config.Config, db cache.DB) {
+func Search(c *gin.Context, config *config.Config, db cache.DB) error {
 	var query, pages, deepSearch string
 
 	switch c.Request.Method {
@@ -38,7 +39,7 @@ func Search(c *gin.Context, config *config.Config, db cache.DB) {
 	} else {
 		maxPages, err := strconv.Atoi(pages)
 		if err != nil {
-			log.Error().Err(err).Msgf("cannot convert \"%v\" to int, reverting to default value of 1", pages)
+			log.Debug().Err(err).Msgf("router.Search(): cannot convert \"%v\" to int, reverting to default value of 1", pages)
 			maxPages = 1
 		}
 
@@ -54,21 +55,34 @@ func Search(c *gin.Context, config *config.Config, db cache.DB) {
 		}
 
 		var results []result.Result
-		db.Get(query, &results)
-		if results != nil {
+		gerr := db.Get(query, &results)
+		if gerr != nil {
+			return fmt.Errorf("router.Search(): failed accessing cache for query %v. error: %w", query, gerr)
+		}
+		foundInDB := results != nil
+
+		if foundInDB {
 			log.Debug().Msgf("Found results for query (%v) in cache", query)
 		} else {
 			log.Debug().Msg("Nothing found in cache, doing a clean search")
+
 			results = search.PerformSearch(query, options, config)
-			defer db.Set(query, results)
 		}
 
 		resultsShort := result.Shorten(results)
 		if resultsJson, err := json.Marshal(resultsShort); err != nil {
-			log.Error().Err(err).Msg("failed marshalling results")
 			c.String(http.StatusInternalServerError, "")
+			return fmt.Errorf("router.Search(): failed marshalling results: %v\n with error: %w", resultsShort, err)
 		} else {
 			c.String(http.StatusOK, string(resultsJson))
 		}
+
+		if !foundInDB {
+			serr := db.Set(query, results)
+			if serr != nil {
+				log.Error().Err(serr).Msgf("router.Search(): error updating database with search results")
+			}
+		}
 	}
+	return nil
 }

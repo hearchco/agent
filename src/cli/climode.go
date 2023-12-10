@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/bucket/result"
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/category"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/search"
+	"github.com/rs/zerolog/log"
 )
 
 func printResults(results []result.Result) {
@@ -44,13 +44,23 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 
 	// todo: ctx cancelling (important since pebble is NoSync)
 	var results []result.Result
-	db.Get(flags.Query, &results)
+	gerr := db.Get(flags.Query, &results)
+	if gerr != nil {
+		log.Fatal().Err(gerr).Msgf("cli.Run(): failed accessing cache for query %v", flags.Query)
+		// ^FATAL
+	}
+
 	if results != nil {
 		log.Debug().Msgf("Found results for query (%v) in cache", flags.Query)
 	} else {
 		log.Debug().Msg("Nothing found in cache, doing a clean search")
+
 		results = search.PerformSearch(flags.Query, options, conf)
-		db.Set(flags.Query, results)
+
+		serr := db.Set(flags.Query, results)
+		if serr != nil {
+			log.Error().Err(serr).Msgf("cli.Run(): error updating database with search results")
+		}
 	}
 
 	duration := time.Since(start)

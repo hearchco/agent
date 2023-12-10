@@ -1,6 +1,7 @@
 package swisscows
 
 import (
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
@@ -58,7 +59,7 @@ func rot13Switch(str string) string {
 	return switchCapitalization(rot13(str))
 }
 
-func generateSignature(params string, nonce string) string {
+func generateSignature(params string, nonce string) (string, error) {
 	var rot13Nonce string = rot13Switch(nonce)
 	var data string = "/web/search" + params + rot13Nonce
 
@@ -67,14 +68,20 @@ func generateSignature(params string, nonce string) string {
 	encData = strings.ReplaceAll(encData, "+", "-")
 	encData = strings.ReplaceAll(encData, "/", "_")
 
-	return string(encData)
+	//log.Debug().Msgf("Final: %v", encData)
+
+	return string(encData), nil
 }
 
 // returns nonce, signature
-func generateAuth(params string) (string, string) {
+func generateAuth(params string) (string, string, error) {
 	params = strings.ReplaceAll(params, "+", " ")
 
 	nonce := generateNonce(32)
-	auth := generateSignature(params, nonce)
-	return nonce, auth
+	auth, err := generateSignature(params, nonce)
+	if err != nil {
+		return "", "", fmt.Errorf("generateAuth(): %w", err)
+	}
+
+	return nonce, auth, nil
 }

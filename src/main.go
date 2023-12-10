@@ -7,7 +7,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/cache/nocache"
 	"github.com/hearchco/hearchco/src/cache/pebble"
@@ -16,6 +15,7 @@ import (
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/logger"
 	"github.com/hearchco/hearchco/src/router"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
@@ -54,7 +54,8 @@ func main() {
 		cli.Run(cliFlags, db, conf)
 	} else {
 		if rw, err := router.New(conf, cliFlags.Verbosity); err != nil {
-			log.Error().Err(err).Msg("Failed creating a router")
+			log.Fatal().Err(err).Msg("main.main(): failed creating a router")
+			// ^FATAL
 		} else {
 			rw.Start(ctx, db, cliFlags.ServeProfiler)
 		}

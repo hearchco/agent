@@ -7,12 +7,12 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/hearchco/hearchco/src/sedefaults"
+	"github.com/rs/zerolog/log"
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
@@ -26,22 +26,16 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	sedefaults.InitializeCollectors(&col, &pagesCol, &options, &timings)
 
-	sedefaults.PagesColRequest(Info.Name, pagesCol, ctx, &retError)
+	sedefaults.PagesColRequest(Info.Name, pagesCol, ctx)
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
-	sedefaults.ColError(Info.Name, col, &retError)
+	sedefaults.ColRequest(Info.Name, col, ctx)
+	sedefaults.ColError(Info.Name, col)
 
 	safeSearch := getSafeSearch(options.SafeSearch)
 
 	col.OnRequest(func(r *colly.Request) {
-		if err := ctx.Err(); err != nil {
-			log.Error().Msgf("%v: SE Collector; Error OnRequest %v", Info.Name, r)
-			r.Abort()
-			retError = err
-			return
-		}
-
 		r.Headers.Add("Cookie", "use_local_search_results=false")
 		r.Headers.Add("Cookie", "ai_results_disable=1")
 		r.Headers.Add("Cookie", "use_safe_search="+safeSearch)
@@ -93,24 +87,14 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx.Put("page", strconv.Itoa(1))
 	colCtx.Put("isAPI", "false")
 
-	err := col.Request("GET", Info.URL+query, nil, colCtx, nil)
-	if engines.IsTimeoutError(err) {
-		log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-	} else if err != nil {
-		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-	}
+	sedefaults.DoGetRequest(Info.URL+query, colCtx, col, Info.Name, &retError)
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 		colCtx.Put("isAPI", "false")
 
-		err := col.Request("GET", Info.URL+query+"&page="+strconv.Itoa(i+1), nil, colCtx, nil)
-		if engines.IsTimeoutError(err) {
-			log.Trace().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
-		} else if err != nil {
-			log.Error().Err(err).Msgf("%v: failed requesting with GET method on page", Info.Name)
-		}
+		sedefaults.DoGetRequest(Info.URL+query+"&page="+strconv.Itoa(i+1), colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()

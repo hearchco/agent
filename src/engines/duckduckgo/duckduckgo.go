@@ -8,7 +8,6 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
@@ -27,18 +26,16 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	sedefaults.InitializeCollectors(&col, &pagesCol, &options, &timings)
 
-	sedefaults.PagesColRequest(Info.Name, pagesCol, ctx, &retError)
+	sedefaults.PagesColRequest(Info.Name, pagesCol, ctx)
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
-	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
-	sedefaults.ColError(Info.Name, col, &retError)
+	sedefaults.ColRequest(Info.Name, col, ctx)
+	sedefaults.ColError(Info.Name, col)
 
 	col.OnHTML(dompaths.ResultsContainer, func(e *colly.HTMLElement) {
-		var linkText string
-		var linkScheme string
-		var titleText string
-		var descText string
+		var linkText, linkScheme, titleText, descText string
+		var hrefExists bool
 		var rrank int
 
 		var pageStr string = e.Request.Ctx.Get("page")
@@ -49,7 +46,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			case 0:
 				rankText := strings.TrimSpace(row.Children().First().Text())
 				fmt.Sscanf(rankText, "%d", &rrank)
-				linkHref, _ := row.Find(dompaths.Link).Attr("href")
+				var linkHref string
+				linkHref, hrefExists = row.Find(dompaths.Link).Attr("href")
 				if strings.Contains(linkHref, "https") {
 					linkScheme = "https://"
 				} else {
@@ -62,7 +60,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				rawURL := linkScheme + row.Find("td > span.link-text").Text()
 				linkText = parse.ParseURL(rawURL)
 			case 3:
-				if linkText != "" && linkText != "#" && titleText != "" {
+				if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
 					res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, (i/4 + 1))
 					bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 				}
@@ -73,23 +71,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
-	err := col.Request("GET", Info.URL+"?q="+query, nil, colCtx, nil)
-	if engines.IsTimeoutError(err) {
-		log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-	} else if err != nil {
-		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-	}
+	sedefaults.DoGetRequest(Info.URL+"?q="+query, colCtx, col, Info.Name, &retError)
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
-		err := col.Request("POST", Info.URL, strings.NewReader("q="+query+"&dc="+strconv.Itoa(i*20)), colCtx, nil)
-		if engines.IsTimeoutError(err) {
-			log.Trace().Err(err).Msgf("%v: failed requesting with POST method on page", Info.Name)
-		} else if err != nil {
-			log.Error().Err(err).Msgf("%v: failed requesting with POST method on page", Info.Name)
-		}
+		sedefaults.DoPostRequest(Info.URL, strings.NewReader("q="+query+"&dc="+strconv.Itoa(i*20)), colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()

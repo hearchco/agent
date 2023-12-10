@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
@@ -25,12 +24,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	sedefaults.InitializeCollectors(&col, &pagesCol, &options, &timings)
 
-	sedefaults.PagesColRequest(Info.Name, pagesCol, ctx, &retError)
+	sedefaults.PagesColRequest(Info.Name, pagesCol, ctx)
 	sedefaults.PagesColError(Info.Name, pagesCol)
 	sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
-	sedefaults.ColRequest(Info.Name, col, &ctx, &retError)
-	sedefaults.ColError(Info.Name, col, &retError)
+	sedefaults.ColRequest(Info.Name, col, ctx)
+	sedefaults.ColError(Info.Name, col)
 
 	col.OnRequest(func(r *colly.Request) {
 		r.Headers.Del("Accept")
@@ -66,12 +65,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		apiURL = Info.URL + "client=web&gl=" + locale + "&limit=" + strconv.Itoa(nRequested) + "&no_correct=false&q=" + query + "&safeSearch=" + safeSearch + "&type=web"
 	}
 
-	err := col.Request("GET", apiURL, nil, nil, nil)
-	if engines.IsTimeoutError(err) {
-		log.Trace().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-	} else if err != nil {
-		log.Error().Err(err).Msgf("%v: failed requesting with GET method", Info.Name)
-	}
+	sedefaults.DoGetRequest(apiURL, nil, col, Info.Name, &retError)
 
 	col.Wait()
 	pagesCol.Wait()

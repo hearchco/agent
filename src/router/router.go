@@ -41,7 +41,7 @@ func (rw *RouterWrapper) addCors() {
 
 func (rw *RouterWrapper) runWithContext(ctx context.Context) {
 	if err := rw.router.RunWithContext(ctx); err != context.Canceled {
-		log.Error().Err(err).Msg("Failed starting router")
+		log.Error().Err(err).Msg("router.runWithContext(): failed starting router")
 	} else if err != nil {
 		log.Info().Msg("Stopping router...")
 		rw.router.Close()
@@ -58,10 +58,16 @@ func (rw *RouterWrapper) Start(ctx context.Context, db cache.DB, serveProfiler b
 
 	// search
 	rw.router.GET("/search", func(c *gin.Context) {
-		Search(c, rw.config, db)
+		err := Search(c, rw.config, db)
+		if err != nil {
+			log.Error().Err(err).Msgf("router.Start() (.GET): failed search")
+		}
 	})
 	rw.router.POST("/search", func(c *gin.Context) {
-		Search(c, rw.config, db)
+		err := Search(c, rw.config, db)
+		if err != nil {
+			log.Error().Err(err).Msgf("router.Start() (.POST): failed search")
+		}
 	})
 
 	if serveProfiler {
