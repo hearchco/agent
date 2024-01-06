@@ -94,9 +94,10 @@ func procSpecificEngine(query string, options *engines.Options, conf *config.Con
 		return false, engines.UNDEFINED
 	}
 	sp := strings.SplitN(query, " ", 2)
-	specE := sp[0][1:]
+	bangWord := sp[0][1:]
 	for key, val := range conf.Settings {
-		if val.Shortcut == specE {
+		log.Info().Msgf("q: %v, lookat: %v", bangWord, val.Shortcut)
+		if strings.EqualFold(bangWord, val.Shortcut) || strings.EqualFold(bangWord, key.String()) {
 			return true, key
 		}
 	}
