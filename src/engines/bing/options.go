@@ -17,4 +17,6 @@ var dompaths engines.DOMPaths = engines.DOMPaths{
 	Description: "div.b_caption",
 }
 
-var Support engines.SupportedSettings = engines.SupportedSettings{}
+var Support engines.SupportedSettings = engines.SupportedSettings{
+	Locale: true,
+}

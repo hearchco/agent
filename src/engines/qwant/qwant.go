@@ -64,15 +64,15 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	locale := getLocale(&options)
+	localeParam := getLocale(&options)
 	nRequested := settings.RequestedResultsPerPage
-	device := getDevice(&options)
-	safeSearch := getSafeSearch(&options)
+	deviceParam := getDevice(&options)
+	safeSearchParam := getSafeSearch(&options)
 
 	for i := 0; i < options.MaxPages; i++ {
 		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		reqString := Info.URL + query + "&count=" + strconv.Itoa(nRequested) + "&locale=" + locale + "&offset=" + strconv.Itoa(i*nRequested) + "&device=" + device + "&safesearch=" + safeSearch
+		reqString := Info.URL + query + "&count=" + strconv.Itoa(nRequested) + localeParam + "&offset=" + strconv.Itoa(i*nRequested) + deviceParam + safeSearchParam
 
 		sedefaults.DoGetRequest(reqString, colCtx, col, Info.Name, &retError)
 	}
@@ -87,21 +87,21 @@ func getLocale(options *engines.Options) string {
 	locale := options.Locale
 	locale = strings.ToLower(locale)
 	locale = strings.ReplaceAll(locale, "-", "_")
-	return locale
+	return "&locale=" + locale
 }
 
 func getDevice(options *engines.Options) string {
 	if options.Mobile {
-		return "mobile"
+		return "&device=mobile"
 	}
-	return "desktop"
+	return "&device=desktop"
 }
 
 func getSafeSearch(options *engines.Options) string {
 	if options.SafeSearch {
-		return "1"
+		return "&safesearch=1"
 	}
-	return "0"
+	return "&safesearch=0"
 }
 
 /*

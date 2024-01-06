@@ -54,15 +54,15 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	locale := getLocale(&options)
+	localeParam := getLocale(&options)
 	nRequested := settings.RequestedResultsPerPage
-	safeSearch := getSafeSearch(&options)
+	safeSearchParam := getSafeSearch(&options)
 
 	var apiURL string
 	if nRequested == Info.ResultsPerPage {
-		apiURL = Info.URL + "client=web&gl=" + locale + "&no_correct=false&q=" + query + "&safeSearch=" + safeSearch + "&type=web"
+		apiURL = Info.URL + "client=web" + localeParam + "&no_correct=false&q=" + query + safeSearchParam + "&type=web"
 	} else {
-		apiURL = Info.URL + "client=web&gl=" + locale + "&limit=" + strconv.Itoa(nRequested) + "&no_correct=false&q=" + query + "&safeSearch=" + safeSearch + "&type=web"
+		apiURL = Info.URL + "client=web" + localeParam + "&limit=" + strconv.Itoa(nRequested) + "&no_correct=false&q=" + query + safeSearchParam + "&type=web"
 	}
 
 	sedefaults.DoGetRequest(apiURL, nil, col, Info.Name, &retError)
@@ -75,12 +75,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 func getLocale(options *engines.Options) string {
 	locale := strings.Split(options.Locale, "-")[1]
-	return locale
+	return "&gl=" + locale
 }
 
 func getSafeSearch(options *engines.Options) string {
 	if options.SafeSearch {
-		return "strict"
+		return "&safeSearch=strict"
 	}
-	return "off"
+	return "&safeSearch=off"
 }

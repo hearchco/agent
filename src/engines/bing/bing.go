@@ -64,16 +64,18 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
+	localeParam := getLocale(&options)
+
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
-	sedefaults.DoGetRequest(Info.URL+query, colCtx, col, Info.Name, &retError)
+	sedefaults.DoGetRequest(Info.URL+query+localeParam, colCtx, col, Info.Name, &retError)
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
-		sedefaults.DoGetRequest(Info.URL+query+"&first="+strconv.Itoa(i*10+1), colCtx, col, Info.Name, &retError)
+		sedefaults.DoGetRequest(Info.URL+query+"&first="+strconv.Itoa(i*10+1)+localeParam, colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()
@@ -99,4 +101,9 @@ func removeTelemetry(link string) string {
 		return parse.ParseURL(string(cleanUrl))
 	}
 	return link
+}
+
+func getLocale(options *engines.Options) string {
+	spl := strings.SplitN(strings.ToLower(options.Locale), "-", 2)
+	return "&setlang=" + spl[0] + "&cc=" + spl[1]
 }

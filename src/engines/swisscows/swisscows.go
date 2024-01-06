@@ -76,17 +76,17 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	var locale string = getLocale(&options)
+	localeParam := getLocale(&options)
 
 	var colCtx *colly.Context
 
 	for i := 0; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		//col.Request("OPTIONS", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+"&region="+locale, nil, colCtx, nil)
+		//col.Request("OPTIONS", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+localeURL, nil, colCtx, nil)
 		//col.Wait()
 
-		reqURL := Info.URL + "freshness=All&itemsCount=" + strconv.Itoa(settings.RequestedResultsPerPage) + "&offset=" + strconv.Itoa(i*10) + "&query=" + query + "&region=" + locale
+		reqURL := Info.URL + "freshness=All&itemsCount=" + strconv.Itoa(settings.RequestedResultsPerPage) + "&offset=" + strconv.Itoa(i*10) + "&query=" + query + localeParam
 		sedefaults.DoGetRequest(reqURL, colCtx, col, Info.Name, &retError)
 	}
 
@@ -97,7 +97,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 }
 
 func getLocale(options *engines.Options) string {
-	return options.Locale
+	return "&region=" + options.Locale
 }
 
 /*
