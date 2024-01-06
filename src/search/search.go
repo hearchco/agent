@@ -58,6 +58,7 @@ func runEngines(engs []engines.Name, timings config.Timings, settings map[engine
 		eng := engs[i] // dont change for to `for _, eng := range engs {`, eng retains the same address throughout the whole loop
 		worker.Go(func() {
 			// if an error can be handled inside, it wont be returned
+			// runs the Search function in the engine package
 			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng], timings)
 			if err != nil {
 				log.Error().Err(err).Msgf("search.runEngines(): error while searching %v", eng)
