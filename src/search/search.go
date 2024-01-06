@@ -26,7 +26,7 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 	timings, toRun := procBang(&query, &options, conf)
 
 	query = url.QueryEscape(query)
-	log.Debug().Msg(query)
+	log.Debug().Msgf("Searching: %v", query)
 
 	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")
