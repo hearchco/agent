@@ -22,11 +22,6 @@ func ParseURL(rawURL string) string {
 func parseURL(rawURL string) (string, error) {
 	// rawURL may be empty string, function should return empty string then.
 	rawURL = strings.TrimSpace(rawURL)
-	rawURL, unescErr := url.QueryUnescape(rawURL) // if the url was part of a telemetry link, this will help.
-	if unescErr != nil {
-		return "", fmt.Errorf("parse.parseURL(): failed url.QueryUnescape() on url(%v). error: %w", rawURL, unescErr)
-	}
-
 	parsedURL, parseErr := url.Parse(rawURL)
 	if parseErr != nil {
 		return "", fmt.Errorf("parse.parseURL(): failed url.Parse() on url(%v). error: %w", rawURL, parseErr)
@@ -36,6 +31,7 @@ func parseURL(rawURL string) (string, error) {
 	if len(urlString) != 0 && len(parsedURL.Path) == 0 { // https://example.org -> https://example.org/
 		urlString += "/"
 	}
+
 	return urlString, nil
 }
 

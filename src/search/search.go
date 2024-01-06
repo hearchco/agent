@@ -26,7 +26,7 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 	timings, toRun := procBang(&query, &options, conf)
 
 	query = url.QueryEscape(query)
-	log.Debug().Msg(query)
+	log.Debug().Msgf("Searching: %v", query)
 
 	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")
@@ -58,6 +58,7 @@ func runEngines(engs []engines.Name, timings config.Timings, settings map[engine
 		eng := engs[i] // dont change for to `for _, eng := range engs {`, eng retains the same address throughout the whole loop
 		worker.Go(func() {
 			// if an error can be handled inside, it wont be returned
+			// runs the Search function in the engine package
 			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng], timings)
 			if err != nil {
 				log.Error().Err(err).Msgf("search.runEngines(): error while searching %v", eng)
@@ -94,9 +95,9 @@ func procSpecificEngine(query string, options *engines.Options, conf *config.Con
 		return false, engines.UNDEFINED
 	}
 	sp := strings.SplitN(query, " ", 2)
-	specE := sp[0][1:]
+	bangWord := sp[0][1:]
 	for key, val := range conf.Settings {
-		if val.Shortcut == specE {
+		if strings.EqualFold(bangWord, val.Shortcut) || strings.EqualFold(bangWord, key.String()) {
 			return true, key
 		}
 	}
