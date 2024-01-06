@@ -92,7 +92,7 @@ func NewSettings() map[engines.Name]Settings {
 			Shortcut: "ets",
 		},
 		engines.GOOGLE: {
-			Shortcut: "go",
+			Shortcut: "g",
 		},
 		engines.MOJEEK: {
 			Shortcut: "mjk",
