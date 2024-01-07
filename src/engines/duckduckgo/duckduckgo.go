@@ -33,6 +33,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	sedefaults.ColRequest(Info.Name, col, ctx)
 	sedefaults.ColError(Info.Name, col)
 
+	localeCookie := getLocale(&options)
+
+	col.OnRequest(func(r *colly.Request) {
+		r.Headers.Add("Cookie", localeCookie)
+	})
+
 	col.OnHTML(dompaths.ResultsContainer, func(e *colly.HTMLElement) {
 		var linkText, linkScheme, titleText, descText string
 		var hrefExists bool
@@ -84,4 +90,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	pagesCol.Wait()
 
 	return retError
+}
+
+func getLocale(options *engines.Options) string {
+	spl := strings.SplitN(strings.ToLower(options.Locale), "_", 2)
+	return "kl=" + spl[1] + "-" + spl[0]
 }
