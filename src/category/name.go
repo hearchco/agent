@@ -2,7 +2,7 @@ package category
 
 type Name string
 
-// enumer not necessary, won't be updated often, have to have ShortcutMap anyways
+// enumer not necessary, won't be updated often, have to have FromString anyways
 const (
 	UNDEFINED Name = "undefined"
 	GENERAL   Name = "general"

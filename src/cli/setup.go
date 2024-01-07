@@ -4,31 +4,10 @@ import (
 	"fmt"
 
 	"github.com/alecthomas/kong"
+	"github.com/hearchco/hearchco/src/category"
+	"github.com/hearchco/hearchco/src/engines"
 	"github.com/rs/zerolog/log"
 )
-
-func validateLocale(locale string) {
-	if locale == "" {
-		return
-	}
-
-	if len(locale) != 5 {
-		log.Fatal().Msg("cli.validateLocale(): failed parsing cli locale argument: isn't 5 characters long")
-		// ^FATAL
-	}
-	if !(('a' <= locale[0] && locale[0] <= 'z') && ('a' <= locale[1] && locale[1] <= 'z')) {
-		log.Fatal().Msg("cli.validateLocale(): failed parsing cli locale argument: first two characters must be lowercase ASCII letters")
-		// ^FATAL
-	}
-	if !(('A' <= locale[3] && locale[3] <= 'Z') && ('A' <= locale[4] && locale[4] <= 'Z')) {
-		log.Fatal().Msg("cli.validateLocale(): failed parsing cli locale argument: last two characters must be uppercase ASCII letters")
-		// ^FATAL
-	}
-	if locale[2] != '_' {
-		log.Fatal().Msg("cli.validateLocale(): failed parsing cli locale argument: third character must be underscore (_)")
-		// ^FATAL
-	}
-}
 
 func Setup() Flags {
 	var cli Flags
@@ -53,7 +32,15 @@ func Setup() Flags {
 		// ^PANIC
 	}
 
-	validateLocale(cli.Locale)
+	if locErr := engines.ValidateLocale(cli.Locale); locErr != nil {
+		log.Fatal().Err(locErr).Msgf("cli.Setup(): invalid locale flag")
+		// ^FATAL
+	}
+
+	if category.SafeFromString(cli.Category) == category.UNDEFINED {
+		log.Fatal().Msgf("cli.Setup(): invalid category flag")
+		// ^FATAL
+	}
 
 	return cli
 }
