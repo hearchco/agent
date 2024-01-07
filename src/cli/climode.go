@@ -38,6 +38,10 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		MaxPages:   flags.MaxPages,
 		VisitPages: flags.Visit,
 		Category:   category.FromString[flags.Category],
+		UserAgent:  flags.UserAgent,
+		Locale:     flags.Locale,
+		SafeSearch: flags.SafeSearch,
+		Mobile:     flags.Mobile,
 	}
 
 	start := time.Now()

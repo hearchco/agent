@@ -33,6 +33,14 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
 
+	localeCookie := getLocale(&options)
+	safeSearchCookie := getSafeSearch(&options)
+
+	col.OnRequest(func(r *colly.Request) {
+		r.Headers.Add("Cookie", localeCookie)
+		r.Headers.Add("Cookie", safeSearchCookie)
+	})
+
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
 
@@ -73,4 +81,16 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	pagesCol.Wait()
 
 	return retError
+}
+
+func getLocale(options *engines.Options) string {
+	region := strings.SplitN(strings.ToLower(options.Locale), "_", 2)[1]
+	return "country=" + region
+}
+
+func getSafeSearch(options *engines.Options) string {
+	if options.SafeSearch {
+		return "safesearch=strict"
+	}
+	return "safesearch=off"
 }

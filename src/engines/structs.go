@@ -43,13 +43,14 @@ type DOMPaths struct {
 }
 
 type Options struct {
-	UserAgent     string
-	MaxPages      int
+	MaxPages   int
+	VisitPages bool
+	Category   category.Name
+	UserAgent  string
+	Locale     string //format: en_US
+	SafeSearch bool
+	Mobile     bool
+
 	ProxyAddr     string
 	JustFirstPage bool
-	VisitPages    bool
-	Locale        string //format: en-US
-	SafeSearch    bool
-	Mobile        bool
-	Category      category.Name
 }

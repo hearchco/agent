@@ -104,6 +104,6 @@ func removeTelemetry(link string) string {
 }
 
 func getLocale(options *engines.Options) string {
-	spl := strings.SplitN(strings.ToLower(options.Locale), "-", 2)
+	spl := strings.SplitN(strings.ToLower(options.Locale), "_", 2)
 	return "&setlang=" + spl[0] + "&cc=" + spl[1]
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"strconv"
+	"strings"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/hearchco/hearchco/src/bucket"
@@ -97,7 +98,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 }
 
 func getLocale(options *engines.Options) string {
-	return "&region=" + options.Locale
+	return "&region=" + strings.Replace(options.Locale, "_", "-", 1)
 }
 
 /*

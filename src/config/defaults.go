@@ -7,7 +7,7 @@ import (
 	"github.com/hearchco/hearchco/src/engines"
 )
 
-const DefaultLocale string = "en-US"
+const DefaultLocale string = "en_US"
 
 func NewRanking() Ranking {
 	return Ranking{

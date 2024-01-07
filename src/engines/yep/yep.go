@@ -74,7 +74,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 }
 
 func getLocale(options *engines.Options) string {
-	locale := strings.Split(options.Locale, "-")[1]
+	locale := strings.Split(options.Locale, "_")[1]
 	return "&gl=" + locale
 }
 

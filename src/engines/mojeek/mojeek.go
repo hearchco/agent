@@ -73,7 +73,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 }
 
 func getLocale(options *engines.Options) string {
-	spl := strings.SplitN(strings.ToLower(options.Locale), "-", 2)
+	spl := strings.SplitN(strings.ToLower(options.Locale), "_", 2)
 	return "&lb=" + spl[0] + "&arc=" + spl[1]
 }
 

@@ -17,4 +17,7 @@ var dompaths engines.DOMPaths = engines.DOMPaths{
 	Description: "div.snippet-description",
 }
 
-var Support engines.SupportedSettings = engines.SupportedSettings{}
+var Support engines.SupportedSettings = engines.SupportedSettings{
+	Locale:     true,
+	SafeSearch: true,
+}
