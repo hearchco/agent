@@ -33,6 +33,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
 
+	safeSearchCookieParam := getSafeSearch(&options)
+
+	col.OnRequest(func(r *colly.Request) {
+		r.Headers.Add("Cookie", "sB=v=1&pn=10&rw=new&userset=0"+safeSearchCookieParam)
+	})
+
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
 
@@ -78,4 +84,11 @@ func removeTelemetry(link string) string {
 	suff := strings.SplitAfterN(link, "/RU=http", 2)[1]
 	newLink := "http" + strings.SplitN(suff, "/RK=", 2)[0]
 	return parse.ParseURL(newLink)
+}
+
+func getSafeSearch(options *engines.Options) string {
+	if options.SafeSearch {
+		return "&vm=r"
+	}
+	return "&vm=p"
 }
