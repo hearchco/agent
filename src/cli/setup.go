@@ -8,6 +8,10 @@ import (
 )
 
 func validateLocale(locale string) {
+	if locale == "" {
+		return
+	}
+
 	if len(locale) != 5 {
 		log.Fatal().Msg("cli.validateLocale(): failed parsing cli locale argument: isn't 5 characters long")
 		// ^FATAL
