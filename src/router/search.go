@@ -95,11 +95,16 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 		}
 
 		var results []result.Result
+		var foundInDB bool
 		gerr := db.Get(query, &results)
 		if gerr != nil {
-			return fmt.Errorf("router.Search(): failed accessing cache for query %v. error: %w", query, gerr)
+			// Error in reading cache is not returned, just logged
+			log.Error().Err(gerr).Msgf("router.Search(): failed accessing cache for query: %v", query)
+		} else if results != nil {
+			foundInDB = true
+		} else {
+			foundInDB = false
 		}
-		foundInDB := results != nil
 
 		if foundInDB {
 			log.Debug().Msgf("Found results for query (%v) in cache", query)
@@ -120,6 +125,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 		if !foundInDB {
 			serr := db.Set(query, results)
 			if serr != nil {
+				// Error in updating cache is not returned, just logged
 				log.Error().Err(serr).Msgf("router.Search(): error updating database with search results")
 			}
 		}
