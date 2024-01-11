@@ -2,6 +2,7 @@ package yahoo
 
 import (
 	"context"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/hearchco/hearchco/src/sedefaults"
+	"github.com/rs/zerolog/log"
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
@@ -33,13 +35,18 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
 
+	safeSearchCookieParam := getSafeSearch(&options)
+
+	col.OnRequest(func(r *colly.Request) {
+		r.Headers.Add("Cookie", "sB=v=1&pn=10&rw=new&userset=0"+safeSearchCookieParam)
+	})
+
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
 
 		titleEl := dom.Find(dompaths.Title)
 		linkHref, hrefExists := titleEl.Attr("href")
-		linkText := parse.ParseURL(linkHref)
-		linkText = removeTelemetry(linkText)
+		linkText := parse.ParseURL(removeTelemetry(linkHref))
 		titleAria, labelExists := titleEl.Attr("aria-label")
 		titleText := strings.TrimSpace(titleAria)
 		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
@@ -76,6 +83,18 @@ func removeTelemetry(link string) string {
 		return link
 	}
 	suff := strings.SplitAfterN(link, "/RU=http", 2)[1]
-	newLink := "http" + strings.SplitN(suff, "/RK=", 2)[0]
-	return parse.ParseURL(newLink)
+	link = "http" + strings.SplitN(suff, "/RK=", 2)[0]
+	newLink, err := url.QueryUnescape(link)
+	if err != nil {
+		log.Error().Err(err).Msgf("yahoo.removeTelemetry(): couldn't parse url(%v): couldn't url.QueryUnescape", link)
+		return ""
+	}
+	return newLink
+}
+
+func getSafeSearch(options *engines.Options) string {
+	if options.SafeSearch {
+		return "&vm=r"
+	}
+	return "&vm=p"
 }

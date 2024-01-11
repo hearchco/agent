@@ -17,4 +17,6 @@ var dompaths engines.DOMPaths = engines.DOMPaths{
 	Description:      "td.result-snippet",
 }
 
-var Support engines.SupportedSettings = engines.SupportedSettings{}
+var Support engines.SupportedSettings = engines.SupportedSettings{
+	Locale: true,
+}

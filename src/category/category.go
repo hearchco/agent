@@ -30,3 +30,14 @@ func FromQuery(query string) Name {
 	}
 	return ""
 }
+
+func SafeFromString(cat string) Name {
+	if cat == "" {
+		return ""
+	}
+	ret, ok := FromString[cat]
+	if !ok {
+		return UNDEFINED
+	}
+	return ret
+}

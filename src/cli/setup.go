@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/alecthomas/kong"
+	"github.com/hearchco/hearchco/src/category"
+	"github.com/hearchco/hearchco/src/engines"
 	"github.com/rs/zerolog/log"
 )
 
@@ -28,6 +30,16 @@ func Setup() Flags {
 	if err := ctx.Validate(); err != nil {
 		log.Panic().Err(err).Msg("cli.Setup(): failed parsing cli") // panic is also run inside the library. when does this happen?
 		// ^PANIC
+	}
+
+	if locErr := engines.ValidateLocale(cli.Locale); locErr != nil {
+		log.Fatal().Err(locErr).Msgf("cli.Setup(): invalid locale flag")
+		// ^FATAL
+	}
+
+	if category.SafeFromString(cli.Category) == category.UNDEFINED {
+		log.Fatal().Msgf("cli.Setup(): invalid category flag")
+		// ^FATAL
 	}
 
 	return cli

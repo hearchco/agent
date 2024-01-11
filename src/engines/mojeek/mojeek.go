@@ -51,20 +51,35 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
+	localeParam := getLocale(&options)
+	safeSearchParam := getSafeSearch(&options)
+
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
-	sedefaults.DoGetRequest(Info.URL+query, colCtx, col, Info.Name, &retError)
+	sedefaults.DoGetRequest(Info.URL+query+localeParam+safeSearchParam, colCtx, col, Info.Name, &retError)
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
-		sedefaults.DoGetRequest(Info.URL+query+"&s="+strconv.Itoa(i*10+1), colCtx, col, Info.Name, &retError)
+		sedefaults.DoGetRequest(Info.URL+query+"&s="+strconv.Itoa(i*10+1)+localeParam+safeSearchParam, colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
 	return retError
+}
+
+func getLocale(options *engines.Options) string {
+	spl := strings.SplitN(strings.ToLower(options.Locale), "_", 2)
+	return "&lb=" + spl[0] + "&arc=" + spl[1]
+}
+
+func getSafeSearch(options *engines.Options) string {
+	if options.SafeSearch {
+		return "&safe=1"
+	}
+	return "&safe=0"
 }

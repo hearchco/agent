@@ -24,3 +24,15 @@ Doesnt use cookies.
 - Not sure if it needs to be set with every request
 
 Disabling javascript in browser settings gets the **Error 883** page. However, sending requests through GET: https://www.startpage.com/sp/search?q=<query> works even if javascript is disabled. The GET request works with no cookies / body. For the page, the `page` URL parameter is used. E.g. https://www.startpage.com/sp/search?q=i+dont+get+it&page=3
+
+
+# Locale
+The locale is set with the POST body `qloc` variable and looks something like this:
+`JTdCJTIyY2MlMjIlM0ElMjJVUyUyMiUyQyUyMmxvY2F0aW9uJTIyJTNBJTIyVW5pdGVkJTIwU3RhdGVzJTIyJTJDJTIyc3RhdGVfY29kZSUyMiUzQSUyMjAwJTIyJTJDJTIydHlwZSUyMiUzQSUyMmN1c3RvbV9sb2NhdGlvbiUyMiU3RA%3D%3D`\
+If we replace `%3D`s with `=`s we can base64 decode it into:
+`%7B%22cc%22%3A%22US%22%2C%22location%22%3A%22United%20States%22%2C%22state_code%22%3A%2200%22%2C%22type%22%3A%22custom_location%22%7D`\
+Which we can url decode into:
+`{"cc":"US","location":"United States","state_code":"00","type":"custom_location"}`
+Another decoded example is
+`{"cc":"CN","location":"People’s Republic of China","state_code":"00","type":"custom_location"}`
+It seems for states, the `state_code` is always `00` and the `type` is always `custom_location`. The `location` parameter may be irrelevant, and spoofing `cc` could be sufficent. However, the results dont seem to change when the region is changed, so its impossible to test.

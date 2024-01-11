@@ -21,4 +21,6 @@ var dompaths engines.DOMPaths = engines.DOMPaths{
 	Description: "div > div.compText > p > span",
 }
 
-var Support engines.SupportedSettings = engines.SupportedSettings{}
+var Support engines.SupportedSettings = engines.SupportedSettings{
+	SafeSearch: true,
+}

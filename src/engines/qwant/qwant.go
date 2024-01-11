@@ -64,15 +64,15 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	locale := getLocale(&options)
+	localeParam := getLocale(&options)
 	nRequested := settings.RequestedResultsPerPage
-	device := getDevice(&options)
-	safeSearch := getSafeSearch(&options)
+	deviceParam := getDevice(&options)
+	safeSearchParam := getSafeSearch(&options)
 
 	for i := 0; i < options.MaxPages; i++ {
 		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
-		reqString := Info.URL + query + "&count=" + strconv.Itoa(nRequested) + "&locale=" + locale + "&offset=" + strconv.Itoa(i*nRequested) + "&device=" + device + "&safesearch=" + safeSearch
+		reqString := Info.URL + query + "&count=" + strconv.Itoa(nRequested) + localeParam + "&offset=" + strconv.Itoa(i*nRequested) + deviceParam + safeSearchParam
 
 		sedefaults.DoGetRequest(reqString, colCtx, col, Info.Name, &retError)
 	}
@@ -83,25 +83,32 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	return retError
 }
 
+// qwant returns this array when an invalid locale is supplied
+var validLocales = [...]string{"bg_bg", "br_fr", "ca_ad", "ca_es", "ca_fr", "co_fr", "cs_cz", "cy_gb", "da_dk", "de_at", "de_ch", "de_de", "ec_ca", "el_gr", "en_au", "en_ca", "en_gb", "en_ie", "en_my", "en_nz", "en_us", "es_ad", "es_ar", "es_cl", "es_co", "es_es", "es_mx", "es_pe", "et_ee", "eu_es", "eu_fr", "fc_ca", "fi_fi", "fr_ad", "fr_be", "fr_ca", "fr_ch", "fr_fr", "gd_gb", "he_il", "hu_hu", "it_ch", "it_it", "ko_kr", "nb_no", "nl_be", "nl_nl", "pl_pl", "pt_ad", "pt_pt", "ro_ro", "sv_se", "th_th", "zh_cn", "zh_hk"}
+
 func getLocale(options *engines.Options) string {
-	locale := options.Locale
-	locale = strings.ToLower(locale)
-	locale = strings.ReplaceAll(locale, "-", "_")
-	return locale
+	locale := strings.ToLower(options.Locale)
+	for _, vl := range validLocales {
+		if locale == vl {
+			return "&locale=" + locale
+		}
+	}
+	log.Warn().Msgf("qwant.getLocale(): Invalid qwant locale (%v) supplied. Defaulting to en_US. Qwant supports these (disregard specific formatting): %v", options.Locale, validLocales)
+	return "&locale=" + strings.ToLower(config.DefaultLocale)
 }
 
 func getDevice(options *engines.Options) string {
 	if options.Mobile {
-		return "mobile"
+		return "&device=mobile"
 	}
-	return "desktop"
+	return "&device=desktop"
 }
 
 func getSafeSearch(options *engines.Options) string {
 	if options.SafeSearch {
-		return "1"
+		return "&safesearch=1"
 	}
-	return "0"
+	return "&safesearch=0"
 }
 
 /*

@@ -10,3 +10,5 @@ https://www.internations.org/magazine/top-10-hobbies-you-ve-never-heard-of-39784
 
 
 Description fetching could be improved for complicated results.
+
+`&setlang=en&cc=us` are the UI language and region parameters respectively.

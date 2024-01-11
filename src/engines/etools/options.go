@@ -18,4 +18,6 @@ var dompaths engines.DOMPaths = engines.DOMPaths{
 	Description: "td.record > div.text",
 }
 
-var Support engines.SupportedSettings = engines.SupportedSettings{}
+var Support engines.SupportedSettings = engines.SupportedSettings{
+	SafeSearch: true,
+}

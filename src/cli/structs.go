@@ -11,14 +11,19 @@ type Flags struct {
 
 	// flags
 	Query       string `type:"string" default:"${query_string}" env:"HEARCHCO_QUERY" help:"Query string used for search"`
-	MaxPages    int    `type:"counter" default:"1" env:"HEARCHCO_MAX_PAGES" help:"Number of pages to search"`
 	Cli         bool   `type:"bool" default:"false" env:"HEARCHCO_CLI" help:"Use CLI mode"`
-	Visit       bool   `type:"bool" default:"false" env:"HEARCHCO_VISIT" help:"Should results be visited"`
 	Silent      bool   `type:"bool" default:"false" short:"s" env:"HEARCHCO_SILENT" help:"Should results be printed"`
 	DataDirPath string `type:"path" default:"${data_folder}" env:"HEARCHCO_DATA_DIR" help:"Data folder path"`
 	LogDirPath  string `type:"path" default:"${log_folder}" env:"HEARCHCO_LOG_DIR" help:"Log folder path"`
 	Verbosity   int8   `type:"counter" default:"0" short:"v" env:"HEARCHCO_VERBOSITY" help:"Log level verbosity"`
-	Category    string `type:"string" default:"" short:"c" env:"HEARCHCO_CATEGORY" help:"Search result category. Can also be supplied through the query (e.g. \"!info smartphone\"). Supported values: info[/wiki], science[/sci], news, blog, surf, newnews[/nnews]"`
+	// options
+	MaxPages   int    `type:"counter" default:"1" env:"HEARCHCO_MAX_PAGES" help:"Number of pages to search"`
+	Visit      bool   `type:"bool" default:"false" env:"HEARCHCO_VISIT" help:"Should results be visited"`
+	Category   string `type:"string" default:"" short:"c" env:"HEARCHCO_CATEGORY" help:"Search result category. Can also be supplied through the query (e.g. \"!info smartphone\"). Supported values: info[/wiki], science[/sci], news, blog, surf, newnews[/nnews]"`
+	UserAgent  string `type:"string" default:"" env:"HEARCHCO_USER_AGENT" help:"The user agent"`
+	Locale     string `type:"string" default:"" env:"HEARCHCO_LOCALE" help:"Locale string specifying result language and region preference. The format is en_US"`
+	SafeSearch bool   `type:"bool" default:"false" env:"HEARCHCO_SAFE_SEARCH" help:"Whether to use safe search"`
+	Mobile     bool   `type:"bool" default:"false" env:"HEARCHCO_MOBILE" help:"Whether to gear results towards mobile"`
 	// profiler
 	CPUProfile    bool `type:"bool" default:"false" env:"HEARCHCO_CPUPROFILE" help:"Use cpu profiling"`
 	HeapProfile   bool `type:"bool" default:"false" env:"HEARCHCO_HEAPPROFILE" help:"Use heap profiling"`

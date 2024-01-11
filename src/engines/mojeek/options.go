@@ -16,4 +16,7 @@ var dompaths engines.DOMPaths = engines.DOMPaths{
 	Description: "p.s",
 }
 
-var Support engines.SupportedSettings = engines.SupportedSettings{}
+var Support engines.SupportedSettings = engines.SupportedSettings{
+	Locale:     true,
+	SafeSearch: true,
+}

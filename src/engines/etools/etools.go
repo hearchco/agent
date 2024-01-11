@@ -67,10 +67,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
+	safeSearchParam := getSafeSearch(&options)
+
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
-	sedefaults.DoPostRequest(Info.URL, strings.NewReader("query="+query+"&country=web&language=all"), colCtx, col, Info.Name, &retError)
+	sedefaults.DoPostRequest(Info.URL, strings.NewReader("query="+query+"&country=web&language=all"+safeSearchParam), colCtx, col, Info.Name, &retError)
 	col.Wait() //wait so I can get the JSESSION cookie back
 
 	for i := 1; i < options.MaxPages; i++ {
@@ -85,4 +87,11 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	pagesCol.Wait()
 
 	return retError
+}
+
+func getSafeSearch(options *engines.Options) string {
+	if options.SafeSearch {
+		return "&safeSearch=true"
+	}
+	return "&safeSearch=false"
 }
