@@ -99,7 +99,7 @@ func getLocale(options *engines.Options) string {
 	}
 	log.Warn().
 		Str("locale", options.Locale).
-		Str("validLocales", strings.Join(validLocales[:], ", ")).
+		Strs("validLocales", validLocales[:]).
 		Msg("qwant.getLocale(): Invalid qwant locale supplied. Falling back to en_US. Qwant supports these (disregard specific formatting)")
 	return "&locale=" + strings.ToLower(config.DefaultLocale)
 }
