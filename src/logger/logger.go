@@ -12,29 +12,29 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func DateString() string {
-	return time.Now().Format("20060102")
-}
-
-func Setup(logDirPath string, verbosity int8) {
-	// Generate logfile name
-	datetime := DateString()
-	logFilePath := path.Join(logDirPath, fmt.Sprintf("hearchco_%v.log", datetime))
-
-	// Setup logger
-	logger := log.Output(io.MultiWriter(zerolog.ConsoleWriter{
+func Setup(verbosity int8, logDirPath ...string) {
+	logWriters := []io.Writer{zerolog.ConsoleWriter{
 		TimeFormat: time.Stamp,
 		Out:        os.Stderr,
-	}, zerolog.ConsoleWriter{
-		TimeFormat: time.Stamp,
-		Out: &lumberjack.Logger{
-			Filename:   logFilePath,
-			MaxSize:    5,
-			MaxAge:     14,
-			MaxBackups: 5,
-		},
-		NoColor: true,
-	}))
+	}}
+
+	// Generate logfile name and ConsoleWriter to file
+	if logDirPath[0] != "" {
+		logFilePath := path.Join(logDirPath[0], fmt.Sprintf("hearchco_%v.log", time.Now().Format("20060102")))
+		logWriters = append(logWriters, zerolog.ConsoleWriter{
+			TimeFormat: time.Stamp,
+			Out: &lumberjack.Logger{
+				Filename:   logFilePath,
+				MaxSize:    5,
+				MaxAge:     14,
+				MaxBackups: 5,
+			},
+			NoColor: true,
+		})
+	}
+
+	// Setup logger
+	logger := log.Output(io.MultiWriter(logWriters...))
 
 	// Setup verbosity
 	switch {

@@ -21,23 +21,27 @@ import (
 func main() {
 	mainTimer := time.Now()
 
+	// setup signal interrupt (CTRL+C)
+	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	// configure logging without file at INFO level
+	logger.Setup(0)
+
 	// parse cli arguments
 	cliFlags := cli.Setup()
 
+	// start profiler
 	_, stopProfiler := runProfiler(&cliFlags)
 	defer stopProfiler()
 
-	// signal interrupt (CTRL+C)
-	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-
-	// configure logging
-	logger.Setup(cliFlags.LogDirPath, cliFlags.Verbosity)
+	// configure logging to file
+	logger.Setup(cliFlags.Verbosity, cliFlags.LogDirPath)
 
 	// load config file
 	conf := config.New()
 	conf.Load(cliFlags.DataDirPath, cliFlags.LogDirPath)
 
-	// cache database
+	// setup cache
 	var db cache.DB
 	switch conf.Server.Cache.Type {
 	case "pebble":

@@ -68,7 +68,9 @@ func generateSignature(params string, nonce string) (string, error) {
 	encData = strings.ReplaceAll(encData, "+", "-")
 	encData = strings.ReplaceAll(encData, "/", "_")
 
-	//log.Debug().Msgf("Final: %v", encData)
+	// log.Debug().
+	// 	Str("encData", encData).
+	// 	Msgf("Final")
 
 	return string(encData), nil
 }

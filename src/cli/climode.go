@@ -30,9 +30,9 @@ func printResults(results []result.Result) {
 func Run(flags Flags, db cache.DB, conf *config.Config) {
 	log.Info().
 		Str("query", flags.Query).
-		Str("max-pages", fmt.Sprintf("%v", flags.MaxPages)).
-		Str("visit", fmt.Sprintf("%v", flags.Visit)).
-		Msg("Started searching")
+		Int("max-pages", flags.MaxPages).
+		Bool("visit", flags.Visit).
+		Msg("Started hearching")
 
 	options := engines.Options{
 		MaxPages:   flags.MaxPages,
@@ -52,7 +52,10 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 	gerr := db.Get(flags.Query, &results)
 	if gerr != nil {
 		// Error in reading cache is not returned, just logged
-		log.Error().Err(gerr).Msgf("cli.Run(): failed accessing cache for query: %v", flags.Query)
+		log.Error().
+			Err(gerr).
+			Str("query", flags.Query).
+			Msg("cli.Run(): failed accessing cache")
 	} else if results != nil {
 		foundInDB = true
 	} else {
@@ -60,7 +63,9 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 	}
 
 	if foundInDB {
-		log.Debug().Msgf("Found results for query (%v) in cache", flags.Query)
+		log.Debug().
+			Str("query", flags.Query).
+			Msg("Found results in cache")
 	} else {
 		log.Debug().Msg("Nothing found in cache, doing a clean search")
 
@@ -68,7 +73,10 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 
 		serr := db.Set(flags.Query, results)
 		if serr != nil {
-			log.Error().Err(serr).Msgf("cli.Run(): error updating database with search results")
+			log.Error().
+				Err(serr).
+				Str("query", flags.Query).
+				Msg("cli.Run(): error updating database with search results")
 		}
 	}
 

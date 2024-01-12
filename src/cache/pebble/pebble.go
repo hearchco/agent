@@ -20,9 +20,14 @@ func New(dataDirPath string) *DB {
 	pdb, err := pebble.Open(pebblePath, &pebble.Options{})
 
 	if err != nil {
-		log.Error().Err(err).Msgf("pebble.New(): error opening pebble at path: %v", pebblePath)
+		log.Error().
+			Err(err).
+			Str("path", pebblePath).
+			Msg("pebble.New(): error opening pebble")
 	} else {
-		log.Info().Msgf("Successfully opened pebble (path: %v)", pebblePath)
+		log.Info().
+			Str("path", pebblePath).
+			Msg("Successfully opened pebble")
 	}
 
 	return &DB{pdb: pdb}
@@ -56,7 +61,9 @@ func (db *DB) Get(k string, o cache.Value) error {
 	val := []byte(v) // copy data before closing, casting needed for unmarshal
 
 	if err == pebble.ErrNotFound {
-		log.Trace().Msgf("Found no value in pebble for key: \"%v\"", k)
+		log.Trace().
+			Str("key", k).
+			Msg("Found no value in pebble")
 	} else if err != nil {
 		return fmt.Errorf("pebble.Get(): error getting value from pebble for key %v: %w", k, err)
 	} else if err := c.Close(); err != nil {

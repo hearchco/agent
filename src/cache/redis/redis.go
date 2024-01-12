@@ -25,9 +25,14 @@ func New(ctx context.Context, config config.Redis) *DB {
 	})
 
 	if err := rdb.Ping(ctx).Err(); err != nil {
-		log.Error().Err(err).Msgf("redis.New(): error connecting to redis with addr: %v:%v/%v", config.Host, config.Port, config.Database)
+		log.Error().
+			Err(err).
+			Str("address", fmt.Sprintf("%v:%v/%v", config.Host, config.Port, config.Database)).
+			Msg("redis.New(): error connecting to redis")
 	} else {
-		log.Info().Msgf("Successful connection to redis (addr: %v:%v/%v)", config.Host, config.Port, config.Database)
+		log.Info().
+			Str("address", fmt.Sprintf("%v:%v/%v", config.Host, config.Port, config.Database)).
+			Msg("Successful connection to redis")
 	}
 
 	return &DB{rdb: rdb, ctx: ctx}
@@ -61,7 +66,9 @@ func (db *DB) Get(k string, o cache.Value) error {
 	val := []byte(v) // copy data before closing, casting needed for unmarshal
 
 	if err == redis.Nil {
-		log.Trace().Msgf("found no value in redis for key \"%v\"", k)
+		log.Trace().
+			Str("key", k).
+			Msgf("Found no value in redis")
 	} else if err != nil {
 		return fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", k, err)
 	} else if err := cbor.Unmarshal(val, o); err != nil {

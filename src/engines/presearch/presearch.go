@@ -53,7 +53,11 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			var pr PresearchResponse
 			err := json.Unmarshal(r.Body, &pr)
 			if err != nil {
-				log.Error().Err(err).Msgf("%v: Failed body unmarshall to json:\n%v", Info.Name, string(r.Body))
+				log.Error().
+					Err(err).
+					Str("SEName", Info.Name.String()).
+					Str("Body", string(r.Body)).
+					Msg("Failed body unmarshall to json")
 			}
 
 			counter := 1
@@ -76,9 +80,15 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			nextCtx.Put("isAPI", "true")
 			err := col.Request("GET", "https://presearch.com/results?id="+searchId, nil, nextCtx, nil)
 			if engines.IsTimeoutError(err) {
-				log.Trace().Err(err).Msgf("%v: failed requesting with API", Info.Name)
+				log.Trace().
+					Err(err).
+					Str("SEName", Info.Name.String()).
+					Msg("failed requesting with API")
 			} else if err != nil {
-				log.Error().Err(err).Msgf("%v: failed requesting with API", Info.Name)
+				log.Error().
+					Err(err).
+					Str("SEName", Info.Name.String()).
+					Msg("failed requesting with API")
 			}
 		}
 	})

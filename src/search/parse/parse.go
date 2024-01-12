@@ -13,7 +13,10 @@ import (
 func ParseURL(rawURL string) string {
 	urll, err := parseURL(rawURL)
 	if err != nil {
-		log.Error().Err(err).Msgf("parse.ParseURL(): couldn't parse url(%v)", urll)
+		log.Error().
+			Err(err).
+			Str("URL", urll).
+			Msg("parse.ParseURL(): couldn't parse url")
 		return rawURL
 	}
 	return urll
@@ -38,7 +41,10 @@ func parseURL(rawURL string) (string, error) {
 func ParseTextWithHTML(rawHTML string) string {
 	text, err := parseTextWithHTML(rawHTML)
 	if err != nil {
-		log.Error().Err(err).Msgf("parse.ParseTextWithHTML(): failed parsing text with html(%v)", rawHTML)
+		log.Error().
+			Err(err).
+			Str("HTML", rawHTML).
+			Msg("parse.ParseTextWithHTML(): failed parsing text with html")
 		return rawHTML
 	}
 	return text

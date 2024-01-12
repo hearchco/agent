@@ -45,7 +45,11 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		var parsedResponse QwantResponse
 		err := json.Unmarshal(r.Body, &parsedResponse)
 		if err != nil {
-			log.Error().Err(err).Msgf("%v: Failed body unmarshall to json:\n%v", Info.Name, string(r.Body))
+			log.Error().
+				Err(err).
+				Str("SEName", Info.Name.String()).
+				Str("Body", string(r.Body)).
+				Msg("Failed body unmarshall to json")
 		}
 
 		mainline := parsedResponse.Data.Res.Items.Mainline
@@ -93,7 +97,10 @@ func getLocale(options *engines.Options) string {
 			return "&locale=" + locale
 		}
 	}
-	log.Warn().Msgf("qwant.getLocale(): Invalid qwant locale (%v) supplied. Defaulting to en_US. Qwant supports these (disregard specific formatting): %v", options.Locale, validLocales)
+	log.Warn().
+		Str("locale", options.Locale).
+		Str("validLocales", strings.Join(validLocales[:], ", ")).
+		Msg("qwant.getLocale(): Invalid qwant locale supplied. Falling back to en_US. Qwant supports these (disregard specific formatting)")
 	return "&locale=" + strings.ToLower(config.DefaultLocale)
 }
 
@@ -131,7 +138,11 @@ col.OnHTML("div[data-testid=\"sectionWeb\"] > div > div", func(e *colly.HTMLElem
 		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, idx+1)
 		bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 	} else {
-		log.Info().Msgf("Not Good! %v\n%v\n%v", linkText, titleText, descText)
+		log.Info().
+			Str("link", linkText).
+			Str("title", titleText).
+			Str("desc", descText).
+			Msg("Not good!")
 	}
 })
 */
