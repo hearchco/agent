@@ -28,7 +28,7 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 
 	query = url.QueryEscape(query)
 	log.Debug().
-		Str("Query", query).
+		Str("query", query).
 		Msg("Searching")
 
 	resTimer := time.Now()
@@ -76,7 +76,7 @@ func runEngines(engs []engines.Name, timings config.Timings, settings map[engine
 			if err != nil {
 				log.Error().
 					Err(err).
-					Str("SEName", eng.String()).
+					Str("engine", eng.String()).
 					Msg("search.runEngines(): error while searching")
 			}
 		})
@@ -89,7 +89,7 @@ func procBang(query *string, options *engines.Options, conf *config.Config) (con
 	if !goodCat && !useSpec && (*query)[0] == '!' {
 		// options.category is set to GENERAL
 		log.Debug().
-			Str("Query", *query).
+			Str("query", *query).
 			Msg("search.procBang(): invalid bang (not category or engine shortcut)")
 	}
 

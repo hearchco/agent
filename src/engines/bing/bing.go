@@ -61,10 +61,10 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			pageRankCounter[page]++
 		} else {
 			log.Trace().
-				Str("SEName", Info.Name.String()).
-				Str("URL", linkText).
-				Str("Title", titleText).
-				Str("Description", descText).
+				Str("engine", Info.Name.String()).
+				Str("url", linkText).
+				Str("title", titleText).
+				Str("description", descText).
 				Msg("Matched result, but couldn't retrieve data")
 		}
 	})

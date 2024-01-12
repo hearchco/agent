@@ -15,7 +15,7 @@ func ParseURL(rawURL string) string {
 	if err != nil {
 		log.Error().
 			Err(err).
-			Str("URL", urll).
+			Str("url", urll).
 			Msg("parse.ParseURL(): couldn't parse url")
 		return rawURL
 	}
@@ -43,7 +43,7 @@ func ParseTextWithHTML(rawHTML string) string {
 	if err != nil {
 		log.Error().
 			Err(err).
-			Str("HTML", rawHTML).
+			Str("html", rawHTML).
 			Msg("parse.ParseTextWithHTML(): failed parsing text with html")
 		return rawHTML
 	}

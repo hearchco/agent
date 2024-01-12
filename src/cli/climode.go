@@ -30,7 +30,7 @@ func printResults(results []result.Result) {
 func Run(flags Flags, db cache.DB, conf *config.Config) {
 	log.Info().
 		Str("query", flags.Query).
-		Int("max-pages", flags.MaxPages).
+		Int("maxPages", flags.MaxPages).
 		Bool("visit", flags.Visit).
 		Msg("Started hearching")
 
@@ -86,7 +86,7 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		printResults(results)
 	}
 	log.Info().
-		Int("resultsLength", len(results)).
+		Int("number", len(results)).
 		Int64("ms", duration.Milliseconds()).
 		Msg("Found results")
 }

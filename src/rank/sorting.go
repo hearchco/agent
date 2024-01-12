@@ -26,8 +26,8 @@ func (r ByRetrievedRank) Less(i, j int) bool {
 	}
 
 	log.Error().
-		Str("comparedA", fmt.Sprintf("%v", r[i])).
-		Str("comparedB", fmt.Sprintf("%v", r[j])).
+		Str("comparableA", fmt.Sprintf("%v", r[i])).
+		Str("comparableB", fmt.Sprintf("%v", r[j])).
 		Msg("rank.(r ByRetrievedRank)Less(): failed at ranking")
 	return true
 }

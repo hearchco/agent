@@ -21,12 +21,12 @@ func PagesColRequest(seName engines.Name, pagesCol *colly.Collector, ctx context
 			if engines.IsTimeoutError(err) {
 				log.Trace().
 					Err(err).
-					Str("SEName", seName.String()).
+					Str("engine", seName.String()).
 					Msg("sedefaults.PagesColRequest() -> pagesCol.OnRequest(): context timeout error")
 			} else {
 				log.Error().
 					Err(err).
-					Str("SEName", seName.String()).
+					Str("engine", seName.String()).
 					Msg("sedefaults.PagesColRequest() -> pagesCol.OnRequest(): context error")
 			}
 			r.Abort()
@@ -42,15 +42,15 @@ func PagesColError(seName engines.Name, pagesCol *colly.Collector) {
 		if engines.IsTimeoutError(err) {
 			log.Trace().
 				Err(err).
-				Str("SEName", seName.String()).
-				Str("URL", urll).
+				Str("engine", seName.String()).
+				Str("url", urll).
 				Msg("sedefaults.PagesColError() -> pagesCol.OnError(): request timeout error for url")
 		} else {
 			log.Trace().
 				Err(err).
-				Str("SEName", seName.String()).
-				Str("URL", urll).
-				Str("Response", fmt.Sprintf("%v", r)).
+				Str("engine", seName.String()).
+				Str("url", urll).
+				Str("response", fmt.Sprintf("%v", r)).
 				Msg("sedefaults.PagesColError() -> pagesCol.OnError(): request error for url")
 		}
 	})
@@ -72,12 +72,12 @@ func ColRequest(seName engines.Name, col *colly.Collector, ctx context.Context) 
 			if engines.IsTimeoutError(err) {
 				log.Trace().
 					Err(err).
-					Str("SEName", seName.String()).
+					Str("engine", seName.String()).
 					Msg("sedefaults.ColRequest() -> col.OnRequest(): context timeout error")
 			} else {
 				log.Error().
 					Err(err).
-					Str("SEName", seName.String()).
+					Str("engine", seName.String()).
 					Msg("sedefaults.ColRequest() -> col.OnRequest(): context error")
 			}
 			r.Abort()
@@ -92,21 +92,21 @@ func ColError(seName engines.Name, col *colly.Collector) {
 		if engines.IsTimeoutError(err) {
 			log.Trace().
 				Err(err).
-				Str("SEName", seName.String()).
-				Str("URL", urll).
+				Str("engine", seName.String()).
+				Str("url", urll).
 				Msg("sedefaults.ColError() -> col.OnError(): request timeout error for url")
 		} else {
 			log.Error().
 				Err(err).
-				Str("SEName", seName.String()).
-				Str("URL", urll).
-				Int("StatusCode", r.StatusCode).
-				Str("Response", string(r.Body)).
+				Str("engine", seName.String()).
+				Str("url", urll).
+				Int("statusCode", r.StatusCode).
+				Str("response", string(r.Body)).
 				Msg("sedefaults.ColError() -> col.OnError(): request error for url")
 
 			log.Debug().
-				Str("SEName", seName.String()).
-				Str("ResponsePath", fmt.Sprintf("%v%v_col.log.html", config.LogDumpLocation, seName.String())).
+				Str("engine", seName.String()).
+				Str("responsePath", fmt.Sprintf("%v%v_col.log.html", config.LogDumpLocation, seName.String())).
 				Msg("sedefaults.ColError() -> col.OnError(): html response written")
 
 			// TODO: implement S3 as alternative to local file system
@@ -114,7 +114,7 @@ func ColError(seName engines.Name, col *colly.Collector) {
 			if bodyWriteErr != nil {
 				log.Error().
 					Err(bodyWriteErr).
-					Str("SEName", seName.String()).
+					Str("engine", seName.String()).
 					Msg("sedefaults.ColError() -> col.OnError(): error writing html response body to file")
 			}
 		}
@@ -130,15 +130,15 @@ func Prepare(seName engines.Name, options *engines.Options, settings *config.Set
 		options.UserAgent = useragent.RandomUserAgent()
 	}
 	log.Trace().
-		Str("SEName", seName.String()).
-		Str("UserAgent", options.UserAgent).
+		Str("engine", seName.String()).
+		Str("userAgent", options.UserAgent).
 		Msg("Prepare")
 
 	// TODO: move to config.SetupConfig
 	if settings.RequestedResultsPerPage != 0 && !support.RequestedResultsPerPage {
 		log.Panic().
-			Str("SEName", seName.String()).
-			Int("RequestedResultsPerPage", settings.RequestedResultsPerPage).
+			Str("engine", seName.String()).
+			Int("requestedResultsPerPage", settings.RequestedResultsPerPage).
 			Msg("sedefaults.Prepare(): setting not supported by engine")
 		// ^PANIC
 	}
@@ -150,16 +150,16 @@ func Prepare(seName engines.Name, options *engines.Options, settings *config.Set
 	if options.Mobile && !support.Mobile {
 		options.Mobile = false // this line shouldn't matter [1]
 		log.Debug().
-			Str("SEName", seName.String()).
-			Bool("Mobile", options.Mobile).
+			Str("engine", seName.String()).
+			Bool("mobile", options.Mobile).
 			Msg("Mobile set but not supported")
 	}
 
 	if options.Locale != "" && !support.Locale {
 		options.Locale = config.DefaultLocale // [1]
 		log.Debug().
-			Str("SEName", seName.String()).
-			Str("Locale", options.Locale).
+			Str("engine", seName.String()).
+			Str("locale", options.Locale).
 			Msg("Locale set but not supported")
 	}
 
@@ -170,8 +170,8 @@ func Prepare(seName engines.Name, options *engines.Options, settings *config.Set
 	if options.SafeSearch && !support.SafeSearch {
 		options.SafeSearch = false // [1]
 		log.Debug().
-			Str("SEName", seName.String()).
-			Bool("SafeSearch", options.SafeSearch).
+			Str("engine", seName.String()).
+			Bool("safeSearch", options.SafeSearch).
 			Msg("SafeSearch set but not supported")
 	}
 
@@ -193,7 +193,7 @@ func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collecto
 		if err := (*colPtr).Limit(limitRule); err != nil {
 			log.Error().
 				Err(err).
-				Str("LimitRule", fmt.Sprintf("%v", limitRule)).
+				Str("limitRule", fmt.Sprintf("%v", limitRule)).
 				Msg("sedefaults.InitializeCollectors(): failed adding new limit rule")
 		}
 
@@ -209,8 +209,8 @@ func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collecto
 
 func DoGetRequest(urll string, colCtx *colly.Context, collector *colly.Collector, packageName engines.Name, retError *error) {
 	log.Trace().
-		Str("SEName", packageName.String()).
-		Str("URL", urll).
+		Str("engine", packageName.String()).
+		Str("url", urll).
 		Msg("GET")
 	err := collector.Request("GET", urll, nil, colCtx, nil)
 	if err != nil {
@@ -220,8 +220,8 @@ func DoGetRequest(urll string, colCtx *colly.Context, collector *colly.Collector
 
 func DoPostRequest(urll string, requestData io.Reader, colCtx *colly.Context, collector *colly.Collector, packageName engines.Name, retError *error) {
 	log.Trace().
-		Str("SEName", packageName.String()).
-		Str("URL", urll).
+		Str("engine", packageName.String()).
+		Str("url", urll).
 		Msg("POST")
 	err := collector.Request("POST", urll, requestData, colCtx, nil)
 	if err != nil {
@@ -235,8 +235,8 @@ func PageFromContext(ctx *colly.Context, seName engines.Name) int {
 	if converr != nil {
 		log.Panic().
 			Err(converr).
-			Str("SEName", seName.String()).
-			Str("PageStr", pageStr).
+			Str("engine", seName.String()).
+			Str("page", pageStr).
 			Msg("sedefaults.PageFromContext(): failed to convert page number to int")
 		// ^PANIC
 	}

@@ -31,7 +31,7 @@ func (c *Config) fromReader(rc *ReaderConfig) {
 		if err != nil {
 			log.Panic().
 				Err(err).
-				Str("SEName", key).
+				Str("engine", key).
 				Msg("config.fromReader(): invalid engine name")
 			// ^PANIC
 		}

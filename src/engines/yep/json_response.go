@@ -30,8 +30,8 @@ func parseJSON(body []byte) *MainContent {
 	if err1 != nil {
 		log.Error().
 			Err(err1).
-			Str("SEName", Info.Name.String()).
-			Str("Body", string(body)).
+			Str("engine", Info.Name.String()).
+			Str("body", string(body)).
 			Msg("Failed body unmarshall to json")
 		return nil
 	}
@@ -40,8 +40,8 @@ func parseJSON(body []byte) *MainContent {
 	if err2 != nil {
 		log.Error().
 			Err(err2).
-			Str("SEName", Info.Name.String()).
-			Str("Body", string(body)).
+			Str("engine", Info.Name.String()).
+			Str("body", string(body)).
 			Msg("Failed marshalling the relevant json content")
 		return nil
 	}
@@ -51,8 +51,8 @@ func parseJSON(body []byte) *MainContent {
 	if err3 != nil {
 		log.Error().
 			Err(err3).
-			Str("SEName", Info.Name.String()).
-			Str("Body", string(body)).
+			Str("engine", Info.Name.String()).
+			Str("body", string(body)).
 			Msg("Failed unmarshalling to MainContent")
 		return nil
 	}

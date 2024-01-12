@@ -101,7 +101,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 			// Error in reading cache is not returned, just logged
 			log.Error().
 				Err(gerr).
-				Str("Query", query).
+				Str("query", query).
 				Msg("router.Search(): failed accessing cache")
 		} else if results != nil {
 			foundInDB = true
@@ -111,7 +111,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 
 		if foundInDB {
 			log.Debug().
-				Str("Query", query).
+				Str("query", query).
 				Msg("Found results in cache")
 		} else {
 			log.Debug().Msg("Nothing found in cache, doing a clean search")
@@ -133,7 +133,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 				// Error in updating cache is not returned, just logged
 				log.Error().
 					Err(serr).
-					Str("Query", query).
+					Str("query", query).
 					Msg("router.Search(): error updating database with search results")
 			}
 		}

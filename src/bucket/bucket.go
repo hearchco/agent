@@ -18,9 +18,9 @@ type Relay struct {
 
 func AddSEResult(seResult *engines.RetrievedResult, seName engines.Name, relay *Relay, options *engines.Options, pagesCol *colly.Collector) {
 	log.Trace().
-		Str("SEName", seName.String()).
-		Str("Title", seResult.Title).
-		Str("URL", seResult.URL).
+		Str("engine", seName.String()).
+		Str("title", seResult.Title).
+		Str("url", seResult.URL).
 		Msg("Got result")
 
 	relay.Mutex.RLock()
@@ -69,7 +69,7 @@ func AddSEResult(seResult *engines.RetrievedResult, seName engines.Name, relay *
 		if err := pagesCol.Visit(seResult.URL); err != nil {
 			log.Error().
 				Err(err).
-				Str("URL", seResult.URL).
+				Str("url", seResult.URL).
 				Msg("bucket.AddSEResult(): failed visiting")
 		}
 	}
@@ -77,8 +77,8 @@ func AddSEResult(seResult *engines.RetrievedResult, seName engines.Name, relay *
 
 func SetResultResponse(link string, response *colly.Response, relay *Relay, seName engines.Name) error {
 	log.Trace().
-		Str("SEName", seName.String()).
-		Str("Link", link).
+		Str("engine", seName.String()).
+		Str("link", link).
 		Msg("Got response")
 
 	relay.Mutex.Lock()

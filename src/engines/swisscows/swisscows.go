@@ -46,9 +46,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 
 		// log.Debug().
-		// 	Str("Query", qry).
-		// 	Str("Nonce", nonce).
-		// 	Str("Signature", sig).
+		// 	Str("query", qry).
+		// 	Str("nonce", nonce).
+		// 	Str("signature", sig).
 		// 	Msg("")
 
 		r.Headers.Set("X-Request-Nonce", nonce)
@@ -58,9 +58,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	col.OnResponse(func(r *colly.Response) {
 		log.Trace().
-			Str("URL", r.Request.URL.String()).
-			Str("Nonce", r.Request.Headers.Get("X-Request-Nonce")).
-			Str("Signature", r.Request.Headers.Get("X-Request-Signature")).
+			Str("url", r.Request.URL.String()).
+			Str("nonce", r.Request.Headers.Get("X-Request-Nonce")).
+			Str("signature", r.Request.Headers.Get("X-Request-Signature")).
 			Msg("swisscows.Search() -> col.OnResponse()")
 
 		var pageStr string = r.Ctx.Get("page")
@@ -131,10 +131,10 @@ func getLocale(options *engines.Options) string {
 // 		pageRankCounter[page]++
 // 	} else {
 // 		log.Trace().
-// 			Str("SEName", Info.Name.String()).
-// 			Str("URL", linkText).
-// 			Str("Title", titleText).
-// 			Str("Description", descText).
+// 			Str("engine", Info.Name.String()).
+// 			Str("url", linkText).
+// 			Str("title", titleText).
+// 			Str("description", descText).
 // 			Msg("Matched Result, but couldn't retrieve data")
 // 	}
 // })
