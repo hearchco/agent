@@ -16,7 +16,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var EnabledEngines []engines.Name = make([]engines.Name, 0)
+var EnabledEngines = make([]engines.Name, 0)
 var LogDumpLocation string = "dump/"
 
 func (c *Config) fromReader(rc *ReaderConfig) {
@@ -129,7 +129,7 @@ func (c *Config) Load(dataDirPath string, logDirPath string) {
 		if _, errr := os.Stat(yamlPath); errr != nil {
 			log.Trace().
 				Str("path", yamlPath).
-				Msgf("config.Load(): no yaml config found")
+				Msg("config.Load(): no yaml config found")
 		} else if errr := k.Load(file.Provider(yamlPath), yaml.Parser()); errr != nil {
 			log.Panic().Err(err).Msg("config.Load(): error loading yaml config")
 			// ^PANIC

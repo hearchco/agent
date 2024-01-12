@@ -51,7 +51,10 @@ func (db *DB) Set(k string, v cache.Value) error {
 		return fmt.Errorf("pebble.Set(): error setting KV to pebble: %w", err)
 	} else {
 		cacheTimeSince := time.Since(cacheTimer)
-		log.Trace().Msgf("Cached results in %vms (%vns)", cacheTimeSince.Milliseconds(), cacheTimeSince.Nanoseconds())
+		log.Trace().
+			Int64("ms", cacheTimeSince.Milliseconds()).
+			Int64("ns", cacheTimeSince.Nanoseconds()).
+			Msg("Cached results")
 	}
 	return nil
 }

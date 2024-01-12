@@ -56,7 +56,10 @@ func (db *DB) Set(k string, v cache.Value) error {
 		return fmt.Errorf("redis.Set(): error setting KV to redis: %w", err)
 	} else {
 		cacheTimeSince := time.Since(cacheTimer)
-		log.Trace().Msgf("Cached results in %vms (%vns)", cacheTimeSince.Milliseconds(), cacheTimeSince.Nanoseconds())
+		log.Trace().
+			Int64("ms", cacheTimeSince.Milliseconds()).
+			Int64("ns", cacheTimeSince.Nanoseconds()).
+			Msg("Cached results")
 	}
 	return nil
 }
@@ -68,7 +71,7 @@ func (db *DB) Get(k string, o cache.Value) error {
 	if err == redis.Nil {
 		log.Trace().
 			Str("key", k).
-			Msgf("Found no value in redis")
+			Msg("Found no value in redis")
 	} else if err != nil {
 		return fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", k, err)
 	} else if err := cbor.Unmarshal(val, o); err != nil {

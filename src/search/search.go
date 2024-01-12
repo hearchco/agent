@@ -2,6 +2,7 @@ package search
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"strings"
 	"time"
@@ -35,15 +36,22 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 	var worker conc.WaitGroup
 	runEngines(toRun, timings, conf.Settings, query, &worker, &relay, options)
 	worker.Wait()
-	log.Debug().Msgf("Got results in %vms", time.Since(resTimer).Milliseconds())
+	log.Debug().
+		Int64("ms", time.Since(resTimer).Milliseconds()).
+		Msg("Got results")
 
 	rankTimer := time.Now()
 	log.Debug().Msg("Ranking...")
 	results := rank.Rank(relay.ResultMap, conf.Categories[options.Category].Ranking) // have to make copy, since its a map value
 	rankTimeSince := time.Since(rankTimer)
-	log.Debug().Msgf("Finished ranking in %vms (%vns)", rankTimeSince.Milliseconds(), rankTimeSince.Nanoseconds())
+	log.Debug().
+		Int64("ms", rankTimeSince.Milliseconds()).
+		Int64("ns", rankTimeSince.Nanoseconds()).
+		Msg("Finished ranking")
 
-	log.Debug().Msgf("Found results in %vms", time.Since(searchTimer).Milliseconds())
+	log.Debug().
+		Int64("ms", time.Since(searchTimer).Milliseconds()).
+		Msg("Found results")
 
 	return results
 }
@@ -53,7 +61,10 @@ type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, 
 
 func runEngines(engs []engines.Name, timings config.Timings, settings map[engines.Name]config.Settings, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
 	config.EnabledEngines = engs
-	log.Info().Msgf("Enabled engines (%v): %v", len(config.EnabledEngines), config.EnabledEngines)
+	log.Info().
+		Int("number", len(config.EnabledEngines)).
+		Str("engines", fmt.Sprintf("%v", config.EnabledEngines)).
+		Msg("Enabled engines")
 
 	engineStarter := NewEngineStarter()
 	for i := range engs {

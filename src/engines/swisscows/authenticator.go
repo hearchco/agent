@@ -70,7 +70,7 @@ func generateSignature(params string, nonce string) (string, error) {
 
 	// log.Debug().
 	// 	Str("encData", encData).
-	// 	Msgf("Final")
+	// 	Msg("Final")
 
 	return string(encData), nil
 }

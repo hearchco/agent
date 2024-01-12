@@ -68,5 +68,7 @@ func main() {
 	// program cleanup
 	db.Close()
 
-	log.Debug().Msgf("Program finished in %vms", time.Since(mainTimer).Milliseconds())
+	log.Debug().
+		Int64("ms", time.Since(mainTimer).Milliseconds()).
+		Msg("Program finished")
 }

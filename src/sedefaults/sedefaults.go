@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/hearchco/hearchco/src/bucket"
@@ -108,7 +107,7 @@ func ColError(seName engines.Name, col *colly.Collector) {
 			log.Debug().
 				Str("SEName", seName.String()).
 				Str("ResponsePath", fmt.Sprintf("%v%v_col.log.html", config.LogDumpLocation, seName.String())).
-				Msgf("sedefaults.ColError() -> col.OnError(): html response written")
+				Msg("sedefaults.ColError() -> col.OnError(): html response written")
 
 			// TODO: implement S3 as alternative to local file system
 			bodyWriteErr := os.WriteFile(config.LogDumpLocation+seName.String()+"_col.log.html", r.Body, 0644)
@@ -209,7 +208,10 @@ func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collecto
 }
 
 func DoGetRequest(urll string, colCtx *colly.Context, collector *colly.Collector, packageName engines.Name, retError *error) {
-	log.Trace().Msgf("%v GET: %v", strings.ToUpper(packageName.String()), urll)
+	log.Trace().
+		Str("SEName", packageName.String()).
+		Str("URL", urll).
+		Msg("GET")
 	err := collector.Request("GET", urll, nil, colCtx, nil)
 	if err != nil {
 		*retError = fmt.Errorf("%v.Search(): failed GET request to %v with %w", packageName.ToLower(), urll, err)
@@ -217,7 +219,10 @@ func DoGetRequest(urll string, colCtx *colly.Context, collector *colly.Collector
 }
 
 func DoPostRequest(urll string, requestData io.Reader, colCtx *colly.Context, collector *colly.Collector, packageName engines.Name, retError *error) {
-	log.Trace().Msgf("%v POST: %v", strings.ToUpper(packageName.String()), urll)
+	log.Trace().
+		Str("SEName", packageName.String()).
+		Str("URL", urll).
+		Msg("POST")
 	err := collector.Request("POST", urll, requestData, colCtx, nil)
 	if err != nil {
 		*retError = fmt.Errorf("%v.Search(): failed POST request to %v and body %v. error %w", packageName.ToLower(), requestData, urll, err)

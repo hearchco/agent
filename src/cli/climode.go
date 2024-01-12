@@ -85,5 +85,8 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 	if !flags.Silent {
 		printResults(results)
 	}
-	log.Info().Msgf("Found %v results in %vms", len(results), duration.Milliseconds())
+	log.Info().
+		Int("resultsLength", len(results)).
+		Int64("ms", duration.Milliseconds()).
+		Msg("Found results")
 }

@@ -112,7 +112,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 		if foundInDB {
 			log.Debug().
 				Str("Query", query).
-				Msgf("Found results in cache")
+				Msg("Found results in cache")
 		} else {
 			log.Debug().Msg("Nothing found in cache, doing a clean search")
 
