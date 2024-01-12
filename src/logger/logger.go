@@ -19,7 +19,7 @@ func Setup(verbosity int8, logDirPath ...string) {
 	}}
 
 	// Generate logfile name and ConsoleWriter to file
-	if logDirPath[0] != "" {
+	if len(logDirPath) > 0 {
 		logFilePath := path.Join(logDirPath[0], fmt.Sprintf("hearchco_%v.log", time.Now().Format("20060102")))
 		logWriters = append(logWriters, zerolog.ConsoleWriter{
 			TimeFormat: time.Stamp,
@@ -38,10 +38,13 @@ func Setup(verbosity int8, logDirPath ...string) {
 
 	// Setup verbosity
 	switch {
+	// DEBUG
 	case verbosity == 1:
 		log.Logger = logger.Level(zerolog.DebugLevel)
+	// TRACE
 	case verbosity > 1:
-		log.Logger = logger.Level(zerolog.TraceLevel)
+		log.Logger = logger.With().Caller().Logger().Level(zerolog.TraceLevel)
+	// INFO
 	default:
 		log.Logger = logger.Level(zerolog.InfoLevel)
 	}
