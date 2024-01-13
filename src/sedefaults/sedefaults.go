@@ -12,6 +12,7 @@ import (
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/search/useragent"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -104,19 +105,20 @@ func ColError(seName engines.Name, col *colly.Collector) {
 				Str("response", string(r.Body)).
 				Msg("sedefaults.ColError() -> col.OnError(): request error for url")
 
+			dumpPath := fmt.Sprintf("%v%v_col.log.html", config.LogDumpLocation, seName.String())
 			log.Debug().
 				Str("engine", seName.String()).
-				Str("responsePath", fmt.Sprintf("%v%v_col.log.html", config.LogDumpLocation, seName.String())).
+				Str("responsePath", dumpPath).
+				Func(func(e *zerolog.Event) {
+					bodyWriteErr := os.WriteFile(dumpPath, r.Body, 0644)
+					if bodyWriteErr != nil {
+						log.Error().
+							Err(bodyWriteErr).
+							Str("engine", seName.String()).
+							Msg("sedefaults.ColError() -> col.OnError(): error writing html response body to file")
+					}
+				}).
 				Msg("sedefaults.ColError() -> col.OnError(): html response written")
-
-			// TODO: implement S3 as alternative to local file system
-			bodyWriteErr := os.WriteFile(config.LogDumpLocation+seName.String()+"_col.log.html", r.Body, 0644)
-			if bodyWriteErr != nil {
-				log.Error().
-					Err(bodyWriteErr).
-					Str("engine", seName.String()).
-					Msg("sedefaults.ColError() -> col.OnError(): error writing html response body to file")
-			}
 		}
 	})
 }
