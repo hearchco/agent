@@ -50,7 +50,7 @@ func PagesColError(seName engines.Name, pagesCol *colly.Collector) {
 				Err(err).
 				Str("engine", seName.String()).
 				Str("url", urll).
-				Str("response", fmt.Sprintf("%v", r)).
+				Str("response", string(r.Body)).
 				Msg("sedefaults.PagesColError() -> pagesCol.OnError(): request error for url")
 		}
 	})
