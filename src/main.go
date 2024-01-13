@@ -34,8 +34,12 @@ func main() {
 	_, stopProfiler := runProfiler(&cliFlags)
 	defer stopProfiler()
 
-	// configure logging to file
-	logger.Setup(cliFlags.Verbosity, cliFlags.LogDirPath)
+	// configure verbosity and logging to file
+	if cliFlags.LogToFile || cliFlags.Cli {
+		logger.Setup(cliFlags.Verbosity, cliFlags.LogDirPath)
+	} else {
+		logger.Setup(cliFlags.Verbosity)
+	}
 
 	// load config file
 	conf := config.New()
