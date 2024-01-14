@@ -2,6 +2,7 @@ package anonymize
 
 import (
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -34,4 +35,9 @@ func randomize(orig string) string {
 
 func String(orig string) string {
 	return randomize(deduplicate(orig))
+}
+
+func Substring(orig string, ssToAnon string) string {
+	anonSubstring := randomize(deduplicate(ssToAnon))
+	return strings.ReplaceAll(orig, ssToAnon, anonSubstring)
 }
