@@ -45,12 +45,6 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			return
 		}
 
-		// log.Debug().
-		// 	Str("query", qry).
-		// 	Str("nonce", nonce).
-		// 	Str("signature", sig).
-		// 	Msg("")
-
 		r.Headers.Set("X-Request-Nonce", nonce)
 		r.Headers.Set("X-Request-Signature", sig)
 		r.Headers.Set("Pragma", "no-cache")

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/bucket/result"
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/category"
@@ -29,7 +30,7 @@ func printResults(results []result.Result) {
 
 func Run(flags Flags, db cache.DB, conf *config.Config) {
 	log.Info().
-		Str("query", flags.Query).
+		Str("query", anonymize.String(flags.Query)).
 		Int("maxPages", flags.MaxPages).
 		Bool("visit", flags.Visit).
 		Msg("Started hearching")
@@ -54,7 +55,7 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		// Error in reading cache is not returned, just logged
 		log.Error().
 			Err(gerr).
-			Str("query", flags.Query).
+			Str("query", anonymize.String(flags.Query)).
 			Msg("cli.Run(): failed accessing cache")
 	} else if results != nil {
 		foundInDB = true
@@ -64,7 +65,7 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 
 	if foundInDB {
 		log.Debug().
-			Str("query", flags.Query).
+			Str("query", anonymize.String(flags.Query)).
 			Msg("Found results in cache")
 	} else {
 		log.Debug().Msg("Nothing found in cache, doing a clean search")
@@ -75,7 +76,7 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		if serr != nil {
 			log.Error().
 				Err(serr).
-				Str("query", flags.Query).
+				Str("query", anonymize.String(flags.Query)).
 				Msg("cli.Run(): error updating database with search results")
 		}
 	}

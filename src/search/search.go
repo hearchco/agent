@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/bucket/result"
 	"github.com/hearchco/hearchco/src/category"
@@ -28,7 +29,7 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 
 	query = url.QueryEscape(query)
 	log.Debug().
-		Str("query", query).
+		Str("query", anonymize.String(query)).
 		Msg("Searching")
 
 	resTimer := time.Now()
@@ -89,7 +90,7 @@ func procBang(query *string, options *engines.Options, conf *config.Config) (con
 	if !goodCat && !useSpec && (*query)[0] == '!' {
 		// options.category is set to GENERAL
 		log.Debug().
-			Str("query", *query).
+			Str("query", anonymize.String(*query)).
 			Msg("search.procBang(): invalid bang (not category or engine shortcut)")
 	}
 

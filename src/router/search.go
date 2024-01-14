@@ -9,6 +9,7 @@ import (
 	"github.com/goccy/go-json"
 	"github.com/rs/zerolog/log"
 
+	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/bucket/result"
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/category"
@@ -101,7 +102,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 			// Error in reading cache is not returned, just logged
 			log.Error().
 				Err(gerr).
-				Str("query", query).
+				Str("query", anonymize.String(query)).
 				Msg("router.Search(): failed accessing cache")
 		} else if results != nil {
 			foundInDB = true
@@ -111,7 +112,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 
 		if foundInDB {
 			log.Debug().
-				Str("query", query).
+				Str("query", anonymize.String(query)).
 				Msg("Found results in cache")
 		} else {
 			log.Debug().Msg("Nothing found in cache, doing a clean search")
@@ -133,7 +134,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 				// Error in updating cache is not returned, just logged
 				log.Error().
 					Err(serr).
-					Str("query", query).
+					Str("query", anonymize.String(query)).
 					Msg("router.Search(): error updating database with search results")
 			}
 		}
