@@ -40,6 +40,9 @@ func (rw *RouterWrapper) addCors() {
 }
 
 func (rw *RouterWrapper) runWithContext(ctx context.Context) {
+	log.Info().
+		Int("port", rw.config.Server.Port).
+		Msg("Starting router...")
 	if err := rw.router.RunWithContext(ctx); err != context.Canceled {
 		log.Error().Err(err).Msg("router.runWithContext(): failed starting router")
 	} else if err != nil {
