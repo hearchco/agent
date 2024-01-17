@@ -62,21 +62,28 @@ func (db *DB) Set(k string, v cache.Value) error {
 			Int64("ns", cacheTimeSince.Nanoseconds()).
 			Msg("Cached results")
 	}
+
 	return nil
 }
 
-func (db *DB) Get(k string, o cache.Value) error {
-	v, err := db.rdb.Get(db.ctx, anonymize.HashToSHA256B64(k)).Result()
-	val := []byte(v) // copy data before closing, casting needed for unmarshal
+func (db *DB) Get(k string, o cache.Value, hashed ...bool) error {
+	var kInput string
+	if len(hashed) > 0 && hashed[0] {
+		kInput = k
+	} else {
+		kInput = anonymize.HashToSHA256B64(k)
+	}
 
+	val, err := db.rdb.Get(db.ctx, kInput).Result()
 	if err == redis.Nil {
 		log.Trace().
-			Str("key", k).
+			Str("key", kInput).
 			Msg("Found no value in redis")
 	} else if err != nil {
-		return fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", k, err)
-	} else if err := cbor.Unmarshal(val, o); err != nil {
-		return fmt.Errorf("redis.Get(): failed unmarshaling value from redis for key %v: %w", k, err)
+		return fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", kInput, err)
+	} else if err := cbor.Unmarshal([]byte(val), o); err != nil {
+		return fmt.Errorf("redis.Get(): failed unmarshaling value from redis for key %v: %w", kInput, err)
 	}
+
 	return nil
 }

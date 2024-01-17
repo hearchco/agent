@@ -149,7 +149,10 @@ func New() *Config {
 			Port:        3030,
 			FrontendUrl: "http://localhost:8000",
 			Cache: Cache{
-				Type: "pebble",
+				Type: "badger",
+				Badger: Badger{
+					Persist: true,
+				},
 				Redis: Redis{
 					Host: "localhost",
 					Port: 6379,

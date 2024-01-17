@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/hearchco/hearchco/src/cache"
+	"github.com/hearchco/hearchco/src/cache/badger"
 	"github.com/hearchco/hearchco/src/cache/nocache"
-	"github.com/hearchco/hearchco/src/cache/pebble"
 	"github.com/hearchco/hearchco/src/cache/redis"
 	"github.com/hearchco/hearchco/src/cli"
 	"github.com/hearchco/hearchco/src/config"
@@ -48,8 +48,8 @@ func main() {
 	// setup cache
 	var db cache.DB
 	switch conf.Server.Cache.Type {
-	case "pebble":
-		db = pebble.New(cliFlags.DataDirPath)
+	case "badger":
+		db = badger.New(cliFlags.DataDirPath, conf.Server.Cache.Badger.Persist)
 	case "redis":
 		db = redis.New(ctx, conf.Server.Cache.Redis)
 	default:

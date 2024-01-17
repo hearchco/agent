@@ -30,6 +30,10 @@ type Settings struct {
 	Shortcut                string `koanf:"shortcut"`
 }
 
+type Badger struct {
+	Persist bool `koanf:"persist"`
+}
+
 type Redis struct {
 	Host     string `koanf:"host"`
 	Port     uint16 `koanf:"port"`
@@ -38,8 +42,9 @@ type Redis struct {
 }
 
 type Cache struct {
-	Type  string `koanf:"type"`
-	Redis Redis  `koanf:"redis"`
+	Type   string `koanf:"type"`
+	Badger Badger `koanf:"badger"`
+	Redis  Redis  `koanf:"redis"`
 }
 
 type Server struct {
