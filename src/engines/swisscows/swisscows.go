@@ -107,28 +107,30 @@ func getLocale(options *engines.Options) string {
 	return "&region=" + strings.Replace(options.Locale, "_", "-", 1)
 }
 
-// var pageRankCounter []int = make([]int, options.MaxPages*Info.ResPerPage)
-// col.OnHTML("div.web-results > article.item-web", func(e *colly.HTMLElement) {
-// 	dom := e.DOM
+/*
+var pageRankCounter []int = make([]int, options.MaxPages*Info.ResPerPage)
+col.OnHTML("div.web-results > article.item-web", func(e *colly.HTMLElement) {
+	dom := e.DOM
 
-// 	linkHref, hrefExists := dom.Find("a.site").Attr("href")
-// 	linkText := parse.ParseURL(linkHref)
-// 	titleText := strings.TrimSpace(dom.Find("h2.title").Text())
-// 	descText := strings.TrimSpace(dom.Find("p.description").Text())
+	linkHref, hrefExists := dom.Find("a.site").Attr("href")
+	linkText := parse.ParseURL(linkHref)
+	titleText := strings.TrimSpace(dom.Find("h2.title").Text())
+	descText := strings.TrimSpace(dom.Find("p.description").Text())
 
-// 	if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-// 		var pageStr string = e.Request.Ctx.Get("page")
-// 		page, _ := strconv.Atoi(pageStr)
+	if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
+		var pageStr string = e.Request.Ctx.Get("page")
+		page, _ := strconv.Atoi(pageStr)
 
-// 		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, pageRankCounter[page]+1)
-// 		bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
-// 		pageRankCounter[page]++
-// 	} else {
-// 		log.Trace().
-// 			Str("engine", Info.Name.String()).
-// 			Str("url", linkText).
-// 			Str("title", titleText).
-// 			Str("description", descText).
-// 			Msg("Matched Result, but couldn't retrieve data")
-// 	}
-// })
+		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, pageRankCounter[page]+1)
+		bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+		pageRankCounter[page]++
+	} else {
+		log.Trace().
+			Str("engine", Info.Name.String()).
+			Str("url", linkText).
+			Str("title", titleText).
+			Str("description", descText).
+			Msg("Matched Result, but couldn't retrieve data")
+	}
+})
+*/
