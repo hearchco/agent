@@ -9,6 +9,7 @@ import (
 	"github.com/fxamacker/cbor/v2"
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/cache"
+	"github.com/hearchco/hearchco/src/config"
 	"github.com/rs/zerolog/log"
 )
 
@@ -16,11 +17,11 @@ type DB struct {
 	bdb *badger.DB
 }
 
-func New(dataDirPath string, persist bool) *DB {
+func New(dataDirPath string, config config.Badger) *DB {
 	badgerPath := path.Join(dataDirPath, "database")
 
 	var opt badger.Options
-	if persist {
+	if config.Persist {
 		opt = badger.DefaultOptions(badgerPath).WithLoggingLevel(badger.WARNING)
 	} else {
 		opt = badger.DefaultOptions("").WithInMemory(true).WithLoggingLevel(badger.WARNING)
@@ -33,14 +34,14 @@ func New(dataDirPath string, persist bool) *DB {
 			Err(err).
 			Str("path", badgerPath).
 			Msg("badger.New(): error opening badger")
-	} else if persist {
+	} else if config.Persist {
 		log.Info().
-			Bool("persistence", persist).
+			Bool("persistence", config.Persist).
 			Str("path", badgerPath).
 			Msg("Successfully opened badger")
 	} else {
 		log.Info().
-			Bool("persistence", persist).
+			Bool("persistence", config.Persist).
 			Msg("Successfully opened in-memory badger")
 	}
 

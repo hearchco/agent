@@ -49,7 +49,7 @@ func main() {
 	var db cache.DB
 	switch conf.Server.Cache.Type {
 	case "badger":
-		db = badger.New(cliFlags.DataDirPath, conf.Server.Cache.Badger.Persist)
+		db = badger.New(cliFlags.DataDirPath, conf.Server.Cache.Badger)
 	case "redis":
 		db = redis.New(ctx, conf.Server.Cache.Redis)
 	default:
