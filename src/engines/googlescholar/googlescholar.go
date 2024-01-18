@@ -2,6 +2,7 @@ package googlescholar
 
 import (
 	"context"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/hearchco/hearchco/src/sedefaults"
+	"github.com/rs/zerolog/log"
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
@@ -37,7 +39,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		dom := e.DOM
 
 		linkHref, hrefExists := dom.Find(dompaths.Link).Attr("href")
-		linkText := parse.ParseURL(linkHref)
+		linkText := removeTelemetry(parse.ParseURL(linkHref))
 		titleText := strings.TrimSpace(dom.Find(dompaths.Title).Text())
 		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
 		citeInfo := strings.TrimSpace(dom.Find("div.gs_a").Text())
@@ -69,4 +71,20 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	pagesCol.Wait()
 
 	return retError
+}
+
+func removeTelemetry(link string) string {
+	parsedURL, err := url.Parse(link)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing url: %#v", link)
+		return link
+	}
+
+	// remove seemingly unused params in query
+	q := parsedURL.Query()
+	for _, key := range []string{"dq", "hl", "lr", "oi", "ots", "sig"} {
+		q.Del(key)
+	}
+	parsedURL.RawQuery = q.Encode()
+	return parsedURL.String()
 }

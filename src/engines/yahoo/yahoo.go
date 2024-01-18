@@ -87,7 +87,7 @@ func removeTelemetry(link string) string {
 	newLink, err := url.QueryUnescape(link)
 	if err != nil {
 		log.Error().Err(err).Msgf("yahoo.removeTelemetry(): couldn't parse url(%v): couldn't url.QueryUnescape", link)
-		return ""
+		return link
 	}
 	return newLink
 }

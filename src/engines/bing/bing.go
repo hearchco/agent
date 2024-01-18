@@ -88,7 +88,8 @@ func removeTelemetry(link string) string {
 	if strings.HasPrefix(link, "https://www.bing.com/ck/a?") {
 		parsedUrl, err := url.Parse(link)
 		if err != nil {
-			log.Error().Err(err).Msg("error parsing url")
+			log.Error().Err(err).Msgf("error parsing url: %#v", link)
+			return link
 		}
 
 		// get the first value of u parameter and remove "a1" in front
