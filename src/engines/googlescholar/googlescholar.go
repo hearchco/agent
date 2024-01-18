@@ -82,7 +82,7 @@ func removeTelemetry(link string) string {
 
 	// remove seemingly unused params in query
 	q := parsedURL.Query()
-	for _, key := range []string{"dq", "hl", "lr", "oi", "ots", "sig"} {
+	for _, key := range []string{"dq", "lr", "oi", "ots", "sig"} {
 		q.Del(key)
 	}
 	parsedURL.RawQuery = q.Encode()
