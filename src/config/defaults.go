@@ -94,6 +94,9 @@ func NewSettings() map[engines.Name]Settings {
 		engines.GOOGLE: {
 			Shortcut: "g",
 		},
+		engines.GOOGLESCHOLAR: {
+			Shortcut: "gs",
+		},
 		engines.MOJEEK: {
 			Shortcut: "mjk",
 		},
