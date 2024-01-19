@@ -60,7 +60,7 @@ func TestShuffle(t *testing.T) {
 		shuffled := anonymize.Shuffle(test.orig)
 		shuffledSorted := anonymize.SortString(shuffled)
 
-		if shuffledSorted == test.expected {
+		if shuffledSorted != test.expected {
 			t.Errorf("SortString(Shuffle(\"%v\")) = \"%v\", want \"%v\"", test.orig, shuffledSorted, test.expected)
 		}
 	}
