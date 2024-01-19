@@ -44,6 +44,7 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		Locale:     flags.Locale,
 		SafeSearch: flags.SafeSearch,
 		Mobile:     flags.Mobile,
+		Proxies:    conf.Server.Proxies,
 	}
 
 	start := time.Now()

@@ -93,6 +93,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 			Locale:     locale,
 			SafeSearch: safeSearchB,
 			Mobile:     isMobile,
+			Proxies:    conf.Server.Proxies,
 		}
 
 		var results []result.Result

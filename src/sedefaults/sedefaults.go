@@ -2,12 +2,15 @@ package sedefaults
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"strconv"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/gocolly/colly/v2/proxy"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
@@ -206,6 +209,26 @@ func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collecto
 		if timings.PageTimeout != 0 {
 			(*pagesColPtr).SetRequestTimeout(timings.PageTimeout)
 		}
+	}
+
+	if options.Proxies != nil {
+		log.Debug().
+			Strs("proxies", options.Proxies).
+			Msg("Using proxies")
+
+		// Rotate proxies
+		rp, err := proxy.RoundRobinProxySwitcher(options.Proxies...)
+		if err != nil {
+			log.Fatal().
+				Err(err).
+				Strs("proxies", options.Proxies).
+				Msg("sedefaults.InitializeCollectors(): failed creating proxy switcher")
+		}
+
+		(*colPtr).SetProxyFunc(rp)
+		(*colPtr).WithTransport(&http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		})
 	}
 }
 
