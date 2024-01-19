@@ -37,14 +37,15 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		Msg("Started hearching")
 
 	options := engines.Options{
-		MaxPages:   flags.MaxPages,
-		VisitPages: flags.Visit,
-		Category:   category.FromString[flags.Category],
-		UserAgent:  flags.UserAgent,
-		Locale:     flags.Locale,
-		SafeSearch: flags.SafeSearch,
-		Mobile:     flags.Mobile,
-		Proxies:    conf.Server.Proxies,
+		MaxPages:           flags.MaxPages,
+		VisitPages:         flags.Visit,
+		Category:           category.FromString[flags.Category],
+		UserAgent:          flags.UserAgent,
+		Locale:             flags.Locale,
+		SafeSearch:         flags.SafeSearch,
+		Mobile:             flags.Mobile,
+		Proxies:            conf.Server.Proxies,
+		InsecureSkipVerify: conf.Server.InsecureSkipVerify,
 	}
 
 	start := time.Now()

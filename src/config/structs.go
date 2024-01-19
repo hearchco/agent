@@ -43,10 +43,11 @@ type Cache struct {
 }
 
 type Server struct {
-	Port        int      `koanf:"port"`
-	FrontendUrl string   `koanf:"frontendurl"`
-	Proxies     []string `koanf:"proxies"`
-	Cache       Cache    `koanf:"cache"`
+	Port               int      `koanf:"port"`
+	FrontendUrl        string   `koanf:"frontendurl"`
+	Proxies            []string `koanf:"proxies"`
+	InsecureSkipVerify bool     `koanf:"insecureskipverify"`
+	Cache              Cache    `koanf:"cache"`
 }
 
 type ReaderEngine struct {
