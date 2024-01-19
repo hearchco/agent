@@ -1,8 +1,10 @@
 package rank
 
 import (
-	"github.com/rs/zerolog/log"
+	"fmt"
+
 	"github.com/hearchco/hearchco/src/bucket/result"
+	"github.com/rs/zerolog/log"
 )
 
 type ByScore []result.Result
@@ -23,6 +25,9 @@ func (r ByRetrievedRank) Less(i, j int) bool {
 		return r[i].RetRank.OnPageRank < r[j].RetRank.OnPageRank
 	}
 
-	log.Error().Msgf("rank.(r ByRetrievedRank)Less(): failed at ranking: %v, %v", r[i], r[j])
+	log.Error().
+		Str("comparableA", fmt.Sprintf("%v", r[i])).
+		Str("comparableB", fmt.Sprintf("%v", r[j])).
+		Msg("rank.(r ByRetrievedRank)Less(): failed at ranking")
 	return true
 }

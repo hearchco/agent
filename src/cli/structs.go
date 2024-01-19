@@ -15,6 +15,7 @@ type Flags struct {
 	Silent      bool   `type:"bool" default:"false" short:"s" env:"HEARCHCO_SILENT" help:"Should results be printed"`
 	DataDirPath string `type:"path" default:"${data_folder}" env:"HEARCHCO_DATA_DIR" help:"Data folder path"`
 	LogDirPath  string `type:"path" default:"${log_folder}" env:"HEARCHCO_LOG_DIR" help:"Log folder path"`
+	LogToFile   bool   `type:"bool" default:"false" env:"HEARCHCO_LOG_TO_FILE" help:"Should logs be written to file"`
 	Verbosity   int8   `type:"counter" default:"0" short:"v" env:"HEARCHCO_VERBOSITY" help:"Log level verbosity"`
 	// options
 	MaxPages   int    `type:"counter" default:"1" env:"HEARCHCO_MAX_PAGES" help:"Number of pages to search"`

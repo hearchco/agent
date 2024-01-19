@@ -16,7 +16,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var EnabledEngines []engines.Name = make([]engines.Name, 0)
+var EnabledEngines = make([]engines.Name, 0)
 var LogDumpLocation string = "dump/"
 
 func (c *Config) fromReader(rc *ReaderConfig) {
@@ -29,7 +29,10 @@ func (c *Config) fromReader(rc *ReaderConfig) {
 	for key, val := range rc.Settings {
 		keyName, err := engines.NameString(key)
 		if err != nil {
-			log.Panic().Err(err).Msgf("failed reading config. invalid engine name: %v", key)
+			log.Panic().
+				Err(err).
+				Str("engine", key).
+				Msg("config.fromReader(): invalid engine name")
 			// ^PANIC
 		}
 		nc.Settings[keyName] = val
@@ -119,10 +122,14 @@ func (c *Config) Load(dataDirPath string, logDirPath string) {
 	// Load YAML config
 	yamlPath := path.Join(dataDirPath, "hearchco.yaml")
 	if _, err := os.Stat(yamlPath); err != nil {
-		log.Trace().Msgf("config.Load(): no yaml config present at path: %v, looking for .yml", yamlPath)
+		log.Trace().
+			Str("path", yamlPath).
+			Msg("config.Load(): no yaml config found, looking for .yml")
 		yamlPath = path.Join(dataDirPath, "hearchco.yml")
 		if _, errr := os.Stat(yamlPath); errr != nil {
-			log.Trace().Msgf("config.Load(): no yaml config present at path: %v", yamlPath)
+			log.Trace().
+				Str("path", yamlPath).
+				Msg("config.Load(): no yaml config found")
 		} else if errr := k.Load(file.Provider(yamlPath), yaml.Parser()); errr != nil {
 			log.Panic().Err(err).Msg("config.Load(): error loading yaml config")
 			// ^PANIC

@@ -2,6 +2,7 @@ package search
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"strings"
 	"time"
@@ -26,22 +27,31 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 	timings, toRun := procBang(&query, &options, conf)
 
 	query = url.QueryEscape(query)
-	log.Debug().Msgf("Searching: %v", query)
+	log.Debug().
+		Str("query", query).
+		Msg("Searching")
 
 	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")
 	var worker conc.WaitGroup
 	runEngines(toRun, timings, conf.Settings, query, &worker, &relay, options)
 	worker.Wait()
-	log.Debug().Msgf("Got results in %vms", time.Since(resTimer).Milliseconds())
+	log.Debug().
+		Int64("ms", time.Since(resTimer).Milliseconds()).
+		Msg("Got results")
 
 	rankTimer := time.Now()
 	log.Debug().Msg("Ranking...")
 	results := rank.Rank(relay.ResultMap, conf.Categories[options.Category].Ranking) // have to make copy, since its a map value
 	rankTimeSince := time.Since(rankTimer)
-	log.Debug().Msgf("Finished ranking in %vms (%vns)", rankTimeSince.Milliseconds(), rankTimeSince.Nanoseconds())
+	log.Debug().
+		Int64("ms", rankTimeSince.Milliseconds()).
+		Int64("ns", rankTimeSince.Nanoseconds()).
+		Msg("Finished ranking")
 
-	log.Debug().Msgf("Found results in %vms", time.Since(searchTimer).Milliseconds())
+	log.Debug().
+		Int64("ms", time.Since(searchTimer).Milliseconds()).
+		Msg("Found results")
 
 	return results
 }
@@ -51,7 +61,10 @@ type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, 
 
 func runEngines(engs []engines.Name, timings config.Timings, settings map[engines.Name]config.Settings, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
 	config.EnabledEngines = engs
-	log.Info().Msgf("Enabled engines (%v): %v", len(config.EnabledEngines), config.EnabledEngines)
+	log.Info().
+		Int("number", len(config.EnabledEngines)).
+		Str("engines", fmt.Sprintf("%v", config.EnabledEngines)).
+		Msg("Enabled engines")
 
 	engineStarter := NewEngineStarter()
 	for i := range engs {
@@ -61,7 +74,10 @@ func runEngines(engs []engines.Name, timings config.Timings, settings map[engine
 			// runs the Search function in the engine package
 			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng], timings)
 			if err != nil {
-				log.Error().Err(err).Msgf("search.runEngines(): error while searching %v", eng)
+				log.Error().
+					Err(err).
+					Str("engine", eng.String()).
+					Msg("search.runEngines(): error while searching")
 			}
 		})
 	}
@@ -72,7 +88,9 @@ func procBang(query *string, options *engines.Options, conf *config.Config) (con
 	goodCat := procCategory(*query, options)
 	if !goodCat && !useSpec && (*query)[0] == '!' {
 		// options.category is set to GENERAL
-		log.Debug().Msgf("search.procBang(): invalid bang (not category or engine shortcut). query: %v", *query)
+		log.Debug().
+			Str("query", *query).
+			Msg("search.procBang(): invalid bang (not category or engine shortcut)")
 	}
 
 	trimBang(query)

@@ -5,10 +5,10 @@ import (
 	"sync"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/rs/zerolog/log"
 	"github.com/hearchco/hearchco/src/bucket/result"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
+	"github.com/rs/zerolog/log"
 )
 
 type Relay struct {
@@ -17,7 +17,11 @@ type Relay struct {
 }
 
 func AddSEResult(seResult *engines.RetrievedResult, seName engines.Name, relay *Relay, options *engines.Options, pagesCol *colly.Collector) {
-	log.Trace().Msgf("%v: Got Result -> %v: %v", seName, seResult.Title, seResult.URL)
+	log.Trace().
+		Str("engine", seName.String()).
+		Str("title", seResult.Title).
+		Str("url", seResult.URL).
+		Msg("Got result")
 
 	relay.Mutex.RLock()
 	mapRes, exists := relay.ResultMap[seResult.URL]
@@ -63,13 +67,19 @@ func AddSEResult(seResult *engines.RetrievedResult, seName engines.Name, relay *
 
 	if !exists && options.VisitPages {
 		if err := pagesCol.Visit(seResult.URL); err != nil {
-			log.Error().Err(err).Msgf("bucket.AddSEResult(): failed visiting %v", seResult.URL)
+			log.Error().
+				Err(err).
+				Str("url", seResult.URL).
+				Msg("bucket.AddSEResult(): failed visiting")
 		}
 	}
 }
 
 func SetResultResponse(link string, response *colly.Response, relay *Relay, seName engines.Name) error {
-	log.Trace().Msgf("%v: Got Response -> %v", seName, link)
+	log.Trace().
+		Str("engine", seName.String()).
+		Str("link", link).
+		Msg("Got response")
 
 	relay.Mutex.Lock()
 	mapRes, exists := relay.ResultMap[link]

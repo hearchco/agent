@@ -41,11 +41,15 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		var qry string = "?" + r.URL.RawQuery
 		nonce, sig, err := generateAuth(qry)
 		if err != nil {
-			log.Error().Err(err).Msgf("swisscows.Search() -> col.OnRequest: failed building request: failed generating auth")
+			log.Error().Err(err).Msg("swisscows.Search() -> col.OnRequest: failed building request: failed generating auth")
 			return
 		}
 
-		//log.Debug().Msgf("qry: %v\nnonce: %v\nsignature: %v", qry, nonce, sig)
+		// log.Debug().
+		// 	Str("query", qry).
+		// 	Str("nonce", nonce).
+		// 	Str("signature", sig).
+		// 	Msg("")
 
 		r.Headers.Set("X-Request-Nonce", nonce)
 		r.Headers.Set("X-Request-Signature", sig)
@@ -53,7 +57,11 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	})
 
 	col.OnResponse(func(r *colly.Response) {
-		log.Trace().Msgf("swisscows.Search() -> col.OnResponse(): url: %v | nonce: %v | signature: %v", r.Request.URL.String(), r.Request.Headers.Get("X-Request-Nonce"), r.Request.Headers.Get("X-Request-Signature"))
+		log.Trace().
+			Str("url", r.Request.URL.String()).
+			Str("nonce", r.Request.Headers.Get("X-Request-Nonce")).
+			Str("signature", r.Request.Headers.Get("X-Request-Signature")).
+			Msg("swisscows.Search() -> col.OnResponse()")
 
 		var pageStr string = r.Ctx.Get("page")
 		page, _ := strconv.Atoi(pageStr)
@@ -61,7 +69,11 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		var parsedResponse SCResponse
 		err := json.Unmarshal(r.Body, &parsedResponse)
 		if err != nil {
-			log.Error().Err(err).Msgf("swissco Failed body unmarshall to json:\n%v", string(r.Body))
+			log.Error().
+				Err(err).
+				Str("body", string(r.Body)).
+				Msg("swisscows.Search() -> col.OnResponse(): failed body unmarshall to json")
+
 			return
 		}
 
@@ -119,7 +131,12 @@ col.OnHTML("div.web-results > article.item-web", func(e *colly.HTMLElement) {
 		bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 		pageRankCounter[page]++
 	} else {
-		log.Trace().Msgf("%v: Matched Result, but couldn't retrieve data.\nURL:%v\nTitle:%v\nDescription:%v", Info.Name, linkText, titleText, descText)
+		log.Trace().
+			Str("engine", Info.Name.String()).
+			Str("url", linkText).
+			Str("title", titleText).
+			Str("description", descText).
+			Msg("Matched Result, but couldn't retrieve data")
 	}
 })
 */

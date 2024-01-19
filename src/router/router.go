@@ -29,7 +29,9 @@ func New(config *config.Config, verbosity int8) (*RouterWrapper, error) {
 }
 
 func (rw *RouterWrapper) addCors() {
-	log.Debug().Msgf("Using CORS: %v", rw.config.Server.FrontendUrl)
+	log.Debug().
+		Str("url", rw.config.Server.FrontendUrl).
+		Msg("Using CORS")
 	rw.router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{rw.config.Server.FrontendUrl},
 		AllowMethods:     []string{"HEAD", "GET", "POST"},
@@ -63,13 +65,13 @@ func (rw *RouterWrapper) Start(ctx context.Context, db cache.DB, serveProfiler b
 	rw.router.GET("/search", func(c *gin.Context) {
 		err := Search(c, rw.config, db)
 		if err != nil {
-			log.Error().Err(err).Msgf("router.Start() (.GET): failed search")
+			log.Error().Err(err).Msg("router.Start() (.GET): failed search")
 		}
 	})
 	rw.router.POST("/search", func(c *gin.Context) {
 		err := Search(c, rw.config, db)
 		if err != nil {
-			log.Error().Err(err).Msgf("router.Start() (.POST): failed search")
+			log.Error().Err(err).Msg("router.Start() (.POST): failed search")
 		}
 	})
 
