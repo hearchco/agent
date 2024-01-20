@@ -7,8 +7,10 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/graceful"
+	"github.com/gin-contrib/logger"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
 	"github.com/hearchco/hearchco/src/cache"
@@ -20,11 +22,18 @@ type RouterWrapper struct {
 	config *config.Config
 }
 
-func New(config *config.Config, verbosity int8) (*RouterWrapper, error) {
+func New(config *config.Config, verbosity int8, lgr zerolog.Logger) (*RouterWrapper, error) {
 	if verbosity == 0 {
 		gin.SetMode(gin.ReleaseMode)
 	}
+
 	router, err := graceful.Default(graceful.WithAddr(":" + strconv.Itoa(config.Server.Port)))
+	if err == nil {
+		router.Use(logger.SetLogger(logger.WithLogger(func(ctx *gin.Context, l zerolog.Logger) zerolog.Logger {
+			return lgr
+		})))
+	}
+
 	return &RouterWrapper{router: router, config: config}, err
 }
 

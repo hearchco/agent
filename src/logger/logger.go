@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Setup(verbosity int8, logDirPath ...string) {
+func Setup(verbosity int8, logDirPath ...string) zerolog.Logger {
 	logWriters := []io.Writer{zerolog.ConsoleWriter{
 		TimeFormat: time.Stamp,
 		Out:        os.Stderr,
@@ -48,4 +48,6 @@ func Setup(verbosity int8, logDirPath ...string) {
 	default:
 		log.Logger = logger.Level(zerolog.InfoLevel)
 	}
+
+	return logger
 }

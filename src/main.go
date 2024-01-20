@@ -25,7 +25,7 @@ func main() {
 	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// configure logging without file at INFO level
-	logger.Setup(0)
+	lgr := logger.Setup(0)
 
 	// parse cli arguments
 	cliFlags := cli.Setup()
@@ -36,9 +36,9 @@ func main() {
 
 	// configure verbosity and logging to file
 	if cliFlags.LogToFile || cliFlags.Cli {
-		logger.Setup(cliFlags.Verbosity, cliFlags.LogDirPath)
+		lgr = logger.Setup(cliFlags.Verbosity, cliFlags.LogDirPath)
 	} else {
-		logger.Setup(cliFlags.Verbosity)
+		lgr = logger.Setup(cliFlags.Verbosity)
 	}
 
 	// load config file
@@ -61,7 +61,7 @@ func main() {
 	if cliFlags.Cli {
 		cli.Run(cliFlags, db, conf)
 	} else {
-		if rw, err := router.New(conf, cliFlags.Verbosity); err != nil {
+		if rw, err := router.New(conf, cliFlags.Verbosity, lgr); err != nil {
 			log.Fatal().Err(err).Msg("main.main(): failed creating a router")
 			// ^FATAL
 		} else {
