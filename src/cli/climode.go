@@ -71,11 +71,14 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 			Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
 			Msg("Found results in cache")
 	} else {
-		log.Debug().Msg("Nothing found in cache, doing a clean search")
+		log.Debug().
+			Str("queryAnon", anonymize.String(flags.Query)).
+			Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
+			Msg("Nothing found in cache, doing a clean search")
 
 		results = search.PerformSearch(flags.Query, options, conf)
 
-		serr := db.Set(flags.Query, results)
+		serr := db.Set(flags.Query, results, conf.Server.Cache.TTL.Results)
 		if serr != nil {
 			log.Error().
 				Err(serr).
@@ -94,4 +97,34 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		Int("number", len(results)).
 		Int64("ms", duration.Milliseconds()).
 		Msg("Found results")
+
+	if foundInDB {
+		log.Info().
+			Str("queryAnon", anonymize.String(flags.Query)).
+			Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
+			Msg("Checking if results need to be updated")
+		ttl, terr := db.GetTTL(flags.Query)
+		if terr != nil {
+			log.Error().
+				Err(terr).
+				Str("queryAnon", anonymize.String(flags.Query)).
+				Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
+				Msg("cli.Run(): error getting TTL from database")
+		} else if ttl < conf.Server.Cache.TTL.ResultsUpdate {
+			log.Info().
+				Str("queryAnon", anonymize.String(flags.Query)).
+				Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
+				Msg("Updating results...")
+			newResults := search.PerformSearch(flags.Query, options, conf)
+			uerr := db.Set(flags.Query, newResults, conf.Server.Cache.TTL.Results)
+			if uerr != nil {
+				// Error in updating cache is not returned, just logged
+				log.Error().
+					Err(uerr).
+					Str("queryAnon", anonymize.String(flags.Query)).
+					Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
+					Msg("cli.Run(): error replacing old results while updating database")
+			}
+		}
+	}
 }

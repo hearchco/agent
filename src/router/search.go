@@ -117,8 +117,10 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 				Str("queryHash", anonymize.HashToSHA256B64(query)).
 				Msg("Found results in cache")
 		} else {
-			log.Debug().Msg("Nothing found in cache, doing a clean search")
-
+			log.Debug().
+				Str("queryAnon", anonymize.String(query)).
+				Str("queryHash", anonymize.HashToSHA256B64(query)).
+				Msg("Nothing found in cache, doing a clean search")
 			results = search.PerformSearch(query, options, conf)
 		}
 
@@ -131,7 +133,11 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 		}
 
 		if !foundInDB {
-			serr := db.Set(query, results)
+			log.Debug().
+				Str("queryAnon", anonymize.String(query)).
+				Str("queryHash", anonymize.HashToSHA256B64(query)).
+				Msg("Caching results...")
+			serr := db.Set(query, results, conf.Server.Cache.TTL.Results)
 			if serr != nil {
 				// Error in updating cache is not returned, just logged
 				log.Error().
@@ -139,6 +145,34 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 					Str("queryAnon", anonymize.String(query)).
 					Str("queryHash", anonymize.HashToSHA256B64(query)).
 					Msg("router.Search(): error updating database with search results")
+			}
+		} else {
+			log.Debug().
+				Str("queryAnon", anonymize.String(query)).
+				Str("queryHash", anonymize.HashToSHA256B64(query)).
+				Msg("Checking if results need to be updated...")
+			ttl, terr := db.GetTTL(query)
+			if terr != nil {
+				log.Error().
+					Err(terr).
+					Str("queryAnon", anonymize.String(query)).
+					Str("queryHash", anonymize.HashToSHA256B64(query)).
+					Msg("router.Search(): error getting TTL from database")
+			} else if ttl < conf.Server.Cache.TTL.ResultsUpdate {
+				log.Debug().
+					Str("queryAnon", anonymize.String(query)).
+					Str("queryHash", anonymize.HashToSHA256B64(query)).
+					Msg("Updating results...")
+				newResults := search.PerformSearch(query, options, conf)
+				uerr := db.Set(query, newResults, conf.Server.Cache.TTL.Results)
+				if uerr != nil {
+					// Error in updating cache is not returned, just logged
+					log.Error().
+						Err(uerr).
+						Str("queryAnon", anonymize.String(query)).
+						Str("queryHash", anonymize.HashToSHA256B64(query)).
+						Msg("router.Search(): error replacing old results while updating database")
+				}
 			}
 		}
 	}

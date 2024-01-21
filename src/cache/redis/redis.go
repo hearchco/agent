@@ -92,3 +92,35 @@ func (db *DB) Get(k string, o cache.Value, hashed ...bool) error {
 
 	return nil
 }
+
+// returns time until the key expires, not the time it will be considered expired
+func (db *DB) GetTTL(k string, hashed ...bool) (time.Duration, error) {
+	var kInput string
+	if len(hashed) > 0 && hashed[0] {
+		kInput = k
+	} else {
+		kInput = anonymize.HashToSHA256B64(k)
+	}
+
+	// returns time with time.Second precision
+	expiresIn, err := db.rdb.TTL(db.ctx, kInput).Result()
+	if err == redis.Nil {
+		log.Trace().
+			Str("key", kInput).
+			Msg("Found no value in redis")
+	} else if err != nil {
+		return expiresIn, fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", kInput, err)
+	}
+
+	/*
+		In Redis 2.6 or older the command returns -1 if the key does not exist or if the key exist but has no associated expire.
+		Starting with Redis 2.8 the return value in case of error changed:
+		The command returns -2 if the key does not exist.
+		The command returns -1 if the key exists but has no associated expire.
+	*/
+	if expiresIn < 0 {
+		expiresIn = 0
+	}
+
+	return expiresIn, nil
+}

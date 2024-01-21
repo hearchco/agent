@@ -5,6 +5,7 @@ import (
 
 	"github.com/hearchco/hearchco/src/category"
 	"github.com/hearchco/hearchco/src/engines"
+	"github.com/hearchco/hearchco/src/moretime"
 )
 
 const DefaultLocale string = "en_US"
@@ -150,6 +151,10 @@ func New() *Config {
 			FrontendUrl: "http://localhost:8000",
 			Cache: Cache{
 				Type: "badger",
+				TTL: TTL{
+					Results:       moretime.Week,
+					ResultsUpdate: 3 * moretime.Day,
+				},
 				Badger: Badger{
 					Persist: true,
 				},

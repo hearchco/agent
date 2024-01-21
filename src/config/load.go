@@ -8,6 +8,7 @@ import (
 
 	"github.com/hearchco/hearchco/src/category"
 	"github.com/hearchco/hearchco/src/engines"
+	"github.com/hearchco/hearchco/src/moretime"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/providers/file"
@@ -21,7 +22,19 @@ var LogDumpLocation string = "dump/"
 
 func (c *Config) fromReader(rc *ReaderConfig) {
 	nc := Config{
-		Server:     rc.Server,
+		Server: Server{
+			Port:        rc.Server.Port,
+			FrontendUrl: rc.Server.FrontendUrl,
+			Cache: Cache{
+				Type: rc.Server.Cache.Type,
+				TTL: TTL{
+					Results:       moretime.ConvertFancyTime(rc.Server.Cache.TTL.Results),
+					ResultsUpdate: moretime.ConvertFancyTime(rc.Server.Cache.TTL.ResultsUpdate),
+				},
+				Badger: rc.Server.Cache.Badger,
+				Redis:  rc.Server.Cache.Redis,
+			},
+		},
 		Settings:   map[engines.Name]Settings{},
 		Categories: map[category.Name]Category{},
 	}
@@ -71,13 +84,21 @@ func (c *Config) fromReader(rc *ReaderConfig) {
 
 func (c *Config) getReader() ReaderConfig {
 	rc := ReaderConfig{
-		Server:      c.Server,
-		Settings:    map[string]Settings{},
+		Server: ReaderServer{
+			Port:        c.Server.Port,
+			FrontendUrl: c.Server.FrontendUrl,
+			Cache: ReaderCache{
+				Type: c.Server.Cache.Type,
+				TTL: ReaderTTL{
+					Results:       moretime.ConvertToFancyTime(c.Server.Cache.TTL.Results),
+					ResultsUpdate: moretime.ConvertToFancyTime(c.Server.Cache.TTL.ResultsUpdate),
+				},
+				Badger: c.Server.Cache.Badger,
+				Redis:  c.Server.Cache.Redis,
+			},
+		},
 		RCategories: map[category.Name]ReaderCategory{},
-	}
-
-	for key, val := range c.Settings {
-		rc.Settings[key.ToLower()] = val
+		Settings:    map[string]Settings{},
 	}
 
 	for key, val := range c.Categories {
@@ -97,6 +118,10 @@ func (c *Config) getReader() ReaderConfig {
 		for _, eng := range val.Engines {
 			rc.RCategories[key].REngines[eng.ToLower()] = ReaderEngine{Enabled: true}
 		}
+	}
+
+	for key, val := range c.Settings {
+		rc.Settings[key.ToLower()] = val
 	}
 
 	return rc

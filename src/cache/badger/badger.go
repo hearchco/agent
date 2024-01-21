@@ -122,3 +122,41 @@ func (db *DB) Get(k string, o cache.Value, hashed ...bool) error {
 
 	return nil
 }
+
+// returns time until the key expires, not the time it will be considered expired
+func (db *DB) GetTTL(k string, hashed ...bool) (time.Duration, error) {
+	var kInput string
+	if len(hashed) > 0 && hashed[0] {
+		kInput = k
+	} else {
+		kInput = anonymize.HashToSHA256B64(k)
+	}
+
+	var expiresIn time.Duration
+	err := db.bdb.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte(kInput))
+		if err != nil {
+			return err
+		}
+
+		expiresAtUnix := time.Unix(int64(item.ExpiresAt()), 0)
+		expiresIn = time.Until(expiresAtUnix)
+
+		// returns negative time.Since() if expiresAtUnix is in the past
+		if expiresIn < 0 {
+			expiresIn = 0
+		}
+
+		return err
+	})
+
+	if err == badger.ErrKeyNotFound {
+		log.Trace().
+			Str("key", kInput).
+			Msg("Found no value in badger")
+	} else if err != nil {
+		return expiresIn, fmt.Errorf("badger.Get(): error getting value from badger for key %v: %w", kInput, err)
+	}
+
+	return expiresIn, nil
+}
