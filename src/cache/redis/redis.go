@@ -47,13 +47,18 @@ func (db *DB) Close() {
 	}
 }
 
-func (db *DB) Set(k string, v cache.Value) error {
+func (db *DB) Set(k string, v cache.Value, ttl ...time.Duration) error {
 	log.Debug().Msg("Caching...")
 	cacheTimer := time.Now()
 
+	var setTtl time.Duration = 0
+	if len(ttl) > 0 {
+		setTtl = ttl[0]
+	}
+
 	if val, err := cbor.Marshal(v); err != nil {
 		return fmt.Errorf("redis.Set(): error marshaling value: %w", err)
-	} else if err := db.rdb.Set(db.ctx, anonymize.HashToSHA256B64(k), val, 0).Err(); err != nil {
+	} else if err := db.rdb.Set(db.ctx, anonymize.HashToSHA256B64(k), val, setTtl).Err(); err != nil {
 		return fmt.Errorf("redis.Set(): error setting KV to redis: %w", err)
 	} else {
 		cacheTimeSince := time.Since(cacheTimer)
