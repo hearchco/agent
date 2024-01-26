@@ -57,6 +57,7 @@ func init() {
 	initPrettyName()
 }
 
+// No bounds checking, okay?
 var PrettyName []string
 
 // Returns Engine Names without UNDEFINED
