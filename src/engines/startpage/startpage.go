@@ -49,15 +49,24 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 			pageRankCounter[page]++
 		} else {
-			log.Trace().Msgf("%v: Matched Result, but couldn't retrieve data.\nURL:%v\nTitle:%v\nDescription:%v", Info.Name, linkText, titleText, descText)
+			log.Trace().
+				Str("engine", Info.Name.String()).
+				Str("url", linkText).
+				Str("title", titleText).
+				Str("description", descText).
+				Msg("Matched result, but couldn't retrieve data")
 		}
 	})
 
 	col.OnResponse(func(r *colly.Response) {
 		if strings.Contains(string(r.Body), "to prevent possible abuse of our service") {
-			log.Error().Msgf("%v: Request blocked by engine due to scraping.", Info.Name)
+			log.Error().
+				Str("engine", Info.Name.String()).
+				Msg("Request blocked by engine due to scraping")
 		} else if strings.Contains(string(r.Body), "This page cannot function without javascript") {
-			log.Error().Msgf("%v: Engine couldn't load requests, needs javascript.", Info.Name)
+			log.Error().
+				Str("engine", Info.Name.String()).
+				Msg("Engine couldn't load requests, needs javascript")
 		}
 	})
 

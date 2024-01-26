@@ -33,12 +33,12 @@ func Setup() Flags {
 	}
 
 	if locErr := engines.ValidateLocale(cli.Locale); locErr != nil {
-		log.Fatal().Err(locErr).Msgf("cli.Setup(): invalid locale flag")
+		log.Fatal().Err(locErr).Msg("cli.Setup(): invalid locale flag")
 		// ^FATAL
 	}
 
 	if category.SafeFromString(cli.Category) == category.UNDEFINED {
-		log.Fatal().Msgf("cli.Setup(): invalid category flag")
+		log.Fatal().Msg("cli.Setup(): invalid category flag")
 		// ^FATAL
 	}
 

@@ -60,7 +60,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 			pageRankCounter[page]++
 		} else {
-			log.Trace().Msgf("%v: Matched Result, but couldn't retrieve data.\nURL:%v\nTitle:%v\nDescription:%v", Info.Name, linkText, titleText, descText)
+			log.Trace().
+				Str("engine", Info.Name.String()).
+				Str("url", linkText).
+				Str("title", titleText).
+				Str("description", descText).
+				Msg("Matched result, but couldn't retrieve data")
 		}
 	})
 
@@ -88,7 +93,7 @@ func removeTelemetry(link string) string {
 	if strings.HasPrefix(link, "https://www.bing.com/ck/a?") {
 		parsedUrl, err := url.Parse(link)
 		if err != nil {
-			log.Error().Err(err).Msgf("error parsing url: %#v", link)
+			log.Error().Err(err).Str("url", link).Msg("bing.removeTelemetry(): error parsing url")
 			return link
 		}
 
@@ -97,7 +102,7 @@ func removeTelemetry(link string) string {
 
 		cleanUrl, err := base64.RawURLEncoding.DecodeString(encodedUrl)
 		if err != nil {
-			log.Error().Err(err).Msg("failed decoding string from base64")
+			log.Error().Err(err).Msg("bing.removeTelemetry(): failed decoding string from base64")
 		}
 		return parse.ParseURL(string(cleanUrl))
 	}
