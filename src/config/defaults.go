@@ -41,6 +41,10 @@ func NewRanking() Ranking {
 				Mul:   1,
 				Const: 0,
 			},
+			engines.GOOGLESCHOLAR.ToLower(): {
+				Mul:   1,
+				Const: 0,
+			},
 			engines.MOJEEK.ToLower(): {
 				Mul:   1,
 				Const: 0,
