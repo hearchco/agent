@@ -9,7 +9,6 @@ var Info engines.Info = engines.Info{
 	Name:           engines.YEP,
 	URL:            "https://api.yep.com/fs/2/search?",
 	ResultsPerPage: 20,
-	Crawlers:       []engines.Name{engines.YEP},
 }
 
 /*

@@ -35,7 +35,6 @@ type Info struct {
 	Name           Name
 	URL            string
 	ResultsPerPage int
-	Crawlers       []Name
 }
 
 type DOMPaths struct {

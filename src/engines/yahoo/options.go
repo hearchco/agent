@@ -11,7 +11,6 @@ var Info engines.Info = engines.Info{
 	Name:           engines.YAHOO,
 	URL:            "https://search.yahoo.com/search?p=",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.BING},
 }
 
 var dompaths engines.DOMPaths = engines.DOMPaths{
