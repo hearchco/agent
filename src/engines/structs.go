@@ -47,16 +47,16 @@ type DOMPaths struct {
 }
 
 type Options struct {
-	MaxPages   int
-	VisitPages bool
-	Category   category.Name
-	UserAgent  string
-	Locale     string //format: en_US
-	SafeSearch bool
-	Mobile     bool
-
-	ProxyAddr     string
-	JustFirstPage bool
+	MaxPages           int
+	VisitPages         bool
+	Category           category.Name
+	UserAgent          string
+	Locale             string //format: en_US
+	SafeSearch         bool
+	Mobile             bool
+	Proxies            []string
+	InsecureSkipVerify bool
+	JustFirstPage      bool
 }
 
 func ValidateLocale(locale string) error {

@@ -66,3 +66,6 @@ jobs:
       # go:test
       - name: Test units
         run: make test
+        env:
+          HEARCHCO_SERVER_INSECURESKIPVERIFY: true
+          HEARCHCO_SERVER_PROXIES: ${{ secrets.HEARCHCO_SERVER_PROXIES}}
