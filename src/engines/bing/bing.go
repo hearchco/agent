@@ -94,7 +94,7 @@ func removeTelemetry(link string) string {
 		parsedUrl, err := url.Parse(link)
 		if err != nil {
 			log.Error().Err(err).Str("url", link).Msg("bing.removeTelemetry(): error parsing url")
-			return link
+			return ""
 		}
 
 		// get the first value of u parameter and remove "a1" in front
