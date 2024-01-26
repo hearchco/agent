@@ -18,7 +18,7 @@ func printResults(results []result.Result) {
 	for _, r := range results {
 		fmt.Printf("%v (%.2f) -----\n\t\"%v\"\n\t\"%v\"\n\t\"%v\"\n\t-", r.Rank, r.Score, r.Title, r.URL, r.Description)
 		for seInd := uint8(0); seInd < r.TimesReturned; seInd++ {
-			fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine.ToLower())
+			fmt.Printf("%v", engines.PrettyName[r.EngineRanks[seInd].SearchEngine])
 			if seInd != r.TimesReturned-1 {
 				fmt.Print(", ")
 			}
