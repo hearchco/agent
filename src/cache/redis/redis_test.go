@@ -81,7 +81,7 @@ func TestSet(t *testing.T) {
 
 	defer db.Close()
 
-	err = db.Set("testkey", "testvalue")
+	err = db.Set("testkeyset", "testvalue")
 	if err != nil {
 		t.Errorf("error setting key-value pair: %v", err)
 	}
@@ -96,7 +96,7 @@ func TestSetTTL(t *testing.T) {
 
 	defer db.Close()
 
-	err = db.Set("testkey", "testvalue", 100*time.Second)
+	err = db.Set("testkeysetttl", "testvalue", 100*time.Second)
 	if err != nil {
 		t.Errorf("error setting key-value pair with TTL: %v", err)
 	}
@@ -111,13 +111,13 @@ func TestGet(t *testing.T) {
 
 	defer db.Close()
 
-	err = db.Set("testkey", "testvalue")
+	err = db.Set("testkeyget", "testvalue")
 	if err != nil {
 		t.Errorf("error setting key-value pair: %v", err)
 	}
 
 	var value string
-	err = db.Get("testkey", &value)
+	err = db.Get("testkeyget", &value)
 	if err != nil {
 		t.Errorf("error getting value: %v", err)
 	}
@@ -136,12 +136,12 @@ func TestGetTTL(t *testing.T) {
 
 	defer db.Close()
 
-	err = db.Set("testkey", "testvalue", 100*time.Second)
+	err = db.Set("testkeygetttl", "testvalue", 100*time.Second)
 	if err != nil {
 		t.Errorf("error setting key-value pair with TTL: %v", err)
 	}
 
-	ttl, err := db.GetTTL("testkey")
+	ttl, err := db.GetTTL("testkeygetttl")
 	if err != nil {
 		t.Errorf("error getting TTL: %v", err)
 	}
