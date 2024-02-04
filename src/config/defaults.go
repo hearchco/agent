@@ -42,6 +42,10 @@ func NewRanking() Ranking {
 				Mul:   1,
 				Const: 0,
 			},
+			engines.GOOGLESCHOLAR.ToLower(): {
+				Mul:   1,
+				Const: 0,
+			},
 			engines.MOJEEK.ToLower(): {
 				Mul:   1,
 				Const: 0,
@@ -95,6 +99,9 @@ func NewSettings() map[engines.Name]Settings {
 		engines.GOOGLE: {
 			Shortcut: "g",
 		},
+		engines.GOOGLESCHOLAR: {
+			Shortcut: "gs",
+		},
 		engines.MOJEEK: {
 			Shortcut: "mjk",
 		},
@@ -126,6 +133,24 @@ func NewAllEnabled() []engines.Name {
 		engines.DUCKDUCKGO,
 		engines.ETOOLS,
 		engines.GOOGLE,
+		engines.GOOGLESCHOLAR,
+		engines.MOJEEK,
+		engines.PRESEARCH,
+		engines.QWANT,
+		engines.STARTPAGE,
+		engines.SWISSCOWS,
+		engines.YAHOO,
+		engines.YEP,
+	}
+}
+
+func NewGeneral() []engines.Name {
+	return []engines.Name{
+		engines.BING,
+		engines.BRAVE,
+		engines.DUCKDUCKGO,
+		engines.ETOOLS,
+		engines.GOOGLE,
 		engines.MOJEEK,
 		engines.PRESEARCH,
 		engines.QWANT,
@@ -141,6 +166,12 @@ func NewInfo() []engines.Name {
 		engines.BING,
 		engines.GOOGLE,
 		engines.MOJEEK,
+	}
+}
+
+func NewScience() []engines.Name {
+	return []engines.Name{
+		engines.GOOGLESCHOLAR,
 	}
 }
 
@@ -167,7 +198,7 @@ func New() *Config {
 		Settings: NewSettings(),
 		Categories: map[category.Name]Category{
 			category.GENERAL: {
-				Engines: NewAllEnabled(),
+				Engines: NewGeneral(),
 				Ranking: NewRanking(),
 				Timings: Timings{
 					Timeout:     1000 * time.Millisecond,
@@ -183,7 +214,7 @@ func New() *Config {
 				},
 			},
 			category.SCIENCE: {
-				Engines: NewAllEnabled(),
+				Engines: NewScience(),
 				Ranking: NewRanking(),
 				Timings: Timings{
 					Timeout:     3000 * time.Millisecond,
