@@ -55,3 +55,24 @@ func TestGet(t *testing.T) {
 		t.Errorf("expected value: testvalue, got: %v", value)
 	}
 }
+
+func TestGetTTL(t *testing.T) {
+	db, err := nocache.New()
+	if err != nil {
+		t.Errorf("error creating nocache: %v", err)
+	}
+	defer db.Close()
+
+	err = db.Set("testkey", "testvalue", 1)
+	if err != nil {
+		t.Errorf("error setting key-value pair with TTL: %v", err)
+	}
+
+	ttl, err := db.GetTTL("testkey")
+	if err != nil {
+		t.Errorf("error getting TTL: %v", err)
+	}
+	if ttl != 0 {
+		t.Errorf("expected TTL: 0, got: %v", ttl)
+	}
+}
