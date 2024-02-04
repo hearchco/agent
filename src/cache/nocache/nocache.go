@@ -8,7 +8,7 @@ import (
 
 type DB struct{}
 
-func New() *DB { return nil }
+func New() (*DB, error) { return nil, nil }
 
 func (db *DB) Close() {}
 

@@ -18,7 +18,7 @@ type DB struct {
 	ctx context.Context
 }
 
-func New(ctx context.Context, config config.Redis) *DB {
+func New(ctx context.Context, config config.Redis) (*DB, error) {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%v:%v", config.Host, config.Port),
 		Password: config.Password,
@@ -36,7 +36,7 @@ func New(ctx context.Context, config config.Redis) *DB {
 			Msg("Successful connection to redis")
 	}
 
-	return &DB{rdb: rdb, ctx: ctx}
+	return &DB{rdb: rdb, ctx: ctx}, nil
 }
 
 func (db *DB) Close() {

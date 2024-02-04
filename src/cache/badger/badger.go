@@ -17,7 +17,7 @@ type DB struct {
 	bdb *badger.DB
 }
 
-func New(dataDirPath string, config config.Badger) *DB {
+func New(dataDirPath string, config config.Badger) (*DB, error) {
 	badgerPath := path.Join(dataDirPath, "database")
 
 	var opt badger.Options
@@ -32,6 +32,7 @@ func New(dataDirPath string, config config.Badger) *DB {
 	if err != nil {
 		log.Error().
 			Err(err).
+			Bool("persistence", config.Persist).
 			Str("path", badgerPath).
 			Msg("badger.New(): error opening badger")
 	} else if config.Persist {
@@ -45,7 +46,7 @@ func New(dataDirPath string, config config.Badger) *DB {
 			Msg("Successfully opened in-memory badger")
 	}
 
-	return &DB{bdb: bdb}
+	return &DB{bdb: bdb}, err
 }
 
 func (db *DB) Close() {
