@@ -1,8 +1,7 @@
-package bing
+package googlescholar
 
 import (
 	"context"
-	"encoding/base64"
 	"net/url"
 	"strconv"
 	"strings"
@@ -40,47 +39,32 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		dom := e.DOM
 
 		linkHref, hrefExists := dom.Find(dompaths.Link).Attr("href")
-		linkText := parse.ParseURL(linkHref)
-		linkText = removeTelemetry(linkText)
-
+		linkText := removeTelemetry(parse.ParseURL(linkHref))
 		titleText := strings.TrimSpace(dom.Find(dompaths.Title).Text())
 		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
+		citeInfo := strings.TrimSpace(dom.Find("div.gs_a").Text())
+
+		descText = citeInfo + " || " + descText
 
 		if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-			if descText == "" {
-				descText = strings.TrimSpace(dom.Find("p.b_algoSlug").Text())
-			}
-			if strings.Contains(descText, "Web") {
-				descText = strings.Split(descText, "Web")[1]
-			}
-
 			page := sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 
 			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
 			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 			pageRankCounter[page]++
-		} else {
-			log.Trace().
-				Str("engine", Info.Name.String()).
-				Str("url", linkText).
-				Str("title", titleText).
-				Str("description", descText).
-				Msg("Matched result, but couldn't retrieve data")
 		}
 	})
-
-	localeParam := getLocale(&options)
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
-	sedefaults.DoGetRequest(Info.URL+query+localeParam, colCtx, col, Info.Name, &retError)
+	sedefaults.DoGetRequest(Info.URL+query, colCtx, col, Info.Name, &retError)
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
-		sedefaults.DoGetRequest(Info.URL+query+"&first="+strconv.Itoa(i*10+1)+localeParam, colCtx, col, Info.Name, &retError)
+		sedefaults.DoGetRequest(Info.URL+query+"&start="+strconv.Itoa(i*10), colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()
@@ -90,26 +74,17 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 }
 
 func removeTelemetry(link string) string {
-	if strings.HasPrefix(link, "https://www.bing.com/ck/a?") {
-		parsedUrl, err := url.Parse(link)
-		if err != nil {
-			log.Error().Err(err).Str("url", link).Msg("bing.removeTelemetry(): error parsing url")
-			return ""
-		}
-
-		// get the first value of u parameter and remove "a1" in front
-		encodedUrl := parsedUrl.Query().Get("u")[2:]
-
-		cleanUrl, err := base64.RawURLEncoding.DecodeString(encodedUrl)
-		if err != nil {
-			log.Error().Err(err).Msg("bing.removeTelemetry(): failed decoding string from base64")
-		}
-		return parse.ParseURL(string(cleanUrl))
+	parsedURL, err := url.Parse(link)
+	if err != nil {
+		log.Error().Err(err).Msgf("error parsing url: %#v", link)
+		return link
 	}
-	return link
-}
 
-func getLocale(options *engines.Options) string {
-	spl := strings.SplitN(strings.ToLower(options.Locale), "_", 2)
-	return "&setlang=" + spl[0] + "&cc=" + spl[1]
+	// remove seemingly unused params in query
+	q := parsedURL.Query()
+	for _, key := range []string{"dq", "lr", "oi", "ots", "sig"} {
+		q.Del(key)
+	}
+	parsedURL.RawQuery = q.Encode()
+	return parsedURL.String()
 }
