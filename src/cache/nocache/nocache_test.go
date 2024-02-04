@@ -34,6 +34,19 @@ func TestSet(t *testing.T) {
 	}
 }
 
+func TestSetTTL(t *testing.T) {
+	db, err := nocache.New()
+	if err != nil {
+		t.Errorf("error creating nocache: %v", err)
+	}
+	defer db.Close()
+
+	err = db.Set("testkey", "testvalue", 1)
+	if err != nil {
+		t.Errorf("error setting key-value pair with TTL: %v", err)
+	}
+}
+
 func TestGet(t *testing.T) {
 	db, err := nocache.New()
 	if err != nil {
