@@ -2,7 +2,7 @@ name: Testing CI
 
 on:
   pull_request:
-    branches: ["main"]
+    branches: ["*"]
     paths:
       - ".github/workflows/testingci.yml" # this file
       - "go.mod"
