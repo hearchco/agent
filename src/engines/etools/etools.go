@@ -82,7 +82,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		colCtx = colly.NewContext()
 		colCtx.Put("page", pageStr)
 
-		sedefaults.DoGetRequest(pageURL+pageStr, colCtx, col, Info.Name, &retError)
+		// no anon needed for etools? where is the query in this request
+		sedefaults.DoGetRequest(pageURL+pageStr, pageURL+pageStr, colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()
