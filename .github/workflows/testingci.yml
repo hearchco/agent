@@ -49,8 +49,11 @@ jobs:
       - name: Generate go code from go:generate comments
         run: make setup
       # test
-      - name: Test units (w/o engines)
+      - name: Test units (w/o engines & redis)
         run: make test
+      # test-redis
+      - name: Test units (only redis)
+        run: make test-redis
         env:
           REDIS_HOST: redis
 
