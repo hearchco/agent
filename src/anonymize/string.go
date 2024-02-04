@@ -54,6 +54,5 @@ func String(orig string) string {
 
 // anonymize substring of string
 func Substring(orig string, ssToAnon string) string {
-	anonSubstring := Shuffle(Deduplicate(ssToAnon))
-	return strings.ReplaceAll(orig, ssToAnon, anonSubstring)
+	return strings.ReplaceAll(orig, ssToAnon, String(ssToAnon))
 }

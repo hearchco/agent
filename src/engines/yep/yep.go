@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
@@ -58,14 +59,20 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	nRequested := settings.RequestedResultsPerPage
 	safeSearchParam := getSafeSearch(&options)
 
-	var apiURL string
+	var urll string
 	if nRequested == Info.ResultsPerPage {
-		apiURL = Info.URL + "client=web" + localeParam + "&no_correct=false&q=" + query + safeSearchParam + "&type=web"
+		urll = Info.URL + "client=web" + localeParam + "&no_correct=false&q=" + query + safeSearchParam + "&type=web"
 	} else {
-		apiURL = Info.URL + "client=web" + localeParam + "&limit=" + strconv.Itoa(nRequested) + "&no_correct=false&q=" + query + safeSearchParam + "&type=web"
+		urll = Info.URL + "client=web" + localeParam + "&limit=" + strconv.Itoa(nRequested) + "&no_correct=false&q=" + query + safeSearchParam + "&type=web"
+	}
+	var anonUrll string
+	if nRequested == Info.ResultsPerPage {
+		anonUrll = Info.URL + "client=web" + localeParam + "&no_correct=false&q=" + anonymize.String(query) + safeSearchParam + "&type=web"
+	} else {
+		anonUrll = Info.URL + "client=web" + localeParam + "&limit=" + strconv.Itoa(nRequested) + "&no_correct=false&q=" + anonymize.String(query) + safeSearchParam + "&type=web"
 	}
 
-	sedefaults.DoGetRequest(apiURL, nil, col, Info.Name, &retError)
+	sedefaults.DoGetRequest(urll, anonUrll, nil, col, Info.Name, &retError)
 
 	col.Wait()
 	pagesCol.Wait()

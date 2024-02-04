@@ -8,6 +8,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"
+	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
@@ -77,7 +78,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
-	sedefaults.DoGetRequest(Info.URL+"?q="+query, colCtx, col, Info.Name, &retError)
+	urll := Info.URL + "?q=" + query
+	anonUrll := Info.URL + "?q=" + anonymize.String(query)
+	sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
