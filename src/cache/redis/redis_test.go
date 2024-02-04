@@ -68,6 +68,7 @@ func TestClose(t *testing.T) {
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
+
 	db.Close()
 }
 
@@ -77,6 +78,7 @@ func TestSet(t *testing.T) {
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
+
 	defer db.Close()
 
 	err = db.Set("testkey", "testvalue")
@@ -91,6 +93,7 @@ func TestSetTTL(t *testing.T) {
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
+
 	defer db.Close()
 
 	err = db.Set("testkey", "testvalue", 100*time.Second)
@@ -105,6 +108,7 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
+
 	defer db.Close()
 
 	err = db.Set("testkey", "testvalue")
@@ -117,6 +121,7 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		t.Errorf("error getting value: %v", err)
 	}
+
 	if value != "testvalue" {
 		t.Errorf("expected value: testvalue, got: %v", value)
 	}
@@ -128,16 +133,19 @@ func TestGetTTL(t *testing.T) {
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
+
 	defer db.Close()
 
 	err = db.Set("testkey", "testvalue", 100*time.Second)
 	if err != nil {
 		t.Errorf("error setting key-value pair with TTL: %v", err)
 	}
+
 	ttl, err := db.GetTTL("testkey")
 	if err != nil {
 		t.Errorf("error getting TTL: %v", err)
 	}
+
 	// TTL is not exact, so we check for a range
 	if ttl > 100*time.Second || ttl < 99*time.Second {
 		t.Errorf("expected 100s >= ttl >= 99s, got: %v", ttl)

@@ -18,6 +18,7 @@ func TestClose(t *testing.T) {
 	if err != nil {
 		t.Errorf("error creating nocache: %v", err)
 	}
+
 	db.Close()
 }
 
@@ -26,6 +27,7 @@ func TestSet(t *testing.T) {
 	if err != nil {
 		t.Errorf("error creating nocache: %v", err)
 	}
+
 	defer db.Close()
 
 	err = db.Set("testkey", "testvalue")
@@ -39,6 +41,7 @@ func TestSetTTL(t *testing.T) {
 	if err != nil {
 		t.Errorf("error creating nocache: %v", err)
 	}
+
 	defer db.Close()
 
 	err = db.Set("testkey", "testvalue", 1)
@@ -52,6 +55,7 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		t.Errorf("error creating nocache: %v", err)
 	}
+
 	defer db.Close()
 
 	err = db.Set("testkey", "testvalue")
@@ -64,6 +68,7 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		t.Errorf("error getting value: %v", err)
 	}
+
 	if value != "testvalue" {
 		t.Errorf("expected value: testvalue, got: %v", value)
 	}
@@ -74,6 +79,7 @@ func TestGetTTL(t *testing.T) {
 	if err != nil {
 		t.Errorf("error creating nocache: %v", err)
 	}
+
 	defer db.Close()
 
 	err = db.Set("testkey", "testvalue", 1)
@@ -85,6 +91,7 @@ func TestGetTTL(t *testing.T) {
 	if err != nil {
 		t.Errorf("error getting TTL: %v", err)
 	}
+
 	if ttl != 0 {
 		t.Errorf("expected TTL: 0, got: %v", ttl)
 	}
