@@ -16,7 +16,10 @@ build:
 	go build ./...
 
 test:
-	go test ./... -count=1
+	sh ./scripts/test.sh
+
+test-engines:
+	sh ./scripts/test-engines.sh
 
 test-redis-podman:
 	podman run --rm --name hearchco-redis -d -p 6379:6379 redis
