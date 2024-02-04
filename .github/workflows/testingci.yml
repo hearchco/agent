@@ -2,7 +2,7 @@ name: Testing CI
 
 on:
   pull_request:
-    branches: ["main"]
+    branches: ["*"]
     paths:
       - ".github/workflows/testingci.yml" # this file
       - "go.mod"
@@ -14,31 +14,53 @@ on:
     - cron: "37 13 * * *"
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version: stable
-
-      # go:generate
       - name: Generate go code from go:generate comments
         run: make setup
-
-      # go:build
+      # build
       - name: Build project
         run: make build
 
-      # go:test
-      - name: Test units
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Generate go code from go:generate comments
+        run: make setup
+      # test
+      - name: Test units (w/o engines)
         run: make test
         env:
           HEARCHCO_SERVER_INSECURESKIPVERIFY: true
           HEARCHCO_SERVER_PROXIES: ${{ secrets.HEARCHCO_SERVER_PROXIES}}
+
+  test-engines:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Generate go code from go:generate comments
+        run: make setup
+      # test-engines
+      - name: Test units (only engines)
+        run: make test-engines
 
   lint:
     runs-on: ubuntu-latest
@@ -50,11 +72,8 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
-
-      # go:generate
       - name: Generate go code from go:generate comments
         run: make setup
-
       # lint
       - uses: golangci/golangci-lint-action@v3
         with:
