@@ -18,6 +18,16 @@ build:
 test:
 	go test ./... -count=1
 
+test-redis-podman:
+	podman run --rm --name hearchco-redis -d -p 6379:6379 redis
+	go test ./src/cache/redis -count=1
+	podman stop hearchco-redis
+
+test-redis-docker:
+	docker run --rm --name hearchco-redis -d -p 6379:6379 redis
+	go test ./src/cache/redis -count=1
+	docker stop hearchco-redis
+
 update:
 	go get -u ./...
 	go mod tidy

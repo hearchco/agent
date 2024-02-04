@@ -19,6 +19,15 @@ jobs:
     permissions:
       contents: read
 
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -36,6 +45,8 @@ jobs:
       # go:test
       - name: Test units
         run: make test
+        env:
+          REDIS_HOST: redis
 
   lint:
     runs-on: ubuntu-latest
