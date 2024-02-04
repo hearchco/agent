@@ -81,7 +81,7 @@ func TestSetTTLInMemory(t *testing.T) {
 	}
 	defer db.Close()
 
-	err = db.Set("testkey", "testvalue", 1)
+	err = db.Set("testkey", "testvalue", 100*time.Second)
 	if err != nil {
 		t.Errorf("error setting key-value pair with TTL: %v", err)
 	}
@@ -96,7 +96,7 @@ func TestSetTTLPersistence(t *testing.T) {
 	}
 	defer db.Close()
 
-	err = db.Set("testkey", "testvalue", 1)
+	err = db.Set("testkey", "testvalue", 100*time.Second)
 	if err != nil {
 		t.Errorf("error setting key-value pair with TTL: %v", err)
 	}
@@ -110,7 +110,10 @@ func TestGetInMemory(t *testing.T) {
 	}
 	defer db.Close()
 
-	db.Set("testkey", "testvalue")
+	err = db.Set("testkey", "testvalue")
+	if err != nil {
+		t.Errorf("error setting key-value pair: %v", err)
+	}
 	var value string
 	err = db.Get("testkey", &value)
 	if err != nil {
@@ -130,7 +133,10 @@ func TestGetPersistence(t *testing.T) {
 	}
 	defer db.Close()
 
-	db.Set("testkey", "testvalue")
+	err = db.Set("testkey", "testvalue")
+	if err != nil {
+		t.Errorf("error setting key-value pair: %v", err)
+	}
 	var value string
 	err = db.Get("testkey", &value)
 	if err != nil {
@@ -149,14 +155,17 @@ func TestGetTTLInMemory(t *testing.T) {
 	}
 	defer db.Close()
 
-	db.Set("testkey", "testvalue", 100*time.Second)
+	err = db.Set("testkey", "testvalue", 100*time.Second)
+	if err != nil {
+		t.Errorf("error setting key-value pair with TTL: %v", err)
+	}
 	ttl, err := db.GetTTL("testkey")
 	if err != nil {
 		t.Errorf("error getting TTL: %v", err)
 	}
 	// TTL is not exact, so we check for a range
 	if ttl > 100*time.Second || ttl < 99*time.Second {
-		t.Errorf("expected ttl: 1s, got: %v", ttl)
+		t.Errorf("expected 100s >= ttl >= 99s, got: %v", ttl)
 	}
 }
 
@@ -169,13 +178,16 @@ func TestGetTTLPersistence(t *testing.T) {
 	}
 	defer db.Close()
 
-	db.Set("testkey", "testvalue", 100*time.Second)
+	err = db.Set("testkey", "testvalue", 100*time.Second)
+	if err != nil {
+		t.Errorf("error setting key-value pair with TTL: %v", err)
+	}
 	ttl, err := db.GetTTL("testkey")
 	if err != nil {
 		t.Errorf("error getting TTL: %v", err)
 	}
 	// TTL is not exact, so we check for a range
 	if ttl > 100*time.Second || ttl < 99*time.Second {
-		t.Errorf("expected ttl: 1s, got: %v", ttl)
+		t.Errorf("expected 100s >= ttl >= 99s, got: %v", ttl)
 	}
 }
