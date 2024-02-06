@@ -6,7 +6,7 @@ toolchain go1.21.3
 
 require (
 	github.com/alecthomas/kong v0.8.1
-	github.com/cockroachdb/pebble v1.0.0
+	github.com/cockroachdb/pebble v1.1.0
 	github.com/fxamacker/cbor/v2 v2.5.0
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-contrib/graceful v0.1.0
@@ -19,11 +19,11 @@ require (
 	github.com/knadh/koanf/providers/env v0.1.0
 	github.com/knadh/koanf/providers/file v0.1.0
 	github.com/knadh/koanf/providers/structs v0.1.0
-	github.com/knadh/koanf/v2 v2.0.1
+	github.com/knadh/koanf/v2 v2.0.2
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/profile v1.7.0
 	github.com/redis/go-redis/v9 v9.4.0
-	github.com/rs/zerolog v1.31.0
+	github.com/rs/zerolog v1.32.0
 	golang.org/x/tools v0.17.0
 )
 
@@ -38,6 +38,7 @@ require (
 	github.com/cockroachdb/errors v1.11.1 // indirect
 	github.com/cockroachdb/logtags v0.0.0-20230118201751-21c54148d20b // indirect
 	github.com/cockroachdb/redact v1.1.5 // indirect
+	github.com/cockroachdb/tokenbucket v0.0.0-20230807174530-cc333fc44b06 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fatih/structs v1.1.0 // indirect
 	github.com/felixge/fgprof v0.9.3 // indirect
@@ -60,7 +61,6 @@ require (
 	github.com/leodido/go-urn v1.3.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
-	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
