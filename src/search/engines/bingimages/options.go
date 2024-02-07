@@ -8,7 +8,7 @@ var Info = engines.Info{
 	Domain:         "www.bing.com",
 	Name:           engines.BINGIMAGES,
 	URL:            "https://www.bing.com/images/async?q=",
-	ResultsPerPage: 10,
+	ResultsPerPage: 35,
 	Crawlers:       []engines.Name{engines.BINGIMAGES},
 }
 
@@ -25,11 +25,11 @@ type bingImagesDomPaths struct {
 var dompaths = bingImagesDomPaths{
 	Result:          "ul.dgControl_list > li",
 	Metadata:        "a.iusc", // e.Attr("m")
-	Title:           "div.infnmpt > a",
+	Title:           "div.infnmpt > div > ul > li > a",
 	ImgFormatStr:    "div.imgpt > div > span",
-	ThumbnailHeight: "a.iusc > img", // e.Attr("height")
-	ThumbnailWidth:  "a.iusc > img", // e.Attr("width")
-	Source:          "div.imgpt > div.lnkw > a",
+	ThumbnailHeight: "a.iusc > div > img", // e.Attr("height")
+	ThumbnailWidth:  "a.iusc > div > img", // e.Attr("width")
+	Source:          "div.imgpt > div > div.lnkw > a",
 }
 
 var Support = engines.SupportedSettings{
