@@ -17,7 +17,6 @@ import (
 )
 
 var EnabledEngines = make([]engines.Name, 0)
-var EnabledImageEngines = make([]engines.Name, 0)
 var LogDumpLocation string = "dump/"
 
 func (c *Config) fromReader(rc *ReaderConfig) {
