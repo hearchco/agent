@@ -5,7 +5,7 @@ import (
 
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/search/engines"
-	"github.com/hearchco/hearchco/src/search/search/useragent"
+	"github.com/hearchco/hearchco/src/search/useragent"
 	"github.com/rs/zerolog/log"
 )
 

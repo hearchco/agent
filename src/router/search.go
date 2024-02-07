@@ -11,10 +11,10 @@ import (
 
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/search"
 	"github.com/hearchco/hearchco/src/search/category"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/result"
-	"github.com/hearchco/hearchco/src/search/search"
 )
 
 func Search(c *gin.Context, conf *config.Config, db cache.DB) error {

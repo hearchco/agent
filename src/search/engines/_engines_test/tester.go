@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/hearchco/hearchco/src/config"
-	"github.com/hearchco/hearchco/src/search/search"
+	"github.com/hearchco/hearchco/src/search"
 )
 
 func CheckTestCases(tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResults,
