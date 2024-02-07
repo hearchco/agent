@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
@@ -75,13 +76,17 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
-	sedefaults.DoGetRequest(Info.URL+query+safeSearch, colCtx, col, Info.Name, &retError)
+	urll := Info.URL + query + safeSearch
+	anonUrll := Info.URL + anonymize.String(query) + safeSearch
+	sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
-		sedefaults.DoGetRequest(Info.URL+query+"&page="+strconv.Itoa(i+1)+safeSearch, colCtx, col, Info.Name, &retError)
+		urll := Info.URL + query + "&page=" + strconv.Itoa(i+1) + safeSearch
+		anonUrll := Info.URL + anonymize.String(query) + "&page=" + strconv.Itoa(i+1) + safeSearch
+		sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()

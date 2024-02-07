@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 	"unicode"
+
+	"github.com/hearchco/hearchco/src/anonymize"
 )
 
 func generateNonce(length int) string {
@@ -63,7 +65,7 @@ func generateSignature(params string, nonce string) (string, error) {
 	var rot13Nonce string = rot13Switch(nonce)
 	var data string = "/web/search" + params + rot13Nonce
 
-	var encData string = hashToSHA256B64(data)
+	var encData string = anonymize.HashToSHA256B64(data)
 	encData = strings.ReplaceAll(encData, "=", "")
 	encData = strings.ReplaceAll(encData, "+", "-")
 	encData = strings.ReplaceAll(encData, "/", "_")

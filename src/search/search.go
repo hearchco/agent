@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/bucket/result"
 	"github.com/hearchco/hearchco/src/category"
@@ -24,11 +25,12 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 		ResultMap: make(map[string]*result.Result),
 	}
 
-	timings, toRun := procBang(&query, &options, conf)
+	query, timings, toRun := procBang(query, &options, conf)
 
 	query = url.QueryEscape(query)
 	log.Debug().
-		Str("query", query).
+		Str("queryAnon", anonymize.String(query)).
+		Str("queryHash", anonymize.HashToSHA256B64(query)).
 		Msg("Searching")
 
 	resTimer := time.Now()
@@ -83,29 +85,31 @@ func runEngines(engs []engines.Name, timings config.Timings, settings map[engine
 	}
 }
 
-func procBang(query *string, options *engines.Options, conf *config.Config) (config.Timings, []engines.Name) {
-	useSpec, specEng := procSpecificEngine(*query, options, conf)
-	goodCat := procCategory(*query, options)
-	if !goodCat && !useSpec && (*query)[0] == '!' {
+func procBang(query string, options *engines.Options, conf *config.Config) (string, config.Timings, []engines.Name) {
+	useSpec, specEng := procSpecificEngine(query, options, conf)
+	goodCat := procCategory(query, options)
+	if !goodCat && !useSpec && query[0] == '!' {
 		// options.category is set to GENERAL
 		log.Debug().
-			Str("query", *query).
+			Str("queryAnon", anonymize.String(query)).
+			Str("queryHash", anonymize.HashToSHA256B64(query)).
 			Msg("search.procBang(): invalid bang (not category or engine shortcut)")
 	}
 
-	trimBang(query)
+	query = trimBang(query)
 
 	if useSpec {
-		return conf.Categories[category.GENERAL].Timings, []engines.Name{specEng}
+		return query, conf.Categories[category.GENERAL].Timings, []engines.Name{specEng}
 	} else {
-		return conf.Categories[options.Category].Timings, conf.Categories[options.Category].Engines
+		return query, conf.Categories[options.Category].Timings, conf.Categories[options.Category].Engines
 	}
 }
 
-func trimBang(query *string) {
-	if (*query)[0] == '!' {
-		*query = strings.SplitN(*query, " ", 2)[1]
+func trimBang(query string) string {
+	if (query)[0] == '!' {
+		return strings.SplitN(query, " ", 2)[1]
 	}
+	return query
 }
 
 func procSpecificEngine(query string, options *engines.Options, conf *config.Config) (bool, engines.Name) {

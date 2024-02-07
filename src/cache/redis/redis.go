@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fxamacker/cbor/v2"
+	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/redis/go-redis/v9"
@@ -52,7 +53,7 @@ func (db *DB) Set(k string, v cache.Value) error {
 
 	if val, err := cbor.Marshal(v); err != nil {
 		return fmt.Errorf("redis.Set(): error marshaling value: %w", err)
-	} else if err := db.rdb.Set(db.ctx, k, val, 0).Err(); err != nil {
+	} else if err := db.rdb.Set(db.ctx, anonymize.HashToSHA256B64(k), val, 0).Err(); err != nil {
 		return fmt.Errorf("redis.Set(): error setting KV to redis: %w", err)
 	} else {
 		cacheTimeSince := time.Since(cacheTimer)
@@ -65,7 +66,7 @@ func (db *DB) Set(k string, v cache.Value) error {
 }
 
 func (db *DB) Get(k string, o cache.Value) error {
-	v, err := db.rdb.Get(db.ctx, k).Result()
+	v, err := db.rdb.Get(db.ctx, anonymize.HashToSHA256B64(k)).Result()
 	val := []byte(v) // copy data before closing, casting needed for unmarshal
 
 	if err == redis.Nil {
