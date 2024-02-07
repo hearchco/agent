@@ -3,8 +3,8 @@ package config
 import (
 	"time"
 
-	"github.com/hearchco/hearchco/src/category"
-	"github.com/hearchco/hearchco/src/engines"
+	"github.com/hearchco/hearchco/src/search/category"
+	"github.com/hearchco/hearchco/src/search/engines"
 )
 
 const DefaultLocale string = "en_US"

@@ -12,6 +12,7 @@ type Flags struct {
 	// flags
 	Query       string `type:"string" default:"${query_string}" env:"HEARCHCO_QUERY" help:"Query string used for search"`
 	Cli         bool   `type:"bool" default:"false" env:"HEARCHCO_CLI" help:"Use CLI mode"`
+	Mode        string `type:"string" default:"general" env:"HEARCHCO_MODE" help:"Search mode. Supported values: general, image"`
 	Silent      bool   `type:"bool" default:"false" short:"s" env:"HEARCHCO_SILENT" help:"Should results be printed"`
 	DataDirPath string `type:"path" default:"${data_folder}" env:"HEARCHCO_DATA_DIR" help:"Data folder path"`
 	LogDirPath  string `type:"path" default:"${log_folder}" env:"HEARCHCO_LOG_DIR" help:"Log folder path"`

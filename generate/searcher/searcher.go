@@ -22,7 +22,7 @@ var (
 	trimprefix    = flag.String("trimprefix", "", "trim the `prefix` from the generated constant names")
 	buildTags     = flag.String("tags", "", "comma-separated list of build tags to apply")
 	packageName   = flag.String("packagename", "", "name of the package for generated code; default current package")
-	enginesImport = flag.String("enginesimport", "github.com/hearchco/hearchco/src/engines", "source of the engines import, which is prefixed to imports for consts; default github.com/hearchco/hearchco/src/engines")
+	enginesImport = flag.String("enginesimport", "github.com/hearchco/hearchco/src/search/engines", "source of the engines import, which is prefixed to imports for consts; default github.com/hearchco/hearchco/src/engines")
 	linecomment   = flag.Bool("linecomment", false, "use line comment text as printed text when present")
 )
 
@@ -195,7 +195,7 @@ func (g *Generator) generate(typeName string) {
 	}
 	g.Printf("}\n")
 
-	g.buildOneRun(values, typeName)
+	g.buildNewEngineStarter(values, typeName)
 }
 
 // format returns the gofmt-ed contents of the Generator's buffer.
@@ -314,10 +314,9 @@ func (f *File) genDecl(node ast.Node) bool {
 	return false
 }
 
-// buildOneRun generates the variables and NewEngineStarter func for a single run of contiguous values.
-func (g *Generator) buildOneRun(values []Value, typeName string) {
+// generates NewEngineStarter func
+func (g *Generator) buildNewEngineStarter(values []Value, typeName string) {
 	g.Printf("\n")
-	// The generated code is simple enough to write as a Printf format.
 	g.Printf("\nfunc NewEngineStarter() []EngineSearch {")
 	g.Printf("\n\tmm := make([]EngineSearch, %d)", len(values))
 	for _, v := range values {

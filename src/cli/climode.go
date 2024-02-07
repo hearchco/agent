@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hearchco/hearchco/src/bucket/result"
 	"github.com/hearchco/hearchco/src/cache"
-	"github.com/hearchco/hearchco/src/category"
 	"github.com/hearchco/hearchco/src/config"
-	"github.com/hearchco/hearchco/src/engines"
-	"github.com/hearchco/hearchco/src/search"
+	"github.com/hearchco/hearchco/src/search/category"
+	"github.com/hearchco/hearchco/src/search/engines"
+	"github.com/hearchco/hearchco/src/search/result"
+	"github.com/hearchco/hearchco/src/search/search"
 	"github.com/rs/zerolog/log"
 )
 
@@ -32,6 +32,7 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		Str("query", flags.Query).
 		Int("maxPages", flags.MaxPages).
 		Bool("visit", flags.Visit).
+		Str("mode", flags.Mode).
 		Msg("Started hearching")
 
 	options := engines.Options{
