@@ -15,6 +15,7 @@ import (
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/logger"
 	"github.com/hearchco/hearchco/src/router"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -25,7 +26,7 @@ func main() {
 	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// configure logging without file at INFO level
-	lgr := logger.Setup(0)
+	_ = logger.Setup(0)
 
 	// parse cli arguments
 	cliFlags := cli.Setup()
@@ -34,6 +35,7 @@ func main() {
 	_, stopProfiler := runProfiler(&cliFlags)
 	defer stopProfiler()
 
+	var lgr zerolog.Logger
 	// configure verbosity and logging to file
 	if cliFlags.LogToFile || cliFlags.Cli {
 		lgr = logger.Setup(cliFlags.Verbosity, cliFlags.LogDirPath)
