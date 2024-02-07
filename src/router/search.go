@@ -85,15 +85,13 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 		}
 
 		options := engines.Options{
-			MaxPages:           maxPages,
-			VisitPages:         visitPages,
-			Category:           ccateg,
-			UserAgent:          useragent,
-			Locale:             locale,
-			SafeSearch:         safeSearchB,
-			Mobile:             isMobile,
-			Proxies:            conf.Server.Proxies,
-			InsecureSkipVerify: conf.Server.InsecureSkipVerify,
+			MaxPages:   maxPages,
+			VisitPages: visitPages,
+			Category:   ccateg,
+			UserAgent:  useragent,
+			Locale:     locale,
+			SafeSearch: safeSearchB,
+			Mobile:     isMobile,
 		}
 
 		var results []result.Result

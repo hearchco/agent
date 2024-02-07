@@ -183,7 +183,7 @@ func Prepare(seName engines.Name, options *engines.Options, settings *config.Set
 	return nil
 }
 
-func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collector, options *engines.Options, timings *config.Timings) {
+func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collector, settings *config.Settings, options *engines.Options, timings *config.Timings) {
 	*colPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 	*pagesColPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 
@@ -211,17 +211,17 @@ func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collecto
 		}
 	}
 
-	if options.Proxies != nil {
+	if settings.Proxies != nil {
 		log.Debug().
-			Strs("proxies", options.Proxies).
+			Strs("proxies", settings.Proxies).
 			Msg("Using proxies")
 
 		// Rotate proxies
-		rp, err := proxy.RoundRobinProxySwitcher(options.Proxies...)
+		rp, err := proxy.RoundRobinProxySwitcher(settings.Proxies...)
 		if err != nil {
 			log.Fatal().
 				Err(err).
-				Strs("proxies", options.Proxies).
+				Strs("proxies", settings.Proxies).
 				Msg("sedefaults.InitializeCollectors(): failed creating proxy switcher")
 		}
 
@@ -229,7 +229,7 @@ func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collecto
 		(*pagesColPtr).SetProxyFunc(rp)
 	}
 
-	if options.InsecureSkipVerify {
+	if settings.InsecureSkipVerify {
 		tp := &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}

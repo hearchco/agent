@@ -26,8 +26,10 @@ type Ranking struct {
 }
 
 type Settings struct {
-	RequestedResultsPerPage int    `koanf:"requestedresults"`
-	Shortcut                string `koanf:"shortcut"`
+	RequestedResultsPerPage int      `koanf:"requestedresults"`
+	Shortcut                string   `koanf:"shortcut"`
+	Proxies                 []string `koanf:"proxies"`
+	InsecureSkipVerify      bool     `koanf:"insecureskipverify"`
 }
 
 type Redis struct {
@@ -43,11 +45,9 @@ type Cache struct {
 }
 
 type Server struct {
-	Port               int      `koanf:"port"`
-	FrontendUrl        string   `koanf:"frontendurl"`
-	Proxies            []string `koanf:"proxies"`
-	InsecureSkipVerify bool     `koanf:"insecureskipverify"`
-	Cache              Cache    `koanf:"cache"`
+	Port        int    `koanf:"port"`
+	FrontendUrl string `koanf:"frontendurl"`
+	Cache       Cache  `koanf:"cache"`
 }
 
 type ReaderEngine struct {
