@@ -75,14 +75,14 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	colCtx.Put("page", strconv.Itoa(1))
 
 	sedefaults.DoPostRequest(Info.URL, strings.NewReader("query="+query+"&country=web&language=all"+safeSearchParam), colCtx, col, Info.Name, &retError)
-	col.Wait() //wait so I can get the JSESSION cookie back
+	col.Wait() // wait so I can get the JSESSION cookie back
 
 	for i := 1; i < options.MaxPages; i++ {
 		pageStr := strconv.Itoa(i + 1)
 		colCtx = colly.NewContext()
 		colCtx.Put("page", pageStr)
 
-		// no anon needed for etools? where is the query in this request
+		// query not needed as its saved in the session
 		sedefaults.DoGetRequest(pageURL+pageStr, pageURL+pageStr, colCtx, col, Info.Name, &retError)
 	}
 
