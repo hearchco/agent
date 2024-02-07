@@ -30,7 +30,6 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 			EngineRanks:   engineRanks,
 			TimesReturned: 1,
 			Response:      nil,
-			Type:          seResult.Type,
 			ImageResult:   seResult.ImageResult,
 		}
 

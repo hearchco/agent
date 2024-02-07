@@ -7,7 +7,6 @@ import (
 // The info a Search Engine returned about some Result
 type RetrievedResult struct {
 	URL         string
-	Type        Type
 	Title       string
 	Description string
 	ImageResult ImageResult

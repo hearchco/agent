@@ -4,13 +4,6 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-type Type uint8
-
-const (
-	GENERAL Type = iota
-	IMAGE
-)
-
 type Image struct {
 	URL    string
 	Height uint
@@ -27,7 +20,6 @@ type ImageResult struct {
 // The URL is the primary key
 type Result struct {
 	URL           string
-	Type          Type
 	Rank          uint
 	Score         float64
 	Title         string
