@@ -33,11 +33,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	_sedefaults.ColRequest(Info.Name, col, ctx)
 	_sedefaults.ColError(Info.Name, col)
 
-	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
+	var pageRankCounter = make([]int, options.MaxPages*Info.ResultsPerPage)
 
 	col.OnResponse(func(e *colly.Response) {
 		body := string(e.Body)
 		index := strings.Index(body, "{\"ischj\":")
+
 		if index != -1 {
 			body = body[index:]
 			var jsonResponse JsonResponse
@@ -48,28 +49,28 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			} else {
 				page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 
-				metadata := jsonResponse.ISCHJ.Metadata[0]
+				for _, metadata := range jsonResponse.ISCHJ.Metadata {
+					origImg := metadata.OriginalImage
+					original := result.Image{
+						URL:    origImg.Url,
+						Height: origImg.Height,
+						Width:  origImg.Width,
+					}
 
-				origImg := metadata.OriginalImage
-				original := result.Image{
-					URL:    origImg.Url,
-					Height: origImg.Height,
-					Width:  origImg.Width,
+					thmbImg := metadata.Thumbnail
+					thumbnail := result.Image{
+						URL:    thmbImg.Url,
+						Height: thmbImg.Height,
+						Width:  thmbImg.Width,
+					}
+
+					resultJson := metadata.Result
+					textInGridJson := metadata.TextInGrid
+
+					res := bucket.MakeSEImageResult(resultJson.ReferrerUrl, resultJson.PageTitle, textInGridJson.Snippet, resultJson.SiteTitle, original, thumbnail, Info.Name, page, pageRankCounter[page]+1)
+					bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+					pageRankCounter[page]++
 				}
-
-				thmbImg := metadata.Thumbnail
-				thumbnail := result.Image{
-					URL:    thmbImg.Url,
-					Height: thmbImg.Height,
-					Width:  thmbImg.Width,
-				}
-
-				resultJson := metadata.Result
-				textInGridJson := metadata.TextInGrid
-
-				res := bucket.MakeSEImageResult(resultJson.ReferrerUrl, resultJson.PageTitle, textInGridJson.Snippet, resultJson.SiteTitle, original, thumbnail, Info.Name, page, pageRankCounter[page]+1)
-				bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
-				pageRankCounter[page]++
 			}
 		} else {
 			log.Error().

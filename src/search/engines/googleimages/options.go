@@ -8,7 +8,7 @@ var Info engines.Info = engines.Info{
 	Domain:         "images.google.com",
 	Name:           engines.GOOGLEIMAGES,
 	URL:            "https://www.google.com/search?q=",
-	ResultsPerPage: 50,
+	ResultsPerPage: 10,
 }
 
 var Support engines.SupportedSettings = engines.SupportedSettings{}
