@@ -19,7 +19,7 @@ require (
 	github.com/knadh/koanf/providers/env v0.1.0
 	github.com/knadh/koanf/providers/file v0.1.0
 	github.com/knadh/koanf/providers/structs v0.1.0
-	github.com/knadh/koanf/v2 v2.0.2
+	github.com/knadh/koanf/v2 v2.1.0
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/profile v1.7.0
 	github.com/redis/go-redis/v9 v9.4.0
