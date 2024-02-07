@@ -1,6 +1,8 @@
 package bingimages
 
-import "github.com/hearchco/hearchco/src/search/engines"
+import (
+	"github.com/hearchco/hearchco/src/search/engines"
+)
 
 var params = []string{"&async=1", "&count=35"}
 

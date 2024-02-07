@@ -1,6 +1,8 @@
 package etools
 
-import "github.com/hearchco/hearchco/src/search/engines"
+import (
+	"github.com/hearchco/hearchco/src/search/engines"
+)
 
 const pageURL string = "https://www.etools.ch/search.do?page="
 

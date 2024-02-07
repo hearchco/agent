@@ -1,6 +1,8 @@
 package yahoo
 
-import "github.com/hearchco/hearchco/src/search/engines"
+import (
+	"github.com/hearchco/hearchco/src/search/engines"
+)
 
 // doesn't catch the yt videos
 // the title cathes the link - e.g.: teentitans.fandom.com › wiki › Nya-NyaNya-Nya | Teen Titans Wiki | Fandom

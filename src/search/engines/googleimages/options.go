@@ -1,6 +1,8 @@
 package googleimages
 
-import "github.com/hearchco/hearchco/src/search/engines"
+import (
+	"github.com/hearchco/hearchco/src/search/engines"
+)
 
 var params = "&tbm=isch&asearch=isch&async=_fmt:json,p:1,ijn:"
 

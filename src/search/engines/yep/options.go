@@ -1,6 +1,8 @@
 package yep
 
-import "github.com/hearchco/hearchco/src/search/engines"
+import (
+	"github.com/hearchco/hearchco/src/search/engines"
+)
 
 var Info engines.Info = engines.Info{
 	Domain:         "yep.com",
