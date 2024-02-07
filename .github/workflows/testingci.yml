@@ -43,9 +43,6 @@ jobs:
       # test
       - name: Test units (w/o engines)
         run: make test
-        env:
-          HEARCHCO_SERVER_INSECURESKIPVERIFY: true
-          HEARCHCO_SERVER_PROXIES: ${{ secrets.HEARCHCO_SERVER_PROXIES}}
 
   test-engines:
     runs-on: ubuntu-latest
