@@ -208,8 +208,8 @@ func New() *Config {
 				Engines: NewImage(),
 				Ranking: NewRanking(),
 				Timings: Timings{
-					Timeout:     1000 * time.Millisecond,
-					PageTimeout: 1000 * time.Millisecond,
+					Timeout:     1500 * time.Millisecond,
+					PageTimeout: 1500 * time.Millisecond,
 				},
 			},
 			category.INFO: {
