@@ -160,6 +160,13 @@ func NewGeneral() []engines.Name {
 	}
 }
 
+func NewImage() []engines.Name {
+	return []engines.Name{
+		engines.BINGIMAGES,
+		engines.GOOGLEIMAGES,
+	}
+}
+
 func NewInfo() []engines.Name {
 	return []engines.Name{
 		engines.BING,
@@ -191,6 +198,14 @@ func New() *Config {
 		Categories: map[category.Name]Category{
 			category.GENERAL: {
 				Engines: NewGeneral(),
+				Ranking: NewRanking(),
+				Timings: Timings{
+					Timeout:     1000 * time.Millisecond,
+					PageTimeout: 1000 * time.Millisecond,
+				},
+			},
+			category.IMAGE: {
+				Engines: NewImage(),
 				Ranking: NewRanking(),
 				Timings: Timings{
 					Timeout:     1000 * time.Millisecond,

@@ -32,7 +32,6 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		Str("query", flags.Query).
 		Int("maxPages", flags.MaxPages).
 		Bool("visit", flags.Visit).
-		Str("mode", flags.Mode).
 		Msg("Started hearching")
 
 	options := engines.Options{
