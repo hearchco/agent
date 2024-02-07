@@ -20,9 +20,13 @@ const (
 	STARTPAGE
 	SWISSCOWS
 	YAHOO
-	YANDEX
 	YEP
 )
+
+// Returns Engine Names without UNDEFINED
+func Names() []Name {
+	return _NameValues[1:]
+}
 
 func (n Name) ToLower() string {
 	return strings.ToLower(n.String())

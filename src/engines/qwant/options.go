@@ -7,7 +7,6 @@ var Info engines.Info = engines.Info{
 	Name:           engines.QWANT,
 	URL:            "https://api.qwant.com/v3/search/web?q=",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.BING},
 }
 
 var Support engines.SupportedSettings = engines.SupportedSettings{
