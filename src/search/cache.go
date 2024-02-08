@@ -9,40 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func DBGetAndSearch(query string, options engines.Options, conf *config.Config, db cache.DB) ([]result.Result, bool) {
-	var results []result.Result
-	var foundInDB bool
-	gerr := db.Get(query, &results)
-	if gerr != nil {
-		// Error in reading cache is not returned, just logged
-		log.Error().
-			Err(gerr).
-			Str("queryAnon", anonymize.String(query)).
-			Str("queryHash", anonymize.HashToSHA256B64(query)).
-			Msg("cli.Run(): failed accessing cache")
-	} else if results != nil {
-		foundInDB = true
-	} else {
-		foundInDB = false
-	}
-
-	if foundInDB {
-		log.Debug().
-			Str("queryAnon", anonymize.String(query)).
-			Str("queryHash", anonymize.HashToSHA256B64(query)).
-			Msg("Found results in cache")
-	} else {
-		log.Debug().
-			Str("queryAnon", anonymize.String(query)).
-			Str("queryHash", anonymize.HashToSHA256B64(query)).
-			Msg("Nothing found in cache, doing a clean search")
-		results = PerformSearch(query, options, conf)
-	}
-
-	return results, foundInDB
-}
-
-func CacheAndUpdate(query string, options engines.Options, conf *config.Config, db cache.DB, results []result.Result, foundInDB bool) {
+func CacheAndUpdateResults(query string, options engines.Options, conf *config.Config, db cache.DB, results []result.Result, foundInDB bool) {
 	if !foundInDB {
 		log.Debug().
 			Str("queryAnon", anonymize.String(query)).
@@ -73,7 +40,7 @@ func CacheAndUpdate(query string, options engines.Options, conf *config.Config, 
 				Str("queryAnon", anonymize.String(query)).
 				Str("queryHash", anonymize.HashToSHA256B64(query)).
 				Msg("Updating results...")
-			newResults := PerformSearch(query, options, conf)
+			newResults := performSearch(query, options, conf)
 			uerr := db.Set(query, newResults, conf.Server.Cache.TTL.Time)
 			if uerr != nil {
 				// Error in updating cache is not returned, just logged

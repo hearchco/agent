@@ -93,7 +93,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 			Mobile:     isMobile,
 		}
 
-		results, foundInDB := search.DBGetAndSearch(query, options, conf, db)
+		results, foundInDB := search.Search(query, options, conf, db)
 
 		resultsShort := result.Shorten(results)
 		if resultsJson, err := json.Marshal(resultsShort); err != nil {
@@ -103,7 +103,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 			c.String(http.StatusOK, string(resultsJson))
 		}
 
-		search.CacheAndUpdate(query, options, conf, db, results, foundInDB)
+		search.CacheAndUpdateResults(query, options, conf, db, results, foundInDB)
 	}
 	return nil
 }
