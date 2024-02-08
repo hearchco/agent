@@ -28,8 +28,8 @@ func (c *Config) fromReader(rc *ReaderConfig) {
 			Cache: Cache{
 				Type: rc.Server.Cache.Type,
 				TTL: TTL{
-					Results:       moretime.ConvertFancyTime(rc.Server.Cache.TTL.Results),
-					ResultsUpdate: moretime.ConvertFancyTime(rc.Server.Cache.TTL.ResultsUpdate),
+					Time:        moretime.ConvertFancyTime(rc.Server.Cache.TTL.Time),
+					RefreshTime: moretime.ConvertFancyTime(rc.Server.Cache.TTL.RefreshTime),
 				},
 				Badger: rc.Server.Cache.Badger,
 				Redis:  rc.Server.Cache.Redis,
@@ -90,8 +90,8 @@ func (c *Config) getReader() ReaderConfig {
 			Cache: ReaderCache{
 				Type: c.Server.Cache.Type,
 				TTL: ReaderTTL{
-					Results:       moretime.ConvertToFancyTime(c.Server.Cache.TTL.Results),
-					ResultsUpdate: moretime.ConvertToFancyTime(c.Server.Cache.TTL.ResultsUpdate),
+					Time:        moretime.ConvertToFancyTime(c.Server.Cache.TTL.Time),
+					RefreshTime: moretime.ConvertToFancyTime(c.Server.Cache.TTL.RefreshTime),
 				},
 				Badger: c.Server.Cache.Badger,
 				Redis:  c.Server.Cache.Redis,

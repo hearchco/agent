@@ -183,8 +183,8 @@ func New() *Config {
 			Cache: Cache{
 				Type: "badger",
 				TTL: TTL{
-					Results:       moretime.Week,
-					ResultsUpdate: 3 * moretime.Day,
+					Time:        moretime.Week,
+					RefreshTime: 3 * moretime.Day,
 				},
 				Badger: Badger{
 					Persist: true,

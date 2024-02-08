@@ -75,21 +75,10 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 			Str("queryAnon", anonymize.String(flags.Query)).
 			Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
 			Msg("Nothing found in cache, doing a clean search")
-
 		results = search.PerformSearch(flags.Query, options, conf)
-
-		serr := db.Set(flags.Query, results, conf.Server.Cache.TTL.Results)
-		if serr != nil {
-			log.Error().
-				Err(serr).
-				Str("queryAnon", anonymize.String(flags.Query)).
-				Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
-				Msg("cli.Run(): error updating database with search results")
-		}
 	}
 
 	duration := time.Since(start)
-
 	if !flags.Silent {
 		printResults(results)
 	}
@@ -98,8 +87,21 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		Int64("ms", duration.Milliseconds()).
 		Msg("Found results")
 
-	if foundInDB {
-		log.Info().
+	if !foundInDB {
+		log.Debug().
+			Str("queryAnon", anonymize.String(flags.Query)).
+			Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
+			Msg("Caching results...")
+		serr := db.Set(flags.Query, results, conf.Server.Cache.TTL.Time)
+		if serr != nil {
+			log.Error().
+				Err(serr).
+				Str("queryAnon", anonymize.String(flags.Query)).
+				Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
+				Msg("cli.Run(): error updating database with search results")
+		}
+	} else {
+		log.Debug().
 			Str("queryAnon", anonymize.String(flags.Query)).
 			Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
 			Msg("Checking if results need to be updated")
@@ -110,13 +112,13 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 				Str("queryAnon", anonymize.String(flags.Query)).
 				Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
 				Msg("cli.Run(): error getting TTL from database")
-		} else if ttl < conf.Server.Cache.TTL.ResultsUpdate {
+		} else if ttl < conf.Server.Cache.TTL.RefreshTime {
 			log.Info().
 				Str("queryAnon", anonymize.String(flags.Query)).
 				Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
 				Msg("Updating results...")
 			newResults := search.PerformSearch(flags.Query, options, conf)
-			uerr := db.Set(flags.Query, newResults, conf.Server.Cache.TTL.Results)
+			uerr := db.Set(flags.Query, newResults, conf.Server.Cache.TTL.Time)
 			if uerr != nil {
 				// Error in updating cache is not returned, just logged
 				log.Error().

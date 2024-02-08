@@ -137,7 +137,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 				Str("queryAnon", anonymize.String(query)).
 				Str("queryHash", anonymize.HashToSHA256B64(query)).
 				Msg("Caching results...")
-			serr := db.Set(query, results, conf.Server.Cache.TTL.Results)
+			serr := db.Set(query, results, conf.Server.Cache.TTL.Time)
 			if serr != nil {
 				// Error in updating cache is not returned, just logged
 				log.Error().
@@ -158,13 +158,13 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 					Str("queryAnon", anonymize.String(query)).
 					Str("queryHash", anonymize.HashToSHA256B64(query)).
 					Msg("router.Search(): error getting TTL from database")
-			} else if ttl < conf.Server.Cache.TTL.ResultsUpdate {
+			} else if ttl < conf.Server.Cache.TTL.RefreshTime {
 				log.Debug().
 					Str("queryAnon", anonymize.String(query)).
 					Str("queryHash", anonymize.HashToSHA256B64(query)).
 					Msg("Updating results...")
 				newResults := search.PerformSearch(query, options, conf)
-				uerr := db.Set(query, newResults, conf.Server.Cache.TTL.Results)
+				uerr := db.Set(query, newResults, conf.Server.Cache.TTL.Time)
 				if uerr != nil {
 					// Error in updating cache is not returned, just logged
 					log.Error().

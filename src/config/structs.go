@@ -38,15 +38,15 @@ type ReaderTTL struct {
 	// how long to store the results in cache
 	// setting this to 0 caches the results forever
 	// to disable caching set conf.Cache.Type to "none"
-	Results string `koanf:"results"`
+	Time string `koanf:"time"`
 	// if the remaining TTL when retrieving from cache is less than this, update the cache entry and reset the TTL
 	// setting this to 0 disables this feature
 	// setting this to the same value (or higher) as Results will update the cache entry every time
-	ResultsUpdate string `koanf:"resultsupdate"`
+	RefreshTime string `koanf:"refreshtime"`
 }
 type TTL struct {
-	Results       time.Duration
-	ResultsUpdate time.Duration
+	Time        time.Duration
+	RefreshTime time.Duration
 }
 
 type Badger struct {
