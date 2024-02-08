@@ -8,12 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
 
-	"github.com/hearchco/hearchco/src/bucket/result"
 	"github.com/hearchco/hearchco/src/cache"
-	"github.com/hearchco/hearchco/src/category"
 	"github.com/hearchco/hearchco/src/config"
-	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/search"
+	"github.com/hearchco/hearchco/src/search/category"
+	"github.com/hearchco/hearchco/src/search/engines"
+	"github.com/hearchco/hearchco/src/search/result"
 )
 
 func Search(c *gin.Context, conf *config.Config, db cache.DB) error {

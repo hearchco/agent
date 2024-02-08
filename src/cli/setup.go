@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/alecthomas/kong"
-	"github.com/hearchco/hearchco/src/category"
-	"github.com/hearchco/hearchco/src/engines"
+	"github.com/hearchco/hearchco/src/search/category"
+	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/rs/zerolog/log"
 )
 

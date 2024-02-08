@@ -8,12 +8,12 @@ import (
 	"time"
 
 	"github.com/hearchco/hearchco/src/anonymize"
-	"github.com/hearchco/hearchco/src/bucket"
-	"github.com/hearchco/hearchco/src/bucket/result"
-	"github.com/hearchco/hearchco/src/category"
 	"github.com/hearchco/hearchco/src/config"
-	"github.com/hearchco/hearchco/src/engines"
-	"github.com/hearchco/hearchco/src/rank"
+	"github.com/hearchco/hearchco/src/search/bucket"
+	"github.com/hearchco/hearchco/src/search/category"
+	"github.com/hearchco/hearchco/src/search/engines"
+	"github.com/hearchco/hearchco/src/search/rank"
+	"github.com/hearchco/hearchco/src/search/result"
 	"github.com/rs/zerolog/log"
 	"github.com/sourcegraph/conc"
 )

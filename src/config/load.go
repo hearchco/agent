@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hearchco/hearchco/src/category"
-	"github.com/hearchco/hearchco/src/engines"
 	"github.com/hearchco/hearchco/src/moretime"
+	"github.com/hearchco/hearchco/src/search/category"
+	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/providers/file"
