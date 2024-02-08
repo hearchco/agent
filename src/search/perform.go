@@ -16,6 +16,9 @@ import (
 	"github.com/sourcegraph/conc"
 )
 
+// engine_searcher -> NewEngineStarter() uses this
+type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings) error
+
 func PerformSearch(query string, options engines.Options, conf *config.Config) []result.Result {
 	searchTimer := time.Now()
 
@@ -55,9 +58,6 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 
 	return results
 }
-
-// engine_searcher, NewEngineStarter()  use this.
-type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings) error
 
 func runEngines(engs []engines.Name, timings config.Timings, settings map[engines.Name]config.Settings, query string, worker *conc.WaitGroup, relay *bucket.Relay, options engines.Options) {
 	config.EnabledEngines = engs
