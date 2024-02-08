@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
-	"github.com/rs/zerolog/log"
 
 	"github.com/hearchco/hearchco/src/bucket/result"
 	"github.com/hearchco/hearchco/src/cache"
@@ -94,30 +93,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 			Mobile:     isMobile,
 		}
 
-		var results []result.Result
-		var foundInDB bool
-		gerr := db.Get(query, &results)
-		if gerr != nil {
-			// Error in reading cache is not returned, just logged
-			log.Error().
-				Err(gerr).
-				Str("query", query).
-				Msg("router.Search(): failed accessing cache")
-		} else if results != nil {
-			foundInDB = true
-		} else {
-			foundInDB = false
-		}
-
-		if foundInDB {
-			log.Debug().
-				Str("query", query).
-				Msg("Found results in cache")
-		} else {
-			log.Debug().Msg("Nothing found in cache, doing a clean search")
-
-			results = search.PerformSearch(query, options, conf)
-		}
+		results, foundInDB := search.Search(query, options, conf, db)
 
 		resultsShort := result.Shorten(results)
 		if resultsJson, err := json.Marshal(resultsShort); err != nil {
@@ -127,16 +103,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 			c.String(http.StatusOK, string(resultsJson))
 		}
 
-		if !foundInDB {
-			serr := db.Set(query, results)
-			if serr != nil {
-				// Error in updating cache is not returned, just logged
-				log.Error().
-					Err(serr).
-					Str("query", query).
-					Msg("router.Search(): error updating database with search results")
-			}
-		}
+		search.CacheAndUpdateResults(query, options, conf, db, results, foundInDB)
 	}
 	return nil
 }

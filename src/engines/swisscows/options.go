@@ -7,7 +7,6 @@ var Info engines.Info = engines.Info{
 	Name:           engines.SWISSCOWS,
 	URL:            "https://api.swisscows.com/web/search?",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.BING},
 }
 
 var Support engines.SupportedSettings = engines.SupportedSettings{

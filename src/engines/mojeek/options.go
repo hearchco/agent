@@ -7,7 +7,6 @@ var Info engines.Info = engines.Info{
 	Name:           engines.MOJEEK,
 	URL:            "https://www.mojeek.com/search?q=",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.MOJEEK},
 }
 
 var dompaths engines.DOMPaths = engines.DOMPaths{

@@ -7,7 +7,6 @@ var Info engines.Info = engines.Info{
 	Name:           engines.BING,
 	URL:            "https://www.bing.com/search?q=",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.BING},
 }
 
 var dompaths engines.DOMPaths = engines.DOMPaths{

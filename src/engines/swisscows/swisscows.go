@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly/v2"
+	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/bucket"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/engines"
@@ -45,20 +46,17 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			return
 		}
 
-		// log.Debug().
-		// 	Str("query", qry).
-		// 	Str("nonce", nonce).
-		// 	Str("signature", sig).
-		// 	Msg("")
-
 		r.Headers.Set("X-Request-Nonce", nonce)
 		r.Headers.Set("X-Request-Signature", sig)
 		r.Headers.Set("Pragma", "no-cache")
 	})
 
 	col.OnResponse(func(r *colly.Response) {
+		query := r.Request.URL.Query().Get("query")
+		urll := r.Request.URL.String()
+		anonUrll := anonymize.Substring(urll, query)
 		log.Trace().
-			Str("url", r.Request.URL.String()).
+			Str("url", anonUrll).
 			Str("nonce", r.Request.Headers.Get("X-Request-Nonce")).
 			Str("signature", r.Request.Headers.Get("X-Request-Signature")).
 			Msg("swisscows.Search() -> col.OnResponse()")
@@ -99,8 +97,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		//col.Request("OPTIONS", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+localeURL, nil, colCtx, nil)
 		//col.Wait()
 
-		reqURL := Info.URL + "freshness=All&itemsCount=" + strconv.Itoa(settings.RequestedResultsPerPage) + "&offset=" + strconv.Itoa(i*10) + "&query=" + query + localeParam
-		sedefaults.DoGetRequest(reqURL, colCtx, col, Info.Name, &retError)
+		urll := Info.URL + "freshness=All&itemsCount=" + strconv.Itoa(settings.RequestedResultsPerPage) + "&offset=" + strconv.Itoa(i*10) + "&query=" + query + localeParam
+		anonUrll := Info.URL + "freshness=All&itemsCount=" + strconv.Itoa(settings.RequestedResultsPerPage) + "&offset=" + strconv.Itoa(i*10) + "&query=" + anonymize.String(query) + localeParam
+		sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
 	}
 
 	col.Wait()

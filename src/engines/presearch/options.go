@@ -7,7 +7,6 @@ var Info engines.Info = engines.Info{
 	Name:           engines.PRESEARCH,
 	URL:            "https://presearch.com/search?q=",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.GOOGLE},
 }
 
 /*

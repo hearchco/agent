@@ -92,20 +92,19 @@ func ColRequest(seName engines.Name, col *colly.Collector, ctx context.Context) 
 
 func ColError(seName engines.Name, col *colly.Collector) {
 	col.OnError(func(r *colly.Response, err error) {
-		urll := r.Request.URL.String()
 		if engines.IsTimeoutError(err) {
 			log.Trace().
-				Err(err).
+				// Err(err). // timeout error produces Get "url" error with the query
 				Str("engine", seName.String()).
-				Str("url", urll).
+				// Str("url", urll). // can't reliably anonymize it (because it's engine dependent and query isn't passed to this function)
 				Msg("sedefaults.ColError() -> col.OnError(): request timeout error for url")
 		} else {
 			log.Error().
 				Err(err).
 				Str("engine", seName.String()).
-				Str("url", urll).
+				// Str("url", urll). // can't reliably anonymize it (because it's engine dependent and query isn't passed to this function)
 				Int("statusCode", r.StatusCode).
-				Str("response", string(r.Body)).
+				Str("response", string(r.Body)). // query can be present, depending on the response from the engine (Google has the query in 3 places)
 				Msg("sedefaults.ColError() -> col.OnError(): request error for url")
 
 			dumpPath := fmt.Sprintf("%v%v_col.log.html", config.LogDumpLocation, seName.String())
@@ -238,10 +237,10 @@ func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collecto
 	}
 }
 
-func DoGetRequest(urll string, colCtx *colly.Context, collector *colly.Collector, packageName engines.Name, retError *error) {
+func DoGetRequest(urll string, anonurll string, colCtx *colly.Context, collector *colly.Collector, packageName engines.Name, retError *error) {
 	log.Trace().
 		Str("engine", packageName.String()).
-		Str("url", urll).
+		Str("url", anonurll).
 		Msg("GET")
 	err := collector.Request("GET", urll, nil, colCtx, nil)
 	if err != nil {
