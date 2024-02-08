@@ -2,10 +2,8 @@ package sedefaults
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"strconv"
 
@@ -226,14 +224,6 @@ func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collecto
 
 		(*colPtr).SetProxyFunc(rp)
 		(*pagesColPtr).SetProxyFunc(rp)
-	}
-
-	if settings.InsecureSkipVerify {
-		tp := &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-		(*colPtr).WithTransport(tp)
-		(*pagesColPtr).WithTransport(tp)
 	}
 }
 
