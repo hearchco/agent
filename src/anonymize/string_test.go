@@ -18,7 +18,7 @@ func TestDeduplicate(t *testing.T) {
 	for _, test := range tests {
 		deduplicated := anonymize.Deduplicate(test.orig)
 		if deduplicated != test.expected {
-			t.Errorf("deduplicate(\"%v\") = \"%v\", want \"%v\"", test.orig, deduplicated, test.expected)
+			t.Errorf("deduplicate(%q) = %q, want %q", test.orig, deduplicated, test.expected)
 		}
 	}
 }
@@ -39,7 +39,7 @@ func TestSortString(t *testing.T) {
 		sorted := anonymize.SortString(test.orig)
 
 		if sorted != test.expected {
-			t.Errorf("SortString(\"%v\") = \"%v\", want \"%v\"", test.orig, sorted, test.expected)
+			t.Errorf("SortString(%q) = %q, want %q", test.orig, sorted, test.expected)
 		}
 	}
 }
@@ -61,7 +61,7 @@ func TestShuffle(t *testing.T) {
 		shuffledSorted := anonymize.SortString(shuffled)
 
 		if shuffledSorted != test.expected {
-			t.Errorf("SortString(Shuffle(\"%v\")) = \"%v\", want \"%v\"", test.orig, shuffledSorted, test.expected)
+			t.Errorf("SortString(Shuffle(%q)) = %q, want %q", test.orig, shuffledSorted, test.expected)
 		}
 	}
 }

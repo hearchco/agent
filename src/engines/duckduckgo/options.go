@@ -7,7 +7,6 @@ var Info engines.Info = engines.Info{
 	Name:           engines.DUCKDUCKGO,
 	URL:            "https://lite.duckduckgo.com/lite/",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.BING},
 }
 
 var dompaths engines.DOMPaths = engines.DOMPaths{

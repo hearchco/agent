@@ -9,7 +9,6 @@ var Info engines.Info = engines.Info{
 	Name:           engines.ETOOLS,
 	URL:            "https://www.etools.ch/searchSubmit.do",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.BING, engines.GOOGLE, engines.MOJEEK, engines.YANDEX},
 }
 
 var dompaths engines.DOMPaths = engines.DOMPaths{

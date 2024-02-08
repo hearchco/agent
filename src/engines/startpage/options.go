@@ -7,7 +7,6 @@ var Info engines.Info = engines.Info{
 	Name:           engines.STARTPAGE,
 	URL:            "https://www.startpage.com/sp/search?q=",
 	ResultsPerPage: 10,
-	Crawlers:       []engines.Name{engines.GOOGLE},
 }
 
 var dompaths engines.DOMPaths = engines.DOMPaths{
