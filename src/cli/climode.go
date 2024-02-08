@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/bucket/result"
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/category"
@@ -29,7 +30,8 @@ func printResults(results []result.Result) {
 
 func Run(flags Flags, db cache.DB, conf *config.Config) {
 	log.Info().
-		Str("query", flags.Query).
+		Str("queryAnon", anonymize.String(flags.Query)).
+		Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
 		Int("maxPages", flags.MaxPages).
 		Bool("visit", flags.Visit).
 		Msg("Started hearching")
@@ -46,42 +48,9 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 
 	start := time.Now()
 
-	// todo: ctx cancelling (important since pebble is NoSync)
-	var results []result.Result
-	var foundInDB bool
-	gerr := db.Get(flags.Query, &results)
-	if gerr != nil {
-		// Error in reading cache is not returned, just logged
-		log.Error().
-			Err(gerr).
-			Str("query", flags.Query).
-			Msg("cli.Run(): failed accessing cache")
-	} else if results != nil {
-		foundInDB = true
-	} else {
-		foundInDB = false
-	}
-
-	if foundInDB {
-		log.Debug().
-			Str("query", flags.Query).
-			Msg("Found results in cache")
-	} else {
-		log.Debug().Msg("Nothing found in cache, doing a clean search")
-
-		results = search.PerformSearch(flags.Query, options, conf)
-
-		serr := db.Set(flags.Query, results)
-		if serr != nil {
-			log.Error().
-				Err(serr).
-				Str("query", flags.Query).
-				Msg("cli.Run(): error updating database with search results")
-		}
-	}
+	results, foundInDB := search.Search(flags.Query, options, conf, db)
 
 	duration := time.Since(start)
-
 	if !flags.Silent {
 		printResults(results)
 	}
@@ -89,4 +58,6 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		Int("number", len(results)).
 		Int64("ms", duration.Milliseconds()).
 		Msg("Found results")
+
+	search.CacheAndUpdateResults(flags.Query, options, conf, db, results, foundInDB)
 }

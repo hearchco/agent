@@ -38,3 +38,7 @@ profiling/
 *_stringer.go
 *_enumer.go
 *_searcher.go
+
+# test dump
+
+testdump*
