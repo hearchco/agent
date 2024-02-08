@@ -1,0 +1,1 @@
+package bingimages_test

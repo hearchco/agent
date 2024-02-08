@@ -6,6 +6,7 @@ type Name string
 const (
 	UNDEFINED Name = "undefined"
 	GENERAL   Name = "general"
+	IMAGE     Name = "image"
 	INFO      Name = "info"
 	SCIENCE   Name = "science"
 	NEWS      Name = "news"

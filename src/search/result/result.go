@@ -4,6 +4,18 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
+type Image struct {
+	URL    string
+	Height uint
+	Width  uint
+}
+
+type ImageResult struct {
+	Source    string
+	Original  Image
+	Thumbnail Image
+}
+
 // Everything about some Result, calculated and compiled from multiple search engines
 // The URL is the primary key
 type Result struct {
@@ -14,6 +26,7 @@ type Result struct {
 	Description   string
 	EngineRanks   []RetrievedRank
 	TimesReturned uint8
+	ImageResult   ImageResult
 	Response      *colly.Response
 }
 

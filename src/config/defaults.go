@@ -44,6 +44,9 @@ func NewSettings() map[engines.Name]Settings {
 		engines.BING: {
 			Shortcut: "bi",
 		},
+		engines.BINGIMAGES: {
+			Shortcut: "biimg",
+		},
 		engines.BRAVE: {
 			Shortcut: "br",
 		},
@@ -55,6 +58,9 @@ func NewSettings() map[engines.Name]Settings {
 		},
 		engines.GOOGLE: {
 			Shortcut: "g",
+		},
+		engines.GOOGLEIMAGES: {
+			Shortcut: "gimg",
 		},
 		engines.GOOGLESCHOLAR: {
 			Shortcut: "gs",
@@ -114,6 +120,13 @@ func NewGeneral() []engines.Name {
 	}
 }
 
+func NewImage() []engines.Name {
+	return []engines.Name{
+		engines.BINGIMAGES,
+		engines.GOOGLEIMAGES,
+	}
+}
+
 func NewInfo() []engines.Name {
 	return []engines.Name{
 		engines.BING,
@@ -156,6 +169,14 @@ func New() *Config {
 				Timings: Timings{
 					Timeout:     1000 * time.Millisecond,
 					PageTimeout: 1000 * time.Millisecond,
+				},
+			},
+			category.IMAGE: {
+				Engines: NewImage(),
+				Ranking: NewRanking(),
+				Timings: Timings{
+					Timeout:     1500 * time.Millisecond,
+					PageTimeout: 1500 * time.Millisecond,
 				},
 			},
 			category.INFO: {
