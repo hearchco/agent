@@ -7,9 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
-	"github.com/rs/zerolog/log"
 
-	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/bucket/result"
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/category"
@@ -95,34 +93,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 			Mobile:     isMobile,
 		}
 
-		var results []result.Result
-		var foundInDB bool
-		gerr := db.Get(query, &results)
-		if gerr != nil {
-			// Error in reading cache is not returned, just logged
-			log.Error().
-				Err(gerr).
-				Str("queryAnon", anonymize.String(query)).
-				Str("queryHash", anonymize.HashToSHA256B64(query)).
-				Msg("router.Search(): failed accessing cache")
-		} else if results != nil {
-			foundInDB = true
-		} else {
-			foundInDB = false
-		}
-
-		if foundInDB {
-			log.Debug().
-				Str("queryAnon", anonymize.String(query)).
-				Str("queryHash", anonymize.HashToSHA256B64(query)).
-				Msg("Found results in cache")
-		} else {
-			log.Debug().
-				Str("queryAnon", anonymize.String(query)).
-				Str("queryHash", anonymize.HashToSHA256B64(query)).
-				Msg("Nothing found in cache, doing a clean search")
-			results = search.PerformSearch(query, options, conf)
-		}
+		results, foundInDB := search.DBGetAndSearch(query, options, conf, db)
 
 		resultsShort := result.Shorten(results)
 		if resultsJson, err := json.Marshal(resultsShort); err != nil {
@@ -132,49 +103,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 			c.String(http.StatusOK, string(resultsJson))
 		}
 
-		if !foundInDB {
-			log.Debug().
-				Str("queryAnon", anonymize.String(query)).
-				Str("queryHash", anonymize.HashToSHA256B64(query)).
-				Msg("Caching results...")
-			serr := db.Set(query, results, conf.Server.Cache.TTL.Time)
-			if serr != nil {
-				// Error in updating cache is not returned, just logged
-				log.Error().
-					Err(serr).
-					Str("queryAnon", anonymize.String(query)).
-					Str("queryHash", anonymize.HashToSHA256B64(query)).
-					Msg("router.Search(): error updating database with search results")
-			}
-		} else {
-			log.Debug().
-				Str("queryAnon", anonymize.String(query)).
-				Str("queryHash", anonymize.HashToSHA256B64(query)).
-				Msg("Checking if results need to be updated...")
-			ttl, terr := db.GetTTL(query)
-			if terr != nil {
-				log.Error().
-					Err(terr).
-					Str("queryAnon", anonymize.String(query)).
-					Str("queryHash", anonymize.HashToSHA256B64(query)).
-					Msg("router.Search(): error getting TTL from database")
-			} else if ttl < conf.Server.Cache.TTL.RefreshTime {
-				log.Debug().
-					Str("queryAnon", anonymize.String(query)).
-					Str("queryHash", anonymize.HashToSHA256B64(query)).
-					Msg("Updating results...")
-				newResults := search.PerformSearch(query, options, conf)
-				uerr := db.Set(query, newResults, conf.Server.Cache.TTL.Time)
-				if uerr != nil {
-					// Error in updating cache is not returned, just logged
-					log.Error().
-						Err(uerr).
-						Str("queryAnon", anonymize.String(query)).
-						Str("queryHash", anonymize.HashToSHA256B64(query)).
-						Msg("router.Search(): error replacing old results while updating database")
-				}
-			}
-		}
+		search.CacheAndUpdate(query, options, conf, db, results, foundInDB)
 	}
 	return nil
 }
