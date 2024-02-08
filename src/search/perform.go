@@ -18,7 +18,7 @@ import (
 	"github.com/sourcegraph/conc"
 )
 
-func performSearch(query string, options engines.Options, conf *config.Config) []result.Result {
+func PerformSearch(query string, options engines.Options, conf *config.Config) []result.Result {
 	searchTimer := time.Now()
 
 	relay := bucket.Relay{

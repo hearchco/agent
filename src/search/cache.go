@@ -40,7 +40,7 @@ func CacheAndUpdateResults(query string, options engines.Options, conf *config.C
 				Str("queryAnon", anonymize.String(query)).
 				Str("queryHash", anonymize.HashToSHA256B64(query)).
 				Msg("Updating results...")
-			newResults := performSearch(query, options, conf)
+			newResults := PerformSearch(query, options, conf)
 			uerr := db.Set(query, newResults, conf.Server.Cache.TTL.Time)
 			if uerr != nil {
 				// Error in updating cache is not returned, just logged
