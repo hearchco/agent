@@ -9,6 +9,7 @@ import (
 
 	"github.com/hearchco/hearchco/src/cache/redis"
 	"github.com/hearchco/hearchco/src/config"
+	redisog "github.com/redis/go-redis/v9"
 )
 
 func newRedisConf() config.Redis {
@@ -149,5 +150,28 @@ func TestGetTTL(t *testing.T) {
 	// TTL is not exact, so we check for a range
 	if ttl > 100*time.Second || ttl < 99*time.Second {
 		t.Errorf("expected 100s >= ttl >= 99s, got: %v", ttl)
+	}
+}
+
+func TestGetExpired(t *testing.T) {
+	ctx := context.Background()
+	db, err := redis.New(ctx, redisConf)
+	if err != nil {
+		t.Errorf("error creating redis: %v", err)
+	}
+
+	defer db.Close()
+
+	err = db.Set("testkeygetexpired", "testvalue", 1*time.Second)
+	if err != nil {
+		t.Errorf("error setting key-value pair with TTL: %v", err)
+	}
+
+	time.Sleep(1 * time.Second)
+
+	var value string
+	err = db.Get("testkeygetexpired", &value)
+	if err != nil && err != redisog.Nil {
+		t.Errorf("error getting value: %v", err)
 	}
 }

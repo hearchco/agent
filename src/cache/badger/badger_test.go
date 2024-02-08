@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	badgerog "github.com/dgraph-io/badger/v4"
 	"github.com/hearchco/hearchco/src/cache/badger"
 	"github.com/hearchco/hearchco/src/config"
 )
@@ -167,6 +168,7 @@ func TestGetTTLInMemory(t *testing.T) {
 		t.Errorf("error getting TTL: %v", err)
 	}
 
+	// TTL is not exact, so we check for a range
 	if ttl > 100*time.Second || ttl < 99*time.Second {
 		t.Errorf("expected 100s >= ttl >= 99s, got: %v", ttl)
 	}
@@ -191,7 +193,53 @@ func TestGetTTLPersistence(t *testing.T) {
 		t.Errorf("error getting TTL: %v", err)
 	}
 
+	// TTL is not exact, so we check for a range
 	if ttl > 100*time.Second || ttl < 99*time.Second {
 		t.Errorf("expected 100s >= ttl >= 99s, got: %v", ttl)
+	}
+}
+
+func TestGetInMemoryExpired(t *testing.T) {
+	db, err := badger.New("", config.Badger{Persist: false})
+	if err != nil {
+		t.Errorf("error opening in-memory badger: %v", err)
+	}
+
+	defer db.Close()
+
+	err = db.Set("testkey", "testvalue", 1*time.Second)
+	if err != nil {
+		t.Errorf("error setting key-value pair with TTL: %v", err)
+	}
+
+	time.Sleep(1 * time.Second)
+
+	var value string
+	err = db.Get("testkey", &value)
+	if err != nil && err != badgerog.ErrKeyNotFound {
+		t.Errorf("error getting key-value pair: %v", err)
+	}
+}
+
+func TestGetPersistenceExpired(t *testing.T) {
+	path := "./testdump/getexpired"
+	db, err := badger.New(path, config.Badger{Persist: true})
+	if err != nil {
+		t.Errorf("error opening badger at %v: %v", path, err)
+	}
+
+	defer db.Close()
+
+	err = db.Set("testkey", "testvalue", 1*time.Second)
+	if err != nil {
+		t.Errorf("error setting key-value pair with TTL: %v", err)
+	}
+
+	time.Sleep(1 * time.Second)
+
+	var value string
+	err = db.Get("testkey", &value)
+	if err != nil && err != badgerog.ErrKeyNotFound {
+		t.Errorf("error getting key-value pair: %v", err)
 	}
 }
