@@ -1,20 +1,12 @@
 package bucket
 
 import (
-	"fmt"
-	"sync"
-
 	"github.com/gocolly/colly/v2"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/result"
 	"github.com/rs/zerolog/log"
 )
-
-type Relay struct {
-	ResultMap map[string]*result.Result
-	Mutex     sync.RWMutex
-}
 
 func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *Relay, options *engines.Options, pagesCol *colly.Collector) {
 	log.Trace().
@@ -73,43 +65,4 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 				Msg("bucket.AddSEResult(): failed visiting")
 		}
 	}
-}
-
-func SetResultResponse(link string, response *colly.Response, relay *Relay, seName engines.Name) error {
-	log.Trace().
-		Str("engine", seName.String()).
-		Str("link", link).
-		Msg("Got response")
-
-	relay.Mutex.Lock()
-	mapRes, exists := relay.ResultMap[link]
-
-	if !exists {
-		relay.Mutex.Unlock()
-		relay.Mutex.RLock()
-		err := fmt.Errorf("bucket.SetResultResponse(): URL not in map when adding response, should not be possible. URL: %v.\nRelay: %v", link, relay)
-		relay.Mutex.RUnlock()
-		return err
-	} else {
-		mapRes.Response = response
-		relay.Mutex.Unlock()
-	}
-
-	return nil
-}
-
-func MakeSEResult(urll string, title string, description string, searchEngineName engines.Name, sePage int, seOnPageRank int) *result.RetrievedResult {
-	ser := result.RetrievedRank{
-		SearchEngine: searchEngineName,
-		Rank:         0,
-		Page:         uint(sePage),
-		OnPageRank:   uint(seOnPageRank),
-	}
-	res := result.RetrievedResult{
-		URL:         urll,
-		Title:       title,
-		Description: description,
-		Rank:        ser,
-	}
-	return &res
 }
