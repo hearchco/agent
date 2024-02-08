@@ -60,7 +60,7 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 		Str("engines", fmt.Sprintf("%v", config.EnabledEngines)).
 		Msg("Enabled engines")
 
-	relay := bucket.Relay{
+	relay := &bucket.Relay{
 		ResultMap: make(map[string]*result.Result),
 	}
 
@@ -74,7 +74,7 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 			defer wg.Done()
 			// if an error can be handled inside, it wont be returned
 			// runs the Search function in the engine package
-			err := engineStarter[eng](context.Background(), query, &relay, options, settings[eng], timings)
+			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng], timings)
 			if err != nil {
 				log.Error().
 					Err(err).
@@ -85,5 +85,5 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 	}
 
 	wg.Wait()
-	return &relay
+	return relay
 }
