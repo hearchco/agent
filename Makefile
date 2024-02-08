@@ -32,9 +32,9 @@ test-redis-podman:
 	sh ./scripts/test-redis-podman.sh
 test-redis-docker:
 	sh ./scripts/test-redis-docker.sh
-test-all: test test-engines test-redis
-test-all-podman: test test-engines test-redis-podman
-test-all-docker: test test-engines test-redis-docker
+test-all: test test-redis test-engines
+test-all-podman: test test-redis-podman test-engines
+test-all-docker: test test-redis-docker test-engines
 
 update:
 	go get -u ./...
