@@ -27,8 +27,9 @@ hearchco.*
 .vscode/*
 test.go
 
-src/engines/*/site/*
-!src/engines/_engines_test
+src/search/engines/*/site/*
+!src/search/engines/_engines_test
+!src/search/engines/_sedefaults
 
 log/
 database/
