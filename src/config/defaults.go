@@ -6,6 +6,7 @@ import (
 
 	"github.com/hearchco/hearchco/src/category"
 	"github.com/hearchco/hearchco/src/engines"
+	"github.com/hearchco/hearchco/src/moretime"
 )
 
 const DefaultLocale string = "en_US"
@@ -133,7 +134,14 @@ func New() *Config {
 			Port:        3030,
 			FrontendUrl: "http://localhost:8000",
 			Cache: Cache{
-				Type: "pebble",
+				Type: "badger",
+				TTL: TTL{
+					Time:        moretime.Week,
+					RefreshTime: 3 * moretime.Day,
+				},
+				Badger: Badger{
+					Persist: true,
+				},
 				Redis: Redis{
 					Host: "localhost",
 					Port: 6379,

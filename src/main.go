@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/hearchco/hearchco/src/cache"
+	"github.com/hearchco/hearchco/src/cache/badger"
 	"github.com/hearchco/hearchco/src/cache/nocache"
-	"github.com/hearchco/hearchco/src/cache/pebble"
 	"github.com/hearchco/hearchco/src/cache/redis"
 	"github.com/hearchco/hearchco/src/cli"
 	"github.com/hearchco/hearchco/src/config"
@@ -49,13 +49,32 @@ func main() {
 
 	// setup cache
 	var db cache.DB
+	var err error
 	switch conf.Server.Cache.Type {
-	case "pebble":
-		db = pebble.New(cliFlags.DataDirPath)
+	case "badger":
+		db, err = badger.New(cliFlags.DataDirPath, conf.Server.Cache.Badger)
+		if err != nil {
+			log.Fatal().
+				Err(err).
+				Msg("main.main(): failed creating a badger cache")
+			// ^FATAL
+		}
 	case "redis":
-		db = redis.New(ctx, conf.Server.Cache.Redis)
+		db, err = redis.New(ctx, conf.Server.Cache.Redis)
+		if err != nil {
+			log.Fatal().
+				Err(err).
+				Msg("main.main(): failed creating a redis cache")
+			// ^FATAL
+		}
 	default:
-		db = nocache.New()
+		db, err = nocache.New()
+		if err != nil {
+			log.Fatal().
+				Err(err).
+				Msg("main.main(): failed creating a nocache")
+			// ^FATAL
+		}
 		log.Warn().Msg("Running without caching!")
 	}
 

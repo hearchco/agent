@@ -21,6 +21,15 @@ test:
 test-engines:
 	sh ./scripts/test-engines.sh
 
+test-redis:
+	sh ./scripts/test-redis.sh
+
+test-redis-podman:
+	sh ./scripts/test-redis-podman.sh
+
+test-redis-docker:
+	sh ./scripts/test-redis-docker.sh
+
 update:
 	go get -u ./...
 	go mod tidy

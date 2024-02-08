@@ -18,7 +18,7 @@ type DB struct {
 	ctx context.Context
 }
 
-func New(ctx context.Context, config config.Redis) *DB {
+func New(ctx context.Context, config config.Redis) (*DB, error) {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%v:%v", config.Host, config.Port),
 		Password: config.Password,
@@ -36,7 +36,7 @@ func New(ctx context.Context, config config.Redis) *DB {
 			Msg("Successful connection to redis")
 	}
 
-	return &DB{rdb: rdb, ctx: ctx}
+	return &DB{rdb: rdb, ctx: ctx}, nil
 }
 
 func (db *DB) Close() {
@@ -47,13 +47,18 @@ func (db *DB) Close() {
 	}
 }
 
-func (db *DB) Set(k string, v cache.Value) error {
+func (db *DB) Set(k string, v cache.Value, ttl ...time.Duration) error {
 	log.Debug().Msg("Caching...")
 	cacheTimer := time.Now()
 
+	var setTtl time.Duration = 0
+	if len(ttl) > 0 {
+		setTtl = ttl[0]
+	}
+
 	if val, err := cbor.Marshal(v); err != nil {
 		return fmt.Errorf("redis.Set(): error marshaling value: %w", err)
-	} else if err := db.rdb.Set(db.ctx, anonymize.HashToSHA256B64(k), val, 0).Err(); err != nil {
+	} else if err := db.rdb.Set(db.ctx, anonymize.HashToSHA256B64(k), val, setTtl).Err(); err != nil {
 		return fmt.Errorf("redis.Set(): error setting KV to redis: %w", err)
 	} else {
 		cacheTimeSince := time.Since(cacheTimer)
@@ -62,21 +67,60 @@ func (db *DB) Set(k string, v cache.Value) error {
 			Int64("ns", cacheTimeSince.Nanoseconds()).
 			Msg("Cached results")
 	}
+
 	return nil
 }
 
-func (db *DB) Get(k string, o cache.Value) error {
-	v, err := db.rdb.Get(db.ctx, anonymize.HashToSHA256B64(k)).Result()
-	val := []byte(v) // copy data before closing, casting needed for unmarshal
+func (db *DB) Get(k string, o cache.Value, hashed ...bool) error {
+	var kInput string
+	if len(hashed) > 0 && hashed[0] {
+		kInput = k
+	} else {
+		kInput = anonymize.HashToSHA256B64(k)
+	}
 
+	val, err := db.rdb.Get(db.ctx, kInput).Result()
 	if err == redis.Nil {
 		log.Trace().
-			Str("key", k).
+			Str("key", kInput).
 			Msg("Found no value in redis")
 	} else if err != nil {
-		return fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", k, err)
-	} else if err := cbor.Unmarshal(val, o); err != nil {
-		return fmt.Errorf("redis.Get(): failed unmarshaling value from redis for key %v: %w", k, err)
+		return fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", kInput, err)
+	} else if err := cbor.Unmarshal([]byte(val), o); err != nil {
+		return fmt.Errorf("redis.Get(): failed unmarshaling value from redis for key %v: %w", kInput, err)
 	}
+
 	return nil
+}
+
+// returns time until the key expires, not the time it will be considered expired
+func (db *DB) GetTTL(k string, hashed ...bool) (time.Duration, error) {
+	var kInput string
+	if len(hashed) > 0 && hashed[0] {
+		kInput = k
+	} else {
+		kInput = anonymize.HashToSHA256B64(k)
+	}
+
+	// returns time with time.Second precision
+	expiresIn, err := db.rdb.TTL(db.ctx, kInput).Result()
+	if err == redis.Nil {
+		log.Trace().
+			Str("key", kInput).
+			Msg("Found no value in redis")
+	} else if err != nil {
+		return expiresIn, fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", kInput, err)
+	}
+
+	/*
+		In Redis 2.6 or older the command returns -1 if the key does not exist or if the key exist but has no associated expire.
+		Starting with Redis 2.8 the return value in case of error changed:
+		The command returns -2 if the key does not exist.
+		The command returns -1 if the key exists but has no associated expire.
+	*/
+	if expiresIn < 0 {
+		expiresIn = 0
+	}
+
+	return expiresIn, nil
 }
