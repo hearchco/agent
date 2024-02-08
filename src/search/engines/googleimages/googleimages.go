@@ -26,6 +26,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	var retError error
 
 	_sedefaults.InitializeCollectors(&col, &pagesCol, &settings, &options, &timings)
+	// disable User Agent since Google Images responds with fake data if UA is correct
+	col.UserAgent = ""
 
 	_sedefaults.PagesColRequest(Info.Name, pagesCol, ctx)
 	_sedefaults.PagesColError(Info.Name, pagesCol)
