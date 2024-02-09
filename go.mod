@@ -90,7 +90,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
-	github.com/sourcegraph/conc v0.3.0
 	github.com/temoto/robotstxt v1.1.2 // indirect
 	golang.org/x/net v0.21.0
 	golang.org/x/sys v0.17.0 // indirect
