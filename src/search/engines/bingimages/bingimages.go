@@ -58,9 +58,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			log.Error().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
-				Str("purl", jsonMetadata.Purl).
-				Str("murl", jsonMetadata.Murl).
-				Str("turl", jsonMetadata.Turl).
+				Str("url", jsonMetadata.Purl).
+				Str("original", jsonMetadata.Murl).
+				Str("thumbnail", jsonMetadata.Turl).
 				Msg("bingimages.Search() -> onHTML: Couldn't find image URL")
 			return // result useless without URL (metadata)
 		}
