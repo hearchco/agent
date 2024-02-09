@@ -30,11 +30,11 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	// disable User Agent since Google Images responds with fake data if UA is correct
 	col.UserAgent = ""
 
-	_sedefaults.PagesColRequest(Info.Name, pagesCol, ctx)
+	_sedefaults.PagesColRequest(ctx, Info.Name, pagesCol)
 	_sedefaults.PagesColError(Info.Name, pagesCol)
 	_sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
 
-	_sedefaults.ColRequest(Info.Name, col, ctx)
+	_sedefaults.ColRequest(ctx, Info.Name, col)
 	_sedefaults.ColError(Info.Name, col)
 
 	var pageRankCounter = make([]int, options.MaxPages*Info.ResultsPerPage)

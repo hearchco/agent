@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func ColRequest(seName engines.Name, col *colly.Collector, ctx context.Context) {
+func ColRequest(ctx context.Context, seName engines.Name, col *colly.Collector) {
 	col.OnRequest(func(r *colly.Request) {
 		if err := ctx.Err(); err != nil {
 			if engines.IsTimeoutError(err) {

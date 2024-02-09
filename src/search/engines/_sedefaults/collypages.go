@@ -9,7 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func PagesColRequest(seName engines.Name, pagesCol *colly.Collector, ctx context.Context) {
+func PagesColRequest(ctx context.Context, seName engines.Name, pagesCol *colly.Collector) {
 	pagesCol.OnRequest(func(r *colly.Request) {
 		if err := ctx.Err(); err != nil {
 			if engines.IsTimeoutError(err) {
@@ -55,7 +55,9 @@ func PagesColResponse(seName engines.Name, pagesCol *colly.Collector, relay *buc
 		urll := r.Ctx.Get("originalURL")
 		err := bucket.SetResultResponse(urll, r, relay, seName)
 		if err != nil {
-			log.Error().Err(err).Msg("_sedefaults.PagesColResponse(): error setting result")
+			log.Error().
+				Err(err).
+				Msg("_sedefaults.PagesColResponse(): error setting result")
 		}
 	})
 }
