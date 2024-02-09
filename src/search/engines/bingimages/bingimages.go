@@ -48,10 +48,20 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			return // result useless without URL (metadata)
 		}
 
-		if err := json.Unmarshal([]byte(metadataS), &jsonMetadata); err != nil {
+		err := json.Unmarshal([]byte(metadataS), &jsonMetadata)
+		if err != nil {
 			log.Error().
 				Err(err).
 				Msg("bingimages.Search() -> onHTML: failed to unmarshal metadata")
+			return // result useless without URL (metadata)
+		} else if jsonMetadata.Purl == "" || jsonMetadata.Murl == "" || jsonMetadata.Turl == "" {
+			log.Error().
+				Str("engine", Info.Name.String()).
+				Str("jsonMetadata", metadataS).
+				Str("purl", jsonMetadata.Purl).
+				Str("murl", jsonMetadata.Murl).
+				Str("turl", jsonMetadata.Turl).
+				Msg("bingimages.Search() -> onHTML: Couldn't find image URL")
 			return // result useless without URL (metadata)
 		}
 

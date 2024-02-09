@@ -2,6 +2,7 @@ package googleimages
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -70,9 +71,19 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 					resultJson := metadata.Result
 					textInGridJson := metadata.TextInGrid
 
-					res := bucket.MakeSEImageResult(resultJson.ReferrerUrl, resultJson.PageTitle, textInGridJson.Snippet, resultJson.SiteTitle, original, thumbnail, Info.Name, page, pageRankCounter[page]+1)
-					bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
-					pageRankCounter[page]++
+					if resultJson.ReferrerUrl == "" || original.URL == "" || thumbnail.URL == "" {
+						log.Error().
+							Str("engine", Info.Name.String()).
+							Str("jsonMetadata", fmt.Sprintf("%v", metadata)).
+							Str("referrerUrl", resultJson.ReferrerUrl).
+							Str("originalUrl", original.URL).
+							Str("thumbnailUrl", thumbnail.URL).
+							Msg("bingimages.Search() -> onHTML: Couldn't find image URL")
+					} else {
+						res := bucket.MakeSEImageResult(resultJson.ReferrerUrl, resultJson.PageTitle, textInGridJson.Snippet, resultJson.SiteTitle, original, thumbnail, Info.Name, page, pageRankCounter[page]+1)
+						bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+						pageRankCounter[page]++
+					}
 				}
 			}
 		} else {
