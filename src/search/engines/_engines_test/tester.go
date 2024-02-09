@@ -9,7 +9,7 @@ import (
 )
 
 func CheckTestCases(tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResults,
-	tcrr []TestCaseRankedResults, t *testing.T, conf *config.Config) {
+	tcrr []TestCaseRankedResults, t *testing.T, conf config.Config) {
 
 	// TestCaseHasAnyResults
 	for _, tc := range tchar {

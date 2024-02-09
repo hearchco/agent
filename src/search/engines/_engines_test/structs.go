@@ -25,9 +25,9 @@ type TestCaseRankedResults struct {
 	Options   engines.Options
 }
 
-func NewConfig(engineName engines.Name) *config.Config {
+func NewConfig(engineName engines.Name) config.Config {
 	config.EnabledEngines = append(config.EnabledEngines, engineName)
-	return &config.Config{
+	return config.Config{
 		Categories: map[category.Name]config.Category{
 			category.GENERAL: {
 				Engines: []engines.Name{engineName},
