@@ -16,7 +16,7 @@ import (
 	"github.com/hearchco/hearchco/src/search/result"
 )
 
-func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
+func Search(c *gin.Context, conf config.Config, db cache.DB) error {
 	var query, pages, deepSearch, locale, categ, useragent, safesearch, mobile string
 	var ccateg category.Name
 

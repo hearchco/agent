@@ -9,7 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func CacheAndUpdateResults(query string, options engines.Options, conf *config.Config, db cache.DB, results []result.Result, foundInDB bool) {
+func CacheAndUpdateResults(query string, options engines.Options, conf config.Config, db cache.DB, results []result.Result, foundInDB bool) {
 	if !foundInDB {
 		log.Debug().
 			Str("queryAnon", anonymize.String(query)).

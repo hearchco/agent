@@ -28,7 +28,7 @@ func printResults(results []result.Result) {
 	}
 }
 
-func Run(flags Flags, db cache.DB, conf *config.Config) {
+func Run(flags Flags, db cache.DB, conf config.Config) {
 	log.Info().
 		Str("queryAnon", anonymize.String(flags.Query)).
 		Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).

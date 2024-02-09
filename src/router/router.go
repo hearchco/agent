@@ -19,10 +19,10 @@ import (
 
 type RouterWrapper struct {
 	router *graceful.Graceful
-	config *config.Config
+	config config.Config
 }
 
-func New(config *config.Config, verbosity int8, lgr zerolog.Logger) (RouterWrapper, error) {
+func New(config config.Config, verbosity int8, lgr zerolog.Logger) (RouterWrapper, error) {
 	// set verbosity to release mode if log level is INFO
 	if verbosity == 0 {
 		gin.SetMode(gin.ReleaseMode)

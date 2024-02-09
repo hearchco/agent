@@ -141,8 +141,8 @@ func NewScience() []engines.Name {
 	}
 }
 
-func New() *Config {
-	return &Config{
+func New() Config {
+	return Config{
 		Server: Server{
 			Port:        3030,
 			FrontendUrl: "http://localhost:8000",

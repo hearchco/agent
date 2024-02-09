@@ -19,7 +19,7 @@ import (
 // engine_searcher -> NewEngineStarter() uses this
 type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings) []error
 
-func PerformSearch(query string, options engines.Options, conf *config.Config) []result.Result {
+func PerformSearch(query string, options engines.Options, conf config.Config) []result.Result {
 	searchTimer := time.Now()
 
 	query, timings, enginesToRun := procBang(query, &options, conf)

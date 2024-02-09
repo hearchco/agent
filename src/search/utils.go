@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func procBang(query string, options *engines.Options, conf *config.Config) (string, config.Timings, []engines.Name) {
+func procBang(query string, options *engines.Options, conf config.Config) (string, config.Timings, []engines.Name) {
 	useSpec, specEng := procSpecificEngine(query, options, conf)
 	goodCat := procCategory(query, options)
 	if !goodCat && !useSpec && query[0] == '!' {
@@ -37,7 +37,7 @@ func trimBang(query string) string {
 	return query
 }
 
-func procSpecificEngine(query string, options *engines.Options, conf *config.Config) (bool, engines.Name) {
+func procSpecificEngine(query string, options *engines.Options, conf config.Config) (bool, engines.Name) {
 	if query[0] != '!' {
 		return false, engines.UNDEFINED
 	}

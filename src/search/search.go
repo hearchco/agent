@@ -9,7 +9,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(query string, options engines.Options, conf *config.Config, db cache.DB) ([]result.Result, bool) {
+func Search(query string, options engines.Options, conf config.Config, db cache.DB) ([]result.Result, bool) {
 	var results []result.Result
 	var foundInDB bool
 	gerr := db.Get(query, &results)
