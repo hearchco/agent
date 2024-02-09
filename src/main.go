@@ -32,7 +32,7 @@ func main() {
 	cliFlags := cli.Setup()
 
 	// start profiler
-	_, stopProfiler := runProfiler(&cliFlags)
+	_, stopProfiler := runProfiler(cliFlags)
 	defer stopProfiler()
 
 	var lgr zerolog.Logger

@@ -11,7 +11,7 @@ type profiler struct {
 	profile func(p *profile.Profile)
 }
 
-func runProfiler(cliFlags *cli.Flags) (bool, func()) {
+func runProfiler(cliFlags cli.Flags) (bool, func()) {
 	/*
 		goroutine — stack traces of all current goroutines
 		heap — a sampling of memory allocations of live objects
