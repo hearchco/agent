@@ -60,16 +60,16 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				goodURL := parse.ParseURL(result.URL)
 
 				res := bucket.MakeSEResult(goodURL, result.Title, result.Description, Info.Name, page, counter)
-				bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+				bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 				counter += 1
 			}
 		}
 	})
 
-	localeParam := getLocale(&options)
+	localeParam := getLocale(options)
 	nRequested := settings.RequestedResultsPerPage
-	deviceParam := getDevice(&options)
-	safeSearchParam := getSafeSearch(&options)
+	deviceParam := getDevice(options)
+	safeSearchParam := getSafeSearch(options)
 
 	errChannel := make(chan error, 1)
 	for i := 0; i < options.MaxPages; i++ {
@@ -98,7 +98,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 // qwant returns this array when an invalid locale is supplied
 var validLocales = [...]string{"bg_bg", "br_fr", "ca_ad", "ca_es", "ca_fr", "co_fr", "cs_cz", "cy_gb", "da_dk", "de_at", "de_ch", "de_de", "ec_ca", "el_gr", "en_au", "en_ca", "en_gb", "en_ie", "en_my", "en_nz", "en_us", "es_ad", "es_ar", "es_cl", "es_co", "es_es", "es_mx", "es_pe", "et_ee", "eu_es", "eu_fr", "fc_ca", "fi_fi", "fr_ad", "fr_be", "fr_ca", "fr_ch", "fr_fr", "gd_gb", "he_il", "hu_hu", "it_ch", "it_it", "ko_kr", "nb_no", "nl_be", "nl_nl", "pl_pl", "pt_ad", "pt_pt", "ro_ro", "sv_se", "th_th", "zh_cn", "zh_hk"}
 
-func getLocale(options *engines.Options) string {
+func getLocale(options engines.Options) string {
 	locale := strings.ToLower(options.Locale)
 	for _, vl := range validLocales {
 		if locale == vl {
@@ -112,14 +112,14 @@ func getLocale(options *engines.Options) string {
 	return "&locale=" + strings.ToLower(config.DefaultLocale)
 }
 
-func getDevice(options *engines.Options) string {
+func getDevice(options engines.Options) string {
 	if options.Mobile {
 		return "&device=mobile"
 	}
 	return "&device=desktop"
 }
 
-func getSafeSearch(options *engines.Options) string {
+func getSafeSearch(options engines.Options) string {
 	if options.SafeSearch {
 		return "&safesearch=1"
 	}

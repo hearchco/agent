@@ -183,13 +183,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 
 		res := bucket.MakeSEImageResult(jsonMetadata.Purl, titleText, jsonMetadata.Desc, source, original, thumbnail, Info.Name, page, pageRankCounter[page]+1)
-		bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+		bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 		pageRankCounter[page]++
 	})
 
 	errChannel := make(chan error, 1)
 
-	localeParam := getLocale(&options)
+	localeParam := getLocale(options)
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
@@ -221,7 +221,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	return retErrors
 }
 
-func getLocale(options *engines.Options) string {
+func getLocale(options engines.Options) string {
 	spl := strings.SplitN(strings.ToLower(options.Locale), "_", 2)
 	return "&setlang=" + spl[0] + "&cc=" + spl[1]
 }

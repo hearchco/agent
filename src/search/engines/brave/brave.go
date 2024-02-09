@@ -31,8 +31,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
 
-	localeCookie := getLocale(&options)
-	safeSearchCookie := getSafeSearch(&options)
+	localeCookie := getLocale(options)
+	safeSearchCookie := getSafeSearch(options)
 
 	col.OnRequest(func(r *colly.Request) {
 		r.Headers.Add("Cookie", localeCookie)
@@ -58,7 +58,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 
 			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 			pageRankCounter[page]++
 		}
 	})
@@ -94,12 +94,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	return retErrors
 }
 
-func getLocale(options *engines.Options) string {
+func getLocale(options engines.Options) string {
 	region := strings.SplitN(strings.ToLower(options.Locale), "_", 2)[1]
 	return "country=" + region
 }
 
-func getSafeSearch(options *engines.Options) string {
+func getSafeSearch(options engines.Options) string {
 	if options.SafeSearch {
 		return "safesearch=strict"
 	}

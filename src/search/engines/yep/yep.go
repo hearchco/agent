@@ -47,14 +47,14 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			goodDescription := parse.ParseTextWithHTML(result.Snippet)
 
 			res := bucket.MakeSEResult(goodURL, goodTitle, goodDescription, Info.Name, 1, counter)
-			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 			counter += 1
 		}
 	})
 
-	localeParam := getLocale(&options)
+	localeParam := getLocale(options)
 	nRequested := settings.RequestedResultsPerPage
-	safeSearchParam := getSafeSearch(&options)
+	safeSearchParam := getSafeSearch(options)
 
 	var urll string
 	if nRequested == Info.ResultsPerPage {
@@ -86,12 +86,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	return retErrors
 }
 
-func getLocale(options *engines.Options) string {
+func getLocale(options engines.Options) string {
 	locale := strings.Split(options.Locale, "_")[1]
 	return "&gl=" + locale
 }
 
-func getSafeSearch(options *engines.Options) string {
+func getSafeSearch(options engines.Options) string {
 	if options.SafeSearch {
 		return "&safeSearch=strict"
 	}

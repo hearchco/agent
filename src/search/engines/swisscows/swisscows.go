@@ -79,12 +79,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			desc := parse.ParseTextWithHTML(result.Desc)
 
 			res := bucket.MakeSEResult(goodURL, title, desc, Info.Name, page, counter)
-			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 			counter += 1
 		}
 	})
 
-	localeParam := getLocale(&options)
+	localeParam := getLocale(options)
 
 	errChannel := make(chan error, 1)
 	for i := 0; i < options.MaxPages; i++ {
@@ -112,7 +112,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	return retErrors
 }
 
-func getLocale(options *engines.Options) string {
+func getLocale(options engines.Options) string {
 	return "&region=" + strings.Replace(options.Locale, "_", "-", 1)
 }
 

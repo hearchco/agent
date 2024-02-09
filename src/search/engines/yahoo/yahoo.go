@@ -33,7 +33,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
 
-	safeSearchCookieParam := getSafeSearch(&options)
+	safeSearchCookieParam := getSafeSearch(options)
 
 	col.OnRequest(func(r *colly.Request) {
 		r.Headers.Add("Cookie", "sB=v=1&pn=10&rw=new&userset=0"+safeSearchCookieParam)
@@ -53,7 +53,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 
 			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 			pageRankCounter[page]++
 		}
 	})
@@ -106,7 +106,7 @@ func removeTelemetry(link string) string {
 	return newLink
 }
 
-func getSafeSearch(options *engines.Options) string {
+func getSafeSearch(options engines.Options) string {
 	if options.SafeSearch {
 		return "&vm=r"
 	}

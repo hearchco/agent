@@ -44,13 +44,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 
 			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 			pageRankCounter[page]++
 		}
 	})
 
-	localeParam := getLocale(&options)
-	safeSearchParam := getSafeSearch(&options)
+	localeParam := getLocale(options)
+	safeSearchParam := getSafeSearch(options)
 
 	errChannel := make(chan error, 1)
 	colCtx := colly.NewContext()
@@ -83,12 +83,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	return retErrors
 }
 
-func getLocale(options *engines.Options) string {
+func getLocale(options engines.Options) string {
 	spl := strings.SplitN(strings.ToLower(options.Locale), "_", 2)
 	return "&lb=" + spl[0] + "&arc=" + spl[1]
 }
 
-func getSafeSearch(options *engines.Options) string {
+func getSafeSearch(options engines.Options) string {
 	if options.SafeSearch {
 		return "&safe=1"
 	}

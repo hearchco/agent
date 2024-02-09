@@ -55,7 +55,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 
 			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 			pageRankCounter[page]++
 		} else {
 			log.Trace().
@@ -67,7 +67,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	localeParam := getLocale(&options)
+	localeParam := getLocale(options)
 
 	// create a buffered channel to hold errors, size of channel is the number of pages = requests being made
 	errChannel := make(chan error, options.MaxPages)
@@ -122,7 +122,7 @@ func removeTelemetry(link string) string {
 	return link
 }
 
-func getLocale(options *engines.Options) string {
+func getLocale(options engines.Options) string {
 	spl := strings.SplitN(strings.ToLower(options.Locale), "_", 2)
 	return "&setlang=" + spl[0] + "&cc=" + spl[1]
 }

@@ -31,7 +31,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	_sedefaults.ColRequest(ctx, Info.Name, col)
 	_sedefaults.ColError(Info.Name, col)
 
-	localeCookie := getLocale(&options)
+	localeCookie := getLocale(options)
 
 	col.OnRequest(func(r *colly.Request) {
 		r.Headers.Add("Cookie", localeCookie)
@@ -66,7 +66,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			case 3:
 				if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
 					res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, (i/4 + 1))
-					bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+					bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 				}
 			}
 		})
@@ -101,7 +101,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	return retErrors
 }
 
-func getLocale(options *engines.Options) string {
+func getLocale(options engines.Options) string {
 	spl := strings.SplitN(strings.ToLower(options.Locale), "_", 2)
 	return "kl=" + spl[1] + "-" + spl[0]
 }

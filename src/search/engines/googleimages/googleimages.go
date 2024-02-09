@@ -78,7 +78,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 							Msg("bingimages.Search() -> onHTML: Couldn't find image URL")
 					} else {
 						res := bucket.MakeSEImageResult(resultJson.ReferrerUrl, resultJson.PageTitle, textInGridJson.Snippet, resultJson.SiteTitle, original, thumbnail, Info.Name, page, pageRankCounter[page]+1)
-						bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+						bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 						pageRankCounter[page]++
 					}
 				}
