@@ -22,7 +22,7 @@ type RouterWrapper struct {
 	config *config.Config
 }
 
-func New(config *config.Config, verbosity int8, lgr zerolog.Logger) (*RouterWrapper, error) {
+func New(config *config.Config, verbosity int8, lgr zerolog.Logger) (RouterWrapper, error) {
 	// set verbosity to release mode if log level is INFO
 	if verbosity == 0 {
 		gin.SetMode(gin.ReleaseMode)
@@ -60,10 +60,10 @@ func New(config *config.Config, verbosity int8, lgr zerolog.Logger) (*RouterWrap
 			Msg("router.New(): failed creating new graceful router")
 	}
 
-	return &RouterWrapper{router: router, config: config}, err
+	return RouterWrapper{router: router, config: config}, err
 }
 
-func (rw *RouterWrapper) runWithContext(ctx context.Context) error {
+func (rw RouterWrapper) runWithContext(ctx context.Context) error {
 	log.Info().
 		Int("port", rw.config.Server.Port).
 		Msg("Started router")
@@ -80,7 +80,7 @@ func (rw *RouterWrapper) runWithContext(ctx context.Context) error {
 	return nil
 }
 
-func (rw *RouterWrapper) Start(ctx context.Context, db cache.DB, serveProfiler bool) error {
+func (rw RouterWrapper) Start(ctx context.Context, db cache.DB, serveProfiler bool) error {
 	// health(z)
 	rw.router.GET("/health", HealthCheck)
 	rw.router.GET("/healthz", HealthCheck)
