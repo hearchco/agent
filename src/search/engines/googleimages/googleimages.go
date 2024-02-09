@@ -75,7 +75,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 						log.Error().
 							Str("engine", Info.Name.String()).
 							Str("jsonMetadata", fmt.Sprintf("%v", metadata)).
-							Str("thumbnail", resultJson.ReferrerUrl).
+							Str("url", resultJson.ReferrerUrl).
 							Str("original", original.URL).
 							Str("thumbnail", thumbnail.URL).
 							Msg("bingimages.Search() -> onHTML: Couldn't find image URL")
