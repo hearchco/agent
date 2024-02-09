@@ -17,7 +17,7 @@ import (
 )
 
 // engine_searcher -> NewEngineStarter() uses this
-type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings) error
+type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings) []error
 
 func PerformSearch(query string, options engines.Options, conf *config.Config) []result.Result {
 	searchTimer := time.Now()
@@ -74,10 +74,10 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 			defer wg.Done()
 			// if an error can be handled inside, it wont be returned
 			// runs the Search function in the engine package
-			err := engineStarter[eng](context.Background(), query, relay, options, settings[eng], timings)
-			if err != nil {
+			errs := engineStarter[eng](context.Background(), query, relay, options, settings[eng], timings)
+			if len(errs) > 0 {
 				log.Error().
-					Err(err).
+					Errs("errors", errs).
 					Str("engine", eng.String()).
 					Msg("search.runEngines(): error while searching")
 			}

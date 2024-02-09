@@ -17,16 +17,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
-	if err := _sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
-		return err
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
+	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
+	if err != nil {
+		return []error{err}
 	}
 
-	var col *colly.Collector
-	var pagesCol *colly.Collector
-	var retError error
-
-	_sedefaults.InitializeCollectors(&col, &pagesCol, &settings, &options, &timings)
+	col, pagesCol := _sedefaults.InitializeCollectors(options, settings, timings)
 
 	_sedefaults.PagesColRequest(ctx, Info.Name, pagesCol)
 	_sedefaults.PagesColError(Info.Name, pagesCol)
@@ -72,12 +69,14 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	localeParam := getLocale(&options)
 
+	// create a buffered channel to hold errors, size of channel is the number of pages = requests being made
+	errChannel := make(chan error, options.MaxPages)
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
 	urll := Info.URL + query + localeParam
 	anonUrll := Info.URL + anonymize.String(query) + localeParam
-	_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
+	_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, errChannel)
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
@@ -85,13 +84,22 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 		urll := Info.URL + query + "&first=" + strconv.Itoa(i*10+1) + localeParam
 		anonUrll := Info.URL + anonymize.String(query) + "&first=" + strconv.Itoa(i*10+1) + localeParam
-		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
+		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, errChannel)
+	}
+
+	// only store errors that occur and are not Timeout errors
+	retErrors := make([]error, 0)
+	for i := 0; i < options.MaxPages; i++ {
+		err := <-errChannel
+		if err != nil && !engines.IsTimeoutError(err) {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retError
+	return retErrors
 }
 
 func removeTelemetry(link string) string {

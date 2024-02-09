@@ -16,16 +16,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
-	if err := _sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
-		return err
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
+	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
+	if err != nil {
+		return []error{err}
 	}
 
-	var col *colly.Collector
-	var pagesCol *colly.Collector
-	var retError error
-
-	_sedefaults.InitializeCollectors(&col, &pagesCol, &settings, &options, &timings)
+	col, pagesCol := _sedefaults.InitializeCollectors(options, settings, timings)
 
 	_sedefaults.PagesColRequest(ctx, Info.Name, pagesCol)
 	_sedefaults.PagesColError(Info.Name, pagesCol)
@@ -89,23 +86,30 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	localeParam := getLocale(&options)
 
-	var colCtx *colly.Context
-
+	errChannel := make(chan error, 1)
 	for i := 0; i < options.MaxPages; i++ {
-		colCtx = colly.NewContext()
+		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 		//col.Request("OPTIONS", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+localeURL, nil, colCtx, nil)
 		//col.Wait()
 
 		urll := Info.URL + "freshness=All&itemsCount=" + strconv.Itoa(settings.RequestedResultsPerPage) + "&offset=" + strconv.Itoa(i*10) + "&query=" + query + localeParam
 		anonUrll := Info.URL + "freshness=All&itemsCount=" + strconv.Itoa(settings.RequestedResultsPerPage) + "&offset=" + strconv.Itoa(i*10) + "&query=" + anonymize.String(query) + localeParam
-		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
+		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, errChannel)
+	}
+
+	retErrors := make([]error, 0)
+	for i := 0; i < options.MaxPages; i++ {
+		err := <-errChannel
+		if err != nil {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retError
+	return retErrors
 }
 
 func getLocale(options *engines.Options) string {

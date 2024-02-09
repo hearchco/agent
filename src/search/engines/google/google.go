@@ -14,16 +14,13 @@ import (
 	"github.com/hearchco/hearchco/src/search/parse"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
-	if err := _sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
-		return err
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
+	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
+	if err != nil {
+		return []error{err}
 	}
 
-	var col *colly.Collector
-	var pagesCol *colly.Collector
-	var retError error
-
-	_sedefaults.InitializeCollectors(&col, &pagesCol, &settings, &options, &timings)
+	col, pagesCol := _sedefaults.InitializeCollectors(options, settings, timings)
 
 	_sedefaults.PagesColRequest(ctx, Info.Name, pagesCol)
 	_sedefaults.PagesColError(Info.Name, pagesCol)
@@ -51,12 +48,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
+	errChannel := make(chan error, 1)
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
 	urll := Info.URL + query
 	anonUrll := Info.URL + anonymize.String(query)
-	_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
+	_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, errChannel)
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
@@ -64,11 +62,19 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 		urll := Info.URL + query + "&start=" + strconv.Itoa(i*10)
 		anonUrll := Info.URL + anonymize.String(query) + "&start=" + strconv.Itoa(i*10)
-		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
+		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, errChannel)
+	}
+
+	retErrors := make([]error, 0)
+	for i := 0; i < options.MaxPages; i++ {
+		err := <-errChannel
+		if err != nil {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retError
+	return retErrors
 }
