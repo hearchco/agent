@@ -26,8 +26,9 @@ type Ranking struct {
 }
 
 type Settings struct {
-	RequestedResultsPerPage int    `koanf:"requestedresults"`
-	Shortcut                string `koanf:"shortcut"`
+	RequestedResultsPerPage int      `koanf:"requestedresults"`
+	Shortcut                string   `koanf:"shortcut"`
+	Proxies                 []string `koanf:"proxies"`
 }
 
 // ReaderTTL is format in which the config is read from the config file
