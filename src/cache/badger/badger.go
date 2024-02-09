@@ -17,7 +17,7 @@ type DB struct {
 	bdb *badger.DB
 }
 
-func New(dataDirPath string, config config.Badger) (*DB, error) {
+func New(dataDirPath string, config config.Badger) (DB, error) {
 	badgerPath := path.Join(dataDirPath, "database")
 
 	var opt badger.Options
@@ -46,10 +46,10 @@ func New(dataDirPath string, config config.Badger) (*DB, error) {
 			Msg("Successfully opened in-memory badger")
 	}
 
-	return &DB{bdb: bdb}, err
+	return DB{bdb: bdb}, err
 }
 
-func (db *DB) Close() {
+func (db DB) Close() {
 	if err := db.bdb.Close(); err != nil {
 		log.Error().Err(err).Msg("badger.Close(): error closing badger")
 	} else {
@@ -57,7 +57,7 @@ func (db *DB) Close() {
 	}
 }
 
-func (db *DB) Set(k string, v cache.Value, ttl ...time.Duration) error {
+func (db DB) Set(k string, v cache.Value, ttl ...time.Duration) error {
 	log.Debug().Msg("Caching...")
 	cacheTimer := time.Now()
 
@@ -90,7 +90,7 @@ func (db *DB) Set(k string, v cache.Value, ttl ...time.Duration) error {
 	return nil
 }
 
-func (db *DB) Get(k string, o cache.Value, hashed ...bool) error {
+func (db DB) Get(k string, o cache.Value, hashed ...bool) error {
 	var kInput string
 	if len(hashed) > 0 && hashed[0] {
 		kInput = k
@@ -125,7 +125,7 @@ func (db *DB) Get(k string, o cache.Value, hashed ...bool) error {
 }
 
 // returns time until the key expires, not the time it will be considered expired
-func (db *DB) GetTTL(k string, hashed ...bool) (time.Duration, error) {
+func (db DB) GetTTL(k string, hashed ...bool) (time.Duration, error) {
 	var kInput string
 	if len(hashed) > 0 && hashed[0] {
 		kInput = k
