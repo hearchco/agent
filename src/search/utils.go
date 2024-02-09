@@ -10,11 +10,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func procBang(query string, options *engines.Options, conf config.Config) (string, config.Timings, []engines.Name) {
-	useSpec, specEng := procSpecificEngine(query, options, conf)
-	goodCat := procCategory(query, options)
+func procBang(query string, options engines.Options, conf config.Config) (string, category.Name, config.Timings, []engines.Name) {
+	useSpec, specEng := procSpecificEngine(query, conf)
+	goodCat, cat := procCategory(query, options)
 	if !goodCat && !useSpec && query[0] == '!' {
-		// options.category is set to GENERAL
+		// cat is set to GENERAL
 		log.Debug().
 			Str("queryAnon", anonymize.String(query)).
 			Str("queryHash", anonymize.HashToSHA256B64(query)).
@@ -24,9 +24,9 @@ func procBang(query string, options *engines.Options, conf config.Config) (strin
 	query = trimBang(query)
 
 	if useSpec {
-		return query, conf.Categories[category.GENERAL].Timings, []engines.Name{specEng}
+		return query, category.GENERAL, conf.Categories[category.GENERAL].Timings, []engines.Name{specEng}
 	} else {
-		return query, conf.Categories[options.Category].Timings, conf.Categories[options.Category].Engines
+		return query, cat, conf.Categories[cat].Timings, conf.Categories[cat].Engines
 	}
 }
 
@@ -37,7 +37,7 @@ func trimBang(query string) string {
 	return query
 }
 
-func procSpecificEngine(query string, options *engines.Options, conf config.Config) (bool, engines.Name) {
+func procSpecificEngine(query string, conf config.Config) (bool, engines.Name) {
 	if query[0] != '!' {
 		return false, engines.UNDEFINED
 	}
@@ -52,13 +52,13 @@ func procSpecificEngine(query string, options *engines.Options, conf config.Conf
 	return false, engines.UNDEFINED
 }
 
-func procCategory(query string, options *engines.Options) bool {
+func procCategory(query string, options engines.Options) (bool, category.Name) {
 	cat := category.FromQuery(query)
 	if cat != "" {
-		options.Category = cat
+		return true, cat
+	} else if options.Category == "" {
+		return false, category.GENERAL
+	} else {
+		return false, options.Category
 	}
-	if options.Category == "" {
-		options.Category = category.GENERAL
-	}
-	return cat != ""
 }

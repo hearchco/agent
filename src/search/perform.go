@@ -22,7 +22,9 @@ type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, 
 func PerformSearch(query string, options engines.Options, conf config.Config) []result.Result {
 	searchTimer := time.Now()
 
-	query, timings, enginesToRun := procBang(query, &options, conf)
+	query, cat, timings, enginesToRun := procBang(query, options, conf)
+	// set the new category only within the scope of this function
+	options.Category = cat
 
 	query = url.QueryEscape(query)
 	log.Debug().
