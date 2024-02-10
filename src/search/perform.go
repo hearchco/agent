@@ -80,7 +80,7 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 			defer wg.Done()
 			// if an error can be handled inside, it wont be returned
 			// runs the Search function in the engine package
-			errs := engineStarter[eng](context.Background(), query, relay, options, settings[eng], timings)
+			errs := engineStarter[eng](context.Background(), query, &relay, options, settings[eng], timings)
 			if len(errs) > 0 {
 				log.Error().
 					Errs("errors", errs).
