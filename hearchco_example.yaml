@@ -1,19 +1,20 @@
-categories:
-  science:
-    engines:
-      startpage:
-        enabled: true
-      duckduckgo:
-        enabled: false
-    ranking:
-      engines:
-        mojeek:
-          mul: 1
-  general:
-    engines:
-      google:
-        enabled: true
-
+#categories:
+#  science:
+#    engines:
+#      startpage:
+#        enabled: true
+#      duckduckgo:
+#        enabled: false
+#    ranking:
+#      engines:
+#        mojeek:
+#          mul: 1
+#  general:
+#    engines:
+#      google:
+#        enabled: true
+# This is needed for local frontend
 server:
+  frontendurl: http://localhost:5173
   cache:
     type: none
