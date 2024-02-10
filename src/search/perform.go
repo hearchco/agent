@@ -25,8 +25,8 @@ func PerformSearch(query string, options engines.Options, conf config.Config) []
 	query, cat, timings, enginesToRun := procBang(query, options, conf)
 	// set the new category only within the scope of this function
 	options.Category = cat
-
 	query = url.QueryEscape(query)
+
 	log.Debug().
 		Str("queryAnon", anonymize.String(query)).
 		Str("queryHash", anonymize.HashToSHA256B64(query)).
@@ -34,14 +34,18 @@ func PerformSearch(query string, options engines.Options, conf config.Config) []
 
 	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")
-	relay := runEngines(enginesToRun, query, options, conf.Settings, timings)
+
+	resultMap := runEngines(enginesToRun, query, options, conf.Settings, timings)
+
 	log.Debug().
 		Int64("ms", time.Since(resTimer).Milliseconds()).
 		Msg("Got results")
 
 	rankTimer := time.Now()
 	log.Debug().Msg("Ranking...")
-	results := rank.Rank(relay.ResultMap, conf.Categories[options.Category].Ranking) // have to make copy, since its a map value
+
+	results := rank.Rank(resultMap, conf.Categories[options.Category].Ranking)
+
 	rankTimeSince := time.Since(rankTimer)
 	log.Debug().
 		Int64("ms", rankTimeSince.Milliseconds()).
@@ -55,14 +59,14 @@ func PerformSearch(query string, options engines.Options, conf config.Config) []
 	return results
 }
 
-func runEngines(engs []engines.Name, query string, options engines.Options, settings map[engines.Name]config.Settings, timings config.Timings) *bucket.Relay {
+func runEngines(engs []engines.Name, query string, options engines.Options, settings map[engines.Name]config.Settings, timings config.Timings) map[string]*result.Result {
 	config.EnabledEngines = engs
 	log.Info().
 		Int("number", len(config.EnabledEngines)).
 		Str("engines", fmt.Sprintf("%v", config.EnabledEngines)).
 		Msg("Enabled engines")
 
-	relay := &bucket.Relay{
+	relay := bucket.Relay{
 		ResultMap: make(map[string]*result.Result),
 	}
 
@@ -87,5 +91,5 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 	}
 
 	wg.Wait()
-	return relay
+	return relay.ResultMap
 }
