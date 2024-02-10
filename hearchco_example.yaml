@@ -15,5 +15,6 @@ categories:
         enabled: true
 
 server:
+  frontendurl: http://localhost:5173
   cache:
     type: none
