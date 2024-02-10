@@ -10,7 +10,6 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/rs/zerolog/log"
 )
 
@@ -35,30 +34,20 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
-		dom := e.DOM
+		linkText, titleText, descText := _sedefaults.RawFieldsFromDOM(e.DOM, &dompaths, Info.Name) // telemetry url isnt valid link so cant pass it to FieldsFromDOM (?)
 
-		linkEl := dom.Find(dompaths.Link)
-		linkHref, hrefExists := linkEl.Attr("href")
-		var linkText string
-
-		if linkHref[0] == 'h' {
-			//normal link
-			linkText = parse.ParseURL(linkHref)
-		} else {
+		if linkText[0] != 'h' {
 			//telemetry link, e.g. //web.search.ch/r/redirect?event=website&origin=result!u377d618861533351/https://de.wikipedia.org/wiki/Charles_Paul_Wilp
-			linkText = parse.ParseURL("http" + strings.Split(linkHref, "http")[1]) //works for https, dont worry
+			linkText = "http" + strings.Split(linkText, "http")[1] //works for https, dont worry
 		}
 
-		titleText := strings.TrimSpace(linkEl.Text())
-		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
+		linkText, titleText, descText = _sedefaults.SanitizeFields(linkText, titleText, descText)
 
-		if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-			page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 
-			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
-			pageRankCounter[page]++
-		}
+		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
+		bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+		pageRankCounter[page]++
 	})
 
 	col.OnResponse(func(r *colly.Response) {

@@ -9,6 +9,10 @@ import (
 )
 
 func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *Relay, options *engines.Options, pagesCol *colly.Collector) {
+	if seResult == nil {
+		return
+	}
+
 	log.Trace().
 		Str("engine", seName.String()).
 		Str("title", seResult.Title).

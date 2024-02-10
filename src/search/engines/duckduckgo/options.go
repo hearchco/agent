@@ -13,7 +13,7 @@ var Info engines.Info = engines.Info{
 
 var dompaths engines.DOMPaths = engines.DOMPaths{
 	ResultsContainer: "div.filters > table > tbody",
-	Link:             "a.result-link",
+	Link:             "td > a.result-link",
 	Title:            "td > a.result-link",
 	Description:      "td.result-snippet",
 }

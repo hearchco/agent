@@ -12,7 +12,6 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/rs/zerolog/log"
 )
 
@@ -60,9 +59,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				continue
 			}
 			for _, result := range group.Items {
-				goodURL := parse.ParseURL(result.URL)
+				goodLink, goodTitle, goodDesc := _sedefaults.SanitizeFields(result.URL, result.Title, result.Description)
 
-				res := bucket.MakeSEResult(goodURL, result.Title, result.Description, Info.Name, page, counter)
+				res := bucket.MakeSEResult(goodLink, goodTitle, goodDesc, Info.Name, page, counter)
 				bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 				counter += 1
 			}

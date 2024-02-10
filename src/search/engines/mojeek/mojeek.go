@@ -11,7 +11,6 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/parse"
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
@@ -35,21 +34,14 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
-		dom := e.DOM
+		linkText, titleText, descText := _sedefaults.FieldsFromDOM(e.DOM, &dompaths, Info.Name)
 
-		titleEl := dom.Find(dompaths.Title)
-		linkHref, hrefExists := titleEl.Attr("href")
-		linkText := parse.ParseURL(linkHref)
-		titleText := strings.TrimSpace(titleEl.Text())
-		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
+		page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 
-		if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-			page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
+		bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+		pageRankCounter[page]++
 
-			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
-			pageRankCounter[page]++
-		}
 	})
 
 	localeParam := getLocale(&options)

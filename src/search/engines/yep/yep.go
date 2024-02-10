@@ -11,7 +11,6 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/parse"
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
@@ -45,11 +44,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				continue
 			}
 
-			goodURL := parse.ParseURL(result.URL)
-			goodTitle := parse.ParseTextWithHTML(result.Title)
-			goodDescription := parse.ParseTextWithHTML(result.Snippet)
+			goodLink, goodTitle, goodDescription := _sedefaults.SanitizeFields(result.URL, result.Title, result.Snippet)
 
-			res := bucket.MakeSEResult(goodURL, goodTitle, goodDescription, Info.Name, 1, counter)
+			res := bucket.MakeSEResult(goodLink, goodTitle, goodDescription, Info.Name, 1, counter)
 			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 			counter += 1
 		}

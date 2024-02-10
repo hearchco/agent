@@ -12,7 +12,6 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/rs/zerolog/log"
 )
 
@@ -46,19 +45,43 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		dom := e.DOM
 
 		titleEl := dom.Find(dompaths.Title)
-		linkHref, hrefExists := titleEl.Attr("href")
-		linkText := parse.ParseURL(removeTelemetry(linkHref))
 		titleAria, labelExists := titleEl.Attr("aria-label")
 		titleText := strings.TrimSpace(titleAria)
-		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
 
-		if labelExists && hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-			page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		linkHref, hrefExists := titleEl.Attr("href")
+		linkText := removeTelemetry(linkHref)
 
-			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
-			pageRankCounter[page]++
+		descText := dom.Find(dompaths.Description).Text()
+
+		linkText, titleText, descText = _sedefaults.SanitizeFields(linkText, titleText, descText)
+
+		if !hrefExists {
+			log.Error().
+				Str("engine", Info.Name.String()).
+				Str("url", linkText).
+				Str("title", titleText).
+				Str("description", descText).
+				Msgf("yahoo.Search(): href attribute doesn't exist on matched URL element (%v)", dompaths.Link)
+
+			return
 		}
+
+		if !labelExists {
+			log.Error().
+				Str("engine", Info.Name.String()).
+				Str("url", linkText).
+				Str("title", titleText).
+				Str("description", descText).
+				Msgf("yahoo.Search(): aria attribute doesn't exist on matched title element (%v)", dompaths.Title)
+
+			return
+		}
+
+		page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+
+		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
+		bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+		pageRankCounter[page]++
 	})
 
 	colCtx := colly.NewContext()
