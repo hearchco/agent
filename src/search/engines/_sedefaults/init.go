@@ -1,16 +1,18 @@
 package _sedefaults
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/proxy"
 	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/rs/zerolog/log"
 )
 
-func InitializeCollectors(options engines.Options, settings config.Settings, timings config.Timings) (*colly.Collector, *colly.Collector) {
+func InitializeCollectors(ctx context.Context, engineName engines.Name, options engines.Options, settings config.Settings, timings config.Timings, relay *bucket.Relay) (*colly.Collector, *colly.Collector) {
 	col := colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 	pagesCol := colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 
@@ -52,6 +54,15 @@ func InitializeCollectors(options engines.Options, settings config.Settings, tim
 		col.SetProxyFunc(rp)
 		pagesCol.SetProxyFunc(rp)
 	}
+
+	// Set up collector
+	colRequest(ctx, engineName, col)
+	colError(engineName, col)
+
+	// Set up pages collector
+	pagesColRequest(ctx, engineName, pagesCol)
+	pagesColError(engineName, pagesCol)
+	pagesColResponse(engineName, pagesCol, relay)
 
 	return col, pagesCol
 }

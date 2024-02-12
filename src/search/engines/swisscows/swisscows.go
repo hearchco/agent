@@ -22,14 +22,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		return []error{err}
 	}
 
-	col, pagesCol := _sedefaults.InitializeCollectors(options, settings, timings)
-
-	_sedefaults.PagesColRequest(ctx, Info.Name, pagesCol)
-	_sedefaults.PagesColError(Info.Name, pagesCol)
-	_sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
-
-	_sedefaults.ColRequest(ctx, Info.Name, col)
-	_sedefaults.ColError(Info.Name, col)
+	col, pagesCol := _sedefaults.InitializeCollectors(ctx, Info.Name, options, settings, timings, relay)
 
 	col.OnRequest(func(r *colly.Request) {
 		if r.Method == "OPTIONS" {
