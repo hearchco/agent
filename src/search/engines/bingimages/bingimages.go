@@ -67,12 +67,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		imgFormatS := strings.TrimSpace(dom.Find(dompaths.ImgFormatStr).Text())
 		var imgH, imgW int
 		if imgFormatS == "" {
-			// TODO: this happens when bingimages returns youtube link, should it be Trace or do we skip youtube links as images?
-			log.Error().
+			// this happens when bingimages returns video instead of image
+			log.Trace().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Msg("bingimages.Search() -> onHTML: Couldn't find image format")
+			return // result useless without image format
 		} else {
 			// convert to "2000x1500·jpeg"
 			imgFormatS = strings.ReplaceAll(imgFormatS, " ", "")
@@ -93,6 +94,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 					Str("title", titleText).
 					Str("imgFormatS", imgFormatS).
 					Msg("bingimages.Search() -> onHTML: Failed to convert original height to int")
+				return // result useless without image format
 			}
 			imgW, err = strconv.Atoi(imgFormat[1])
 			if err != nil {
@@ -105,6 +107,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 					Str("title", titleText).
 					Str("imgFormatS", imgFormatS).
 					Msg("bingimages.Search() -> onHTML: Failed to convert original width to int")
+				return // result useless without image format
 			}
 		}
 
@@ -116,6 +119,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Msg("bingimages.Search() -> onHTML: Couldn't find thumbnail height")
+			return // result useless without thumbnail format
 		} else {
 			var err error
 			if thmbH, err = strconv.Atoi(thmbHS); err != nil {
@@ -127,6 +131,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 					Str("jsonMetadata", metadataS).
 					Str("title", titleText).
 					Msg("bingimages.Search() -> onHTML: Failed to convert thumbnail height to int")
+				return // result useless without thumbnail format
 			}
 		}
 
@@ -138,6 +143,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Msg("bingimages.Search() -> onHTML: Couldn't find thumbnail width")
+			return // result useless without thumbnail format
 		} else {
 			var err error
 			thmbW, err = strconv.Atoi(thmbHS)
@@ -150,6 +156,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 					Str("jsonMetadata", metadataS).
 					Str("title", titleText).
 					Msg("bingimages.Search() -> onHTML: Failed to convert thumbnail width to int")
+				return // result useless without thumbnail format
 			}
 		}
 
@@ -160,6 +167,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Msg("bingimages.Search() -> onHTML: Couldn't find source")
+			// we keep the result even if we couldn't find the source
 		}
 
 		page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
