@@ -7,7 +7,7 @@ toolchain go1.21.3
 require (
 	github.com/alecthomas/kong v0.8.1
 	github.com/dgraph-io/badger/v4 v4.2.0
-	github.com/fxamacker/cbor/v2 v2.5.0
+	github.com/fxamacker/cbor/v2 v2.6.0
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-contrib/graceful v0.1.0
 	github.com/gin-contrib/pprof v1.4.0
