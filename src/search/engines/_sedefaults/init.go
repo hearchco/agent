@@ -55,14 +55,14 @@ func InitializeCollectors(ctx context.Context, engineName engines.Name, options 
 		pagesCol.SetProxyFunc(rp)
 	}
 
-	// Set up collector
-	colRequest(ctx, engineName, col)
-	colError(engineName, col)
+	// Set up collector (false means normal collector)
+	col.OnRequest(colRequest(ctx, engineName, false))
+	col.OnError(colError(engineName, false))
 
-	// Set up pages collector
-	pagesColRequest(ctx, engineName, pagesCol)
-	pagesColError(engineName, pagesCol)
-	pagesColResponse(engineName, pagesCol, relay)
+	// Set up pages collector (true means pages collector)
+	pagesCol.OnRequest(colRequest(ctx, engineName, true))
+	pagesCol.OnError(colError(engineName, true))
+	pagesCol.OnResponse(colResponse(engineName, relay, true))
 
 	return col, pagesCol
 }
