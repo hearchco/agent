@@ -23,7 +23,7 @@ func main() {
 	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// configure logging without file at INFO level
-	_ = logger.Setup(0)
+	logger.Setup(0)
 
 	// parse cli arguments
 	cliFlags := cli.Setup()
