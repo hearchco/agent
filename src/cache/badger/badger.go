@@ -8,7 +8,6 @@ import (
 	"github.com/dgraph-io/badger/v4"
 	"github.com/fxamacker/cbor/v2"
 	"github.com/hearchco/hearchco/src/anonymize"
-	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/rs/zerolog/log"
 )
@@ -57,7 +56,7 @@ func (db DB) Close() {
 	}
 }
 
-func (db DB) Set(k string, v cache.Value, ttl ...time.Duration) error {
+func (db DB) Set(k string, v interface{}, ttl ...time.Duration) error {
 	log.Debug().Msg("Caching...")
 	cacheTimer := time.Now()
 
@@ -90,7 +89,7 @@ func (db DB) Set(k string, v cache.Value, ttl ...time.Duration) error {
 	return nil
 }
 
-func (db DB) Get(k string, o cache.Value, hashed ...bool) error {
+func (db DB) Get(k string, o interface{}, hashed ...bool) error {
 	var kInput string
 	if len(hashed) > 0 && hashed[0] {
 		kInput = k
