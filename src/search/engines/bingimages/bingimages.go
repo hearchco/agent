@@ -85,7 +85,6 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			var err error
 			imgH, err = strconv.Atoi(imgFormat[0])
 			if err != nil {
-				imgH = 0
 				log.Error().
 					Err(err).
 					Str("engine", Info.Name.String()).
@@ -98,7 +97,6 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			}
 			imgW, err = strconv.Atoi(imgFormat[1])
 			if err != nil {
-				imgW = 0
 				log.Error().
 					Err(err).
 					Str("engine", Info.Name.String()).
@@ -123,7 +121,6 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		} else {
 			var err error
 			if thmbH, err = strconv.Atoi(thmbHS); err != nil {
-				thmbH = 0
 				log.Error().
 					Err(err).
 					Str("engine", Info.Name.String()).
@@ -148,7 +145,6 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			var err error
 			thmbW, err = strconv.Atoi(thmbHS)
 			if err != nil {
-				thmbW = 0
 				log.Error().
 					Err(err).
 					Str("engine", Info.Name.String()).
