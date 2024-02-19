@@ -35,16 +35,17 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			log.Trace().
 				Str("engine", Info.Name.String()).
 				Msg("Matched result, but couldn't retrieve data")
-			return // result useless without URL (metadata)
+			return
 		}
 
-		err := json.Unmarshal([]byte(metadataS), &jsonMetadata)
-		if err != nil {
+		if err := json.Unmarshal([]byte(metadataS), &jsonMetadata); err != nil {
 			log.Error().
 				Err(err).
 				Msg("bingimages.Search() -> onHTML: failed to unmarshal metadata")
-			return // result useless without URL (metadata)
-		} else if jsonMetadata.Purl == "" || jsonMetadata.Murl == "" || jsonMetadata.Turl == "" {
+			return
+		}
+
+		if jsonMetadata.Purl == "" || jsonMetadata.Murl == "" || jsonMetadata.Turl == "" {
 			log.Error().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
@@ -52,7 +53,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				Str("original", jsonMetadata.Murl).
 				Str("thumbnail", jsonMetadata.Turl).
 				Msg("bingimages.Search() -> onHTML: Couldn't find image URL")
-			return // result useless without URL (metadata)
+			return
 		}
 
 		titleText := strings.TrimSpace(dom.Find(dompaths.Title).Text())
@@ -61,11 +62,11 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
 				Msg("bingimages.Search() -> onHTML: Couldn't find title")
+			return
 		}
 
 		// this returns "2000 x 1500 · jpeg"
 		imgFormatS := strings.TrimSpace(dom.Find(dompaths.ImgFormatStr).Text())
-		var imgH, imgW int
 		if imgFormatS == "" {
 			// this happens when bingimages returns video instead of image
 			log.Trace().
@@ -73,87 +74,84 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Msg("bingimages.Search() -> onHTML: Couldn't find image format")
-			return // result useless without image format
-		} else {
-			// convert to "2000x1500·jpeg"
-			imgFormatS = strings.ReplaceAll(imgFormatS, " ", "")
-			// remove everything after 2000x1500
-			imgFormatS = strings.Split(imgFormatS, "·")[0]
-			// create height and width
-			imgFormat := strings.Split(imgFormatS, "x")
+			return
+		}
 
-			var err error
-			imgH, err = strconv.Atoi(imgFormat[0])
-			if err != nil {
-				log.Error().
-					Err(err).
-					Str("engine", Info.Name.String()).
-					Str("height", imgFormat[0]).
-					Str("jsonMetadata", metadataS).
-					Str("title", titleText).
-					Str("imgFormatS", imgFormatS).
-					Msg("bingimages.Search() -> onHTML: Failed to convert original height to int")
-				return // result useless without image format
-			}
-			imgW, err = strconv.Atoi(imgFormat[1])
-			if err != nil {
-				log.Error().
-					Err(err).
-					Str("engine", Info.Name.String()).
-					Str("width", imgFormat[1]).
-					Str("jsonMetadata", metadataS).
-					Str("title", titleText).
-					Str("imgFormatS", imgFormatS).
-					Msg("bingimages.Search() -> onHTML: Failed to convert original width to int")
-				return // result useless without image format
-			}
+		// convert to "2000x1500·jpeg"
+		imgFormatS = strings.ReplaceAll(imgFormatS, " ", "")
+		// remove everything after 2000x1500
+		imgFormatS = strings.Split(imgFormatS, "·")[0]
+		// create height and width
+		imgFormat := strings.Split(imgFormatS, "x")
+
+		imgH, err := strconv.Atoi(imgFormat[0])
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("engine", Info.Name.String()).
+				Str("height", imgFormat[0]).
+				Str("jsonMetadata", metadataS).
+				Str("title", titleText).
+				Str("imgFormatS", imgFormatS).
+				Msg("bingimages.Search() -> onHTML: Failed to convert original height to int")
+			return
+		}
+
+		imgW, err := strconv.Atoi(imgFormat[1])
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("engine", Info.Name.String()).
+				Str("width", imgFormat[1]).
+				Str("jsonMetadata", metadataS).
+				Str("title", titleText).
+				Str("imgFormatS", imgFormatS).
+				Msg("bingimages.Search() -> onHTML: Failed to convert original width to int")
+			return
 		}
 
 		thmbHS, thmbHSExists := dom.Find(dompaths.ThumbnailHeight).Attr("height")
-		var thmbH int
 		if !thmbHSExists {
 			log.Error().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Msg("bingimages.Search() -> onHTML: Couldn't find thumbnail height")
-			return // result useless without thumbnail format
-		} else {
-			var err error
-			if thmbH, err = strconv.Atoi(thmbHS); err != nil {
-				log.Error().
-					Err(err).
-					Str("engine", Info.Name.String()).
-					Str("height", thmbHS).
-					Str("jsonMetadata", metadataS).
-					Str("title", titleText).
-					Msg("bingimages.Search() -> onHTML: Failed to convert thumbnail height to int")
-				return // result useless without thumbnail format
-			}
+			return
+		}
+
+		thmbH, err := strconv.Atoi(thmbHS)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("engine", Info.Name.String()).
+				Str("height", thmbHS).
+				Str("jsonMetadata", metadataS).
+				Str("title", titleText).
+				Msg("bingimages.Search() -> onHTML: Failed to convert thumbnail height to int")
+			return
 		}
 
 		thmbWS, thmbWSExists := dom.Find(dompaths.ThumbnailWidth).Attr("width")
-		var thmbW int
 		if !thmbWSExists {
 			log.Error().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Msg("bingimages.Search() -> onHTML: Couldn't find thumbnail width")
-			return // result useless without thumbnail format
-		} else {
-			var err error
-			thmbW, err = strconv.Atoi(thmbHS)
-			if err != nil {
-				log.Error().
-					Err(err).
-					Str("engine", Info.Name.String()).
-					Str("width", thmbWS).
-					Str("jsonMetadata", metadataS).
-					Str("title", titleText).
-					Msg("bingimages.Search() -> onHTML: Failed to convert thumbnail width to int")
-				return // result useless without thumbnail format
-			}
+			return
+		}
+
+		thmbW, err := strconv.Atoi(thmbHS)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("engine", Info.Name.String()).
+				Str("width", thmbWS).
+				Str("jsonMetadata", metadataS).
+				Str("title", titleText).
+				Msg("bingimages.Search() -> onHTML: Failed to convert thumbnail width to int")
+			return
 		}
 
 		source := strings.TrimSpace(dom.Find(dompaths.Source).Text())
@@ -163,7 +161,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Msg("bingimages.Search() -> onHTML: Couldn't find source")
-			// we keep the result even if we couldn't find the source
+			return
 		}
 
 		page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
