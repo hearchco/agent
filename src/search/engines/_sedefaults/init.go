@@ -16,13 +16,13 @@ func InitializeCollectors(ctx context.Context, engineName engines.Name, options 
 	col := colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 	pagesCol := colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 
-	var limitRule = &colly.LimitRule{
+	limitRule := colly.LimitRule{
 		DomainGlob:  "*",
 		Delay:       timings.Delay,
 		RandomDelay: timings.RandomDelay,
 		Parallelism: timings.Parallelism,
 	}
-	if err := col.Limit(limitRule); err != nil {
+	if err := col.Limit(&limitRule); err != nil {
 		log.Error().
 			Err(err).
 			Str("limitRule", fmt.Sprintf("%v", limitRule)).
