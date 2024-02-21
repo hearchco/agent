@@ -110,13 +110,26 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			return
 		}
 
-		thmbHS, thmbHSExists := dom.Find(dompaths.ThumbnailHeight).Attr("height")
-		if !thmbHSExists {
+		found := false
+		var thmbHS, thmbWS string
+		for _, thmb := range dompaths.Thumbnail {
+			var thmbHExists, thmbWExists bool
+			thmbHS, thmbHExists = dom.Find(thmb.Path).Attr(thmb.Height)
+			thmbWS, thmbWExists = dom.Find(thmb.Path).Attr(thmb.Width)
+			if thmbHExists && thmbWExists {
+				found = true
+				break
+			}
+		}
+
+		if !found {
 			log.Error().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
-				Msg("bingimages.Search() -> onHTML: Couldn't find thumbnail height")
+				Str("height", thmbHS).
+				Str("width", thmbWS).
+				Msg("bingimages.Search() -> onHTML: Couldn't find thumbnail format")
 			return
 		}
 
@@ -129,16 +142,6 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Msg("bingimages.Search() -> onHTML: Failed to convert thumbnail height to int")
-			return
-		}
-
-		thmbWS, thmbWSExists := dom.Find(dompaths.ThumbnailWidth).Attr("width")
-		if !thmbWSExists {
-			log.Error().
-				Str("engine", Info.Name.String()).
-				Str("jsonMetadata", metadataS).
-				Str("title", titleText).
-				Msg("bingimages.Search() -> onHTML: Couldn't find thumbnail width")
 			return
 		}
 
