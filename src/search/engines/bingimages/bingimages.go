@@ -40,7 +40,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		dom := e.DOM
 
 		var jsonMetadata JsonMetadata
-		metadataS, metadataExists := dom.Find(dompaths.Metadata).Attr("m")
+		metadataS, metadataExists := dom.Find(dompaths.Metadata.Path).Attr(dompaths.Metadata.Attr)
 		if !metadataExists {
 			log.Trace().
 				Str("engine", Info.Name.String()).
