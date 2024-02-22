@@ -196,6 +196,14 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		pageRankCounter[page]++
 	})
 
+	col.OnResponse(func(r *colly.Response) {
+		if len(r.Body) == 0 {
+			log.Trace().
+				Str("engine", Info.Name.String()).
+				Msgf("Got empty response, probably too many requests")
+		}
+	})
+
 	localeParam := getLocale(&options)
 
 	colCtx := colly.NewContext()
