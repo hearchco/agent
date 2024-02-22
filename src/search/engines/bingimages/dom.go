@@ -21,7 +21,7 @@ type bingImagesDomPaths struct {
 }
 
 var dompaths = bingImagesDomPaths{
-	Result: "ul.dgControl_list > li",
+	Result: "ul.dgControl_list > li[data-idx]",
 	Metadata: metadataDomPaths{
 		Path: "a.iusc",
 		Attr: "m",
