@@ -42,7 +42,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		var jsonMetadata JsonMetadata
 		metadataS, metadataExists := dom.Find(dompaths.Metadata.Path).Attr(dompaths.Metadata.Attr)
 		if !metadataExists {
-			log.Trace().
+			log.Error().
 				Str("engine", Info.Name.String()).
 				Msg("Matched result, but couldn't retrieve data")
 			return
