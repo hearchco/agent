@@ -69,6 +69,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 		titleText := strings.TrimSpace(dom.Find(dompaths.Title).Text())
 		if titleText == "" {
+			// could also use the json data ("t" field)
 			log.Error().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
