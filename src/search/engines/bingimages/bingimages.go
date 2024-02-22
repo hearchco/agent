@@ -63,7 +63,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				Str("url", jsonMetadata.PageURL).
 				Str("original", jsonMetadata.ImageURL).
 				Str("thumbnail", jsonMetadata.ThumbnailURL).
-				Msg("bingimages.Search() -> onHTML: Couldn't find image URL")
+				Msg("bingimages.Search() -> onHTML: Couldn't find image, thumbnail, or page URL")
 			return
 		}
 
