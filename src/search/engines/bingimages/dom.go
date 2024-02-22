@@ -21,7 +21,8 @@ type bingImagesDomPaths struct {
 }
 
 var dompaths = bingImagesDomPaths{
-	Result: "ul.dgControl_list > li",
+	// aria-live is also a possible attribute for not()
+	Result: "ul.dgControl_list > li[data-idx] > div.iuscp:not([vrhatt])",
 	Metadata: metadataDomPaths{
 		Path: "a.iusc",
 		Attr: "m",
