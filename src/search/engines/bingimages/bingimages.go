@@ -51,7 +51,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		if err := json.Unmarshal([]byte(metadataS), &jsonMetadata); err != nil {
 			log.Error().
 				Err(err).
-				Msg("bingimages.Search() -> onHTML: failed to unmarshal metadata")
+				Str("jsonMetadata", metadataS).
+				Msgf("bingimages.Search() -> onHTML: failed to unmarshal metadata")
 			return
 		}
 
