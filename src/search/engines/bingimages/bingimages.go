@@ -157,7 +157,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			return
 		}
 
-		thmbW, err := strconv.Atoi(thmbHS)
+		thmbW, err := strconv.Atoi(thmbWS)
 		if err != nil {
 			log.Error().
 				Err(err).
