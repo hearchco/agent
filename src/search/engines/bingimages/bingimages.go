@@ -80,8 +80,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		// this returns "2000 x 1500 · jpeg"
 		imgFormatS := strings.TrimSpace(dom.Find(dompaths.ImgFormatStr).Text())
 		if imgFormatS == "" {
-			// this happens when bingimages returns video instead of image
-			log.Trace().
+			log.Error().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
