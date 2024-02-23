@@ -17,6 +17,7 @@ import (
 	"github.com/hearchco/hearchco/src/config"
 )
 
+// it's okay to store pointer to graceful.Graceful since graceful.New() returns a pointer
 type RouterWrapper struct {
 	rtr  *graceful.Graceful
 	conf config.Config
