@@ -57,6 +57,7 @@ func main() {
 	if cliFlags.Cli {
 		cli.Run(cliFlags, db, conf)
 	} else {
+		// conf is passed by value, so it won't espace to heap when stored inside RouterWrapper
 		rw, err := router.New(conf, cliFlags.Verbosity, lgr)
 		if err != nil {
 			log.Fatal().Err(err).Msg("main.main(): failed creating a router")
@@ -73,7 +74,13 @@ func main() {
 	// program cleanup
 	db.Close()
 
-	log.Debug().
-		Int64("ms", time.Since(mainTimer).Milliseconds()).
-		Msg("Program finished")
+	if cliFlags.Cli {
+		log.Debug().
+			Int64("ms", time.Since(mainTimer).Milliseconds()).
+			Msg("Program finished")
+	} else {
+		// router mode could be running for a very long time
+		log.Info().
+			Msg("Program finished")
+	}
 }
