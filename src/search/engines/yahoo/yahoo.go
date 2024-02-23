@@ -61,7 +61,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				Str("url", linkText).
 				Str("title", titleText).
 				Str("description", descText).
-				Msgf("yahoo.Search(): href attribute doesn't exist on matched URL element (%v)", dompaths.Link)
+				Str("link selector", dompaths.Link).
+				Msg("yahoo.Search(): href attribute doesn't exist on matched URL element")
 
 			return
 		}
