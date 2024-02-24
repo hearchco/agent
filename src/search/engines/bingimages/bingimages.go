@@ -80,11 +80,11 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		// this returns "2000 x 1500 · jpeg"
 		imgFormatS := strings.TrimSpace(dom.Find(dompaths.ImgFormatStr).Text())
 		if imgFormatS == "" {
-			log.Error().
+			log.Trace().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
-				Msg("bingimages.Search() -> onHTML: Couldn't find image format")
+				Msg("bingimages.Search() -> onHTML: Couldn't find image format (probably a video)")
 			return
 		}
 
