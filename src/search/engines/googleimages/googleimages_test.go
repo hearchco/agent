@@ -24,7 +24,7 @@ func TestSearch(t *testing.T) {
 
 	tccr := [...]_engines_test.TestCaseContainsResults{{
 		Query:     "wikipedia logo",
-		ResultURL: []string{"wikipedia."},
+		ResultURL: []string{"upload.wikimedia.org"},
 		Options: engines.Options{
 			MaxPages:   1,
 			VisitPages: false,
@@ -33,7 +33,7 @@ func TestSearch(t *testing.T) {
 
 	tcrr := [...]_engines_test.TestCaseRankedResults{{
 		Query:     "linux logo wikipedia",
-		ResultURL: []string{"wikipedia.org/wiki/Linux"},
+		ResultURL: []string{"upload.wikimedia.org"},
 		Options: engines.Options{
 			MaxPages:   1,
 			VisitPages: false,
