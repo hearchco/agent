@@ -52,7 +52,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			log.Error().
 				Err(err).
 				Str("jsonMetadata", metadataS).
-				Msgf("bingimages.Search() -> onHTML: failed to unmarshal metadata")
+				Msg("bingimages.Search() -> onHTML: failed to unmarshal metadata")
 			return
 		}
 
