@@ -5,15 +5,16 @@ import (
 )
 
 type Image struct {
-	URL    string
 	Height uint
 	Width  uint
 }
 
 type ImageResult struct {
-	Source    string
-	Original  Image
-	Thumbnail Image
+	Original     Image
+	Thumbnail    Image
+	ThumbnailURL string
+	Source       string
+	SourceURL    string
 }
 
 // Everything about some Result, calculated and compiled from multiple search engines

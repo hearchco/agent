@@ -180,17 +180,15 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 
 		original := result.Image{
-			URL:    jsonMetadata.Murl,
 			Height: uint(imgH),
 			Width:  uint(imgW),
 		}
 		thumbnail := result.Image{
-			URL:    jsonMetadata.Turl,
 			Height: uint(thmbH),
 			Width:  uint(thmbW),
 		}
 
-		res := bucket.MakeSEImageResult(jsonMetadata.Purl, titleText, jsonMetadata.Desc, source, original, thumbnail, Info.Name, page, pageRankCounter[page]+1)
+		res := bucket.MakeSEImageResult(jsonMetadata.Murl, titleText, jsonMetadata.Desc, source, jsonMetadata.Purl, original, thumbnail, jsonMetadata.Turl, Info.Name, page, pageRankCounter[page]+1)
 		bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 		pageRankCounter[page]++
 	})
