@@ -64,14 +64,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		for _, metadata := range jsonResponse.ISCHJ.Metadata {
 			origImg := metadata.OriginalImage
 			original := result.Image{
-				URL:    origImg.Url,
 				Height: origImg.Height,
 				Width:  origImg.Width,
 			}
 
 			thmbImg := metadata.Thumbnail
 			thumbnail := result.Image{
-				URL:    thmbImg.Url,
 				Height: thmbImg.Height,
 				Width:  thmbImg.Width,
 			}
@@ -79,8 +77,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			resultJson := metadata.Result
 			textInGridJson := metadata.TextInGrid
 
-			if resultJson.ReferrerUrl != "" && original.URL != "" && thumbnail.URL != "" {
-				res := bucket.MakeSEImageResult(resultJson.ReferrerUrl, resultJson.PageTitle, textInGridJson.Snippet, resultJson.SiteTitle, original, thumbnail, Info.Name, page, pageRankCounter[page]+1)
+			if resultJson.ReferrerUrl != "" && origImg.Url != "" && thmbImg.Url != "" {
+				res := bucket.MakeSEImageResult(origImg.Url, resultJson.PageTitle, textInGridJson.Snippet, resultJson.SiteTitle, resultJson.ReferrerUrl, original, thumbnail, thmbImg.Url, Info.Name, page, pageRankCounter[page]+1)
 				bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 				pageRankCounter[page]++
 			} else {
@@ -88,8 +86,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 					Str("engine", Info.Name.String()).
 					Str("jsonMetadata", fmt.Sprintf("%v", metadata)).
 					Str("url", resultJson.ReferrerUrl).
-					Str("original", original.URL).
-					Str("thumbnail", thumbnail.URL).
+					Str("original", origImg.Url).
+					Str("thumbnail", thmbImg.Url).
 					Msg("googleimages.Search() -> onHTML: Couldn't find image URL")
 			}
 		}

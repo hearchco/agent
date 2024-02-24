@@ -21,7 +21,7 @@ func MakeSEResult(urll string, title string, description string, searchEngineNam
 	return &res
 }
 
-func MakeSEImageResult(urll string, title string, description string, source string, original result.Image, thumbnail result.Image, searchEngineName engines.Name, sePage int, seOnPageRank int) *result.RetrievedResult {
+func MakeSEImageResult(urll, title, desc, src, srcUrl string, orig, thmb result.Image, thmbUrl string, searchEngineName engines.Name, sePage, seOnPageRank int) *result.RetrievedResult {
 	ser := result.RetrievedRank{
 		SearchEngine: searchEngineName,
 		Rank:         0,
@@ -31,11 +31,13 @@ func MakeSEImageResult(urll string, title string, description string, source str
 	res := result.RetrievedResult{
 		URL:         urll,
 		Title:       title,
-		Description: description,
+		Description: desc,
 		ImageResult: result.ImageResult{
-			Source:    source,
-			Original:  original,
-			Thumbnail: thumbnail,
+			Original:     orig,
+			Thumbnail:    thmb,
+			ThumbnailURL: thmbUrl,
+			Source:       src,
+			SourceURL:    srcUrl,
 		},
 		Rank: ser,
 	}
