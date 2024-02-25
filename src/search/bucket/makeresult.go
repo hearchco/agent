@@ -31,11 +31,11 @@ func MakeSEImageResult(
 	urll, title, desc string,
 	src, srcUrl, thmbUrl string,
 	origH, origW, thmbH, thmbW int,
-	searchEngineName engines.Name, sePage, seOnPageRank int,
+	seName engines.Name, sePage, seOnPageRank int,
 ) *result.RetrievedResult {
 
 	ser := result.RetrievedRank{
-		SearchEngine: searchEngineName,
+		SearchEngine: seName,
 		Rank:         0,
 		Page:         uint(sePage),
 		OnPageRank:   uint(seOnPageRank),
