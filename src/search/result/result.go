@@ -4,16 +4,17 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-type Image struct {
-	URL    string
+type ImageFormat struct {
 	Height uint
 	Width  uint
 }
 
 type ImageResult struct {
-	Source    string
-	Original  Image
-	Thumbnail Image
+	Original     ImageFormat
+	Thumbnail    ImageFormat
+	ThumbnailURL string
+	Source       string
+	SourceURL    string
 }
 
 // Everything about some Result, calculated and compiled from multiple search engines

@@ -12,8 +12,8 @@ type TextInGrid struct {
 
 type Image struct {
 	Url    string `json:"url"`
-	Height uint   `json:"height"`
-	Width  uint   `json:"width"`
+	Height int    `json:"height"`
+	Width  int    `json:"width"`
 }
 
 type Metadata struct {

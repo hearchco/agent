@@ -80,7 +80,10 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 func removeTelemetry(link string) string {
 	parsedURL, err := url.Parse(link)
 	if err != nil {
-		log.Error().Err(err).Msgf("error parsing url: %#v", link)
+		log.Error().
+			Err(err).
+			Str("link", link).
+			Msg("error parsing link")
 		return link
 	}
 

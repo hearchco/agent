@@ -12,7 +12,6 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/result"
 	"github.com/rs/zerolog/log"
 )
 
@@ -32,7 +31,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		var jsonMetadata JsonMetadata
 		metadataS, metadataExists := dom.Find(dompaths.Metadata.Path).Attr(dompaths.Metadata.Attr)
 		if !metadataExists {
-			log.Trace().
+			log.Error().
 				Str("engine", Info.Name.String()).
 				Msg("Matched result, but couldn't retrieve data")
 			return
@@ -41,23 +40,25 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		if err := json.Unmarshal([]byte(metadataS), &jsonMetadata); err != nil {
 			log.Error().
 				Err(err).
+				Str("jsonMetadata", metadataS).
 				Msg("bingimages.Search() -> onHTML: failed to unmarshal metadata")
 			return
 		}
 
-		if jsonMetadata.Purl == "" || jsonMetadata.Murl == "" || jsonMetadata.Turl == "" {
+		if jsonMetadata.ImageURL == "" || jsonMetadata.PageURL == "" || jsonMetadata.ThumbnailURL == "" {
 			log.Error().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
-				Str("url", jsonMetadata.Purl).
-				Str("original", jsonMetadata.Murl).
-				Str("thumbnail", jsonMetadata.Turl).
-				Msg("bingimages.Search() -> onHTML: Couldn't find image URL")
+				Str("url", jsonMetadata.PageURL).
+				Str("original", jsonMetadata.ImageURL).
+				Str("thumbnail", jsonMetadata.ThumbnailURL).
+				Msg("bingimages.Search() -> onHTML: Couldn't find image, thumbnail, or page URL")
 			return
 		}
 
 		titleText := strings.TrimSpace(dom.Find(dompaths.Title).Text())
 		if titleText == "" {
+			// could also use the json data ("t" field), it seems to include weird/erroneous characters though (particularly '\ue000' and '\ue001')
 			log.Error().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
@@ -68,12 +69,11 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		// this returns "2000 x 1500 · jpeg"
 		imgFormatS := strings.TrimSpace(dom.Find(dompaths.ImgFormatStr).Text())
 		if imgFormatS == "" {
-			// this happens when bingimages returns video instead of image
 			log.Trace().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
-				Msg("bingimages.Search() -> onHTML: Couldn't find image format")
+				Msg("bingimages.Search() -> onHTML: Couldn't find image format (probably a video)")
 			return
 		}
 
@@ -145,7 +145,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			return
 		}
 
-		thmbW, err := strconv.Atoi(thmbHS)
+		thmbW, err := strconv.Atoi(thmbWS)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -169,23 +169,25 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 		page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 
-		original := result.Image{
-			URL:    jsonMetadata.Murl,
-			Height: uint(imgH),
-			Width:  uint(imgW),
-		}
-		thumbnail := result.Image{
-			URL:    jsonMetadata.Turl,
-			Height: uint(thmbH),
-			Width:  uint(thmbW),
-		}
-
-		res := bucket.MakeSEImageResult(jsonMetadata.Purl, titleText, jsonMetadata.Desc, source, original, thumbnail, Info.Name, page, pageRankCounter[page]+1)
+		res := bucket.MakeSEImageResult(
+			jsonMetadata.ImageURL, titleText, jsonMetadata.Desc,
+			source, jsonMetadata.PageURL, jsonMetadata.ThumbnailURL,
+			imgH, imgW, thmbH, thmbW,
+			Info.Name, page, pageRankCounter[page]+1,
+		)
 		bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
 		pageRankCounter[page]++
 	})
 
-	errChannel := make(chan error, 1)
+	col.OnResponse(func(r *colly.Response) {
+		if len(r.Body) == 0 {
+			log.Trace().
+				Str("engine", Info.Name.String()).
+				Msg("Got empty response, probably too many requests")
+		}
+	})
+
+  errChannel := make(chan error, 1)
 
 	localeParam := getLocale(options)
 
