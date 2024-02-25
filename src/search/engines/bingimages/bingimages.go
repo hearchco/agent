@@ -12,7 +12,6 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/result"
 	"github.com/rs/zerolog/log"
 )
 
@@ -180,16 +179,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 		page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 
-		original := result.Image{
-			Height: uint(imgH),
-			Width:  uint(imgW),
-		}
-		thumbnail := result.Image{
-			Height: uint(thmbH),
-			Width:  uint(thmbW),
-		}
-
-		res := bucket.MakeSEImageResult(jsonMetadata.ImageURL, titleText, jsonMetadata.Desc, source, jsonMetadata.PageURL, original, thumbnail, jsonMetadata.ThumbnailURL, Info.Name, page, pageRankCounter[page]+1)
+		res := bucket.MakeSEImageResult(
+			jsonMetadata.ImageURL, titleText, jsonMetadata.Desc,
+			source, jsonMetadata.PageURL, jsonMetadata.ThumbnailURL,
+			imgH, imgW, thmbH, thmbW,
+			Info.Name, page, pageRankCounter[page]+1,
+		)
 		bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 		pageRankCounter[page]++
 	})

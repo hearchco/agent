@@ -13,7 +13,6 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/result"
 	"github.com/rs/zerolog/log"
 )
 
@@ -63,22 +62,17 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 		for _, metadata := range jsonResponse.ISCHJ.Metadata {
 			origImg := metadata.OriginalImage
-			original := result.Image{
-				Height: origImg.Height,
-				Width:  origImg.Width,
-			}
-
 			thmbImg := metadata.Thumbnail
-			thumbnail := result.Image{
-				Height: thmbImg.Height,
-				Width:  thmbImg.Width,
-			}
-
 			resultJson := metadata.Result
 			textInGridJson := metadata.TextInGrid
 
 			if resultJson.ReferrerUrl != "" && origImg.Url != "" && thmbImg.Url != "" {
-				res := bucket.MakeSEImageResult(origImg.Url, resultJson.PageTitle, textInGridJson.Snippet, resultJson.SiteTitle, resultJson.ReferrerUrl, original, thumbnail, thmbImg.Url, Info.Name, page, pageRankCounter[page]+1)
+				res := bucket.MakeSEImageResult(
+					origImg.Url, resultJson.PageTitle, textInGridJson.Snippet,
+					resultJson.SiteTitle, resultJson.ReferrerUrl, thmbImg.Url,
+					origImg.Height, origImg.Width, thmbImg.Height, thmbImg.Width,
+					Info.Name, page, pageRankCounter[page]+1,
+				)
 				bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
 				pageRankCounter[page]++
 			} else {

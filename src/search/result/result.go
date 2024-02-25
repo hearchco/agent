@@ -4,14 +4,14 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-type Image struct {
+type ImageFormat struct {
 	Height uint
 	Width  uint
 }
 
 type ImageResult struct {
-	Original     Image
-	Thumbnail    Image
+	Original     ImageFormat
+	Thumbnail    ImageFormat
 	ThumbnailURL string
 	Source       string
 	SourceURL    string
