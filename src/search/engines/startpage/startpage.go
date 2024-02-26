@@ -63,7 +63,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	safeSearch := getSafeSearch(options)
 
-	errChannel := make(chan error, 1)
+	errChannel := make(chan error, options.MaxPages)
+
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 

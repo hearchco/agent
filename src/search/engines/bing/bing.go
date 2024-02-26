@@ -62,8 +62,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	localeParam := getLocale(options)
 
-	// create a buffered channel to hold errors, size of channel is the number of pages = requests being made
 	errChannel := make(chan error, options.MaxPages)
+
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
