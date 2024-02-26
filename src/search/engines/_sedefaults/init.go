@@ -57,13 +57,13 @@ func InitializeCollectors(ctx context.Context, engineName engines.Name, options 
 	}
 
 	// Set up collector (false means normal collector)
-	col.OnRequest(colRequest(ctx, engineName, false))
-	col.OnError(colError(engineName, false))
+	col.OnRequest(colRequest(ctx, engineName))
+	col.OnError(colError(engineName))
 
 	// Set up pages collector (true means pages collector)
-	pagesCol.OnRequest(colRequest(ctx, engineName, true))
-	pagesCol.OnError(colError(engineName, true))
-	pagesCol.OnResponse(colResponse(engineName, relay, true))
+	pagesCol.OnRequest(pagesColRequest(ctx, engineName))
+	pagesCol.OnError(pagesColError(engineName))
+	pagesCol.OnResponse(pagesColResponse(engineName, relay))
 
 	return col, pagesCol
 }
