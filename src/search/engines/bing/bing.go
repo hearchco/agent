@@ -80,14 +80,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, errChannel)
 	}
 
-	// only store errors that occur and are not Timeout errors
-	retErrors := make([]error, 0)
-	for i := 0; i < options.MaxPages; i++ {
-		err := <-errChannel
-		if err != nil && !engines.IsTimeoutError(err) {
-			retErrors = append(retErrors, err)
-		}
-	}
+	retErrors := _sedefaults.ReadErrorChannel(options.MaxPages, errChannel)
 
 	col.Wait()
 	pagesCol.Wait()
