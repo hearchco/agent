@@ -73,7 +73,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 					Str("url", resultJson.ReferrerUrl).
 					Str("original", origImg.Url).
 					Str("thumbnail", thmbImg.Url).
-					Msg("googleimages.Search() -> onHTML: Couldn't find image URL")
+					Msg("googleimages.Search() -> col.OnResponse: Couldn't find image URL")
 			}
 		}
 	})
