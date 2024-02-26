@@ -12,8 +12,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func colRequest(ctx context.Context, seName engines.Name) func(r *colly.Request) {
-	return func(r *colly.Request) {
+func colRequest(col *colly.Collector, ctx context.Context, seName engines.Name) {
+	col.OnRequest(func(r *colly.Request) {
 		if err := ctx.Err(); err != nil {
 			if engines.IsTimeoutError(err) {
 				log.Trace().
@@ -29,11 +29,11 @@ func colRequest(ctx context.Context, seName engines.Name) func(r *colly.Request)
 			r.Abort()
 			return
 		}
-	}
+	})
 }
 
-func colError(seName engines.Name) func(r *colly.Response, err error) {
-	return func(r *colly.Response, err error) {
+func colError(col *colly.Collector, seName engines.Name) {
+	col.OnError(func(r *colly.Response, err error) {
 		if engines.IsTimeoutError(err) {
 			log.Trace().
 				// Err(err). // timeout error produces Get "url" error with the query
@@ -64,5 +64,5 @@ func colError(seName engines.Name) func(r *colly.Response, err error) {
 				}).
 				Msg("_sedefaults.colError(): html response written")
 		}
-	}
+	})
 }

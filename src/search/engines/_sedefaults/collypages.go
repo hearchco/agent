@@ -13,8 +13,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func pagesColRequest(ctx context.Context, seName engines.Name) func(r *colly.Request) {
-	return func(r *colly.Request) {
+func pagesColRequest(pagesCol *colly.Collector, ctx context.Context, seName engines.Name) {
+	pagesCol.OnRequest(func(r *colly.Request) {
 		if err := ctx.Err(); err != nil {
 			if engines.IsTimeoutError(err) {
 				log.Trace().
@@ -31,11 +31,11 @@ func pagesColRequest(ctx context.Context, seName engines.Name) func(r *colly.Req
 			return
 		}
 		r.Ctx.Put("originalURL", r.URL.String())
-	}
+	})
 }
 
-func pagesColError(seName engines.Name) func(r *colly.Response, err error) {
-	return func(r *colly.Response, err error) {
+func pagesColError(pagesCol *colly.Collector, seName engines.Name) {
+	pagesCol.OnError(func(r *colly.Response, err error) {
 		if engines.IsTimeoutError(err) {
 			log.Trace().
 				// Err(err). // timeout error produces Get "url" error with the query
@@ -66,11 +66,11 @@ func pagesColError(seName engines.Name) func(r *colly.Response, err error) {
 				}).
 				Msg("_sedefaults.pagesColError(): html response written")
 		}
-	}
+	})
 }
 
-func pagesColResponse(seName engines.Name, relay *bucket.Relay) func(r *colly.Response) {
-	return func(r *colly.Response) {
+func pagesColResponse(pagesCol *colly.Collector, seName engines.Name, relay *bucket.Relay) {
+	pagesCol.OnResponse(func(r *colly.Response) {
 		urll := r.Ctx.Get("originalURL")
 		if urll == "" {
 			log.Error().
@@ -83,5 +83,5 @@ func pagesColResponse(seName engines.Name, relay *bucket.Relay) func(r *colly.Re
 					Msg("_sedefaults.pagesColResponse(): error setting result")
 			}
 		}
-	}
+	})
 }
