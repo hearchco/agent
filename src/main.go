@@ -57,7 +57,7 @@ func main() {
 	if cliFlags.Cli {
 		cli.Run(cliFlags, db, conf)
 	} else {
-		// conf is passed by value, so it won't espace to heap when stored inside RouterWrapper
+		// conf is passed by value, so it won't escape to heap when stored inside RouterWrapper
 		rw, err := router.New(conf, cliFlags.Verbosity, lgr)
 		if err != nil {
 			log.Fatal().Err(err).Msg("main.main(): failed creating a router")

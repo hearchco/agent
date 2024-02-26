@@ -72,7 +72,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			desc := parse.ParseTextWithHTML(result.Desc)
 
 			res := bucket.MakeSEResult(goodURL, title, desc, Info.Name, page, counter)
-			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+			bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 			counter += 1
 		}
 	})
@@ -125,7 +125,7 @@ col.OnHTML("div.web-results > article.item-web", func(e *colly.HTMLElement) {
 		page, _ := strconv.Atoi(pageStr)
 
 		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, pageRankCounter[page]+1)
-		bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+		bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 		pageRankCounter[page]++
 	} else {
 		log.Trace().

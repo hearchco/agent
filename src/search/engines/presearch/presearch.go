@@ -58,7 +58,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				goodDesc := parse.ParseTextWithHTML(result.Desc)
 
 				res := bucket.MakeSEResult(goodURL, goodTitle, goodDesc, Info.Name, page, counter)
-				bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+				bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 				counter += 1
 			}
 		} else {

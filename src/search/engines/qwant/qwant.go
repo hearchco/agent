@@ -53,7 +53,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				goodURL := parse.ParseURL(result.URL)
 
 				res := bucket.MakeSEResult(goodURL, result.Title, result.Description, Info.Name, page, counter)
-				bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+				bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 				counter += 1
 			}
 		}
@@ -138,7 +138,7 @@ col.OnHTML("div[data-testid=\"sectionWeb\"] > div > div", func(e *colly.HTMLElem
 		page, _ := strconv.Atoi(pageStr)
 
 		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, idx+1)
-		bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+		bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 	} else {
 		log.Info().
 			Str("link", linkText).

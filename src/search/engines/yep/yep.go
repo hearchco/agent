@@ -40,7 +40,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			goodDescription := parse.ParseTextWithHTML(result.Snippet)
 
 			res := bucket.MakeSEResult(goodURL, goodTitle, goodDescription, Info.Name, 1, counter)
-			bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+			bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 			counter += 1
 		}
 	})

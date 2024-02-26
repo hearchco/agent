@@ -8,7 +8,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func AddSEResult(seResult result.RetrievedResult, seName engines.Name, relay *Relay, options engines.Options, pagesCol *colly.Collector) {
+// passing pointers down is on stack
+func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *Relay, options engines.Options, pagesCol *colly.Collector) {
 	log.Trace().
 		Str("engine", seName.String()).
 		Str("title", seResult.Title).

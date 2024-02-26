@@ -59,7 +59,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			case 3:
 				if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
 					res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, (i/4 + 1))
-					bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+					bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 				}
 			}
 		})

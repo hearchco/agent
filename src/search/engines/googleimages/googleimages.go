@@ -64,7 +64,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 					origImg.Height, origImg.Width, thmbImg.Height, thmbImg.Width,
 					Info.Name, page, pageRankCounter[page]+1,
 				)
-				bucket.AddSEResult(res, Info.Name, relay, options, pagesCol)
+				bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 				pageRankCounter[page]++
 			} else {
 				log.Error().
