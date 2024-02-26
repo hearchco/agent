@@ -14,10 +14,10 @@ func Rank(resMap map[string]*result.Result, rconf config.Ranking) []result.Resul
 		results = append(results, *res)
 	}
 
-	FillRetrievedRank(results)
+	fillRetrievedRank(results)
 
 	for ind := range results {
-		results[ind].Score = GetScore(results[ind], rconf)
+		results[ind].Score = getScore(&results[ind], &rconf)
 	}
 	sort.Sort(ByScore(results))
 	for ind := range results {

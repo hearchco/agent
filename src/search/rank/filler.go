@@ -13,7 +13,7 @@ type RankFiller struct {
 	RRInd   int
 }
 
-func FillRetrievedRank(results []result.Result) {
+func fillRetrievedRank(results []result.Result) {
 	engResults := make([][]RankFiller, len(engines.NameValues()))
 	for arrind, res := range results {
 		for rrind, er := range res.EngineRanks {

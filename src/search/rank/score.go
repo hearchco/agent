@@ -7,7 +7,8 @@ import (
 	"github.com/hearchco/hearchco/src/search/result"
 )
 
-func GetScore(result result.Result, rconf config.Ranking) float64 {
+// package local func that gets result pointer passed down
+func getScore(result *result.Result, rconf *config.Ranking) float64 {
 	retRankScore := float64(0)
 	for _, er := range result.EngineRanks {
 		seMul := rconf.Engines[er.SearchEngine.ToLower()].Mul
