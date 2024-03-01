@@ -171,7 +171,7 @@ func New() *Config {
 					PageTimeout: 1000 * time.Millisecond,
 				},
 			},
-			category.IMAGE: {
+			category.IMAGES: {
 				Engines: NewImage(),
 				Ranking: NewRanking(),
 				Timings: Timings{
