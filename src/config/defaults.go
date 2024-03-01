@@ -1,12 +1,12 @@
 package config
 
 import (
-	"log"
 	"time"
 
 	"github.com/hearchco/hearchco/src/moretime"
 	"github.com/hearchco/hearchco/src/search/category"
 	"github.com/hearchco/hearchco/src/search/engines"
+	"github.com/rs/zerolog/log"
 )
 
 const DefaultLocale string = "en_US"
@@ -91,7 +91,9 @@ func NewSettings() map[engines.Name]Settings {
 	// Check if all search engines have a shortcut set
 	for _, eng := range engines.Names() {
 		if _, ok := mp[eng]; !ok {
-			log.Fatalf("config.NewSettings(): %v doesn't have a shortcut set.", eng)
+			log.Fatal().
+				Str("engine", eng.String()).
+				Msg("config.NewSettings(): no shortcut set")
 			// ^FATAL
 		}
 	}
