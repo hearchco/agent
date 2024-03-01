@@ -7,6 +7,7 @@ import (
 var FromString = map[string]Name{
 	//main
 	"general": GENERAL,
+	"images":  IMAGES,
 	"info":    INFO,
 	"science": SCIENCE,
 	"news":    NEWS,

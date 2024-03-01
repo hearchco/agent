@@ -5,18 +5,61 @@ import (
 	"github.com/hearchco/hearchco/src/search/result"
 )
 
-func MakeSEResult(urll string, title string, description string, searchEngineName engines.Name, sePage int, seOnPageRank int) *result.RetrievedResult {
+func MakeSEResult(
+	urll, title, desc string,
+	seName engines.Name, sePage, seOnPageRank int,
+) *result.RetrievedResult {
+
 	ser := result.RetrievedRank{
-		SearchEngine: searchEngineName,
+		SearchEngine: seName,
 		Rank:         0,
 		Page:         uint(sePage),
 		OnPageRank:   uint(seOnPageRank),
 	}
+
 	res := result.RetrievedResult{
 		URL:         urll,
 		Title:       title,
-		Description: description,
+		Description: desc,
 		Rank:        ser,
 	}
+
+	return &res
+}
+
+func MakeSEImageResult(
+	urll, title, desc string,
+	src, srcUrl, thmbUrl string,
+	origH, origW, thmbH, thmbW int,
+	seName engines.Name, sePage, seOnPageRank int,
+) *result.RetrievedResult {
+
+	ser := result.RetrievedRank{
+		SearchEngine: seName,
+		Rank:         0,
+		Page:         uint(sePage),
+		OnPageRank:   uint(seOnPageRank),
+	}
+
+	res := result.RetrievedResult{
+		URL:         urll,
+		Title:       title,
+		Description: desc,
+		ImageResult: result.ImageResult{
+			Original: result.ImageFormat{
+				Height: uint(origH),
+				Width:  uint(origW),
+			},
+			Thumbnail: result.ImageFormat{
+				Height: uint(thmbH),
+				Width:  uint(thmbW),
+			},
+			ThumbnailURL: thmbUrl,
+			Source:       src,
+			SourceURL:    srcUrl,
+		},
+		Rank: ser,
+	}
+
 	return &res
 }

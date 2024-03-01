@@ -29,7 +29,7 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 			Description:   seResult.Description,
 			EngineRanks:   engineRanks,
 			TimesReturned: 1,
-			Response:      nil,
+			ImageResult:   seResult.ImageResult,
 		}
 
 		relay.Mutex.Lock()
