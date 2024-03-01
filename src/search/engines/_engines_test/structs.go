@@ -36,7 +36,7 @@ func NewConfig(engineName engines.Name) *config.Config {
 					Timeout: 10000 * time.Millisecond, // colly default
 				},
 			},
-			category.IMAGE: {
+			category.IMAGES: {
 				Engines: []engines.Name{engineName},
 				Ranking: config.NewRanking(),
 				Timings: config.Timings{
