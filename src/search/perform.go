@@ -10,6 +10,7 @@ import (
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/search/bucket"
+	"github.com/hearchco/hearchco/src/search/category"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/rank"
 	"github.com/hearchco/hearchco/src/search/result"
@@ -19,7 +20,7 @@ import (
 // engine_searcher -> NewEngineStarter() uses this
 type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings) []error
 
-func PerformSearch(query string, options engines.Options, conf config.Config) []result.Result {
+func PerformSearch(query string, options engines.Options, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) []result.Result {
 	if query == "" {
 		log.Trace().Msg("Empty search query.")
 		return []result.Result{}
@@ -27,7 +28,7 @@ func PerformSearch(query string, options engines.Options, conf config.Config) []
 
 	searchTimer := time.Now()
 
-	query, cat, timings, enginesToRun := procBang(query, options, conf)
+	query, cat, timings, enginesToRun := procBang(query, options.Category, settings, categories)
 	// set the new category only within the scope of this function
 	options.Category = cat
 	query = url.QueryEscape(query)
@@ -46,7 +47,7 @@ func PerformSearch(query string, options engines.Options, conf config.Config) []
 	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")
 
-	resultMap := runEngines(enginesToRun, query, options, conf.Settings, timings)
+	resultMap := runEngines(enginesToRun, query, options, settings, timings)
 
 	log.Debug().
 		Int64("ms", time.Since(resTimer).Milliseconds()).
@@ -55,7 +56,7 @@ func PerformSearch(query string, options engines.Options, conf config.Config) []
 	rankTimer := time.Now()
 	log.Debug().Msg("Ranking...")
 
-	results := rank.Rank(resultMap, conf.Categories[options.Category].Ranking)
+	results := rank.Rank(resultMap, categories[options.Category].Ranking)
 
 	rankTimeSince := time.Since(rankTimer)
 	log.Debug().

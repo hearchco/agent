@@ -19,11 +19,10 @@ import (
 
 // it's okay to store pointer to graceful.Graceful since graceful.New() returns a pointer
 type RouterWrapper struct {
-	rtr  *graceful.Graceful
-	conf config.Config
+	rtr *graceful.Graceful
 }
 
-func New(conf config.Config, verbosity int8, lgr zerolog.Logger) (RouterWrapper, error) {
+func New(serverConf config.Server, verbosity int8, lgr zerolog.Logger) (RouterWrapper, error) {
 	// set verbosity to release mode if log level is INFO
 	if verbosity == 0 {
 		gin.SetMode(gin.ReleaseMode)
@@ -43,10 +42,10 @@ func New(conf config.Config, verbosity int8, lgr zerolog.Logger) (RouterWrapper,
 
 	// add CORS middleware
 	log.Debug().
-		Str("url", conf.Server.FrontendUrl).
+		Str("url", serverConf.FrontendUrl).
 		Msg("Using CORS")
 	gengine.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{conf.Server.FrontendUrl},
+		AllowOrigins:     []string{serverConf.FrontendUrl},
 		AllowMethods:     []string{"HEAD", "GET", "POST"},
 		AllowHeaders:     []string{"Origin", "X-Requested-With", "Content-Length", "Content-Type", "Accept"},
 		AllowCredentials: false,
@@ -54,19 +53,19 @@ func New(conf config.Config, verbosity int8, lgr zerolog.Logger) (RouterWrapper,
 	}))
 
 	// create new graceful engine with config port
-	rtr, err := graceful.New(gengine, graceful.WithAddr(":"+strconv.Itoa(conf.Server.Port)))
+	rtr, err := graceful.New(gengine, graceful.WithAddr(":"+strconv.Itoa(serverConf.Port)))
 	if err != nil {
 		log.Error().
 			Err(err).
 			Msg("router.New(): failed creating new graceful router")
 	}
 
-	return RouterWrapper{rtr: rtr, conf: conf}, err
+	return RouterWrapper{rtr: rtr}, err
 }
 
-func (rw RouterWrapper) runWithContext(ctx context.Context) error {
+func (rw RouterWrapper) runWithContext(ctx context.Context, port int) error {
 	log.Info().
-		Int("port", rw.conf.Server.Port).
+		Int("port", port).
 		Msg("Started router")
 	if err := rw.rtr.RunWithContext(ctx); err != context.Canceled {
 		log.Error().
@@ -81,20 +80,20 @@ func (rw RouterWrapper) runWithContext(ctx context.Context) error {
 	return nil
 }
 
-func (rw RouterWrapper) Start(ctx context.Context, db cache.DB, serveProfiler bool) error {
+func (rw RouterWrapper) Start(ctx context.Context, db cache.DB, conf config.Config, serveProfiler bool) error {
 	// health(z)
 	rw.rtr.GET("/health", HealthCheck)
 	rw.rtr.GET("/healthz", HealthCheck)
 
 	// search
 	rw.rtr.GET("/search", func(c *gin.Context) {
-		err := Search(c, rw.conf, db)
+		err := Search(c, db, conf)
 		if err != nil {
 			log.Error().Err(err).Msg("router.Start() (.GET): failed search")
 		}
 	})
 	rw.rtr.POST("/search", func(c *gin.Context) {
-		err := Search(c, rw.conf, db)
+		err := Search(c, db, conf)
 		if err != nil {
 			log.Error().Err(err).Msg("router.Start() (.POST): failed search")
 		}
@@ -103,5 +102,5 @@ func (rw RouterWrapper) Start(ctx context.Context, db cache.DB, serveProfiler bo
 	if serveProfiler {
 		pprof.Register(rw.rtr.Engine)
 	}
-	return rw.runWithContext(ctx)
+	return rw.runWithContext(ctx, conf.Server.Port)
 }

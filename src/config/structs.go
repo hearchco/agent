@@ -91,7 +91,7 @@ type ReaderServer struct {
 	Cache ReaderCache `koanf:"cache"`
 }
 type Server struct {
-	Port        int `koanf:"port"`
+	Port        int
 	FrontendUrl string
 	Cache       Cache
 }
