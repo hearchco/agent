@@ -84,12 +84,11 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 	var wg sync.WaitGroup
 	engineStarter := NewEngineStarter()
 
-	for i := range engs {
+	for _, eng := range engs {
 		wg.Add(1)
-		eng := engs[i] // dont change for to `for _, eng := range engs {`, eng retains the same address throughout the whole loop
 		go func() {
 			defer wg.Done()
-			// if an error can be handled inside, it wont be returned
+			// if an error can be handled inside, it won't be returned
 			// runs the Search function in the engine package
 			errs := engineStarter[eng](context.Background(), query, &relay, options, settings[eng], timings)
 			if len(errs) > 0 {

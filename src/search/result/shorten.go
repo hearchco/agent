@@ -11,10 +11,10 @@ func firstNchars(str string, n int) string {
 func Shorten(results []Result) []Result {
 	resultsShort := make([]Result, len(results))
 	copy(resultsShort, results)
-	for i := range resultsShort {
-		if len(resultsShort[i].Description) >= 400 {
-			descShort := firstNchars(resultsShort[i].Description, 397)
-			resultsShort[i].Description = descShort + "..."
+	for _, result := range resultsShort {
+		if len(result.Description) >= 400 {
+			descShort := firstNchars(result.Description, 397)
+			result.Description = descShort + "..."
 		}
 	}
 	return resultsShort
