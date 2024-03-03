@@ -64,23 +64,29 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	deviceParam := getDevice(options)
 	safeSearchParam := getSafeSearch(options)
 
-	errChannel := make(chan error, options.MaxPages)
+	retErrors := make([]error, options.MaxPages)
 
+	// TODO: first engine that start from 0?
 	for i := 0; i < options.MaxPages; i++ {
 		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
 		urll := Info.URL + query + "&count=" + strconv.Itoa(nRequested) + localeParam + "&offset=" + strconv.Itoa(i*nRequested) + deviceParam + safeSearchParam
 		anonUrll := Info.URL + anonymize.String(query) + "&count=" + strconv.Itoa(nRequested) + localeParam + "&offset=" + strconv.Itoa(i*nRequested) + deviceParam + safeSearchParam
-		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, errChannel)
+		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		retErrors[i] = err
 	}
-
-	retErrors := _sedefaults.ReadErrorChannel(options.MaxPages, errChannel)
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retErrors
+	realRetErrors := make([]error, 0)
+	for _, err := range retErrors {
+		if err != nil {
+			realRetErrors = append(realRetErrors, err)
+		}
+	}
+	return realRetErrors
 }
 
 // qwant returns this array when an invalid locale is supplied

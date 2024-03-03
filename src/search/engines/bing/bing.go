@@ -62,14 +62,16 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	localeParam := getLocale(options)
 
-	errChannel := make(chan error, options.MaxPages)
+	retErrors := make([]error, options.MaxPages)
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
 	urll := Info.URL + query + localeParam
 	anonUrll := Info.URL + anonymize.String(query) + localeParam
-	_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, errChannel)
+
+	err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+	retErrors[0] = err
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
@@ -77,15 +79,21 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 		urll := Info.URL + query + "&first=" + strconv.Itoa(i*10+1) + localeParam
 		anonUrll := Info.URL + anonymize.String(query) + "&first=" + strconv.Itoa(i*10+1) + localeParam
-		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, errChannel)
-	}
 
-	retErrors := _sedefaults.ReadErrorChannel(options.MaxPages, errChannel)
+		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		retErrors[i] = err
+	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retErrors
+	realRetErrors := make([]error, 0)
+	for _, err := range retErrors {
+		if err != nil {
+			realRetErrors = append(realRetErrors, err)
+		}
+	}
+	return realRetErrors
 }
 
 func removeTelemetry(link string) string {

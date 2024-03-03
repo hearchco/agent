@@ -84,7 +84,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	errChannel := make(chan error, options.MaxPages)
+	retErrors := make([]error, options.MaxPages)
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
@@ -92,7 +92,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	urll := Info.URL + query
 	anonUrll := Info.URL + anonymize.String(query)
-	_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, errChannel)
+	err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+	retErrors[0] = err
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
@@ -101,15 +102,20 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 		urll := Info.URL + query + "&page=" + strconv.Itoa(i+1)
 		anonUrll := Info.URL + anonymize.String(query) + "&page=" + strconv.Itoa(i+1)
-		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, errChannel)
+		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		retErrors[i] = err
 	}
-
-	retErrors := _sedefaults.ReadErrorChannel(options.MaxPages, errChannel)
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retErrors
+	realRetErrors := make([]error, 0)
+	for _, err := range retErrors {
+		if err != nil {
+			realRetErrors = append(realRetErrors, err)
+		}
+	}
+	return realRetErrors
 }
 
 func getSafeSearch(ss bool) string {

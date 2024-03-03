@@ -62,16 +62,23 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		anonUrll = Info.URL + "client=web" + localeParam + "&limit=" + strconv.Itoa(nRequested) + "&no_correct=false&q=" + anonymize.String(query) + safeSearchParam + "&type=web"
 	}
 
-	errChannel := make(chan error, options.MaxPages)
+	retErrors := make([]error, options.MaxPages)
 
-	_sedefaults.DoGetRequest(urll, anonUrll, nil, col, Info.Name, errChannel)
+	err = _sedefaults.DoGetRequest(urll, anonUrll, nil, col, Info.Name)
+	retErrors[0] = err
 
-	retErrors := _sedefaults.ReadErrorChannel(options.MaxPages, errChannel)
+	// TODO: missing pages request loop?
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retErrors
+	realRetErrors := make([]error, 0)
+	for _, err := range retErrors {
+		if err != nil {
+			realRetErrors = append(realRetErrors, err)
+		}
+	}
+	return realRetErrors
 }
 
 func getLocale(options engines.Options) string {

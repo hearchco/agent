@@ -79,8 +79,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	localeParam := getLocale(options)
 
-	errChannel := make(chan error, options.MaxPages)
+	retErrors := make([]error, options.MaxPages)
 
+	// TODO: second engine that starts with 0?
 	for i := 0; i < options.MaxPages; i++ {
 		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
@@ -89,15 +90,20 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 		urll := Info.URL + "freshness=All&itemsCount=" + strconv.Itoa(settings.RequestedResultsPerPage) + "&offset=" + strconv.Itoa(i*10) + "&query=" + query + localeParam
 		anonUrll := Info.URL + "freshness=All&itemsCount=" + strconv.Itoa(settings.RequestedResultsPerPage) + "&offset=" + strconv.Itoa(i*10) + "&query=" + anonymize.String(query) + localeParam
-		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, errChannel)
+		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		retErrors[i] = err
 	}
-
-	retErrors := _sedefaults.ReadErrorChannel(options.MaxPages, errChannel)
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retErrors
+	realRetErrors := make([]error, 0)
+	for _, err := range retErrors {
+		if err != nil {
+			realRetErrors = append(realRetErrors, err)
+		}
+	}
+	return realRetErrors
 }
 
 func getLocale(options engines.Options) string {

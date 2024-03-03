@@ -65,28 +65,34 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		})
 	})
 
-	errChannel := make(chan error, options.MaxPages)
+	retErrors := make([]error, options.MaxPages)
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
 	urll := Info.URL + "?q=" + query
 	anonUrll := Info.URL + "?q=" + anonymize.String(query)
-	_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, errChannel)
+	err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+	retErrors[0] = err
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
-		_sedefaults.DoPostRequest(Info.URL, strings.NewReader("q="+query+"&dc="+strconv.Itoa(i*20)), colCtx, col, Info.Name, errChannel)
+		err = _sedefaults.DoPostRequest(Info.URL, strings.NewReader("q="+query+"&dc="+strconv.Itoa(i*20)), colCtx, col, Info.Name)
+		retErrors[i] = err
 	}
-
-	retErrors := _sedefaults.ReadErrorChannel(options.MaxPages, errChannel)
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retErrors
+	realRetErrors := make([]error, 0)
+	for _, err := range retErrors {
+		if err != nil {
+			realRetErrors = append(realRetErrors, err)
+		}
+	}
+	return realRetErrors
 }
 
 func getLocale(options engines.Options) string {
