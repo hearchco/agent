@@ -7,12 +7,13 @@ import (
 
 	"github.com/gocolly/colly/v2"
 	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
-func colRequest(col *colly.Collector, ctx context.Context, seName engines.Name) {
+func colRequest(col *colly.Collector, ctx context.Context, seName engines.Name, saveOrigUrl bool) {
 	col.OnRequest(func(r *colly.Request) {
 		if err := ctx.Err(); err != nil {
 			if engines.IsTimeoutError(err) {
@@ -29,24 +30,31 @@ func colRequest(col *colly.Collector, ctx context.Context, seName engines.Name) 
 			r.Abort()
 			return
 		}
+		if saveOrigUrl {
+			r.Ctx.Put("originalURL", r.URL.String())
+		}
 	})
 }
 
-func colError(col *colly.Collector, seName engines.Name) {
+func colError(col *colly.Collector, seName engines.Name, visiting bool) {
 	col.OnError(func(r *colly.Response, err error) {
 		if engines.IsTimeoutError(err) {
 			log.Trace().
 				// Err(err). // timeout error produces Get "url" error with the query
 				Str("engine", seName.String()).
-				// Str("url", urll). // can't reliably anonymize it (because it's engine dependent and query isn't passed to this function)
+				// Str("url", urll). // can't reliably anonymize it (because it's engine dependent)
 				Msg("_sedefaults.colError(): request timeout error for url")
 		} else {
-			log.Error().
+			event := log.Error()
+			if visiting {
+				event = log.Trace()
+			}
+			event.
 				Err(err).
 				Str("engine", seName.String()).
-				// Str("url", urll). // can't reliably anonymize it (because it's engine dependent and query isn't passed to this function)
+				// Str("url", urll). // can't reliably anonymize it (because it's engine dependent)
 				Int("statusCode", r.StatusCode).
-				Str("response", string(r.Body)). // query can be present, depending on the response from the engine (Google has the query in 3 places)
+				Str("response", string(r.Body)). // WARN: query can be present, depending on the response from the engine (example: google has the query in 3 places)
 				Msg("_sedefaults.colError(): request error for url")
 
 			dumpPath := fmt.Sprintf("%v%v_col.log.html", config.LogDumpLocation, seName.String())
@@ -63,6 +71,23 @@ func colError(col *colly.Collector, seName engines.Name) {
 					}
 				}).
 				Msg("_sedefaults.colError(): html response written")
+		}
+	})
+}
+
+func pagesColResponse(pagesCol *colly.Collector, seName engines.Name, relay *bucket.Relay) {
+	pagesCol.OnResponse(func(r *colly.Response) {
+		urll := r.Ctx.Get("originalURL")
+		if urll == "" {
+			log.Error().
+				Msg("_sedefaults.pagesColResponse(): error getting original url")
+		} else {
+			err := bucket.SetResultResponse(urll, r, relay, seName)
+			if err != nil {
+				log.Error().
+					Err(err).
+					Msg("_sedefaults.pagesColResponse(): error setting result")
+			}
 		}
 	})
 }
