@@ -22,7 +22,7 @@ var FromString = map[string]Name{
 
 // returns category
 func FromQuery(query string) Name {
-	if query[0] != '!' {
+	if query == "" || query[0] != '!' {
 		return ""
 	}
 	cat := strings.SplitN(query, " ", 2)[0][1:]

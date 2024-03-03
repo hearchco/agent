@@ -13,7 +13,7 @@ import (
 func procBang(query string, options *engines.Options, conf *config.Config) (string, config.Timings, []engines.Name) {
 	useSpec, specEng := procSpecificEngine(query, options, conf)
 	goodCat := procCategory(query, options)
-	if !goodCat && !useSpec && query[0] == '!' {
+	if !goodCat && !useSpec && (query != "" && query[0] == '!') {
 		// options.category is set to GENERAL
 		log.Debug().
 			Str("queryAnon", anonymize.String(query)).
@@ -30,15 +30,25 @@ func procBang(query string, options *engines.Options, conf *config.Config) (stri
 	}
 }
 
+// takes the bang out of the query performs TrimSpace
 func trimBang(query string) string {
-	if (query)[0] == '!' {
-		return strings.SplitN(query, " ", 2)[1]
+	query = strings.TrimSpace(query)
+
+	if query == "" || query[0] != '!' {
+		return query
 	}
-	return query
+
+	sp := strings.SplitN(query, " ", 2)
+	if len(sp) == 1 {
+		// only the bang is present
+		return ""
+	}
+
+	return strings.TrimSpace(sp[1])
 }
 
 func procSpecificEngine(query string, options *engines.Options, conf *config.Config) (bool, engines.Name) {
-	if query[0] != '!' {
+	if query == "" || query[0] != '!' {
 		return false, engines.UNDEFINED
 	}
 	sp := strings.SplitN(query, " ", 2)
@@ -52,6 +62,7 @@ func procSpecificEngine(query string, options *engines.Options, conf *config.Con
 	return false, engines.UNDEFINED
 }
 
+// updates options.Category to the category in the query, and returns if a valid category is present
 func procCategory(query string, options *engines.Options) bool {
 	cat := category.FromQuery(query)
 	if cat != "" {
