@@ -36,6 +36,8 @@ func Search(query string, options engines.Options, conf *config.Config, db cache
 			Str("queryAnon", anonymize.String(query)).
 			Str("queryHash", anonymize.HashToSHA256B64(query)).
 			Msg("Nothing found in cache, doing a clean search")
+
+		// the main line
 		results = PerformSearch(query, options, conf)
 	}
 
