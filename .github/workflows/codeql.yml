@@ -12,10 +12,15 @@
 name: "CodeQL"
 
 on:
-  push:
-    branches: ["main"]
   pull_request:
-    branches: ["main"]
+    branches: ["*"]
+    paths:
+      - ".github/workflows/codeql.yml" # this file
+      - "go.mod"
+      - "go.sum"
+      - "Makefile"
+      - "generate/**/*"
+      - "src/**/*"
   schedule:
     - cron: "38 14 * * 3"
 
