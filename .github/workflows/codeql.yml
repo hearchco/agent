@@ -12,6 +12,15 @@
 name: "CodeQL"
 
 on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/codeql.yml" # this file
+      - "go.mod"
+      - "go.sum"
+      - "Makefile"
+      - "generate/**/*"
+      - "src/**/*"
   pull_request:
     branches: ["*"]
     paths:
