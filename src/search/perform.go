@@ -20,10 +20,21 @@ import (
 type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings) error
 
 func PerformSearch(query string, options engines.Options, conf *config.Config) []result.Result {
+	if query == "" {
+		log.Trace().Msg("Empty search query.")
+		return []result.Result{}
+	}
+
 	searchTimer := time.Now()
 
 	query, timings, enginesToRun := procBang(query, &options, conf)
 	query = url.QueryEscape(query)
+
+	// check again after the bang is taken out
+	if query == "" {
+		log.Trace().Msg("Empty search query (with bang present).")
+		return []result.Result{}
+	}
 
 	log.Debug().
 		Str("queryAnon", anonymize.String(query)).

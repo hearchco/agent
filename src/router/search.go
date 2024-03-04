@@ -50,37 +50,37 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 	} else {
 		maxPages, pageserr := strconv.Atoi(pages)
 		if pageserr != nil {
-			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Cannot convert pages value (\"%v\") to int", pages))
-			return fmt.Errorf("router.Search(): cannot convert pages value \"%v\" to int: %w", pages, pageserr)
+			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Cannot convert pages value (%q) to int", pages))
+			return fmt.Errorf("router.Search(): cannot convert pages value %q to int: %w", pages, pageserr)
 		}
 
 		visitPages, deeperr := strconv.ParseBool(deepSearch)
 		if deeperr != nil {
-			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Cannot convert deep value (\"%v\") to bool", deepSearch))
-			return fmt.Errorf("router.Search(): cannot convert deep value \"%v\" to int: %w", deepSearch, deeperr)
+			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Cannot convert deep value (%q) to bool", deepSearch))
+			return fmt.Errorf("router.Search(): cannot convert deep value %q to int: %w", deepSearch, deeperr)
 		}
 
 		if lerr := engines.ValidateLocale(locale); lerr != nil {
-			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Invalid locale value (\"%v\"), should be of the form \"en_US\"", locale))
-			return fmt.Errorf("router.Search(): invalid locale value \"%v\": %w", locale, lerr)
+			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Invalid locale value (%q), should be of the form \"en_US\"", locale))
+			return fmt.Errorf("router.Search(): invalid locale value %q: %w", locale, lerr)
 		}
 
 		ccateg = category.SafeFromString(categ)
 		if ccateg == category.UNDEFINED {
-			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Invalid category value (\"%v\")", categ))
-			return fmt.Errorf("router.Search(): invalid category value \"%v\"", categ)
+			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Invalid category value (%q)", categ))
+			return fmt.Errorf("router.Search(): invalid category value %q", categ)
 		}
 
 		safeSearchB, safeerr := strconv.ParseBool(safesearch)
 		if safeerr != nil {
-			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Cannot convert safesearch value (\"%v\") to bool", safesearch))
-			return fmt.Errorf("router.Search(): cannot convert safesearch value \"%v\" to bool: %w", safesearch, safeerr)
+			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Cannot convert safesearch value (%q) to bool", safesearch))
+			return fmt.Errorf("router.Search(): cannot convert safesearch value %q to bool: %w", safesearch, safeerr)
 		}
 
 		isMobile, mobileerr := strconv.ParseBool(mobile)
 		if mobileerr != nil {
-			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Cannot convert mobile value (\"%v\") to bool", mobile))
-			return fmt.Errorf("router.Search(): cannot convert mobile value \"%v\" to bool: %w", mobile, mobileerr)
+			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Cannot convert mobile value (%q) to bool", mobile))
+			return fmt.Errorf("router.Search(): cannot convert mobile value %q to bool: %w", mobile, mobileerr)
 		}
 
 		options := engines.Options{

@@ -14,17 +14,42 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+func printImageResult(r result.Result) {
+	fmt.Printf("%v (%.2f) -----\n\t%q\n\t%q\n\t%q\n\t%q\n\t%q\n\t%q\n\t-", r.Rank, r.Score, r.Title, r.URL, r.Description, r.ImageResult.Source, r.ImageResult.SourceURL, r.ImageResult.ThumbnailURL)
+	for seInd := uint8(0); seInd < r.TimesReturned; seInd++ {
+		fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine.ToLower())
+		if seInd != r.TimesReturned-1 {
+			fmt.Print(", ")
+		}
+	}
+	fmt.Printf("\n")
+}
+
+func printResult(r result.Result) {
+	fmt.Printf("%v (%.2f) -----\n\t%q\n\t%q\n\t%q\n\t-", r.Rank, r.Score, r.Title, r.URL, r.Description)
+	for seInd := uint8(0); seInd < r.TimesReturned; seInd++ {
+		fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine.ToLower())
+		if seInd != r.TimesReturned-1 {
+			fmt.Print(", ")
+		}
+	}
+	fmt.Printf("\n")
+}
+
 func printResults(results []result.Result) {
 	fmt.Print("\n\tThe Search Results:\n\n")
+
+	images := false
+	if len(results) > 0 && results[0].ImageResult.Source != "" {
+		images = true
+	}
+
 	for _, r := range results {
-		fmt.Printf("%v (%.2f) -----\n\t\"%v\"\n\t\"%v\"\n\t\"%v\"\n\t-", r.Rank, r.Score, r.Title, r.URL, r.Description)
-		for seInd := uint8(0); seInd < r.TimesReturned; seInd++ {
-			fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine.ToLower())
-			if seInd != r.TimesReturned-1 {
-				fmt.Print(", ")
-			}
+		if images {
+			printImageResult(r)
+		} else {
+			printResult(r)
 		}
-		fmt.Printf("\n")
 	}
 }
 
