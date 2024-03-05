@@ -146,8 +146,8 @@ func NewScience() []engines.Name {
 func New() Config {
 	return Config{
 		Server: Server{
-			Port:        3030,
-			FrontendUrl: "http://localhost:5173",
+			Port:         3030,
+			FrontendUrls: []string{"http://localhost:5173"},
 			Cache: Cache{
 				Type: "badger",
 				TTL: TTL{

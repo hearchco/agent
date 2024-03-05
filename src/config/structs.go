@@ -85,15 +85,17 @@ type Cache struct {
 type ReaderServer struct {
 	// port on which the API server listens
 	Port int `koanf:"port"`
-	// frontend url needed for CORS
-	FrontendUrl string `koanf:"frontendurl"`
+	// urls used for CORS, comma separated and converted into slice
+	// WARN: beware this bug with trailing * for wildcard CORS
+	// https://github.com/gin-contrib/cors/pull/106
+	FrontendUrls string `koanf:"frontendurls"`
 	// cache settings
 	Cache ReaderCache `koanf:"cache"`
 }
 type Server struct {
-	Port        int
-	FrontendUrl string
-	Cache       Cache
+	Port         int
+	FrontendUrls []string
+	Cache        Cache
 }
 
 // ReaderEngine is format in which the config is read from the config file

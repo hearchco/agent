@@ -11,11 +11,11 @@ primary_region = "cdg"
 
 [env]
   HEARCHCO_SERVER_CACHE_TYPE = "redis"
-  HEARCHCO_SERVER_FRONTENDURL = "https://hearch.co"
+  HEARCHCO_SERVER_FRONTENDURLS = "http://localhost:5173,https://*hearch.co,https://*hearchco-frontend.pages.dev"
 
 [http_service]
   internal_port = 3030
-  force_https = false # needed for flycast
+  force_https = true
   auto_stop_machines = true
   auto_start_machines = true
   min_machines_running = 2
