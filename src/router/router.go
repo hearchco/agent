@@ -38,14 +38,15 @@ func New(config *config.Config, verbosity int8, lgr zerolog.Logger) (*RouterWrap
 			Str("path", c.Request.URL.Path).
 			Str("ip", c.ClientIP()).
 			Logger()
-	}), logger.WithDefaultFieldsDisabled(), logger.WithLatency(), logger.WithSkipPath([]string{"/health", "/healthz"})))
+	}), logger.WithDefaultFieldsDisabled(), logger.WithLatency(), logger.WithSkipPath([]string{"/healthz"})))
 
 	// add CORS middleware
 	log.Debug().
-		Str("url", config.Server.FrontendUrl).
+		Strs("url", config.Server.FrontendUrls).
 		Msg("Using CORS")
 	gengine.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{config.Server.FrontendUrl},
+		AllowOrigins:     config.Server.FrontendUrls,
+		AllowWildcard:    true,
 		AllowMethods:     []string{"HEAD", "GET", "POST"},
 		AllowHeaders:     []string{"Origin", "X-Requested-With", "Content-Length", "Content-Type", "Accept"},
 		AllowCredentials: false,
@@ -81,8 +82,7 @@ func (rw *RouterWrapper) runWithContext(ctx context.Context) error {
 }
 
 func (rw *RouterWrapper) Start(ctx context.Context, db cache.DB, serveProfiler bool) error {
-	// health(z)
-	rw.router.GET("/health", HealthCheck)
+	// healthz
 	rw.router.GET("/healthz", HealthCheck)
 
 	// search
