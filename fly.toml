@@ -11,7 +11,7 @@ primary_region = "cdg"
 
 [env]
   HEARCHCO_SERVER_CACHE_TYPE = "redis"
-  HEARCHCO_SERVER_FRONTENDURL = "*"
+  HEARCHCO_SERVER_FRONTENDURLS = "http://localhost:5173,https://*.hearch.co,https://*.hearchco-frontend.pages.dev"
 
 [http_service]
   internal_port = 3030

@@ -42,10 +42,11 @@ func New(config *config.Config, verbosity int8, lgr zerolog.Logger) (*RouterWrap
 
 	// add CORS middleware
 	log.Debug().
-		Str("url", config.Server.FrontendUrl).
+		Strs("url", config.Server.FrontendUrls).
 		Msg("Using CORS")
 	gengine.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{config.Server.FrontendUrl},
+		AllowOrigins:     config.Server.FrontendUrls,
+		AllowWildcard:    true,
 		AllowMethods:     []string{"HEAD", "GET", "POST"},
 		AllowHeaders:     []string{"Origin", "X-Requested-With", "Content-Length", "Content-Type", "Accept"},
 		AllowCredentials: false,
