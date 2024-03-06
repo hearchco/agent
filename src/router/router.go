@@ -52,10 +52,7 @@ func New(config *config.Config, verbosity int8, lgr zerolog.Logger) (*RouterWrap
 	// gengine.Use(brotli.Brotli(brotli.DefaultCompression))
 	// TODO: this doesn't exist for gin yet, should we switch to fasthttp (gofiber)?
 
-	// add CORS middleware
-	log.Debug().
-		Strs("url", config.Server.FrontendUrls).
-		Msg("Using CORS")
+	// apply CORS middleware
 	gengine.Use(cors.New(cors.Config{
 		AllowOrigins:     config.Server.FrontendUrls,
 		AllowWildcard:    true,
@@ -64,6 +61,10 @@ func New(config *config.Config, verbosity int8, lgr zerolog.Logger) (*RouterWrap
 		AllowCredentials: false,
 		MaxAge:           12 * time.Hour,
 	}))
+
+	log.Debug().
+		Strs("url", config.Server.FrontendUrls).
+		Msg("Using CORS")
 
 	// create new graceful engine with config port
 	router, err := graceful.New(gengine, graceful.WithAddr(":"+strconv.Itoa(config.Server.Port)))
