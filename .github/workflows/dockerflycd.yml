@@ -41,7 +41,7 @@ jobs:
 
       # go:generate
       - name: Generate go code from go:generate comments
-        run: make setup
+        run: make install
 
       # goreleaser release
       - name: Release
