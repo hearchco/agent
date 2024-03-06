@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/graceful"
+	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/hearchco/logger"
@@ -28,9 +29,13 @@ func New(config *config.Config, verbosity int8, lgr zerolog.Logger) (*RouterWrap
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	// create new gin engine with recovery middleware and zerolog logger
+	// create new gin engine
 	gengine := gin.New()
+
+	// apply recovery middleware
 	gengine.Use(gin.Recovery())
+
+	// apply zerolog middleware
 	gengine.Use(logger.SetLogger(logger.WithLogger(func(c *gin.Context, l zerolog.Logger) zerolog.Logger {
 		return lgr.With().
 			Int("status", c.Writer.Status()).
@@ -39,6 +44,13 @@ func New(config *config.Config, verbosity int8, lgr zerolog.Logger) (*RouterWrap
 			Str("ip", c.ClientIP()).
 			Logger()
 	}), logger.WithDefaultFieldsDisabled(), logger.WithLatency(), logger.WithSkipPath([]string{"/healthz"})))
+
+	// apply gzip middleware
+	gengine.Use(gzip.Gzip(gzip.DefaultCompression))
+
+	// apply brotli middleware
+	// gengine.Use(brotli.Brotli(brotli.DefaultCompression))
+	// TODO: this doesn't exist for gin yet, should we switch to fasthttp (gofiber)?
 
 	// add CORS middleware
 	log.Debug().
