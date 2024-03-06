@@ -46,3 +46,9 @@ func NewConfig(engineName engines.Name) config.Config {
 		},
 	}
 }
+
+func NewOpts() engines.Options {
+	return engines.Options{
+		Pages: engines.Pages{Start: 0, Max: 1},
+	}
+}

@@ -62,7 +62,10 @@ func Run(flags Flags, db cache.DB, conf config.Config) {
 		Msg("Started hearching")
 
 	options := engines.Options{
-		MaxPages:   flags.MaxPages,
+		Pages: engines.Pages{
+			Start: flags.StartPage,
+			Max:   flags.MaxPages,
+		},
 		VisitPages: flags.Visit,
 		Category:   category.FromString[flags.Category],
 		UserAgent:  flags.UserAgent,

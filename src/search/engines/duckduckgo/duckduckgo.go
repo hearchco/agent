@@ -14,6 +14,7 @@ import (
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
 	"github.com/hearchco/hearchco/src/search/parse"
+	"github.com/rs/zerolog/log"
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
@@ -36,7 +37,15 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		var rrank int
 
 		var pageStr string = e.Request.Ctx.Get("page")
-		page, _ := strconv.Atoi(pageStr)
+		page, err := strconv.Atoi(pageStr)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("engine", Info.Name.String()).
+				Str("page", pageStr).
+				Msg("Failed to convert page number")
+			return
+		}
 
 		e.DOM.Children().Each(func(i int, row *goquery.Selection) {
 			switch i % 4 {
@@ -65,21 +74,23 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		})
 	})
 
-	retErrors := make([]error, options.MaxPages)
+	retErrors := make([]error, options.Pages.Start+options.Pages.Max)
 
-	colCtx := colly.NewContext()
-	colCtx.Put("page", strconv.Itoa(1))
-
-	urll := Info.URL + "?q=" + query
-	anonUrll := Info.URL + "?q=" + anonymize.String(query)
-	err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
-	retErrors[0] = err
-
-	for i := 1; i < options.MaxPages; i++ {
-		colCtx = colly.NewContext()
+	// starts from at least 0
+	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
+		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
-		err = _sedefaults.DoPostRequest(Info.URL, strings.NewReader("q="+query+"&dc="+strconv.Itoa(i*20)), colCtx, col, Info.Name)
+		// i == 0 is the first page
+		if i <= 0 {
+			urll := Info.URL + "?q=" + query
+			anonUrll := Info.URL + "?q=" + anonymize.String(query)
+			err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		} else {
+			requestData := strings.NewReader("q=" + query + "&dc=" + strconv.Itoa(i*20))
+			err = _sedefaults.DoPostRequest(Info.URL, requestData, colCtx, col, Info.Name)
+		}
+
 		retErrors[i] = err
 	}
 

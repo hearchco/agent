@@ -62,7 +62,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		anonUrll = Info.URL + "client=web" + localeParam + "&limit=" + strconv.Itoa(nRequested) + "&no_correct=false&q=" + anonymize.String(query) + safeSearchParam + "&type=web"
 	}
 
-	retErrors := make([]error, options.MaxPages)
+	retErrors := make([]error, options.Pages.Start+options.Pages.Max)
 
 	err = _sedefaults.DoGetRequest(urll, anonUrll, nil, col, Info.Name)
 	retErrors[0] = err

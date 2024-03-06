@@ -59,20 +59,25 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
+	retErrors := make([]error, options.Pages.Start+options.Pages.Max)
+
+	// static params
 	localeParam := getLocale(options)
-	nRequested := settings.RequestedResultsPerPage
 	deviceParam := getDevice(options)
 	safeSearchParam := getSafeSearch(options)
+	countParam := "&count=" + strconv.Itoa(settings.RequestedResultsPerPage)
 
-	retErrors := make([]error, options.MaxPages)
-
-	// TODO: first engine that start from 0?
-	for i := 0; i < options.MaxPages; i++ {
+	// starts from at least 0
+	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
 		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
-		urll := Info.URL + query + "&count=" + strconv.Itoa(nRequested) + localeParam + "&offset=" + strconv.Itoa(i*nRequested) + deviceParam + safeSearchParam
-		anonUrll := Info.URL + anonymize.String(query) + "&count=" + strconv.Itoa(nRequested) + localeParam + "&offset=" + strconv.Itoa(i*nRequested) + deviceParam + safeSearchParam
+		// dynamic params
+		offsetParam := "&offset=" + strconv.Itoa(i*settings.RequestedResultsPerPage)
+
+		urll := Info.URL + query + countParam + localeParam + offsetParam + safeSearchParam
+		anonUrll := Info.URL + anonymize.String(query) + countParam + localeParam + offsetParam + deviceParam + safeSearchParam
+
 		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
 		retErrors[i] = err
 	}

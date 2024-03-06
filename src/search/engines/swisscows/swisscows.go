@@ -77,19 +77,25 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
+	retErrors := make([]error, options.Pages.Start+options.Pages.Max)
+
+	// static params
 	localeParam := getLocale(options)
+	itemsParam := "freshness=All&itemsCount=" + strconv.Itoa(settings.RequestedResultsPerPage)
 
-	retErrors := make([]error, options.MaxPages)
-
-	// TODO: second engine that starts with 0?
-	for i := 0; i < options.MaxPages; i++ {
+	// starts from at least 0
+	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
 		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 		//col.Request("OPTIONS", seAPIURL+"freshness=All&itemsCount="+strconv.Itoa(sResCount)+"&offset="+strconv.Itoa(i*10)+"&query="+query+localeURL, nil, colCtx, nil)
 		//col.Wait()
 
-		urll := Info.URL + "freshness=All&itemsCount=" + strconv.Itoa(settings.RequestedResultsPerPage) + "&offset=" + strconv.Itoa(i*10) + "&query=" + query + localeParam
-		anonUrll := Info.URL + "freshness=All&itemsCount=" + strconv.Itoa(settings.RequestedResultsPerPage) + "&offset=" + strconv.Itoa(i*10) + "&query=" + anonymize.String(query) + localeParam
+		// dynamic params
+		offsetParam := "&offset=" + strconv.Itoa(i*10)
+
+		urll := Info.URL + itemsParam + offsetParam + "&query=" + query + localeParam
+		anonUrll := Info.URL + itemsParam + offsetParam + "&query=" + anonymize.String(query) + localeParam
+
 		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
 		retErrors[i] = err
 	}
@@ -111,7 +117,7 @@ func getLocale(options engines.Options) string {
 }
 
 /*
-var pageRankCounter []int = make([]int, options.MaxPages*Info.ResPerPage)
+var pageRankCounter []int = make([]int, options.Pages.Max*Info.ResPerPage)
 col.OnHTML("div.web-results > article.item-web", func(e *colly.HTMLElement) {
 	dom := e.DOM
 

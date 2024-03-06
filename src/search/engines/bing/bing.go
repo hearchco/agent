@@ -25,7 +25,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	col, pagesCol := _sedefaults.InitializeCollectors(ctx, Info.Name, options, settings, timings, relay)
 
-	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
+	var pageRankCounter = make([]int, options.Pages.Max*Info.ResultsPerPage)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
@@ -60,25 +60,25 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
+	retErrors := make([]error, options.Pages.Start+options.Pages.Max)
+
+	// static params
 	localeParam := getLocale(options)
 
-	retErrors := make([]error, options.MaxPages)
-
-	colCtx := colly.NewContext()
-	colCtx.Put("page", strconv.Itoa(1))
-
-	urll := Info.URL + query + localeParam
-	anonUrll := Info.URL + anonymize.String(query) + localeParam
-
-	err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
-	retErrors[0] = err
-
-	for i := 1; i < options.MaxPages; i++ {
-		colCtx = colly.NewContext()
+	// starts from at least 0
+	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
+		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
-		urll := Info.URL + query + "&first=" + strconv.Itoa(i*10+1) + localeParam
-		anonUrll := Info.URL + anonymize.String(query) + "&first=" + strconv.Itoa(i*10+1) + localeParam
+		// dynamic params
+		pageParam := ""
+		// i == 0 is the first page
+		if i > 0 {
+			pageParam = "&first=" + strconv.Itoa(i*10+1)
+		}
+
+		urll := Info.URL + query + pageParam + localeParam
+		anonUrll := Info.URL + anonymize.String(query) + pageParam + localeParam
 
 		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
 		retErrors[i] = err

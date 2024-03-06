@@ -22,7 +22,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	col, pagesCol := _sedefaults.InitializeCollectors(ctx, Info.Name, options, settings, timings, relay)
 
-	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
+	var pageRankCounter []int = make([]int, options.Pages.Max*Info.ResultsPerPage)
 
 	localeCookie := getLocale(options)
 	safeSearchCookie := getSafeSearch(options)
@@ -56,22 +56,23 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	retErrors := make([]error, options.MaxPages)
+	retErrors := make([]error, options.Pages.Start+options.Pages.Max)
 
-	colCtx := colly.NewContext()
-	colCtx.Put("page", strconv.Itoa(1))
-
-	urll := Info.URL + query + "&source=web"
-	anonUrll := Info.URL + anonymize.String(query) + "&source=web"
-	err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
-	retErrors[0] = err
-
-	for i := 1; i < options.MaxPages; i++ {
-		colCtx = colly.NewContext()
+	// starts from at least 0
+	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
+		colCtx := colly.NewContext()
 		colCtx.Put("page", strconv.Itoa(i+1))
 
-		urll := Info.URL + query + "&spellcheck=0&offset=" + strconv.Itoa(i)
-		anonUrll := Info.URL + anonymize.String(query) + "&spellcheck=0&offset=" + strconv.Itoa(i)
+		// dynamic params
+		pageParam := "&source=web"
+		// i == 0 is the first page
+		if i > 0 {
+			pageParam = "&spellcheck=0&offset=" + strconv.Itoa(i)
+		}
+
+		urll := Info.URL + query + pageParam
+		anonUrll := Info.URL + anonymize.String(query) + pageParam
+
 		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
 		retErrors[i] = err
 	}

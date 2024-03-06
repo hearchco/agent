@@ -12,32 +12,24 @@ func TestSearch(t *testing.T) {
 
 	// testing config
 	conf := _engines_test.NewConfig(engineName)
+	opt := _engines_test.NewOpts()
 
 	// test cases
 	tchar := [...]_engines_test.TestCaseHasAnyResults{{
-		Query: "ping",
-		Options: engines.Options{
-			MaxPages:   1,
-			VisitPages: false,
-		},
+		Query:   "ping",
+		Options: opt,
 	}}
 
 	tccr := [...]_engines_test.TestCaseContainsResults{{
 		Query:     "wikipedia logo",
 		ResultURL: []string{"upload.wikimedia.org"},
-		Options: engines.Options{
-			MaxPages:   1,
-			VisitPages: false,
-		},
+		Options:   opt,
 	}}
 
 	tcrr := [...]_engines_test.TestCaseRankedResults{{
 		Query:     "linux logo wikipedia",
 		ResultURL: []string{"upload.wikimedia.org"},
-		Options: engines.Options{
-			MaxPages:   1,
-			VisitPages: false,
-		},
+		Options:   opt,
 	}}
 
 	_engines_test.CheckTestCases(tchar[:], tccr[:], tcrr[:], t, conf)

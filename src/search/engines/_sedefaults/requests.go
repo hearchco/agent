@@ -26,6 +26,7 @@ func DoGetRequest(urll string, anonurll string, colCtx *colly.Context, collector
 func DoPostRequest(urll string, requestData io.Reader, colCtx *colly.Context, collector *colly.Collector, packageName engines.Name) error {
 	log.Trace().
 		Str("engine", packageName.String()).
+		// no body logging, so it's already anonymous
 		Str("url", urll).
 		Msg("POST")
 

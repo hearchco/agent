@@ -18,6 +18,7 @@ type Flags struct {
 	LogToFile   bool   `type:"bool" default:"false" env:"HEARCHCO_LOG_TO_FILE" help:"Should logs be written to file"`
 	Verbosity   int8   `type:"counter" default:"0" short:"v" env:"HEARCHCO_VERBOSITY" help:"Log level verbosity"`
 	// options
+	StartPage  int    `type:"counter" default:"1" env:"HEARCHCO_START_PAGE" help:"Page from which to start searching"`
 	MaxPages   int    `type:"counter" default:"1" env:"HEARCHCO_MAX_PAGES" help:"Number of pages to search"`
 	Visit      bool   `type:"bool" default:"false" env:"HEARCHCO_VISIT" help:"Should results be visited"`
 	Category   string `type:"string" default:"" short:"c" env:"HEARCHCO_CATEGORY" help:"Search result category. Can also be supplied through the query (e.g. \"!info smartphone\"). Supported values: info[/wiki], science[/sci], news, blog, surf, newnews[/nnews]"`

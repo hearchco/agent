@@ -17,13 +17,14 @@ import (
 )
 
 func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) error {
-	var query, pages, deepSearch, locale, categ, useragent, safesearch, mobile string
+	var query, start, pages, deepSearch, locale, categ, useragent, safesearch, mobile string
 	var ccateg category.Name
 
 	switch c.Request.Method {
 	case "", "GET":
 		{
 			query = c.Query("q")
+			start = c.DefaultQuery("start", "1")
 			pages = c.DefaultQuery("pages", "1")
 			deepSearch = c.DefaultQuery("deep", "false")
 			locale = c.DefaultQuery("locale", config.DefaultLocale)
@@ -35,6 +36,7 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 	case "POST":
 		{
 			query = c.PostForm("q")
+			start = c.DefaultPostForm("start", "1")
 			pages = c.DefaultPostForm("pages", "1")
 			deepSearch = c.DefaultPostForm("deep", "false")
 			locale = c.DefaultPostForm("locale", config.DefaultLocale)
@@ -48,10 +50,24 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 	if query == "" {
 		c.String(http.StatusOK, "")
 	} else {
-		maxPages, pageserr := strconv.Atoi(pages)
+		pagesStart, starterr := strconv.Atoi(start)
+		if starterr != nil {
+			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Cannot convert start value (%q) to int", start))
+			return fmt.Errorf("router.Search(): cannot convert start value %q to int: %w", start, starterr)
+		}
+		if pagesStart < 1 {
+			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Start value (%q) must be at least 1", start))
+			return fmt.Errorf("router.Search(): start value %q must be at least 1: %w", start, starterr)
+		}
+
+		pagesMax, pageserr := strconv.Atoi(pages)
 		if pageserr != nil {
 			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Cannot convert pages value (%q) to int", pages))
 			return fmt.Errorf("router.Search(): cannot convert pages value %q to int: %w", pages, pageserr)
+		}
+		if pagesMax < 1 {
+			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Pages value (%q) must be at least 1", pages))
+			return fmt.Errorf("router.Search(): pages value %q must be at least 1: %w", pages, pageserr)
 		}
 
 		visitPages, deeperr := strconv.ParseBool(deepSearch)
@@ -84,7 +100,7 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 		}
 
 		options := engines.Options{
-			MaxPages:   maxPages,
+			Pages:      engines.Pages{Start: pagesStart, Max: pagesMax},
 			VisitPages: visitPages,
 			Category:   ccateg,
 			UserAgent:  useragent,
