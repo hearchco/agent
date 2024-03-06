@@ -1,6 +1,4 @@
 server:
-  # beware this bug with trailing * for wildcard CORS
-  # https://github.com/gin-contrib/cors/pull/106
   frontendurls: http://localhost:5173,https://*hearch.co,https://*hearchco-frontend.pages.dev
   cache:
     type: none
