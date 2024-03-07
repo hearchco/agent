@@ -6,3 +6,5 @@ Hearchco objectives:
 + anonymity; no ads, no tracking
 + customizability - ranking, filtering, separate frontend and backend for modular changes
 + bangs - engine categories with specialized ranking for specialized searches
+
+Requires go version >= 1.22.
