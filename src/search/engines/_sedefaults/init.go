@@ -1,41 +1,41 @@
 package _sedefaults
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/gocolly/colly/v2/proxy"
 	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/rs/zerolog/log"
 )
 
-func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collector, settings *config.Settings, options *engines.Options, timings *config.Timings) {
-	*colPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
-	*pagesColPtr = colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
+// it's okay to return pointers to collectors since colly.NewCollector() returns a pointer
+func InitializeCollectors(ctx context.Context, engineName engines.Name, options engines.Options, settings config.Settings, timings config.Timings, relay *bucket.Relay) (*colly.Collector, *colly.Collector) {
+	col := colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
+	pagesCol := colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 
-	if timings != nil {
-		var limitRule *colly.LimitRule = &colly.LimitRule{
-			DomainGlob:  "*",
-			Delay:       timings.Delay,
-			RandomDelay: timings.RandomDelay,
-			Parallelism: timings.Parallelism,
-		}
+	limitRule := colly.LimitRule{
+		DomainGlob:  "*",
+		Delay:       timings.Delay,
+		RandomDelay: timings.RandomDelay,
+		Parallelism: timings.Parallelism,
+	}
+	if err := col.Limit(&limitRule); err != nil {
+		log.Error().
+			Err(err).
+			Str("limitRule", fmt.Sprintf("%v", limitRule)).
+			Msg("_sedefaults.InitializeCollectors(): failed adding new limit rule")
+	}
 
-		if err := (*colPtr).Limit(limitRule); err != nil {
-			log.Error().
-				Err(err).
-				Str("limitRule", fmt.Sprintf("%v", limitRule)).
-				Msg("_sedefaults.InitializeCollectors(): failed adding new limit rule")
-		}
+	if timings.Timeout != 0 {
+		col.SetRequestTimeout(timings.Timeout)
+	}
 
-		if timings.Timeout != 0 {
-			(*colPtr).SetRequestTimeout(timings.Timeout)
-		}
-
-		if timings.PageTimeout != 0 {
-			(*pagesColPtr).SetRequestTimeout(timings.PageTimeout)
-		}
+	if timings.PageTimeout != 0 {
+		pagesCol.SetRequestTimeout(timings.PageTimeout)
 	}
 
 	if settings.Proxies != nil {
@@ -52,7 +52,18 @@ func InitializeCollectors(colPtr **colly.Collector, pagesColPtr **colly.Collecto
 				Msg("_sedefaults.InitializeCollectors(): failed creating proxy switcher")
 		}
 
-		(*colPtr).SetProxyFunc(rp)
-		(*pagesColPtr).SetProxyFunc(rp)
+		col.SetProxyFunc(rp)
+		pagesCol.SetProxyFunc(rp)
 	}
+
+	// Set up collector
+	colRequest(col, ctx, engineName, false)
+	colError(col, engineName, false)
+
+	// Set up pages collector
+	colRequest(pagesCol, ctx, engineName, true)
+	colError(pagesCol, engineName, true)
+	pagesColResponse(pagesCol, engineName, relay)
+
+	return col, pagesCol
 }

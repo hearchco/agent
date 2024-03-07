@@ -10,11 +10,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func procBang(query string, options *engines.Options, conf *config.Config) (string, config.Timings, []engines.Name) {
-	useSpec, specEng := procSpecificEngine(query, options, conf)
-	goodCat := procCategory(query, options)
+func procBang(query string, setCategory category.Name, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) (string, category.Name, config.Timings, []engines.Name) {
+	useSpec, specEng := procSpecificEngine(query, settings)
+	goodCat, cat := procCategory(query, setCategory)
 	if !goodCat && !useSpec && (query != "" && query[0] == '!') {
-		// options.category is set to GENERAL
+		// cat is set to GENERAL
 		log.Debug().
 			Str("queryAnon", anonymize.String(query)).
 			Str("queryHash", anonymize.HashToSHA256B64(query)).
@@ -24,9 +24,9 @@ func procBang(query string, options *engines.Options, conf *config.Config) (stri
 	query = trimBang(query)
 
 	if useSpec {
-		return query, conf.Categories[category.GENERAL].Timings, []engines.Name{specEng}
+		return query, category.GENERAL, categories[category.GENERAL].Timings, []engines.Name{specEng}
 	} else {
-		return query, conf.Categories[options.Category].Timings, conf.Categories[options.Category].Engines
+		return query, cat, categories[cat].Timings, categories[cat].Engines
 	}
 }
 
@@ -47,13 +47,13 @@ func trimBang(query string) string {
 	return strings.TrimSpace(sp[1])
 }
 
-func procSpecificEngine(query string, options *engines.Options, conf *config.Config) (bool, engines.Name) {
+func procSpecificEngine(query string, settings map[engines.Name]config.Settings) (bool, engines.Name) {
 	if query == "" || query[0] != '!' {
 		return false, engines.UNDEFINED
 	}
 	sp := strings.SplitN(query, " ", 2)
 	bangWord := sp[0][1:]
-	for key, val := range conf.Settings {
+	for key, val := range settings {
 		if strings.EqualFold(bangWord, val.Shortcut) || strings.EqualFold(bangWord, key.String()) {
 			return true, key
 		}
@@ -62,14 +62,14 @@ func procSpecificEngine(query string, options *engines.Options, conf *config.Con
 	return false, engines.UNDEFINED
 }
 
-// updates options.Category to the category in the query, and returns if a valid category is present
-func procCategory(query string, options *engines.Options) bool {
+// returns category in the query if a valid category is present
+func procCategory(query string, setCategory category.Name) (bool, category.Name) {
 	cat := category.FromQuery(query)
 	if cat != "" {
-		options.Category = cat
+		return true, cat
+	} else if setCategory == "" {
+		return false, category.GENERAL
+	} else {
+		return false, setCategory
 	}
-	if options.Category == "" {
-		options.Category = category.GENERAL
-	}
-	return cat != ""
 }

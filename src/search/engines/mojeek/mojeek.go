@@ -14,23 +14,13 @@ import (
 	"github.com/hearchco/hearchco/src/search/parse"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
-	if err := _sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
-		return err
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
+	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
+	if err != nil {
+		return []error{err}
 	}
 
-	var col *colly.Collector
-	var pagesCol *colly.Collector
-	var retError error
-
-	_sedefaults.InitializeCollectors(&col, &pagesCol, &settings, &options, &timings)
-
-	_sedefaults.PagesColRequest(Info.Name, pagesCol, ctx)
-	_sedefaults.PagesColError(Info.Name, pagesCol)
-	_sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
-
-	_sedefaults.ColRequest(Info.Name, col, ctx)
-	_sedefaults.ColError(Info.Name, col)
+	col, pagesCol := _sedefaults.InitializeCollectors(ctx, Info.Name, options, settings, timings, relay)
 
 	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
 
@@ -47,20 +37,23 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 
 			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
-			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+			bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 			pageRankCounter[page]++
 		}
 	})
 
-	localeParam := getLocale(&options)
-	safeSearchParam := getSafeSearch(&options)
+	localeParam := getLocale(options)
+	safeSearchParam := getSafeSearch(options)
+
+	retErrors := make([]error, options.MaxPages)
 
 	colCtx := colly.NewContext()
 	colCtx.Put("page", strconv.Itoa(1))
 
 	urll := Info.URL + query + localeParam + safeSearchParam
 	anonUrll := Info.URL + anonymize.String(query) + localeParam + safeSearchParam
-	_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
+	err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+	retErrors[0] = err
 
 	for i := 1; i < options.MaxPages; i++ {
 		colCtx = colly.NewContext()
@@ -68,21 +61,22 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 		urll := Info.URL + query + "&s=" + strconv.Itoa(i*10+1) + localeParam + safeSearchParam
 		anonUrll := Info.URL + anonymize.String(query) + "&s=" + strconv.Itoa(i*10+1) + localeParam + safeSearchParam
-		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
+		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		retErrors[i] = err
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retError
+	return _sedefaults.NonNilErrorsFromSlice(retErrors)
 }
 
-func getLocale(options *engines.Options) string {
+func getLocale(options engines.Options) string {
 	spl := strings.SplitN(strings.ToLower(options.Locale), "_", 2)
 	return "&lb=" + spl[0] + "&arc=" + spl[1]
 }
 
-func getSafeSearch(options *engines.Options) string {
+func getSafeSearch(options engines.Options) string {
 	if options.SafeSearch {
 		return "&safe=1"
 	}

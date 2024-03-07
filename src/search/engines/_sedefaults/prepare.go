@@ -9,10 +9,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Prepare(seName engines.Name, options *engines.Options, settings *config.Settings, support *engines.SupportedSettings, info *engines.Info, ctx *context.Context) error {
-	if ctx == nil {
-		*ctx = context.Background()
-	}
+// sending options and settings as pointers since they are modified
+func Prepare(ctx context.Context, info engines.Info, support engines.SupportedSettings, options *engines.Options, settings *config.Settings) (context.Context, error) {
+	seName := info.Name
 
 	if options.UserAgent == "" {
 		options.UserAgent = useragent.RandomUserAgent()
@@ -63,5 +62,9 @@ func Prepare(seName engines.Name, options *engines.Options, settings *config.Set
 			Msg("SafeSearch set but not supported")
 	}
 
-	return nil
+	if ctx == nil {
+		return context.Background(), nil
+	} else {
+		return ctx, nil
+	}
 }

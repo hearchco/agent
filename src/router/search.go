@@ -16,7 +16,7 @@ import (
 	"github.com/hearchco/hearchco/src/search/result"
 )
 
-func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
+func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) error {
 	var query, pages, deepSearch, locale, categ, useragent, safesearch, mobile string
 	var ccateg category.Name
 
@@ -93,7 +93,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 			Mobile:     isMobile,
 		}
 
-		results, foundInDB := search.Search(query, options, conf, db)
+		results, foundInDB := search.Search(query, options, db, settings, categories)
 
 		resultsShort := result.Shorten(results)
 		if resultsJson, err := json.Marshal(resultsShort); err != nil {
@@ -103,7 +103,7 @@ func Search(c *gin.Context, conf *config.Config, db cache.DB) error {
 			c.String(http.StatusOK, string(resultsJson))
 		}
 
-		search.CacheAndUpdateResults(query, options, conf, db, results, foundInDB)
+		search.CacheAndUpdateResults(query, options, db, ttlConf, settings, categories, results, foundInDB)
 	}
 	return nil
 }

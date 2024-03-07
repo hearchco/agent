@@ -7,62 +7,91 @@ import (
 
 	"github.com/gocolly/colly/v2"
 	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
-func ColRequest(seName engines.Name, col *colly.Collector, ctx context.Context) {
+func colRequest(col *colly.Collector, ctx context.Context, seName engines.Name, saveOrigUrl bool) {
 	col.OnRequest(func(r *colly.Request) {
 		if err := ctx.Err(); err != nil {
 			if engines.IsTimeoutError(err) {
 				log.Trace().
 					Err(err).
 					Str("engine", seName.String()).
-					Msg("_sedefaults.ColRequest() -> col.OnRequest(): context timeout error")
+					Msg("_sedefaults.colRequest(): context timeout error")
 			} else {
 				log.Error().
 					Err(err).
 					Str("engine", seName.String()).
-					Msg("_sedefaults.ColRequest() -> col.OnRequest(): context error")
+					Msg("_sedefaults.colRequest(): context error")
 			}
 			r.Abort()
 			return
 		}
+		if saveOrigUrl {
+			r.Ctx.Put("originalURL", r.URL.String())
+		}
 	})
 }
 
-func ColError(seName engines.Name, col *colly.Collector) {
+func colError(col *colly.Collector, seName engines.Name, visiting bool) {
 	col.OnError(func(r *colly.Response, err error) {
 		if engines.IsTimeoutError(err) {
 			log.Trace().
 				// Err(err). // timeout error produces Get "url" error with the query
 				Str("engine", seName.String()).
-				// Str("url", urll). // can't reliably anonymize it (because it's engine dependent and query isn't passed to this function)
-				Msg("_sedefaults.ColError() -> col.OnError(): request timeout error for url")
+				// Str("url", urll). // can't reliably anonymize it (because it's engine dependent)
+				Msg("_sedefaults.colError(): request timeout error for url")
 		} else {
-			log.Error().
+			event := log.Error()
+			if visiting {
+				event = log.Trace()
+			}
+			event.
 				Err(err).
 				Str("engine", seName.String()).
-				// Str("url", urll). // can't reliably anonymize it (because it's engine dependent and query isn't passed to this function)
+				// Str("url", urll). // can't reliably anonymize it (because it's engine dependent)
 				Int("statusCode", r.StatusCode).
-				Str("response", string(r.Body)). // query can be present, depending on the response from the engine (Google has the query in 3 places)
-				Msg("_sedefaults.ColError() -> col.OnError(): request error for url")
+				Str("response", string(r.Body)). // WARN: query can be present, depending on the response from the engine (example: google has the query in 3 places)
+				Msg("_sedefaults.colError(): request error for url")
 
-			dumpPath := fmt.Sprintf("%v%v_col.log.html", config.LogDumpLocation, seName.String())
-			log.Debug().
-				Str("engine", seName.String()).
-				Str("responsePath", dumpPath).
-				Func(func(e *zerolog.Event) {
-					bodyWriteErr := os.WriteFile(dumpPath, r.Body, 0644)
-					if bodyWriteErr != nil {
-						log.Error().
-							Err(bodyWriteErr).
-							Str("engine", seName.String()).
-							Msg("_sedefaults.ColError() -> col.OnError(): error writing html response body to file")
-					}
-				}).
-				Msg("_sedefaults.ColError() -> col.OnError(): html response written")
+			if !visiting {
+				// dump file only in Trace logging mode
+				dumpPath := fmt.Sprintf("%v%v_col.log.html", config.LogDumpLocation, seName.String())
+				log.Trace().
+					Str("engine", seName.String()).
+					Str("responsePath", dumpPath).
+					Func(func(e *zerolog.Event) {
+						bodyWriteErr := os.WriteFile(dumpPath, r.Body, 0644)
+						if bodyWriteErr != nil {
+							log.Error().
+								Err(bodyWriteErr).
+								Str("engine", seName.String()).
+								Msg("_sedefaults.colError(): error writing html response body to file")
+						}
+					}).
+					Msg("_sedefaults.colError(): html response written")
+			}
+		}
+	})
+}
+
+func pagesColResponse(pagesCol *colly.Collector, seName engines.Name, relay *bucket.Relay) {
+	pagesCol.OnResponse(func(r *colly.Response) {
+		urll := r.Ctx.Get("originalURL")
+		if urll == "" {
+			log.Error().
+				Msg("_sedefaults.pagesColResponse(): error getting original url")
+			return
+		}
+
+		err := bucket.SetResultResponse(urll, r, relay, seName)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Msg("_sedefaults.pagesColResponse(): error setting result")
 		}
 	})
 }

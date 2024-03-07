@@ -14,23 +14,13 @@ import (
 	"github.com/hearchco/hearchco/src/search/parse"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
-	if err := _sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
-		return err
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
+	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
+	if err != nil {
+		return []error{err}
 	}
 
-	var col *colly.Collector
-	var pagesCol *colly.Collector
-	var retError error
-
-	_sedefaults.InitializeCollectors(&col, &pagesCol, &settings, &options, &timings)
-
-	_sedefaults.PagesColRequest(Info.Name, pagesCol, ctx)
-	_sedefaults.PagesColError(Info.Name, pagesCol)
-	_sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
-
-	_sedefaults.ColRequest(Info.Name, col, ctx)
-	_sedefaults.ColError(Info.Name, col)
+	col, pagesCol := _sedefaults.InitializeCollectors(ctx, Info.Name, options, settings, timings, relay)
 
 	col.OnRequest(func(r *colly.Request) {
 		r.Headers.Del("Accept")
@@ -50,14 +40,14 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			goodDescription := parse.ParseTextWithHTML(result.Snippet)
 
 			res := bucket.MakeSEResult(goodURL, goodTitle, goodDescription, Info.Name, 1, counter)
-			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+			bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 			counter += 1
 		}
 	})
 
-	localeParam := getLocale(&options)
+	localeParam := getLocale(options)
 	nRequested := settings.RequestedResultsPerPage
-	safeSearchParam := getSafeSearch(&options)
+	safeSearchParam := getSafeSearch(options)
 
 	var urll string
 	if nRequested == Info.ResultsPerPage {
@@ -72,20 +62,25 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		anonUrll = Info.URL + "client=web" + localeParam + "&limit=" + strconv.Itoa(nRequested) + "&no_correct=false&q=" + anonymize.String(query) + safeSearchParam + "&type=web"
 	}
 
-	_sedefaults.DoGetRequest(urll, anonUrll, nil, col, Info.Name, &retError)
+	retErrors := make([]error, options.MaxPages)
+
+	err = _sedefaults.DoGetRequest(urll, anonUrll, nil, col, Info.Name)
+	retErrors[0] = err
+
+	// TODO: missing pages request loop?
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retError
+	return _sedefaults.NonNilErrorsFromSlice(retErrors)
 }
 
-func getLocale(options *engines.Options) string {
+func getLocale(options engines.Options) string {
 	locale := strings.Split(options.Locale, "_")[1]
 	return "&gl=" + locale
 }
 
-func getSafeSearch(options *engines.Options) string {
+func getSafeSearch(options engines.Options) string {
 	if options.SafeSearch {
 		return "&safeSearch=strict"
 	}

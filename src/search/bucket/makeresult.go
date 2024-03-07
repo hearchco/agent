@@ -8,7 +8,7 @@ import (
 func MakeSEResult(
 	urll, title, desc string,
 	seName engines.Name, sePage, seOnPageRank int,
-) *result.RetrievedResult {
+) result.RetrievedResult {
 
 	ser := result.RetrievedRank{
 		SearchEngine: seName,
@@ -24,7 +24,7 @@ func MakeSEResult(
 		Rank:        ser,
 	}
 
-	return &res
+	return res
 }
 
 func MakeSEImageResult(
@@ -32,7 +32,7 @@ func MakeSEImageResult(
 	src, srcUrl, thmbUrl string,
 	origH, origW, thmbH, thmbW int,
 	seName engines.Name, sePage, seOnPageRank int,
-) *result.RetrievedResult {
+) result.RetrievedResult {
 
 	ser := result.RetrievedRank{
 		SearchEngine: seName,
@@ -61,5 +61,5 @@ func MakeSEImageResult(
 		Rank: ser,
 	}
 
-	return &res
+	return res
 }

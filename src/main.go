@@ -8,9 +8,6 @@ import (
 	"time"
 
 	"github.com/hearchco/hearchco/src/cache"
-	"github.com/hearchco/hearchco/src/cache/badger"
-	"github.com/hearchco/hearchco/src/cache/nocache"
-	"github.com/hearchco/hearchco/src/cache/redis"
 	"github.com/hearchco/hearchco/src/cli"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/logger"
@@ -26,13 +23,13 @@ func main() {
 	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// configure logging without file at INFO level
-	_ = logger.Setup(0)
+	logger.Setup(0)
 
 	// parse cli arguments
 	cliFlags := cli.Setup()
 
 	// start profiler
-	_, stopProfiler := runProfiler(&cliFlags)
+	_, stopProfiler := runProfiler(cliFlags)
 	defer stopProfiler()
 
 	var lgr zerolog.Logger
@@ -48,44 +45,26 @@ func main() {
 	conf.Load(cliFlags.DataDirPath, cliFlags.LogDirPath)
 
 	// setup cache
-	var db cache.DB
-	var err error
-	switch conf.Server.Cache.Type {
-	case "badger":
-		db, err = badger.New(cliFlags.DataDirPath, conf.Server.Cache.Badger)
-		if err != nil {
-			log.Fatal().
-				Err(err).
-				Msg("main.main(): failed creating a badger cache")
-			// ^FATAL
-		}
-	case "redis":
-		db, err = redis.New(ctx, conf.Server.Cache.Redis)
-		if err != nil {
-			log.Fatal().
-				Err(err).
-				Msg("main.main(): failed creating a redis cache")
-			// ^FATAL
-		}
-	default:
-		db, err = nocache.New()
-		if err != nil {
-			log.Fatal().
-				Err(err).
-				Msg("main.main(): failed creating a nocache")
-			// ^FATAL
-		}
-		log.Warn().Msg("Running without caching!")
+	db, err := cache.New(ctx, cliFlags.DataDirPath, conf.Server.Cache)
+	if err != nil {
+		log.Fatal().
+			Err(err).
+			Msg("main.main(): failed creating a new db")
+		// ^FATAL
 	}
 
 	// startup
 	if cliFlags.Cli {
 		cli.Run(cliFlags, db, conf)
 	} else {
-		if rw, err := router.New(conf, cliFlags.Verbosity, lgr); err != nil {
+		rw, err := router.New(conf.Server, cliFlags.Verbosity, lgr)
+		if err != nil {
 			log.Fatal().Err(err).Msg("main.main(): failed creating a router")
 			// ^FATAL
-		} else if err := rw.Start(ctx, db, cliFlags.ServeProfiler); err != nil {
+		}
+
+		err = rw.Start(ctx, db, conf, cliFlags.ServeProfiler)
+		if err != nil {
 			log.Fatal().Err(err).Msg("main.main(): failed starting the router")
 			// ^FATAL
 		}
@@ -94,7 +73,13 @@ func main() {
 	// program cleanup
 	db.Close()
 
-	log.Debug().
-		Int64("ms", time.Since(mainTimer).Milliseconds()).
-		Msg("Program finished")
+	if cliFlags.Cli {
+		log.Debug().
+			Int64("ms", time.Since(mainTimer).Milliseconds()).
+			Msg("Program finished")
+	} else {
+		// router mode could be running for a very long time
+		log.Info().
+			Msg("Program finished")
+	}
 }

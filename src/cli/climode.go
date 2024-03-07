@@ -53,7 +53,7 @@ func printResults(results []result.Result) {
 	}
 }
 
-func Run(flags Flags, db cache.DB, conf *config.Config) {
+func Run(flags Flags, db cache.DB, conf config.Config) {
 	log.Info().
 		Str("queryAnon", anonymize.String(flags.Query)).
 		Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
@@ -73,7 +73,7 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 
 	start := time.Now()
 
-	results, foundInDB := search.Search(flags.Query, options, conf, db)
+	results, foundInDB := search.Search(flags.Query, options, db, conf.Settings, conf.Categories)
 
 	duration := time.Since(start)
 	if !flags.Silent {
@@ -84,5 +84,5 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		Int64("ms", duration.Milliseconds()).
 		Msg("Found results")
 
-	search.CacheAndUpdateResults(flags.Query, options, conf, db, results, foundInDB)
+	search.CacheAndUpdateResults(flags.Query, options, db, conf.Server.Cache.TTL, conf.Settings, conf.Categories, results, foundInDB)
 }
