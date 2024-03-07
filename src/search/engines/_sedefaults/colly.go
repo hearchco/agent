@@ -58,8 +58,9 @@ func colError(col *colly.Collector, seName engines.Name, visiting bool) {
 				Msg("_sedefaults.colError(): request error for url")
 
 			if !visiting {
+				// dump file only in Trace logging mode
 				dumpPath := fmt.Sprintf("%v%v_col.log.html", config.LogDumpLocation, seName.String())
-				log.Debug().
+				log.Trace().
 					Str("engine", seName.String()).
 					Str("responsePath", dumpPath).
 					Func(func(e *zerolog.Event) {
