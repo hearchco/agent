@@ -57,7 +57,7 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 		}
 		if pagesStart < 1 {
 			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Start value (%q) must be at least 1", start))
-			return fmt.Errorf("router.Search(): start value %q must be at least 1: %w", start, starterr)
+			return fmt.Errorf("router.Search(): start value %q must be at least 1", start)
 		} else {
 			// since it's >=1, we decrement it to match the 0-based index
 			pagesStart -= 1
@@ -70,7 +70,7 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 		}
 		if pagesMax < 1 {
 			c.String(http.StatusUnprocessableEntity, fmt.Sprintf("Pages value (%q) must be at least 1", pages))
-			return fmt.Errorf("router.Search(): pages value %q must be at least 1: %w", pages, pageserr)
+			return fmt.Errorf("router.Search(): pages value %q must be at least 1", pages)
 		}
 
 		visitPages, deeperr := strconv.ParseBool(deepSearch)
