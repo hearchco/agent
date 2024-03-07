@@ -42,23 +42,24 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 		index := 0
 
 		relay.Mutex.RLock()
-		for ind := range mapRes.EngineRanks { // this could also be done by changing EngineRanks to a map
-			if seName == mapRes.EngineRanks[ind].SearchEngine {
+		for i, er := range mapRes.EngineRanks { // this could also be done by changing EngineRanks to a map
+			if seName == er.SearchEngine {
 				alreadyIn = true
-				index = ind
+				index = i
 				break
 			}
 		}
 		relay.Mutex.RUnlock()
 
 		relay.Mutex.Lock()
+		er := mapRes.EngineRanks[index]
 		if !alreadyIn {
 			mapRes.EngineRanks = append(mapRes.EngineRanks, seResult.Rank)
-		} else if mapRes.EngineRanks[index].Page > seResult.Rank.Page {
-			mapRes.EngineRanks[index].Page = seResult.Rank.Page
-			mapRes.EngineRanks[index].OnPageRank = seResult.Rank.OnPageRank
-		} else if mapRes.EngineRanks[index].Page == seResult.Rank.Page && mapRes.EngineRanks[index].OnPageRank > seResult.Rank.OnPageRank {
-			mapRes.EngineRanks[index].OnPageRank = seResult.Rank.OnPageRank
+		} else if er.Page > seResult.Rank.Page {
+			er.Page = seResult.Rank.Page
+			er.OnPageRank = seResult.Rank.OnPageRank
+		} else if er.Page == seResult.Rank.Page && er.OnPageRank > seResult.Rank.OnPageRank {
+			er.OnPageRank = seResult.Rank.OnPageRank
 		}
 
 		if len(mapRes.Description) < len(seResult.Description) {
