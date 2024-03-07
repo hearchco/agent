@@ -20,13 +20,12 @@ type ImageResult struct {
 // Everything about some Result, calculated and compiled from multiple search engines
 // The URL is the primary key
 type Result struct {
-	URL           string
-	Rank          uint
-	Score         float64
-	Title         string
-	Description   string
-	EngineRanks   []RetrievedRank
-	TimesReturned uint8
-	ImageResult   ImageResult
-	Response      *colly.Response
+	URL         string
+	Rank        uint
+	Score       float64
+	Title       string
+	Description string
+	EngineRanks []RetrievedRank
+	ImageResult ImageResult
+	Response    *colly.Response
 }

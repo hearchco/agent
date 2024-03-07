@@ -15,9 +15,9 @@ func getScore(result *result.Result, rconf *config.Ranking) float64 {
 		seConst := rconf.Engines[er.SearchEngine.ToLower()].Const //these 2 could be preproced into array
 		retRankScore += (100.0/math.Pow(float64(er.Rank)*rconf.A+rconf.B, rconf.REXP)*rconf.C+rconf.D)*seMul + seConst
 	}
-	retRankScore /= float64(result.TimesReturned)
+	retRankScore /= float64(len(result.EngineRanks))
 
-	timesReturnedScore := math.Log(float64(result.TimesReturned)*rconf.TRA+rconf.TRB)*10*rconf.TRC + rconf.TRD
+	timesReturnedScore := math.Log(float64(len(result.EngineRanks))*rconf.TRA+rconf.TRB)*10*rconf.TRC + rconf.TRD
 
 	score := retRankScore + timesReturnedScore
 	return score
