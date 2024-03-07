@@ -57,20 +57,22 @@ func colError(col *colly.Collector, seName engines.Name, visiting bool) {
 				Str("response", string(r.Body)). // WARN: query can be present, depending on the response from the engine (example: google has the query in 3 places)
 				Msg("_sedefaults.colError(): request error for url")
 
-			dumpPath := fmt.Sprintf("%v%v_col.log.html", config.LogDumpLocation, seName.String())
-			log.Debug().
-				Str("engine", seName.String()).
-				Str("responsePath", dumpPath).
-				Func(func(e *zerolog.Event) {
-					bodyWriteErr := os.WriteFile(dumpPath, r.Body, 0644)
-					if bodyWriteErr != nil {
-						log.Error().
-							Err(bodyWriteErr).
-							Str("engine", seName.String()).
-							Msg("_sedefaults.colError(): error writing html response body to file")
-					}
-				}).
-				Msg("_sedefaults.colError(): html response written")
+			if !visiting {
+				dumpPath := fmt.Sprintf("%v%v_col.log.html", config.LogDumpLocation, seName.String())
+				log.Debug().
+					Str("engine", seName.String()).
+					Str("responsePath", dumpPath).
+					Func(func(e *zerolog.Event) {
+						bodyWriteErr := os.WriteFile(dumpPath, r.Body, 0644)
+						if bodyWriteErr != nil {
+							log.Error().
+								Err(bodyWriteErr).
+								Str("engine", seName.String()).
+								Msg("_sedefaults.colError(): error writing html response body to file")
+						}
+					}).
+					Msg("_sedefaults.colError(): html response written")
+			}
 		}
 	})
 }
