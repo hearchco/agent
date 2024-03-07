@@ -24,7 +24,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	col, pagesCol := _sedefaults.InitializeCollectors(ctx, Info.Name, options, settings, timings, relay)
 
-	var pageRankCounter []int = make([]int, options.Pages.Max*Info.ResultsPerPage)
+	pageRankCounter := make([]int, options.Pages.Max*Info.ResultsPerPage)
 
 	safeSearchCookieParam := getSafeSearch(options)
 
