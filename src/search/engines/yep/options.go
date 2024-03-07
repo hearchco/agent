@@ -21,7 +21,6 @@ var dompaths = engines.DOMPaths{
 */
 
 var Support = engines.SupportedSettings{
-	Locale:                  true,
-	SafeSearch:              true,
-	RequestedResultsPerPage: true,
+	Locale:     true,
+	SafeSearch: true,
 }
