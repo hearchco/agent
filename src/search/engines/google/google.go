@@ -65,11 +65,5 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	col.Wait()
 	pagesCol.Wait()
 
-	realRetErrors := make([]error, 0)
-	for _, err := range retErrors {
-		if err != nil {
-			realRetErrors = append(realRetErrors, err)
-		}
-	}
-	return realRetErrors
+	return _sedefaults.NonNilErrorsFromSlice(retErrors)
 }

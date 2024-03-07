@@ -81,13 +81,14 @@ func pagesColResponse(pagesCol *colly.Collector, seName engines.Name, relay *buc
 		if urll == "" {
 			log.Error().
 				Msg("_sedefaults.pagesColResponse(): error getting original url")
-		} else {
-			err := bucket.SetResultResponse(urll, r, relay, seName)
-			if err != nil {
-				log.Error().
-					Err(err).
-					Msg("_sedefaults.pagesColResponse(): error setting result")
-			}
+			return
+		}
+
+		err := bucket.SetResultResponse(urll, r, relay, seName)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Msg("_sedefaults.pagesColResponse(): error setting result")
 		}
 	})
 }
