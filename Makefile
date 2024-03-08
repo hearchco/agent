@@ -1,23 +1,23 @@
 run:
-	go run ./src
+	air
 run-cli:
 	go run ./src --cli
 
 debug:
-	go run ./src -v
+	air -- -v
 debug-cli:
 	go run ./srv -v --cli
 
 trace:
-	go run ./src -vv
+	air -- -vv
 trace-cli:
 	go run ./src -vv --cli
 
-setup:
+install:
 	go get ./...
 	go install github.com/dmarkham/enumer@latest
 	go generate ./...
-install: setup
+	go install github.com/cosmtrek/air@latest
 
 build:
 	go build ./...

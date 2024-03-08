@@ -83,7 +83,7 @@ jobs:
 
       # Runs go:generate
       - name: Generate go code from go:generate comments
-        run: make setup
+        run: make install
 
       # Builds project
       - name: Build project
