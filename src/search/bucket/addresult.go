@@ -52,7 +52,7 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 		relay.Mutex.RUnlock()
 
 		relay.Mutex.Lock()
-		er := mapRes.EngineRanks[index]
+		er := &mapRes.EngineRanks[index]
 		if !alreadyIn {
 			mapRes.EngineRanks = append(mapRes.EngineRanks, seResult.Rank)
 		} else if er.Page > seResult.Rank.Page {
