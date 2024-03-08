@@ -43,3 +43,4 @@ profiling/
 # test dump
 
 testdump*
+tmp/
