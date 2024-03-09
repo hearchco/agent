@@ -10,7 +10,7 @@ primary_region = "cdg"
   image = "ghcr.io/hearchco/hearchco:latest"
 
 [env]
-  HEARCHCO_SERVER_CACHE_TYPE = "redis"
+#  HEARCHCO_SERVER_CACHE_TYPE = "redis" # currently caching has some bugs so it's disabled
   HEARCHCO_SERVER_FRONTENDURLS = "http://localhost:5173,https://*hearch.co,https://*hearchco-frontend.pages.dev"
 
 [http_service]
