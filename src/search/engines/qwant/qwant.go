@@ -59,7 +59,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	retErrors := make([]error, options.Pages.Start+options.Pages.Max)
+	retErrors := make([]error, 0, options.Pages.Max)
 
 	// static params
 	localeParam := getLocale(options)
@@ -78,14 +78,16 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		urll := Info.URL + query + countParam + localeParam + offsetParam + safeSearchParam
 		anonUrll := Info.URL + anonymize.String(query) + countParam + localeParam + offsetParam + deviceParam + safeSearchParam
 
-		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
-		retErrors[i] = err
+		err := _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		if err != nil {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return _sedefaults.NonNilErrorsFromSlice(retErrors)
+	return retErrors[:len(retErrors):len(retErrors)]
 }
 
 // qwant returns this array when an invalid locale is supplied

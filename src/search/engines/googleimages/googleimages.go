@@ -27,7 +27,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	// disable User Agent since Google Images responds with fake data if UA is correct
 	col.UserAgent = ""
 
-	pageRankCounter := make([]int, options.Pages.Max*Info.ResultsPerPage)
+	pageRankCounter := make([]int, options.Pages.Max)
 
 	col.OnResponse(func(e *colly.Response) {
 		body := string(e.Body)
@@ -78,7 +78,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	retErrors := make([]error, options.Pages.Start+options.Pages.Max)
+	retErrors := make([]error, 0, options.Pages.Max)
 
 	// starts from at least 0
 	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
@@ -95,12 +95,14 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		urll := Info.URL + query + pageParam
 		anonUrll := Info.URL + anonymize.String(query) + pageParam
 
-		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
-		retErrors[i] = err
+		err := _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		if err != nil {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return _sedefaults.NonNilErrorsFromSlice(retErrors)
+	return retErrors[:len(retErrors):len(retErrors)]
 }

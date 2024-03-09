@@ -22,7 +22,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	col, pagesCol := _sedefaults.InitializeCollectors(ctx, Info.Name, options, settings, timings, relay)
 
-	pageRankCounter := make([]int, options.Pages.Max*Info.ResultsPerPage)
+	pageRankCounter := make([]int, options.Pages.Max)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
@@ -59,7 +59,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	retErrors := make([]error, options.Pages.Start+options.Pages.Max)
+	retErrors := make([]error, 0, options.Pages.Max)
 
 	// static params
 	safeSearchParam := getSafeSearch(options)
@@ -70,8 +70,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		colCtx := colly.NewContext()
 		colCtx.Put("page", pageStr)
 
+		var err error
 		// i == 0 is the first page
-		if i <= 0 {
+		if i == 0 {
 			requestData := strings.NewReader("query=" + query + "&country=web&language=all" + safeSearchParam)
 			err = _sedefaults.DoPostRequest(Info.URL, requestData, colCtx, col, Info.Name)
 			col.Wait() // col.Wait() is needed to save the JSESSION cookie
@@ -80,13 +81,15 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			err = _sedefaults.DoGetRequest(pageURL+pageStr, pageURL+pageStr, colCtx, col, Info.Name)
 		}
 
-		retErrors[i] = err
+		if err != nil {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return _sedefaults.NonNilErrorsFromSlice(retErrors)
+	return retErrors[:len(retErrors):len(retErrors)]
 }
 
 func getSafeSearch(options engines.Options) string {
