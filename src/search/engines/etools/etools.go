@@ -22,7 +22,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	col, pagesCol := _sedefaults.InitializeCollectors(ctx, Info.Name, options, settings, timings, relay)
 
-	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
+	pageRankCounter := make([]int, options.Pages.Max)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
@@ -43,11 +43,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
 
 		if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-			page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+			pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+			page := pageIndex + options.Pages.Start + 1
 
-			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
+			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
 			bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
-			pageRankCounter[page]++
+
+			pageRankCounter[pageIndex]++
 		}
 	})
 
@@ -59,32 +61,37 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
+	retErrors := make([]error, 0, options.Pages.Max)
+
+	// static params
 	safeSearchParam := getSafeSearch(options)
 
-	retErrors := make([]error, options.MaxPages)
-
-	colCtx := colly.NewContext()
-	colCtx.Put("page", strconv.Itoa(1))
-
-	err = _sedefaults.DoPostRequest(Info.URL, strings.NewReader("query="+query+"&country=web&language=all"+safeSearchParam), colCtx, col, Info.Name)
-	retErrors[0] = err
-
-	col.Wait() // wait so I can get the JSESSION cookie back
-
-	for i := 1; i < options.MaxPages; i++ {
-		pageStr := strconv.Itoa(i + 1)
-		colCtx = colly.NewContext()
+	// starts from at least 0
+	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
+		pageStr := strconv.Itoa(i - options.Pages.Start)
+		colCtx := colly.NewContext()
 		colCtx.Put("page", pageStr)
 
-		// query not needed as its saved in the session
-		err = _sedefaults.DoGetRequest(pageURL+pageStr, pageURL+pageStr, colCtx, col, Info.Name)
-		retErrors[i] = err
+		var err error
+		// i == 0 is the first page
+		if i == 0 {
+			requestData := strings.NewReader("query=" + query + "&country=web&language=all" + safeSearchParam)
+			err = _sedefaults.DoPostRequest(Info.URL, requestData, colCtx, col, Info.Name)
+			col.Wait() // col.Wait() is needed to save the JSESSION cookie
+		} else {
+			// query is not needed as it's saved in the JSESSION cookie
+			err = _sedefaults.DoGetRequest(pageURL+pageStr, pageURL+pageStr, colCtx, col, Info.Name)
+		}
+
+		if err != nil {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return _sedefaults.NonNilErrorsFromSlice(retErrors)
+	return retErrors[:len(retErrors):len(retErrors)]
 }
 
 func getSafeSearch(options engines.Options) string {

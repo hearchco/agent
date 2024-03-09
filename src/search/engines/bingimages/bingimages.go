@@ -23,7 +23,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	col, pagesCol := _sedefaults.InitializeCollectors(ctx, Info.Name, options, settings, timings, relay)
 
-	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
+	pageRankCounter := make([]int, options.Pages.Max)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
@@ -167,16 +167,18 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			return
 		}
 
-		page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start + 1
 
 		res := bucket.MakeSEImageResult(
 			jsonMetadata.ImageURL, titleText, jsonMetadata.Desc,
 			source, jsonMetadata.PageURL, jsonMetadata.ThumbnailURL,
 			imgH, imgW, thmbH, thmbW,
-			Info.Name, page, pageRankCounter[page]+1,
+			Info.Name, page, pageRankCounter[pageIndex]+1,
 		)
 		bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
-		pageRankCounter[page]++
+
+		pageRankCounter[pageIndex]++
 	})
 
 	col.OnResponse(func(r *colly.Response) {
@@ -187,31 +189,36 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	retErrors := make([]error, options.MaxPages)
+	retErrors := make([]error, 0, options.Pages.Max)
 
+	// static params
 	localeParam := getLocale(options)
-	colCtx := colly.NewContext()
-	colCtx.Put("page", strconv.Itoa(1))
 
-	urll := Info.URL + query + params[0] + "&first=1" + params[1] + localeParam
-	anonUrll := Info.URL + anonymize.String(query) + params[0] + "&first=1" + params[1] + localeParam
-	err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
-	retErrors[0] = err
+	// starts from at least 0
+	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
+		colCtx := colly.NewContext()
+		colCtx.Put("page", strconv.Itoa(i-options.Pages.Start))
 
-	for i := 1; i < options.MaxPages; i++ {
-		colCtx = colly.NewContext()
-		colCtx.Put("page", strconv.Itoa(i+1))
+		// dynamic params
+		pageParam := "&first=1"
+		// i == 0 is the first page
+		if i > 0 {
+			pageParam = "&first=" + strconv.Itoa((i+1)*10)
+		}
 
-		urll := Info.URL + query + params[0] + "&first=" + strconv.Itoa(i*10+1) + params[1] + localeParam
-		anonUrll := Info.URL + anonymize.String(query) + params[0] + "&first=" + strconv.Itoa(i*10+1) + params[1] + localeParam
-		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
-		retErrors[i] = err
+		urll := Info.URL + query + "&async=1" + pageParam + "&count=35" + localeParam
+		anonUrll := Info.URL + anonymize.String(query) + "&async=1" + pageParam + "&count=35" + localeParam
+
+		err := _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		if err != nil {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return _sedefaults.NonNilErrorsFromSlice(retErrors)
+	return retErrors[:len(retErrors):len(retErrors)]
 }
 
 func getLocale(options engines.Options) string {

@@ -35,8 +35,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		var hrefExists bool
 		var rrank int
 
-		var pageStr string = e.Request.Ctx.Get("page")
-		page, _ := strconv.Atoi(pageStr)
+		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start + 1
 
 		e.DOM.Children().Each(func(i int, row *goquery.Selection) {
 			switch i % 4 {
@@ -65,28 +65,33 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		})
 	})
 
-	retErrors := make([]error, options.MaxPages)
+	retErrors := make([]error, 0, options.Pages.Max)
 
-	colCtx := colly.NewContext()
-	colCtx.Put("page", strconv.Itoa(1))
+	// starts from at least 0
+	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
+		colCtx := colly.NewContext()
+		colCtx.Put("page", strconv.Itoa(i-options.Pages.Start))
 
-	urll := Info.URL + "?q=" + query
-	anonUrll := Info.URL + "?q=" + anonymize.String(query)
-	err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
-	retErrors[0] = err
+		var err error
+		// i == 0 is the first page
+		if i == 0 {
+			urll := Info.URL + "?q=" + query
+			anonUrll := Info.URL + "?q=" + anonymize.String(query)
+			err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		} else {
+			requestData := strings.NewReader("q=" + query + "&dc=" + strconv.Itoa(i*20))
+			err = _sedefaults.DoPostRequest(Info.URL, requestData, colCtx, col, Info.Name)
+		}
 
-	for i := 1; i < options.MaxPages; i++ {
-		colCtx = colly.NewContext()
-		colCtx.Put("page", strconv.Itoa(i+1))
-
-		err = _sedefaults.DoPostRequest(Info.URL, strings.NewReader("q="+query+"&dc="+strconv.Itoa(i*20)), colCtx, col, Info.Name)
-		retErrors[i] = err
+		if err != nil {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return _sedefaults.NonNilErrorsFromSlice(retErrors)
+	return retErrors[:len(retErrors):len(retErrors)]
 }
 
 func getLocale(options engines.Options) string {
