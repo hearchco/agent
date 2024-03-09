@@ -21,16 +21,17 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 	relay.Mutex.RUnlock()
 
 	if !exists {
-		engineRanks := make([]result.RetrievedRank, len(config.EnabledEngines))
-		engineRanks[0] = seResult.Rank
+		// create engine ranks slice with capacity of enabled engines
+		engineRanks := make([]result.RetrievedRank, 0, len(config.EnabledEngines))
+		engineRanks = append(engineRanks, seResult.Rank)
+
 		result := result.Result{
-			URL:           seResult.URL,
-			Rank:          0,
-			Title:         seResult.Title,
-			Description:   seResult.Description,
-			EngineRanks:   engineRanks,
-			TimesReturned: 1,
-			ImageResult:   seResult.ImageResult,
+			URL:         seResult.URL,
+			Rank:        0,
+			Title:       seResult.Title,
+			Description: seResult.Description,
+			EngineRanks: engineRanks,
+			ImageResult: seResult.ImageResult,
 		}
 
 		relay.Mutex.Lock()
@@ -38,20 +39,29 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 		relay.Mutex.Unlock()
 	} else {
 		alreadyIn := false
+		index := 0
+
 		relay.Mutex.RLock()
-		for ind := range mapRes.EngineRanks { // this could also be done by changing EngineRanks to a map
-			if seName == mapRes.EngineRanks[ind].SearchEngine {
+		for i, er := range mapRes.EngineRanks { // this could also be done by changing EngineRanks to a map
+			if seName == er.SearchEngine {
 				alreadyIn = true
+				index = i
 				break
 			}
 		}
 		relay.Mutex.RUnlock()
 
 		relay.Mutex.Lock()
+		er := &mapRes.EngineRanks[index]
 		if !alreadyIn {
-			mapRes.EngineRanks[mapRes.TimesReturned] = seResult.Rank
-			mapRes.TimesReturned++
+			mapRes.EngineRanks = append(mapRes.EngineRanks, seResult.Rank)
+		} else if er.Page > seResult.Rank.Page {
+			er.Page = seResult.Rank.Page
+			er.OnPageRank = seResult.Rank.OnPageRank
+		} else if er.Page == seResult.Rank.Page && er.OnPageRank > seResult.Rank.OnPageRank {
+			er.OnPageRank = seResult.Rank.OnPageRank
 		}
+
 		if len(mapRes.Description) < len(seResult.Description) {
 			mapRes.Description = seResult.Description
 		}
