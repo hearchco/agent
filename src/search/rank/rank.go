@@ -11,7 +11,7 @@ func Rank(resMap map[string]*result.Result, rconf config.Ranking) []result.Resul
 	results := make([]result.Result, 0, len(resMap))
 	for _, res := range resMap {
 		// set res.EngineRanks slice's capacity to it's length
-		res.EngineRanks = res.EngineRanks[:len(res.EngineRanks)]
+		res.EngineRanks = res.EngineRanks[:len(res.EngineRanks):len(res.EngineRanks)]
 		results = append(results, *res)
 	}
 
