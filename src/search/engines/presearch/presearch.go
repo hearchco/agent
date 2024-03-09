@@ -33,8 +33,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	})
 
 	col.OnResponse(func(r *colly.Response) {
-		var pageStr string = r.Request.Ctx.Get("page")
-		page, _ := strconv.Atoi(pageStr)
+		pageIndex := _sedefaults.PageFromContext(r.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start + 1
 
 		var apiStr string = r.Request.Ctx.Get("isAPI")
 		isApi, _ := strconv.ParseBool(apiStr)
@@ -59,6 +59,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 				res := bucket.MakeSEResult(goodURL, goodTitle, goodDesc, Info.Name, page, counter)
 				bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+
 				counter += 1
 			}
 		} else {
@@ -84,12 +85,12 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	retErrors := make([]error, options.Pages.Start+options.Pages.Max)
+	retErrors := make([]error, 0, options.Pages.Max)
 
 	// starts from at least 0
 	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
 		colCtx := colly.NewContext()
-		colCtx.Put("page", strconv.Itoa(i+1))
+		colCtx.Put("page", strconv.Itoa(i-options.Pages.Start))
 		colCtx.Put("isAPI", "false")
 
 		// dynamic params
@@ -102,14 +103,16 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		urll := Info.URL + query + pageParam
 		anonUrll := Info.URL + anonymize.String(query) + pageParam
 
-		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
-		retErrors[i] = err
+		err := _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		if err != nil {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return _sedefaults.NonNilErrorsFromSlice(retErrors)
+	return retErrors[:len(retErrors):len(retErrors)]
 }
 
 func getSafeSearch(ss bool) string {

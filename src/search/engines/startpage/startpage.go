@@ -23,7 +23,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	col, pagesCol := _sedefaults.InitializeCollectors(ctx, Info.Name, options, settings, timings, relay)
 
-	pageRankCounter := make([]int, options.Pages.Max*Info.ResultsPerPage)
+	pageRankCounter := make([]int, options.Pages.Max)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
@@ -34,11 +34,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
 
 		if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-			page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+			pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+			page := pageIndex + options.Pages.Start + 1
 
-			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
+			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
 			bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
-			pageRankCounter[page]++
+
+			pageRankCounter[pageIndex]++
 		} else {
 			log.Trace().
 				Str("engine", Info.Name.String()).
@@ -61,7 +63,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	retErrors := make([]error, options.Pages.Start+options.Pages.Max)
+	retErrors := make([]error, 0, options.Pages.Max)
 
 	// static params
 	safeSearch := getSafeSearch(options)
@@ -69,7 +71,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	// starts from at least 0
 	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
 		colCtx := colly.NewContext()
-		colCtx.Put("page", strconv.Itoa(i+1))
+		colCtx.Put("page", strconv.Itoa(i-options.Pages.Start))
 
 		// dynamic params
 		pageParam := ""
@@ -81,14 +83,16 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		urll := Info.URL + query + pageParam + safeSearch
 		anonUrll := Info.URL + anonymize.String(query) + pageParam + safeSearch
 
-		err = _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
-		retErrors[i] = err
+		err := _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		if err != nil {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return _sedefaults.NonNilErrorsFromSlice(retErrors)
+	return retErrors[:len(retErrors):len(retErrors)]
 }
 
 func getSafeSearch(options engines.Options) string {
