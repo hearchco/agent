@@ -45,6 +45,7 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 		}
 	}
 
+	// TODO: implement more cases when query is useless to process
 	if query == "" {
 		// return empty array of objects
 		c.JSON(http.StatusOK, []struct{}{})
