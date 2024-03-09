@@ -9,6 +9,7 @@ import (
 
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/hearchco/src/gotypelimits"
 	"github.com/hearchco/hearchco/src/search"
 	"github.com/hearchco/hearchco/src/search/category"
 	"github.com/hearchco/hearchco/src/search/engines"
@@ -52,25 +53,6 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 		return nil
 	}
 
-	pagesStart, err := strconv.Atoi(pagesStartS)
-	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Message: "Cannot convert start value to int",
-			Value:   pagesStartS,
-		})
-		return fmt.Errorf("router.Search(): cannot convert start value %q to int: %w", pagesStartS, err)
-	}
-	if pagesStart < 1 {
-		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Message: "Start value must be at least 1",
-			Value:   pagesStartS,
-		})
-		return fmt.Errorf("router.Search(): start value %q must be at least 1", pagesStartS)
-	} else {
-		// since it's >=1, we decrement it to match the 0-based index
-		pagesStart -= 1
-	}
-
 	pagesMax, err := strconv.Atoi(pagesMaxS)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
@@ -79,12 +61,34 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 		})
 		return fmt.Errorf("router.Search(): cannot convert pages value %q to int: %w", pagesMaxS, err)
 	}
-	if pagesMax < 1 {
+	// TODO: make upper limit configurable
+	pagesMaxUpperLimit := 10
+	if pagesMax < 1 && pagesMax > pagesMaxUpperLimit {
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Message: "Pages value must be at least 1",
+			Message: fmt.Sprintf("Pages value must be at least 1 and at most %v", pagesMaxUpperLimit),
 			Value:   pagesMaxS,
 		})
-		return fmt.Errorf("router.Search(): pages value %q must be at least 1", pagesMaxS)
+		return fmt.Errorf("router.Search(): pages value %q must be at least 1 and at most %v", pagesMaxS, pagesMaxUpperLimit)
+	}
+
+	pagesStart, err := strconv.Atoi(pagesStartS)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
+			Message: "Cannot convert start value to int",
+			Value:   pagesStartS,
+		})
+		return fmt.Errorf("router.Search(): cannot convert start value %q to int: %w", pagesStartS, err)
+	}
+	// make sure that pagesStart can be safely added to pagesMax
+	if pagesStart < 1 && pagesStart > gotypelimits.MaxInt-pagesMaxUpperLimit {
+		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
+			Message: "Start value must be at least 1",
+			Value:   pagesStartS,
+		})
+		return fmt.Errorf("router.Search(): start value %q must be at least 1", pagesStartS)
+	} else {
+		// since it's >=1, we decrement it to match the 0-based index
+		pagesStart -= 1
 	}
 
 	visitPages, err := strconv.ParseBool(visitPagesS)
