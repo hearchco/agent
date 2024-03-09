@@ -63,7 +63,7 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 	}
 	// TODO: make upper limit configurable
 	pagesMaxUpperLimit := 10
-	if pagesMax < 1 && pagesMax > pagesMaxUpperLimit {
+	if pagesMax < 1 || pagesMax > pagesMaxUpperLimit {
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
 			Message: fmt.Sprintf("Pages value must be at least 1 and at most %v", pagesMaxUpperLimit),
 			Value:   pagesMaxS,
@@ -80,7 +80,7 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 		return fmt.Errorf("router.Search(): cannot convert start value %q to int: %w", pagesStartS, err)
 	}
 	// make sure that pagesStart can be safely added to pagesMax
-	if pagesStart < 1 && pagesStart > gotypelimits.MaxInt-pagesMaxUpperLimit {
+	if pagesStart < 1 || pagesStart > gotypelimits.MaxInt-pagesMaxUpperLimit {
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
 			Message: "Start value must be at least 1",
 			Value:   pagesStartS,
