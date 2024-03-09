@@ -31,7 +31,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			return
 		}
 
-		page, _ := strconv.Atoi(pageStr)
+		pageIndex := _sedefaults.PageFromContext(r.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start + 1
 
 		var parsedResponse QwantResponse
 		err := json.Unmarshal(r.Body, &parsedResponse)
@@ -54,6 +55,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 				res := bucket.MakeSEResult(goodURL, result.Title, result.Description, Info.Name, page, counter)
 				bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+
 				counter += 1
 			}
 		}
@@ -70,7 +72,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	// starts from at least 0
 	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
 		colCtx := colly.NewContext()
-		colCtx.Put("page", strconv.Itoa(i+1))
+		colCtx.Put("page", strconv.Itoa(i-options.Pages.Start))
 
 		// dynamic params
 		offsetParam := "&offset=" + strconv.Itoa(i*settings.RequestedResultsPerPage)

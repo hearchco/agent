@@ -34,11 +34,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
 
 		if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-			page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+			pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+			page := pageIndex + options.Pages.Start + 1
 
-			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
+			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
 			bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
-			pageRankCounter[page]++
+
+			pageRankCounter[pageIndex]++
 		}
 	})
 
@@ -51,7 +53,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	// starts from at least 0
 	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
 		colCtx := colly.NewContext()
-		colCtx.Put("page", strconv.Itoa(i+1))
+		colCtx.Put("page", strconv.Itoa(i-options.Pages.Start))
 
 		// dynamic params
 		pageParam := ""

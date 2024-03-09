@@ -167,16 +167,18 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			return
 		}
 
-		page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start + 1
 
 		res := bucket.MakeSEImageResult(
 			jsonMetadata.ImageURL, titleText, jsonMetadata.Desc,
 			source, jsonMetadata.PageURL, jsonMetadata.ThumbnailURL,
 			imgH, imgW, thmbH, thmbW,
-			Info.Name, page, pageRankCounter[page]+1,
+			Info.Name, page, pageRankCounter[pageIndex]+1,
 		)
 		bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
-		pageRankCounter[page]++
+
+		pageRankCounter[pageIndex]++
 	})
 
 	col.OnResponse(func(r *colly.Response) {
@@ -195,7 +197,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	// starts from at least 0
 	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
 		colCtx := colly.NewContext()
-		colCtx.Put("page", strconv.Itoa(i+1))
+		colCtx.Put("page", strconv.Itoa(i-options.Pages.Start))
 
 		// dynamic params
 		pageParam := "&first=1"

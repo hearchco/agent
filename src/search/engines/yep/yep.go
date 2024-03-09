@@ -53,7 +53,9 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			return
 		}
 
-		page := _sedefaults.PageFromContext(r.Request.Ctx, Info.Name)
+		pageIndex := _sedefaults.PageFromContext(r.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start + 1
+
 		for _, result := range content.Results {
 			if result.TType != "Organic" {
 				continue
@@ -63,9 +65,10 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			goodTitle := parse.ParseTextWithHTML(result.Title)
 			goodDescription := parse.ParseTextWithHTML(result.Snippet)
 
-			res := bucket.MakeSEResult(goodURL, goodTitle, goodDescription, Info.Name, page, pageRankCounter[page]+1)
+			res := bucket.MakeSEResult(goodURL, goodTitle, goodDescription, Info.Name, page, pageRankCounter[pageIndex]+1)
 			bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
-			pageRankCounter[page]++
+
+			pageRankCounter[pageIndex]++
 		}
 	})
 
@@ -78,7 +81,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	// starts from at least 0
 	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
 		colCtx := colly.NewContext()
-		colCtx.Put("page", strconv.Itoa(i+1))
+		colCtx.Put("page", strconv.Itoa(i-options.Pages.Start))
 
 		// dynamic params
 		pageParam := ""

@@ -49,7 +49,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			return
 		}
 
-		page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start + 1
 
 		for _, metadata := range jsonResponse.ISCHJ.Metadata {
 			origImg := metadata.OriginalImage
@@ -62,10 +63,11 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 					origImg.Url, resultJson.PageTitle, textInGridJson.Snippet,
 					resultJson.SiteTitle, resultJson.ReferrerUrl, thmbImg.Url,
 					origImg.Height, origImg.Width, thmbImg.Height, thmbImg.Width,
-					Info.Name, page, pageRankCounter[page]+1,
+					Info.Name, page, pageRankCounter[pageIndex]+1,
 				)
 				bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
-				pageRankCounter[page]++
+
+				pageRankCounter[pageIndex]++
 			} else {
 				log.Error().
 					Str("engine", Info.Name.String()).
@@ -83,7 +85,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	// starts from at least 0
 	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
 		colCtx := colly.NewContext()
-		colCtx.Put("page", strconv.Itoa(i+1))
+		colCtx.Put("page", strconv.Itoa(i-options.Pages.Start))
 
 		// dynamic params
 		pageParam := "&tbm=isch&asearch=isch&async=_fmt:json,p:1,ijn:1"
