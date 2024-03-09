@@ -16,32 +16,32 @@ import (
 )
 
 func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) error {
-	var query, start, pages, deepSearch, locale, cats, useragent, safesearch, mobile string
+	var query, pagesStartS, pagesMaxS, visitPagesS, locale, categoryS, userAgent, safeSearchS, mobileS string
 
 	switch c.Request.Method {
 	case "", "GET":
 		{
 			query = c.Query("q")
-			start = c.DefaultQuery("start", "1")
-			pages = c.DefaultQuery("pages", "1")
-			deepSearch = c.DefaultQuery("deep", "false")
+			pagesStartS = c.DefaultQuery("start", "1")
+			pagesMaxS = c.DefaultQuery("pages", "1")
+			visitPagesS = c.DefaultQuery("deep", "false")
 			locale = c.DefaultQuery("locale", config.DefaultLocale)
-			cats = c.DefaultQuery("category", "")
-			useragent = c.DefaultQuery("useragent", "")
-			safesearch = c.DefaultQuery("safesearch", "false")
-			mobile = c.DefaultQuery("mobile", "false")
+			categoryS = c.DefaultQuery("category", "")
+			userAgent = c.DefaultQuery("useragent", "")
+			safeSearchS = c.DefaultQuery("safesearch", "false")
+			mobileS = c.DefaultQuery("mobile", "false")
 		}
 	case "POST":
 		{
 			query = c.PostForm("q")
-			start = c.DefaultPostForm("start", "1")
-			pages = c.DefaultPostForm("pages", "1")
-			deepSearch = c.DefaultPostForm("deep", "false")
+			pagesStartS = c.DefaultPostForm("start", "1")
+			pagesMaxS = c.DefaultPostForm("pages", "1")
+			visitPagesS = c.DefaultPostForm("deep", "false")
 			locale = c.DefaultPostForm("locale", config.DefaultLocale)
-			cats = c.DefaultPostForm("category", "")
-			useragent = c.DefaultPostForm("useragent", "")
-			safesearch = c.DefaultPostForm("safesearch", "false")
-			mobile = c.DefaultPostForm("mobile", "false")
+			categoryS = c.DefaultPostForm("category", "")
+			userAgent = c.DefaultPostForm("useragent", "")
+			safeSearchS = c.DefaultPostForm("safesearch", "false")
+			mobileS = c.DefaultPostForm("mobile", "false")
 		}
 	}
 
@@ -51,83 +51,84 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 		return nil
 	}
 
-	pagesStart, starterr := strconv.Atoi(start)
-	if starterr != nil {
+	pagesStart, err := strconv.Atoi(pagesStartS)
+	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
 			Message: "Cannot convert start value to int",
-			Value:   start,
+			Value:   pagesStartS,
 		})
-		return fmt.Errorf("router.Search(): cannot convert start value %q to int: %w", start, starterr)
+		return fmt.Errorf("router.Search(): cannot convert start value %q to int: %w", pagesStartS, err)
 	}
 	if pagesStart < 1 {
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
 			Message: "Start value must be at least 1",
-			Value:   start,
+			Value:   pagesStartS,
 		})
-		return fmt.Errorf("router.Search(): start value %q must be at least 1", start)
+		return fmt.Errorf("router.Search(): start value %q must be at least 1", pagesStartS)
 	} else {
 		// since it's >=1, we decrement it to match the 0-based index
 		pagesStart -= 1
 	}
 
-	pagesMax, pageserr := strconv.Atoi(pages)
-	if pageserr != nil {
+	pagesMax, err := strconv.Atoi(pagesMaxS)
+	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
 			Message: "Cannot convert pages value to int",
-			Value:   pages,
+			Value:   pagesMaxS,
 		})
-		return fmt.Errorf("router.Search(): cannot convert pages value %q to int: %w", pages, pageserr)
+		return fmt.Errorf("router.Search(): cannot convert pages value %q to int: %w", pagesMaxS, err)
 	}
 	if pagesMax < 1 {
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
 			Message: "Pages value must be at least 1",
-			Value:   pages,
+			Value:   pagesMaxS,
 		})
-		return fmt.Errorf("router.Search(): pages value %q must be at least 1", pages)
+		return fmt.Errorf("router.Search(): pages value %q must be at least 1", pagesMaxS)
 	}
 
-	visitPages, deeperr := strconv.ParseBool(deepSearch)
-	if deeperr != nil {
+	visitPages, err := strconv.ParseBool(visitPagesS)
+	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
 			Message: "Cannot convert deep value to bool",
-			Value:   deepSearch,
+			Value:   visitPagesS,
 		})
-		return fmt.Errorf("router.Search(): cannot convert deep value %q to int: %w", deepSearch, deeperr)
+		return fmt.Errorf("router.Search(): cannot convert deep value %q to int: %w", visitPagesS, err)
 	}
 
-	if lerr := engines.ValidateLocale(locale); lerr != nil {
+	err = engines.ValidateLocale(locale)
+	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
 			Message: "Invalid locale value, should be of the form \"en_US\"",
 			Value:   locale,
 		})
-		return fmt.Errorf("router.Search(): invalid locale value %q: %w", locale, lerr)
+		return fmt.Errorf("router.Search(): invalid locale value %q: %w", locale, err)
 	}
 
-	cat := category.SafeFromString(cats)
-	if cat == category.UNDEFINED {
+	categoryName := category.SafeFromString(categoryS)
+	if categoryName == category.UNDEFINED {
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
 			Message: "Invalid category value",
-			Value:   cats,
+			Value:   categoryS,
 		})
-		return fmt.Errorf("router.Search(): invalid category value %q", cats)
+		return fmt.Errorf("router.Search(): invalid category value %q", categoryS)
 	}
 
-	safeSearchB, safeerr := strconv.ParseBool(safesearch)
-	if safeerr != nil {
+	safeSearch, err := strconv.ParseBool(safeSearchS)
+	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
 			Message: "Cannot convert safesearch value to bool",
-			Value:   safesearch,
+			Value:   safeSearchS,
 		})
-		return fmt.Errorf("router.Search(): cannot convert safesearch value %q to bool: %w", safesearch, safeerr)
+		return fmt.Errorf("router.Search(): cannot convert safesearch value %q to bool: %w", safeSearchS, err)
 	}
 
-	isMobile, mobileerr := strconv.ParseBool(mobile)
-	if mobileerr != nil {
+	mobile, err := strconv.ParseBool(mobileS)
+	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
 			Message: "Cannot convert mobile value to bool",
-			Value:   mobile,
+			Value:   mobileS,
 		})
-		return fmt.Errorf("router.Search(): cannot convert mobile value %q to bool: %w", mobile, mobileerr)
+		return fmt.Errorf("router.Search(): cannot convert mobile value %q to bool: %w", mobileS, err)
 	}
 
 	options := engines.Options{
@@ -136,11 +137,11 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 			Max:   pagesMax,
 		},
 		VisitPages: visitPages,
-		Category:   cat,
-		UserAgent:  useragent,
+		Category:   categoryName,
+		UserAgent:  userAgent,
 		Locale:     locale,
-		SafeSearch: safeSearchB,
-		Mobile:     isMobile,
+		SafeSearch: safeSearch,
+		Mobile:     mobile,
 	}
 
 	results, foundInDB := search.Search(query, options, db, settings, categories)
