@@ -4,7 +4,7 @@ import (
 	"github.com/hearchco/hearchco/src/search/engines"
 )
 
-var Info engines.Info = engines.Info{
+var Info = engines.Info{
 	Domain:         "search.brave.com",
 	Name:           engines.BRAVE,
 	URL:            "https://search.brave.com/search?q=",
@@ -18,7 +18,7 @@ var dompaths engines.DOMPaths = engines.DOMPaths{
 	Description: "div.snippet-description",
 }
 
-var Support engines.SupportedSettings = engines.SupportedSettings{
+var Support = engines.SupportedSettings{
 	Locale:     true,
 	SafeSearch: true,
 }

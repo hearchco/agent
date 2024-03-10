@@ -20,11 +20,12 @@ import (
 var EnabledEngines = make([]engines.Name, 0)
 var LogDumpLocation string = "dump/"
 
-func (c *Config) fromReader(rc *ReaderConfig) {
+// passed as pointer since config is modified
+func (c *Config) fromReader(rc ReaderConfig) {
 	nc := Config{
 		Server: Server{
-			Port:        rc.Server.Port,
-			FrontendUrl: rc.Server.FrontendUrl,
+			Port:         rc.Server.Port,
+			FrontendUrls: strings.Split(rc.Server.FrontendUrls, ","),
 			Cache: Cache{
 				Type: rc.Server.Cache.Type,
 				TTL: TTL{
@@ -82,11 +83,11 @@ func (c *Config) fromReader(rc *ReaderConfig) {
 	*c = nc
 }
 
-func (c *Config) getReader() ReaderConfig {
+func (c Config) getReader() ReaderConfig {
 	rc := ReaderConfig{
 		Server: ReaderServer{
-			Port:        c.Server.Port,
-			FrontendUrl: c.Server.FrontendUrl,
+			Port:         c.Server.Port,
+			FrontendUrls: strings.Join(c.Server.FrontendUrls, ","),
 			Cache: ReaderCache{
 				Type: c.Server.Cache.Type,
 				TTL: ReaderTTL{
@@ -127,6 +128,7 @@ func (c *Config) getReader() ReaderConfig {
 	return rc
 }
 
+// passed as pointer since config is modified
 func (c *Config) Load(dataDirPath string, logDirPath string) {
 	rc := c.getReader()
 
@@ -178,7 +180,7 @@ func (c *Config) Load(dataDirPath string, logDirPath string) {
 		// ^PANIC
 	}
 
-	c.fromReader(&rc)
+	c.fromReader(rc)
 }
 
 func loadVars(logDirPath string) {

@@ -14,10 +14,10 @@ type SupportedSettings struct {
 }
 
 type Info struct {
-	Domain         string
 	Name           Name
-	URL            string
 	ResultsPerPage int
+	Domain         string
+	URL            string
 }
 
 type DOMPaths struct {
@@ -28,15 +28,20 @@ type DOMPaths struct {
 	Description      string // paragraph
 }
 
+type Pages struct {
+	Start int
+	Max   int
+}
+
 type Options struct {
-	MaxPages      int
 	VisitPages    bool
-	Category      category.Name
-	UserAgent     string
-	Locale        string //format: en_US
 	SafeSearch    bool
 	Mobile        bool
 	JustFirstPage bool
+	Pages         Pages
+	UserAgent     string
+	Locale        string //format: en_US
+	Category      category.Name
 }
 
 func ValidateLocale(locale string) error {

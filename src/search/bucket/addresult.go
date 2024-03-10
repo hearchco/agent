@@ -8,9 +8,25 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *Relay, options *engines.Options, pagesCol *colly.Collector) {
+// Checks if the retrieved result is valid. Makes a result object and adds it to the relay.
+// Returns true if the result is valid (false otherwise).
+func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *Relay, options *engines.Options, pagesCol *colly.Collector) bool {
 	if seResult == nil {
-		return
+		log.Error().
+			Str("engine", seName.String()).
+			Msg("bucket.AddSEResult(): nil result.")
+		return false
+	}
+
+	// TODO: add a check if image result is valid
+	if seResult.URL == "" || seResult.Title == "" {
+		log.Error().
+			Str("engine", seName.String()).
+			Str("url", seResult.URL).
+			Str("title", seResult.Title).
+			Str("description", seResult.Description).
+			Msg("bucket.AddSEResult(): invalid result, some fields are empty.")
+		return false
 	}
 
 	log.Trace().
@@ -24,16 +40,17 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 	relay.Mutex.RUnlock()
 
 	if !exists {
-		engineRanks := make([]result.RetrievedRank, len(config.EnabledEngines))
-		engineRanks[0] = seResult.Rank
+		// create engine ranks slice with capacity of enabled engines
+		engineRanks := make([]result.RetrievedRank, 0, len(config.EnabledEngines))
+		engineRanks = append(engineRanks, seResult.Rank)
+
 		result := result.Result{
-			URL:           seResult.URL,
-			Rank:          0,
-			Title:         seResult.Title,
-			Description:   seResult.Description,
-			EngineRanks:   engineRanks,
-			TimesReturned: 1,
-			Response:      nil,
+			URL:         seResult.URL,
+			Rank:        0,
+			Title:       seResult.Title,
+			Description: seResult.Description,
+			EngineRanks: engineRanks,
+			ImageResult: seResult.ImageResult,
 		}
 
 		relay.Mutex.Lock()
@@ -41,20 +58,29 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 		relay.Mutex.Unlock()
 	} else {
 		alreadyIn := false
+		index := 0
+
 		relay.Mutex.RLock()
-		for ind := range mapRes.EngineRanks { // this could also be done by changing EngineRanks to a map
-			if seName == mapRes.EngineRanks[ind].SearchEngine {
+		for i, er := range mapRes.EngineRanks { // this could also be done by changing EngineRanks to a map
+			if seName == er.SearchEngine {
 				alreadyIn = true
+				index = i
 				break
 			}
 		}
 		relay.Mutex.RUnlock()
 
 		relay.Mutex.Lock()
+		er := &mapRes.EngineRanks[index]
 		if !alreadyIn {
-			mapRes.EngineRanks[mapRes.TimesReturned] = seResult.Rank
-			mapRes.TimesReturned++
+			mapRes.EngineRanks = append(mapRes.EngineRanks, seResult.Rank)
+		} else if er.Page > seResult.Rank.Page {
+			er.Page = seResult.Rank.Page
+			er.OnPageRank = seResult.Rank.OnPageRank
+		} else if er.Page == seResult.Rank.Page && er.OnPageRank > seResult.Rank.OnPageRank {
+			er.OnPageRank = seResult.Rank.OnPageRank
 		}
+
 		if len(mapRes.Description) < len(seResult.Description) {
 			mapRes.Description = seResult.Description
 		}
@@ -69,4 +95,6 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 				Msg("bucket.AddSEResult(): failed visiting")
 		}
 	}
+
+	return true
 }

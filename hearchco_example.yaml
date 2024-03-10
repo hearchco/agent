@@ -1,19 +1,19 @@
-categories:
-  science:
-    engines:
-      startpage:
-        enabled: true
-      duckduckgo:
-        enabled: false
-    ranking:
-      engines:
-        mojeek:
-          mul: 1
-  general:
-    engines:
-      google:
-        enabled: true
-
 server:
+  frontendurls: http://localhost:5173,https://*hearch.co,https://*hearchco-frontend.pages.dev
   cache:
     type: none
+# categories:
+#   science:
+#     engines:
+#       startpage:
+#         enabled: true
+#       duckduckgo:
+#         enabled: false
+#     ranking:
+#       engines:
+#         mojeek:
+#           mul: 1
+#   general:
+#     engines:
+#       google:
+#         enabled: true

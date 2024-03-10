@@ -10,6 +10,7 @@ import (
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/search/bucket"
+	"github.com/hearchco/hearchco/src/search/category"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/rank"
 	"github.com/hearchco/hearchco/src/search/result"
@@ -17,13 +18,26 @@ import (
 )
 
 // engine_searcher -> NewEngineStarter() uses this
-type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings) error
+type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings) []error
 
-func PerformSearch(query string, options engines.Options, conf *config.Config) []result.Result {
+func PerformSearch(query string, options engines.Options, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) []result.Result {
+	if query == "" {
+		log.Trace().Msg("Empty search query.")
+		return []result.Result{}
+	}
+
 	searchTimer := time.Now()
 
-	query, timings, enginesToRun := procBang(query, &options, conf)
+	query, cat, timings, enginesToRun := procBang(query, options.Category, settings, categories)
+	// set the new category only within the scope of this function
+	options.Category = cat
 	query = url.QueryEscape(query)
+
+	// check again after the bang is taken out
+	if query == "" {
+		log.Trace().Msg("Empty search query (with bang present).")
+		return []result.Result{}
+	}
 
 	log.Debug().
 		Str("queryAnon", anonymize.String(query)).
@@ -33,7 +47,7 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")
 
-	resultMap := runEngines(enginesToRun, query, options, conf.Settings, timings)
+	resultMap := runEngines(enginesToRun, query, options, settings, timings)
 
 	log.Debug().
 		Int64("ms", time.Since(resTimer).Milliseconds()).
@@ -42,7 +56,7 @@ func PerformSearch(query string, options engines.Options, conf *config.Config) [
 	rankTimer := time.Now()
 	log.Debug().Msg("Ranking...")
 
-	results := rank.Rank(resultMap, conf.Categories[options.Category].Ranking)
+	results := rank.Rank(resultMap, categories[options.Category].Ranking)
 
 	rankTimeSince := time.Since(rankTimer)
 	log.Debug().
@@ -71,17 +85,16 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 	var wg sync.WaitGroup
 	engineStarter := NewEngineStarter()
 
-	for i := range engs {
+	for _, eng := range engs {
 		wg.Add(1)
-		eng := engs[i] // dont change for to `for _, eng := range engs {`, eng retains the same address throughout the whole loop
 		go func() {
 			defer wg.Done()
-			// if an error can be handled inside, it wont be returned
+			// if an error can be handled inside, it won't be returned
 			// runs the Search function in the engine package
-			err := engineStarter[eng](context.Background(), query, &relay, options, settings[eng], timings)
-			if err != nil {
+			errs := engineStarter[eng](context.Background(), query, &relay, options, settings[eng], timings)
+			if len(errs) > 0 {
 				log.Error().
-					Err(err).
+					Errs("errors", errs).
 					Str("engine", eng.String()).
 					Msg("search.runEngines(): error while searching")
 			}

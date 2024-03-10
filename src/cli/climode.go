@@ -14,21 +14,46 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+func printImageResult(r result.Result) {
+	fmt.Printf("%v (%.2f) -----\n\t%q\n\t%q\n\t%q\n\t%q\n\t%q\n\t%q\n\t-", r.Rank, r.Score, r.Title, r.URL, r.Description, r.ImageResult.Source, r.ImageResult.SourceURL, r.ImageResult.ThumbnailURL)
+	for seInd := range len(r.EngineRanks) {
+		fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine.ToLower())
+		if seInd != len(r.EngineRanks)-1 {
+			fmt.Print(", ")
+		}
+	}
+	fmt.Printf("\n")
+}
+
+func printResult(r result.Result) {
+	fmt.Printf("%v (%.2f) -----\n\t%q\n\t%q\n\t%q\n\t-", r.Rank, r.Score, r.Title, r.URL, r.Description)
+	for seInd := range len(r.EngineRanks) {
+		fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine.ToLower())
+		if seInd != len(r.EngineRanks)-1 {
+			fmt.Print(", ")
+		}
+	}
+	fmt.Printf("\n")
+}
+
 func printResults(results []result.Result) {
 	fmt.Print("\n\tThe Search Results:\n\n")
+
+	images := false
+	if len(results) > 0 && results[0].ImageResult.Source != "" {
+		images = true
+	}
+
 	for _, r := range results {
-		fmt.Printf("%v (%.2f) -----\n\t\"%v\"\n\t\"%v\"\n\t\"%v\"\n\t-", r.Rank, r.Score, r.Title, r.URL, r.Description)
-		for seInd := uint8(0); seInd < r.TimesReturned; seInd++ {
-			fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine.ToLower())
-			if seInd != r.TimesReturned-1 {
-				fmt.Print(", ")
-			}
+		if images {
+			printImageResult(r)
+		} else {
+			printResult(r)
 		}
-		fmt.Printf("\n")
 	}
 }
 
-func Run(flags Flags, db cache.DB, conf *config.Config) {
+func Run(flags Flags, db cache.DB, conf config.Config) {
 	log.Info().
 		Str("queryAnon", anonymize.String(flags.Query)).
 		Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
@@ -37,7 +62,10 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		Msg("Started hearching")
 
 	options := engines.Options{
-		MaxPages:   flags.MaxPages,
+		Pages: engines.Pages{
+			Start: flags.StartPage,
+			Max:   flags.MaxPages,
+		},
 		VisitPages: flags.Visit,
 		Category:   category.FromString[flags.Category],
 		UserAgent:  flags.UserAgent,
@@ -48,7 +76,7 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 
 	start := time.Now()
 
-	results, foundInDB := search.Search(flags.Query, options, conf, db)
+	results, foundInDB := search.Search(flags.Query, options, db, conf.Settings, conf.Categories)
 
 	duration := time.Since(start)
 	if !flags.Silent {
@@ -59,5 +87,5 @@ func Run(flags Flags, db cache.DB, conf *config.Config) {
 		Int64("ms", duration.Milliseconds()).
 		Msg("Found results")
 
-	search.CacheAndUpdateResults(flags.Query, options, conf, db, results, foundInDB)
+	search.CacheAndUpdateResults(flags.Query, options, db, conf.Server.Cache.TTL, conf.Settings, conf.Categories, results, foundInDB)
 }

@@ -16,5 +16,6 @@ type RetrievedResult struct {
 	URL         string
 	Title       string
 	Description string
+	ImageResult ImageResult
 	Rank        RetrievedRank
 }

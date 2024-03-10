@@ -13,25 +13,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
-	if err := _sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
-		return err
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
+	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
+	if err != nil {
+		return []error{err}
 	}
 
-	var col *colly.Collector
-	var pagesCol *colly.Collector
-	var retError error
+	col, pagesCol := _sedefaults.InitializeCollectors(ctx, Info.Name, options, settings, timings, relay)
 
-	_sedefaults.InitializeCollectors(&col, &pagesCol, &settings, &options, &timings)
-
-	_sedefaults.PagesColRequest(Info.Name, pagesCol, ctx)
-	_sedefaults.PagesColError(Info.Name, pagesCol)
-	_sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
-
-	_sedefaults.ColRequest(Info.Name, col, ctx)
-	_sedefaults.ColError(Info.Name, col)
-
-	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
+	pageRankCounter := make([]int, options.Pages.Max)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		linkText, titleText, descText := _sedefaults.RawFieldsFromDOM(e.DOM, &dompaths, Info.Name) // telemetry url isnt valid link so cant pass it to FieldsFromDOM (?)
@@ -43,11 +33,14 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 		linkText, titleText, descText = _sedefaults.SanitizeFields(linkText, titleText, descText)
 
-		page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start
 
-		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
-		bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
-		pageRankCounter[page]++
+		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
+		valid := bucket.AddSEResult(&res, Info.Name, relay, &options, pagesCol)
+		if valid {
+			pageRankCounter[pageIndex]++
+		}
 	})
 
 	col.OnResponse(func(r *colly.Response) {
@@ -58,30 +51,40 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	safeSearchParam := getSafeSearch(&options)
+	retErrors := make([]error, 0, options.Pages.Max)
 
-	colCtx := colly.NewContext()
-	colCtx.Put("page", strconv.Itoa(1))
+	// static params
+	safeSearchParam := getSafeSearch(options)
 
-	_sedefaults.DoPostRequest(Info.URL, strings.NewReader("query="+query+"&country=web&language=all"+safeSearchParam), colCtx, col, Info.Name, &retError)
-	col.Wait() // wait so I can get the JSESSION cookie back
-
-	for i := 1; i < options.MaxPages; i++ {
-		pageStr := strconv.Itoa(i + 1)
-		colCtx = colly.NewContext()
+	// starts from at least 0
+	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
+		pageStr := strconv.Itoa(i - options.Pages.Start)
+		colCtx := colly.NewContext()
 		colCtx.Put("page", pageStr)
 
-		// query not needed as its saved in the session
-		_sedefaults.DoGetRequest(pageURL+pageStr, pageURL+pageStr, colCtx, col, Info.Name, &retError)
+		var err error
+		// i == 0 is the first page
+		if i == 0 {
+			requestData := strings.NewReader("query=" + query + "&country=web&language=all" + safeSearchParam)
+			err = _sedefaults.DoPostRequest(Info.URL, requestData, colCtx, col, Info.Name)
+			col.Wait() // col.Wait() is needed to save the JSESSION cookie
+		} else {
+			// query is not needed as it's saved in the JSESSION cookie
+			err = _sedefaults.DoGetRequest(pageURL+pageStr, pageURL+pageStr, colCtx, col, Info.Name)
+		}
+
+		if err != nil {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retError
+	return retErrors[:len(retErrors):len(retErrors)]
 }
 
-func getSafeSearch(options *engines.Options) string {
+func getSafeSearch(options engines.Options) string {
 	if options.SafeSearch {
 		return "&safeSearch=true"
 	}

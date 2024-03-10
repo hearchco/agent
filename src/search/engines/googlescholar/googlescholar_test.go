@@ -12,32 +12,24 @@ func TestSearch(t *testing.T) {
 
 	// testing config
 	conf := _engines_test.NewConfig(engineName)
+	opt := _engines_test.NewOpts()
 
 	// test cases
 	tchar := [...]_engines_test.TestCaseHasAnyResults{{
-		Query: "ping",
-		Options: engines.Options{
-			MaxPages:   1,
-			VisitPages: false,
-		},
+		Query:   "ping",
+		Options: opt,
 	}}
 
 	tccr := [...]_engines_test.TestCaseContainsResults{{
 		Query:     "interaction nets",
 		ResultURL: []string{"https://dl.acm.org/doi/pdf/10.1145/96709.96718"},
-		Options: engines.Options{
-			MaxPages:   1,
-			VisitPages: false,
-		},
+		Options:   opt,
 	}}
 
 	tcrr := [...]_engines_test.TestCaseRankedResults{{
 		Query:     "On building fast kd-trees for ray tracing, and on doing that in O (N log N)",
 		ResultURL: []string{"https://ieeexplore.ieee.org/abstract/document/4061547/"},
-		Options: engines.Options{
-			MaxPages:   1,
-			VisitPages: false,
-		},
+		Options:   opt,
 	}}
 
 	_engines_test.CheckTestCases(tchar[:], tccr[:], tcrr[:], t, conf)

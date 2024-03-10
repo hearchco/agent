@@ -1,12 +1,12 @@
 package config
 
 import (
-	"log"
 	"time"
 
 	"github.com/hearchco/hearchco/src/moretime"
 	"github.com/hearchco/hearchco/src/search/category"
 	"github.com/hearchco/hearchco/src/search/engines"
+	"github.com/rs/zerolog/log"
 )
 
 const DefaultLocale string = "en_US"
@@ -44,6 +44,9 @@ func NewSettings() map[engines.Name]Settings {
 		engines.BING: {
 			Shortcut: "bi",
 		},
+		engines.BINGIMAGES: {
+			Shortcut: "biimg",
+		},
 		engines.BRAVE: {
 			Shortcut: "br",
 		},
@@ -55,6 +58,9 @@ func NewSettings() map[engines.Name]Settings {
 		},
 		engines.GOOGLE: {
 			Shortcut: "g",
+		},
+		engines.GOOGLEIMAGES: {
+			Shortcut: "gimg",
 		},
 		engines.GOOGLESCHOLAR: {
 			Shortcut: "gs",
@@ -85,7 +91,9 @@ func NewSettings() map[engines.Name]Settings {
 	// Check if all search engines have a shortcut set
 	for _, eng := range engines.Names() {
 		if _, ok := mp[eng]; !ok {
-			log.Fatalf("config.NewSettings(): %v doesn't have a shortcut set.", eng)
+			log.Fatal().
+				Str("engine", eng.String()).
+				Msg("config.NewSettings(): no shortcut set")
 			// ^FATAL
 		}
 	}
@@ -114,6 +122,13 @@ func NewGeneral() []engines.Name {
 	}
 }
 
+func NewImage() []engines.Name {
+	return []engines.Name{
+		engines.BINGIMAGES,
+		engines.GOOGLEIMAGES,
+	}
+}
+
 func NewInfo() []engines.Name {
 	return []engines.Name{
 		engines.BING,
@@ -128,11 +143,11 @@ func NewScience() []engines.Name {
 	}
 }
 
-func New() *Config {
-	return &Config{
+func New() Config {
+	return Config{
 		Server: Server{
-			Port:        3030,
-			FrontendUrl: "http://localhost:8000",
+			Port:         3030,
+			FrontendUrls: []string{"http://localhost:5173"},
 			Cache: Cache{
 				Type: "badger",
 				TTL: TTL{
@@ -156,6 +171,14 @@ func New() *Config {
 				Timings: Timings{
 					Timeout:     1000 * time.Millisecond,
 					PageTimeout: 1000 * time.Millisecond,
+				},
+			},
+			category.IMAGES: {
+				Engines: NewImage(),
+				Ranking: NewRanking(),
+				Timings: Timings{
+					Timeout:     1500 * time.Millisecond,
+					PageTimeout: 1500 * time.Millisecond,
 				},
 			},
 			category.INFO: {

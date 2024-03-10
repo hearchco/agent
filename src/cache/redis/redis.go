@@ -7,18 +7,17 @@ import (
 
 	"github.com/fxamacker/cbor/v2"
 	"github.com/hearchco/hearchco/src/anonymize"
-	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 )
 
 type DB struct {
-	rdb *redis.Client
 	ctx context.Context
+	rdb *redis.Client
 }
 
-func New(ctx context.Context, config config.Redis) (*DB, error) {
+func New(ctx context.Context, config config.Redis) (DB, error) {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%v:%v", config.Host, config.Port),
 		Password: config.Password,
@@ -36,10 +35,10 @@ func New(ctx context.Context, config config.Redis) (*DB, error) {
 			Msg("Successful connection to redis")
 	}
 
-	return &DB{rdb: rdb, ctx: ctx}, nil
+	return DB{rdb: rdb, ctx: ctx}, nil
 }
 
-func (db *DB) Close() {
+func (db DB) Close() {
 	if err := db.rdb.Close(); err != nil {
 		log.Error().Err(err).Msg("redis.Close(): error disconnecting from redis")
 	} else {
@@ -47,7 +46,7 @@ func (db *DB) Close() {
 	}
 }
 
-func (db *DB) Set(k string, v cache.Value, ttl ...time.Duration) error {
+func (db DB) Set(k string, v interface{}, ttl ...time.Duration) error {
 	log.Debug().Msg("Caching...")
 	cacheTimer := time.Now()
 
@@ -71,7 +70,7 @@ func (db *DB) Set(k string, v cache.Value, ttl ...time.Duration) error {
 	return nil
 }
 
-func (db *DB) Get(k string, o cache.Value, hashed ...bool) error {
+func (db DB) Get(k string, o interface{}, hashed ...bool) error {
 	var kInput string
 	if len(hashed) > 0 && hashed[0] {
 		kInput = k
@@ -94,7 +93,7 @@ func (db *DB) Get(k string, o cache.Value, hashed ...bool) error {
 }
 
 // returns time until the key expires, not the time it will be considered expired
-func (db *DB) GetTTL(k string, hashed ...bool) (time.Duration, error) {
+func (db DB) GetTTL(k string, hashed ...bool) (time.Duration, error) {
 	var kInput string
 	if len(hashed) > 0 && hashed[0] {
 		kInput = k

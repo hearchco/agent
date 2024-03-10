@@ -12,39 +12,25 @@ func TestSearch(t *testing.T) {
 
 	// testing config
 	conf := _engines_test.NewConfig(engineName)
+	opt := _engines_test.NewOpts()
 
 	// test cases
-	tchar := [...]_engines_test.TestCaseHasAnyResults{}
-	tccr := [...]_engines_test.TestCaseContainsResults{}
-	tcrr := [...]_engines_test.TestCaseRankedResults{}
+	tchar := [...]_engines_test.TestCaseHasAnyResults{{
+		Query:   "ping",
+		Options: opt,
+	}}
 
-	/*
-		tchar := [...]_engines_test.TestCaseHasAnyResults{{
-			Query: "ping",
-			Options: engines.Options{
-				MaxPages:   1,
-				VisitPages: false,
-			},
-		}}
+	tccr := [...]_engines_test.TestCaseContainsResults{{
+		Query:     "facebook",
+		ResultURL: []string{"facebook.com"},
+		Options:   opt,
+	}}
 
-		tccr := [...]_engines_test.TestCaseContainsResults{{
-			Query:     "facebook",
-			ResultURL: []string{"facebook.com"},
-			Options: engines.Options{
-				MaxPages:   1,
-				VisitPages: false,
-			},
-		}}
-
-		tcrr := [...]_engines_test.TestCaseRankedResults{{
-			Query:     "wikipedia",
-			ResultURL: []string{"wikipedia."},
-			Options: engines.Options{
-				MaxPages:   1,
-				VisitPages: false,
-			},
-		}}
-	*/
+	tcrr := [...]_engines_test.TestCaseRankedResults{{
+		Query:     "wikipedia",
+		ResultURL: []string{"wikipedia."},
+		Options:   opt,
+	}}
 
 	_engines_test.CheckTestCases(tchar[:], tccr[:], tcrr[:], t, conf)
 }

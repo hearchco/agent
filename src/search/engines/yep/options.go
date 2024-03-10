@@ -4,7 +4,7 @@ import (
 	"github.com/hearchco/hearchco/src/search/engines"
 )
 
-var Info engines.Info = engines.Info{
+var Info = engines.Info{
 	Domain:         "yep.com",
 	Name:           engines.YEP,
 	URL:            "https://api.yep.com/fs/2/search?",
@@ -12,7 +12,7 @@ var Info engines.Info = engines.Info{
 }
 
 /*
-var dompaths engines.DOMPaths = engines.DOMPaths{
+var dompaths = engines.DOMPaths{
 	Result:      "div.css-102xgmn-card",
 	Link:        "a.css-29ut38-noDecoration",
 	Title:       "a.css-29ut38-noDecoration",
@@ -20,8 +20,7 @@ var dompaths engines.DOMPaths = engines.DOMPaths{
 }
 */
 
-var Support engines.SupportedSettings = engines.SupportedSettings{
-	Locale:                  true,
-	SafeSearch:              true,
-	RequestedResultsPerPage: true,
+var Support = engines.SupportedSettings{
+	Locale:     true,
+	SafeSearch: true,
 }

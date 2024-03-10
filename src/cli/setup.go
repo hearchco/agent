@@ -42,5 +42,22 @@ func Setup() Flags {
 		// ^FATAL
 	}
 
+	if cli.StartPage < 1 {
+		log.Fatal().
+			Int("startpage", cli.StartPage).
+			Msg("cli.Setup(): invalid start page flag (must be >= 1)")
+		// ^FATAL
+	} else {
+		// since it's >=1, we decrement it to match the 0-based index
+		cli.StartPage -= 1
+	}
+
+	if cli.MaxPages < 1 {
+		log.Fatal().
+			Int("maxpages", cli.MaxPages).
+			Msg("cli.Setup(): invalid max pages flag (must be >= 1)")
+		// ^FATAL
+	}
+
 	return cli
 }

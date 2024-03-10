@@ -16,25 +16,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
-	if err := _sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
-		return err
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
+	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
+	if err != nil {
+		return []error{err}
 	}
 
-	var col *colly.Collector
-	var pagesCol *colly.Collector
-	var retError error
+	col, pagesCol := _sedefaults.InitializeCollectors(ctx, Info.Name, options, settings, timings, relay)
 
-	_sedefaults.InitializeCollectors(&col, &pagesCol, &settings, &options, &timings)
-
-	_sedefaults.PagesColRequest(Info.Name, pagesCol, ctx)
-	_sedefaults.PagesColError(Info.Name, pagesCol)
-	_sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
-
-	_sedefaults.ColRequest(Info.Name, col, ctx)
-	_sedefaults.ColError(Info.Name, col)
-
-	var pageRankCounter []int = make([]int, options.MaxPages*Info.ResultsPerPage)
+	pageRankCounter := make([]int, options.Pages.Max)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		linkText, titleText, descText := _sedefaults.FieldsFromDOM(e.DOM, &dompaths, Info.Name) // the telemetry link is a valid link so it can be sanitized
@@ -48,35 +38,46 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 		descText = _sedefaults.SanitizeDescription(descText)
 
-		page := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start
 
-		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[page]+1)
-		bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
-		pageRankCounter[page]++
+		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
+		valid := bucket.AddSEResult(&res, Info.Name, relay, &options, pagesCol)
+		if valid {
+			pageRankCounter[pageIndex]++
+		}
 	})
 
-	localeParam := getLocale(&options)
+	retErrors := make([]error, 0, options.Pages.Max)
 
-	colCtx := colly.NewContext()
-	colCtx.Put("page", strconv.Itoa(1))
+	// static params
+	localeParam := getLocale(options)
 
-	urll := Info.URL + query + localeParam
-	anonUrll := Info.URL + anonymize.String(query) + localeParam
-	_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
+	// starts from at least 0
+	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
+		colCtx := colly.NewContext()
+		colCtx.Put("page", strconv.Itoa(i-options.Pages.Start))
 
-	for i := 1; i < options.MaxPages; i++ {
-		colCtx = colly.NewContext()
-		colCtx.Put("page", strconv.Itoa(i+1))
+		// dynamic params
+		pageParam := ""
+		// i == 0 is the first page
+		if i > 0 {
+			pageParam = "&first=" + strconv.Itoa(i*10+1)
+		}
 
-		urll := Info.URL + query + "&first=" + strconv.Itoa(i*10+1) + localeParam
-		anonUrll := Info.URL + anonymize.String(query) + "&first=" + strconv.Itoa(i*10+1) + localeParam
-		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
+		urll := Info.URL + query + pageParam + localeParam
+		anonUrll := Info.URL + anonymize.String(query) + pageParam + localeParam
+
+		err := _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		if err != nil {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retError
+	return retErrors[:len(retErrors):len(retErrors)]
 }
 
 func removeTelemetry(link string) string {
@@ -99,7 +100,7 @@ func removeTelemetry(link string) string {
 	return link
 }
 
-func getLocale(options *engines.Options) string {
+func getLocale(options engines.Options) string {
 	spl := strings.SplitN(strings.ToLower(options.Locale), "_", 2)
 	return "&setlang=" + spl[0] + "&cc=" + spl[1]
 }

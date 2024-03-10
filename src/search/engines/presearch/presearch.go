@@ -15,23 +15,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) error {
-	if err := _sedefaults.Prepare(Info.Name, &options, &settings, &Support, &Info, &ctx); err != nil {
-		return err
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
+	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
+	if err != nil {
+		return []error{err}
 	}
 
-	var col *colly.Collector
-	var pagesCol *colly.Collector
-	var retError error
-
-	_sedefaults.InitializeCollectors(&col, &pagesCol, &settings, &options, &timings)
-
-	_sedefaults.PagesColRequest(Info.Name, pagesCol, ctx)
-	_sedefaults.PagesColError(Info.Name, pagesCol)
-	_sedefaults.PagesColResponse(Info.Name, pagesCol, relay)
-
-	_sedefaults.ColRequest(Info.Name, col, ctx)
-	_sedefaults.ColError(Info.Name, col)
+	col, pagesCol := _sedefaults.InitializeCollectors(ctx, Info.Name, options, settings, timings, relay)
 
 	safeSearch := getSafeSearch(options.SafeSearch)
 
@@ -42,8 +32,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	})
 
 	col.OnResponse(func(r *colly.Response) {
-		var pageStr string = r.Request.Ctx.Get("page")
-		page, _ := strconv.Atoi(pageStr)
+		pageIndex := _sedefaults.PageFromContext(r.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start + 1
 
 		var apiStr string = r.Request.Ctx.Get("isAPI")
 		isApi, _ := strconv.ParseBool(apiStr)
@@ -65,7 +55,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				goodURL, goodTitle, goodDesc := _sedefaults.SanitizeFields(result.Link, result.Title, result.Desc)
 
 				res := bucket.MakeSEResult(goodURL, goodTitle, goodDesc, Info.Name, page, counter)
-				bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
+				bucket.AddSEResult(&res, Info.Name, relay, &options, pagesCol)
+
 				counter += 1
 			}
 		} else {
@@ -91,28 +82,34 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 	})
 
-	colCtx := colly.NewContext()
-	colCtx.Put("page", strconv.Itoa(1))
-	colCtx.Put("isAPI", "false")
+	retErrors := make([]error, 0, options.Pages.Max)
 
-	urll := Info.URL + query
-	anonUrll := Info.URL + anonymize.String(query)
-	_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
-
-	for i := 1; i < options.MaxPages; i++ {
-		colCtx = colly.NewContext()
-		colCtx.Put("page", strconv.Itoa(i+1))
+	// starts from at least 0
+	for i := options.Pages.Start; i < options.Pages.Start+options.Pages.Max; i++ {
+		colCtx := colly.NewContext()
+		colCtx.Put("page", strconv.Itoa(i-options.Pages.Start))
 		colCtx.Put("isAPI", "false")
 
-		urll := Info.URL + query + "&page=" + strconv.Itoa(i+1)
-		anonUrll := Info.URL + anonymize.String(query) + "&page=" + strconv.Itoa(i+1)
-		_sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name, &retError)
+		// dynamic params
+		pageParam := ""
+		// i == 0 is the first page
+		if i > 0 {
+			pageParam = "&page=" + strconv.Itoa(i+1)
+		}
+
+		urll := Info.URL + query + pageParam
+		anonUrll := Info.URL + anonymize.String(query) + pageParam
+
+		err := _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
+		if err != nil {
+			retErrors = append(retErrors, err)
+		}
 	}
 
 	col.Wait()
 	pagesCol.Wait()
 
-	return retError
+	return retErrors[:len(retErrors):len(retErrors)]
 }
 
 func getSafeSearch(ss bool) string {

@@ -25,9 +25,9 @@ type TestCaseRankedResults struct {
 	Options   engines.Options
 }
 
-func NewConfig(engineName engines.Name) *config.Config {
+func NewConfig(engineName engines.Name) config.Config {
 	config.EnabledEngines = append(config.EnabledEngines, engineName)
-	return &config.Config{
+	return config.Config{
 		Categories: map[category.Name]config.Category{
 			category.GENERAL: {
 				Engines: []engines.Name{engineName},
@@ -36,6 +36,19 @@ func NewConfig(engineName engines.Name) *config.Config {
 					Timeout: 10000 * time.Millisecond, // colly default
 				},
 			},
+			category.IMAGES: {
+				Engines: []engines.Name{engineName},
+				Ranking: config.NewRanking(),
+				Timings: config.Timings{
+					Timeout: 10000 * time.Millisecond, // colly default
+				},
+			},
 		},
+	}
+}
+
+func NewOpts() engines.Options {
+	return engines.Options{
+		Pages: engines.Pages{Start: 0, Max: 1},
 	}
 }

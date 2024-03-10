@@ -2,7 +2,7 @@ package presearch
 
 import "github.com/hearchco/hearchco/src/search/engines"
 
-var Info engines.Info = engines.Info{
+var Info = engines.Info{
 	Domain:         "presearch.com",
 	Name:           engines.PRESEARCH,
 	URL:            "https://presearch.com/search?q=",
@@ -19,6 +19,6 @@ var dompaths engines.DOMPaths = engines.DOMPaths{
 }
 */
 
-var Support engines.SupportedSettings = engines.SupportedSettings{
+var Support = engines.SupportedSettings{
 	SafeSearch: true,
 }
