@@ -5,7 +5,7 @@ import (
 	"github.com/hearchco/hearchco/src/search/result"
 )
 
-// Returns the result made, and true if successful. If the result is not valid, false is returned.
+// Makes result from parameters
 func MakeSEResult(
 	urll, title, desc string,
 	seName engines.Name, sePage, seOnPageRank int,
