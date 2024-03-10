@@ -12,11 +12,7 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-<<<<<<< HEAD
-=======
-	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/rs/zerolog/log"
->>>>>>> main
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
@@ -57,7 +53,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 
 		pageIndex := _sedefaults.PageFromContext(r.Request.Ctx, Info.Name)
-		page := pageIndex + options.Pages.Start + 1
+		page := pageIndex + options.Pages.Start
 
 		for _, result := range content.Results {
 			if result.TType != "Organic" {
@@ -66,9 +62,11 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 			goodLink, goodTitle, goodDescription := _sedefaults.SanitizeFields(result.URL, result.Title, result.Snippet)
 
-			res := bucket.MakeSEResult(goodLink, goodTitle, goodDescription, Info.Name, 1, counter)
-			bucket.AddSEResult(res, Info.Name, relay, &options, pagesCol)
-			counter += 1
+			res := bucket.MakeSEResult(goodLink, goodTitle, goodDescription, Info.Name, page, pageRankCounter[pageIndex]+1)
+			valid := bucket.AddSEResult(&res, Info.Name, relay, &options, pagesCol)
+			if valid {
+				pageRankCounter[pageIndex]++
+			}
 		}
 	})
 

@@ -15,13 +15,8 @@ var Info = engines.Info{
 	ResultsPerPage: 10,
 }
 
-<<<<<<< HEAD
 var dompaths engines.DOMPaths = engines.DOMPaths{
 	Result:      "div#main > div > div#web > ol > li > div.algo",
-=======
-var dompaths = engines.DOMPaths{
-	Result:      "div#main > div > div#web > ol > li",
->>>>>>> main
 	Link:        "h3.title > a",
 	Title:       "h3.title > a",
 	Description: "div > div.compText > p > span",
