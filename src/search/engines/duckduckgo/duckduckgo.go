@@ -36,7 +36,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		var rrank int
 
 		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
-		page := pageIndex + options.Pages.Start
+		page := pageIndex + options.Pages.Start + 1
 
 		e.DOM.Children().Each(func(i int, row *goquery.Selection) {
 			switch i % 4 {

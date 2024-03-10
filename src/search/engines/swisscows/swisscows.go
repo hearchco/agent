@@ -51,7 +51,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			Msg("swisscows.Search() -> col.OnResponse()")
 
 		pageIndex := _sedefaults.PageFromContext(r.Request.Ctx, Info.Name)
-		page := pageIndex + options.Pages.Start
+		page := pageIndex + options.Pages.Start + 1
 
 		var parsedResponse SCResponse
 		err := json.Unmarshal(r.Body, &parsedResponse)

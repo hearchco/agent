@@ -53,7 +53,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 
 		pageIndex := _sedefaults.PageFromContext(r.Request.Ctx, Info.Name)
-		page := pageIndex + options.Pages.Start
+		page := pageIndex + options.Pages.Start + 1
 
 		for _, result := range content.Results {
 			if result.TType != "Organic" {

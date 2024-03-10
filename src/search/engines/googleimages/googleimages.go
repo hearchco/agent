@@ -50,7 +50,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 
 		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
-		page := pageIndex + options.Pages.Start
+		page := pageIndex + options.Pages.Start + 1
 
 		for _, metadata := range jsonResponse.ISCHJ.Metadata {
 			origImg := metadata.OriginalImage

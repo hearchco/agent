@@ -33,7 +33,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	col.OnResponse(func(r *colly.Response) {
 		pageIndex := _sedefaults.PageFromContext(r.Request.Ctx, Info.Name)
-		page := pageIndex + options.Pages.Start
+		page := pageIndex + options.Pages.Start + 1
 
 		var apiStr string = r.Request.Ctx.Get("isAPI")
 		isApi, _ := strconv.ParseBool(apiStr)
