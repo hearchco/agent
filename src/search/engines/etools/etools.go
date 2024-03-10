@@ -26,6 +26,15 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		linkText, titleText, descText := _sedefaults.RawFieldsFromDOM(e.DOM, &dompaths, Info.Name) // telemetry url isnt valid link so cant pass it to FieldsFromDOM (?)
 
+		// Need to perform this check here so the check below (linkText[0] != 'h') doesn't panic
+		if linkText == "" {
+			log.Error().
+				Str("title", titleText).
+				Str("description", descText).
+				Msg("etools.Search(): invalid result, url is empty.")
+			return
+		}
+
 		if linkText[0] != 'h' {
 			//telemetry link, e.g. //web.search.ch/r/redirect?event=website&origin=result!u377d618861533351/https://de.wikipedia.org/wiki/Charles_Paul_Wilp
 			linkText = "http" + strings.Split(linkText, "http")[1] //works for https, dont worry
