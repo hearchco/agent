@@ -31,7 +31,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		}
 
 		pageIndex := _sedefaults.PageFromContext(r.Request.Ctx, Info.Name)
-		page := pageIndex + options.Pages.Start + 1
+		page := pageIndex + options.Pages.Start
 
 		var parsedResponse QwantResponse
 		err := json.Unmarshal(r.Body, &parsedResponse)
@@ -53,8 +53,10 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				goodLink, goodTitle, goodDesc := _sedefaults.SanitizeFields(result.URL, result.Title, result.Description)
 
 				res := bucket.MakeSEResult(goodLink, goodTitle, goodDesc, Info.Name, page, counter)
-				bucket.AddSEResult(&res, Info.Name, relay, &options, pagesCol)
-				counter += 1
+				valid := bucket.AddSEResult(&res, Info.Name, relay, &options, pagesCol)
+				if valid {
+					counter += 1
+				}
 			}
 		}
 	})

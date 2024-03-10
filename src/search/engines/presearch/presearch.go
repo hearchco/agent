@@ -33,7 +33,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	col.OnResponse(func(r *colly.Response) {
 		pageIndex := _sedefaults.PageFromContext(r.Request.Ctx, Info.Name)
-		page := pageIndex + options.Pages.Start + 1
+		page := pageIndex + options.Pages.Start
 
 		var apiStr string = r.Request.Ctx.Get("isAPI")
 		isApi, _ := strconv.ParseBool(apiStr)
@@ -55,9 +55,10 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				goodURL, goodTitle, goodDesc := _sedefaults.SanitizeFields(result.Link, result.Title, result.Desc)
 
 				res := bucket.MakeSEResult(goodURL, goodTitle, goodDesc, Info.Name, page, counter)
-				bucket.AddSEResult(&res, Info.Name, relay, &options, pagesCol)
-
-				counter += 1
+				valid := bucket.AddSEResult(&res, Info.Name, relay, &options, pagesCol)
+				if valid {
+					counter += 1
+				}
 			}
 		} else {
 			//html response, forward call to API
