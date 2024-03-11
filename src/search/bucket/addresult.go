@@ -14,7 +14,7 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 	if seResult == nil {
 		log.Error().
 			Str("engine", seName.String()).
-			Msg("bucket.AddSEResult(): nil result.")
+			Msg("bucket.AddSEResult(): nil result")
 		return false
 	}
 
@@ -25,7 +25,7 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 			Str("url", seResult.URL).
 			Str("title", seResult.Title).
 			Str("description", seResult.Description).
-			Msg("bucket.AddSEResult(): invalid result, some fields are empty.")
+			Msg("bucket.AddSEResult(): invalid result, some fields are empty")
 		return false
 	}
 
