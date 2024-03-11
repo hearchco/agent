@@ -24,7 +24,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	pageRankCounter := make([]int, options.Pages.Max)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
-		linkText, titleText, descText := _sedefaults.FieldsFromDOM(e.DOM, &dompaths, Info.Name)
+		linkText, titleText, descText := _sedefaults.FieldsFromDOM(e.DOM, dompaths, Info.Name)
 
 		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 		page := pageIndex + options.Pages.Start + 1

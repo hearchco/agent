@@ -25,7 +25,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	pageRankCounter := make([]int, options.Pages.Max)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
-		linkText, titleText, descText := _sedefaults.FieldsFromDOM(e.DOM, &dompaths, Info.Name)
+		linkText, titleText, descText := _sedefaults.FieldsFromDOM(e.DOM, dompaths, Info.Name)
 		linkText = removeTelemetry(linkText)
 		citeInfo := _sedefaults.SanitizeDescription(e.DOM.Find("div.gs_a").Text()) // sanitize citeInfo with description sanitization
 		descText = citeInfo + " || " + descText

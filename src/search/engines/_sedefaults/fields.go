@@ -10,8 +10,7 @@ import (
 )
 
 // Fetches from DOM via dompaths. Returns (url, title, description).
-// Doesn't change dom, dompaths.
-func RawFieldsFromDOM(dom *goquery.Selection, dompaths *engines.DOMPaths, seName engines.Name) (string, string, string) {
+func RawFieldsFromDOM(dom *goquery.Selection, dompaths engines.DOMPaths, seName engines.Name) (string, string, string) {
 	descText := dom.Find(dompaths.Description).Text()
 	titleDom := dom.Find(dompaths.Title)
 	titleText := titleDom.Text()
@@ -41,8 +40,7 @@ func RawFieldsFromDOM(dom *goquery.Selection, dompaths *engines.DOMPaths, seName
 }
 
 // Fetches from DOM via dompaths and sanitizes. Returns (url, title, description).
-// Doesn't change dom, dompaths.
-func FieldsFromDOM(dom *goquery.Selection, dompaths *engines.DOMPaths, seName engines.Name) (string, string, string) {
+func FieldsFromDOM(dom *goquery.Selection, dompaths engines.DOMPaths, seName engines.Name) (string, string, string) {
 	return SanitizeFields(RawFieldsFromDOM(dom, dompaths, seName))
 }
 

@@ -27,7 +27,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	pageRankCounter := make([]int, options.Pages.Max)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
-		linkText, titleText, descText := _sedefaults.FieldsFromDOM(e.DOM, &dompaths, Info.Name) // the telemetry link is a valid link so it can be sanitized
+		linkText, titleText, descText := _sedefaults.FieldsFromDOM(e.DOM, dompaths, Info.Name) // the telemetry link is a valid link so it can be sanitized
 		linkText = _sedefaults.SanitizeURL(removeTelemetry(linkText))
 
 		if descText == "" {

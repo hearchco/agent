@@ -32,7 +32,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	})
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
-		linkText, titleText, descText := _sedefaults.FieldsFromDOM(e.DOM, &dompaths, Info.Name)
+		linkText, titleText, descText := _sedefaults.FieldsFromDOM(e.DOM, dompaths, Info.Name)
 
 		if descText == "" {
 			descText = e.DOM.Find("div.product > div.flex-hcenter > div > div[class=\"text-sm text-gray\"]").Text()

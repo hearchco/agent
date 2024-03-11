@@ -24,7 +24,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	pageRankCounter := make([]int, options.Pages.Max)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
-		linkText, titleText, descText := _sedefaults.RawFieldsFromDOM(e.DOM, &dompaths, Info.Name) // telemetry url isnt valid link so cant pass it to FieldsFromDOM (?)
+		linkText, titleText, descText := _sedefaults.RawFieldsFromDOM(e.DOM, dompaths, Info.Name) // telemetry url isnt valid link so cant pass it to FieldsFromDOM (?)
 
 		// Need to perform this check here so the check below (linkText[0] != 'h') doesn't panic
 		if linkText == "" {
