@@ -21,6 +21,14 @@ install:
 
 build:
 	go build ./...
+build-linux:
+	CGO_ENABLED=0 go build -ldflags "-s -w" -trimpath -o bin/hearchco ./src
+build-macos: build-linux
+build-windows:
+	CGO_ENABLED=0 go build -ldflags "-s -w" -trimpath -o bin/hearchco.exe ./src
+build-wasi:
+	tinygo build -ldflags "-s -w" -trimpath -o bin/hearchco.wasm -target=wasi ./src
+
 
 test:
 	sh ./scripts/test.sh
