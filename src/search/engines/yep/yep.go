@@ -31,23 +31,30 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 
 	col.OnResponse(func(r *colly.Response) {
 		body := string(r.Body)
-		index := strings.Index(body, "{\"results\":")
+		start := "[\"Ok\","
+		end := ']'
+		index := strings.Index(body, start)
 
-		if index == -1 || body[len(body)-1] != ']' {
+		if index != 0 || body[len(body)-1] != byte(end) {
 			log.Error().
 				Str("body", body).
+				Str("start", start).
+				Str("end", string(end)).
 				Str("engine", Info.Name.String()).
 				Msg("failed parsing response: failed finding start and/or end of JSON")
 			return
 		}
 
-		body = body[index : len(body)-1]
+		// starts after start and ends before end
+		// so after "[\"Ok\"," and before "]"
+		resultsJson := body[len(start) : len(body)-1]
 		var content JsonResponse
-		if err := json.Unmarshal([]byte(body), &content); err != nil {
+		if err := json.Unmarshal([]byte(resultsJson), &content); err != nil {
 			log.Error().
 				Err(err).
 				Str("engine", Info.Name.String()).
-				Str("content", body).
+				Str("body", body).
+				Str("content", resultsJson).
 				Msg("Failed unmarshalling content")
 			return
 		}
