@@ -11,7 +11,7 @@ var Info = engines.Info{
 	ResultsPerPage: 20,
 }
 
-var dompaths engines.DOMPaths = engines.DOMPaths{
+var dompaths = engines.DOMPaths{
 	Result:      "div.snippet[data-type=\"web\"]",
 	Link:        "a",
 	Title:       "div.title",
