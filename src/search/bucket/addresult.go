@@ -10,7 +10,7 @@ import (
 
 // Checks if the retrieved result is valid. Makes a result object and adds it to the relay.
 // Returns true if the result is valid (false otherwise).
-func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *Relay, options *engines.Options, pagesCol *colly.Collector) bool {
+func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *Relay, options engines.Options, pagesCol *colly.Collector) bool {
 	if seResult == nil {
 		log.Error().
 			Str("engine", seName.String()).

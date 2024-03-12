@@ -69,7 +69,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			goodLink, goodTitle, goodDesc := _sedefaults.SanitizeFields(result.URL, result.Title, result.Desc)
 
 			res := bucket.MakeSEResult(goodLink, goodTitle, goodDesc, Info.Name, page, counter)
-			valid := bucket.AddSEResult(&res, Info.Name, relay, &options, pagesCol)
+			valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 			if valid {
 				counter += 1
 			}

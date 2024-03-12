@@ -42,7 +42,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		page := pageIndex + options.Pages.Start + 1
 
 		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
-		valid := bucket.AddSEResult(&res, Info.Name, relay, &options, pagesCol)
+		valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 		if valid {
 			pageRankCounter[pageIndex]++
 		}
