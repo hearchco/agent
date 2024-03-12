@@ -63,7 +63,8 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				Str("url", linkText).
 				Str("title", titleText).
 				Str("description", descText).
-				Msgf("yahoo.Search(): aria attribute doesn't exist on matched title element (%v)", dompaths.Title)
+				Str("title selector", dompaths.Title).
+				Msg("yahoo.Search(): aria attribute doesn't exist on matched title element")
 
 			return
 		}
