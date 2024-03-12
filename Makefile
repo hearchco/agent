@@ -22,10 +22,11 @@ install:
 build:
 	CGO_ENABLED=0 go build -ldflags "-s -w" -trimpath ./src/...
 build-linux:
-	CGO_ENABLED=0 go build -ldflags "-s -w" -trimpath -o bin/hearchco ./src
-build-macos: build-linux
+	CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -trimpath -o bin/hearchco ./src
+build-macos:
+	CGO_ENABLED=0 GOOS=darwin go build -ldflags "-s -w" -trimpath -o bin/hearchco ./src
 build-windows:
-	CGO_ENABLED=0 go build -ldflags "-s -w" -trimpath -o bin/hearchco.exe ./src
+	CGO_ENABLED=0 GOOS=windows go build -ldflags "-s -w" -trimpath -o bin/hearchco.exe ./src
 
 test:
 	sh ./scripts/test.sh
