@@ -20,7 +20,7 @@ install:
 	go install github.com/cosmtrek/air@latest
 
 build:
-	go build ./...
+	CGO_ENABLED=0 go build -ldflags "-s -w" -trimpath ./src/...
 build-linux:
 	CGO_ENABLED=0 go build -ldflags "-s -w" -trimpath -o bin/hearchco ./src
 build-macos: build-linux
