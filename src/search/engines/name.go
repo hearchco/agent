@@ -25,7 +25,7 @@ const (
 	YEP
 )
 
-// Returns Engine Names without UNDEFINED
+// return engines' names without UNDEFINED
 func Names() []Name {
 	return _NameValues[1:]
 }

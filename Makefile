@@ -28,6 +28,9 @@ build-macos:
 build-windows:
 	CGO_ENABLED=0 GOOS=windows go build -ldflags "-s -w" -trimpath -o bin/hearchco.exe ./src
 
+check-init:
+	go run ./check
+
 test:
 	sh ./scripts/test.sh
 test-engines:

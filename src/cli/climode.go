@@ -17,7 +17,7 @@ import (
 func printImageResult(r result.Result) {
 	fmt.Printf("%v (%.2f) -----\n\t%q\n\t%q\n\t%q\n\t%q\n\t%q\n\t%q\n\t-", r.Rank, r.Score, r.Title, r.URL, r.Description, r.ImageResult.Source, r.ImageResult.SourceURL, r.ImageResult.ThumbnailURL)
 	for seInd := range len(r.EngineRanks) {
-		fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine.ToLower())
+		fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine.Pretty())
 		if seInd != len(r.EngineRanks)-1 {
 			fmt.Print(", ")
 		}
@@ -28,7 +28,7 @@ func printImageResult(r result.Result) {
 func printResult(r result.Result) {
 	fmt.Printf("%v (%.2f) -----\n\t%q\n\t%q\n\t%q\n\t-", r.Rank, r.Score, r.Title, r.URL, r.Description)
 	for seInd := range len(r.EngineRanks) {
-		fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine.ToLower())
+		fmt.Printf("%v", r.EngineRanks[seInd].SearchEngine.Pretty())
 		if seInd != len(r.EngineRanks)-1 {
 			fmt.Print(", ")
 		}

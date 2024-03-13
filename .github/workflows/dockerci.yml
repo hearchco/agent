@@ -59,6 +59,10 @@ jobs:
       - name: Generate go code from go:generate comments
         run: make install
 
+      # check packages
+      - name: Check packages
+        run: make check-init
+
       # go:build
       - name: Build project
         run: make build

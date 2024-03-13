@@ -50,6 +50,9 @@ jobs:
           go-version: stable
       - name: Generate go code from go:generate comments
         run: make install
+      # check packages
+      - name: Check packages
+        run: make check-init
       # test
       - name: Test units (w/o engines & redis)
         run: make test
