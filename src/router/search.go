@@ -13,7 +13,6 @@ import (
 	"github.com/hearchco/hearchco/src/search"
 	"github.com/hearchco/hearchco/src/search/category"
 	"github.com/hearchco/hearchco/src/search/engines"
-	"github.com/hearchco/hearchco/src/search/result"
 )
 
 func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) error {
@@ -150,7 +149,7 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 	}
 
 	results, foundInDB := search.Search(query, options, db, settings, categories)
-	c.JSON(http.StatusOK, result.Shorten(results))
+	c.JSON(http.StatusOK, results)
 
 	search.CacheAndUpdateResults(query, options, db, ttlConf, settings, categories, results, foundInDB)
 	return nil

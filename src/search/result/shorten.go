@@ -1,6 +1,6 @@
 package result
 
-func firstNchars(str string, n int) string {
+func FirstNchars(str string, n int) string {
 	v := []rune(str)
 	if n >= len(v) {
 		return str
@@ -8,14 +8,19 @@ func firstNchars(str string, n int) string {
 	return string(v[:n])
 }
 
-func Shorten(results []Result) []Result {
-	resultsShort := make([]Result, len(results))
-	copy(resultsShort, results)
-	for _, result := range resultsShort {
-		if len(result.Description) >= 400 {
-			descShort := firstNchars(result.Description, 397)
+// modifies the passed slice of results,
+// changes the description of the results to be at most N characters long
+func Shorten(results []Result, n int) {
+	if n-3 < 0 {
+		return
+	}
+
+	// can't use _, result := range short because we need to modify the elements in slice
+	for i := range results {
+		result := &results[i]
+		if len(result.Description) > n {
+			descShort := FirstNchars(result.Description, n-3)
 			result.Description = descShort + "..."
 		}
 	}
-	return resultsShort
 }
