@@ -40,6 +40,7 @@ func Search(query string, options engines.Options, db cache.DB, settings map[eng
 
 		// the main line
 		results = PerformSearch(query, options, settings, categories)
+		result.Shorten(results, 2500)
 	}
 
 	return results, foundInDB
