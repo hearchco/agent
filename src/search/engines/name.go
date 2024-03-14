@@ -27,7 +27,10 @@ const (
 
 // return engines' names without UNDEFINED
 func Names() []Name {
-	return _NameValues[1:]
+	if len(_NameValues) > 1 {
+		return _NameValues[1:]
+	}
+	return _NameValues[:]
 }
 
 func (n Name) ToLower() string {

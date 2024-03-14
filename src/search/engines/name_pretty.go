@@ -48,5 +48,8 @@ func init() {
 
 // return engines' pretty names without Undefined
 func PrettyNames() []string {
-	return prettyNames[1:]
+	if len(prettyNames) > 1 {
+		return prettyNames[1:]
+	}
+	return prettyNames[:]
 }
