@@ -13,7 +13,7 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/parse"
+	"github.com/rs/zerolog/log"
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
@@ -50,17 +50,26 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				} else {
 					linkScheme = "http://"
 				}
-				titleText = strings.TrimSpace(row.Find(dompaths.Title).Text())
+				titleText = _sedefaults.SanitizeTitle(row.Find(dompaths.Title).Text())
 			case 1:
-				descText = strings.TrimSpace(row.Find(dompaths.Description).Text())
+				descText = _sedefaults.SanitizeDescription(row.Find(dompaths.Description).Text())
 			case 2:
 				rawURL := linkScheme + row.Find("td > span.link-text").Text()
-				linkText = parse.ParseURL(rawURL)
+				linkText = _sedefaults.SanitizeURL(rawURL)
 			case 3:
-				if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-					res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, (i/4 + 1))
-					bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+				if !hrefExists {
+					log.Error().
+						Str("engine", Info.Name.String()).
+						Str("url", linkText).
+						Str("title", titleText).
+						Str("description", descText).
+						Str("link selector", dompaths.Link).
+						Msg("duckduckgo.Search(): href attribute doesn't exist on matched URL element")
+					return
 				}
+
+				res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, (i/4 + 1))
+				bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 			}
 		})
 	})

@@ -12,7 +12,7 @@ var Info = engines.Info{
 }
 
 var dompaths = engines.DOMPaths{
-	Result:      "div.snippet",
+	Result:      "div.snippet[data-type=\"web\"]",
 	Link:        "a",
 	Title:       "div.title",
 	Description: "div.snippet-description",

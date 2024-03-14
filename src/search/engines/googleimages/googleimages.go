@@ -65,9 +65,10 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 					origImg.Height, origImg.Width, thmbImg.Height, thmbImg.Width,
 					Info.Name, page, pageRankCounter[pageIndex]+1,
 				)
-				bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
-
-				pageRankCounter[pageIndex]++
+				valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+				if valid {
+					pageRankCounter[pageIndex]++
+				}
 			} else {
 				log.Error().
 					Str("engine", Info.Name.String()).

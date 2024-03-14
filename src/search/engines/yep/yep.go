@@ -12,7 +12,6 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/rs/zerolog/log"
 )
 
@@ -68,14 +67,13 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				continue
 			}
 
-			goodURL := parse.ParseURL(result.URL)
-			goodTitle := parse.ParseTextWithHTML(result.Title)
-			goodDescription := parse.ParseTextWithHTML(result.Snippet)
+			goodLink, goodTitle, goodDescription := _sedefaults.SanitizeFields(result.URL, result.Title, result.Snippet)
 
-			res := bucket.MakeSEResult(goodURL, goodTitle, goodDescription, Info.Name, page, pageRankCounter[pageIndex]+1)
-			bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
-
-			pageRankCounter[pageIndex]++
+			res := bucket.MakeSEResult(goodLink, goodTitle, goodDescription, Info.Name, page, pageRankCounter[pageIndex]+1)
+			valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+			if valid {
+				pageRankCounter[pageIndex]++
+			}
 		}
 	})
 

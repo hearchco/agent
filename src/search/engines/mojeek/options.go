@@ -11,6 +11,7 @@ var Info = engines.Info{
 
 var dompaths = engines.DOMPaths{
 	Result:      "ul.results-standard > li",
+	Link:        "h2 > a.title",
 	Title:       "h2 > a.title",
 	Description: "p.s",
 }

@@ -8,8 +8,27 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// passing pointers down is on stack
-func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *Relay, options engines.Options, pagesCol *colly.Collector) {
+// Checks if the retrieved result is valid. Makes a result object and adds it to the relay.
+// Returns true if the result is valid (false otherwise).
+func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *Relay, options engines.Options, pagesCol *colly.Collector) bool {
+	if seResult == nil {
+		log.Error().
+			Str("engine", seName.String()).
+			Msg("bucket.AddSEResult(): nil result")
+		return false
+	}
+
+	// TODO: add a check if image result is valid
+	if seResult.URL == "" || seResult.Title == "" {
+		log.Error().
+			Str("engine", seName.String()).
+			Str("url", seResult.URL).
+			Str("title", seResult.Title).
+			Str("description", seResult.Description).
+			Msg("bucket.AddSEResult(): invalid result, some fields are empty")
+		return false
+	}
+
 	log.Trace().
 		Str("engine", seName.String()).
 		Str("title", seResult.Title).
@@ -76,4 +95,6 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 				Msg("bucket.AddSEResult(): failed visiting")
 		}
 	}
+
+	return true
 }

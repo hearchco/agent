@@ -13,7 +13,6 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/rs/zerolog/log"
 )
 
@@ -28,37 +27,24 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	pageRankCounter := make([]int, options.Pages.Max)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
-		dom := e.DOM
+		linkText, titleText, descText := _sedefaults.FieldsFromDOM(e.DOM, dompaths, Info.Name) // the telemetry link is a valid link so it can be sanitized
+		linkText = _sedefaults.SanitizeURL(removeTelemetry(linkText))
 
-		linkHref, hrefExists := dom.Find(dompaths.Link).Attr("href")
-		linkText := parse.ParseURL(linkHref)
-		linkText = removeTelemetry(linkText)
+		if descText == "" {
+			descText = e.DOM.Find("p.b_algoSlug").Text()
+		}
+		if strings.Contains(descText, "Web") {
+			descText = strings.Split(descText, "Web")[1]
+		}
+		descText = _sedefaults.SanitizeDescription(descText)
 
-		titleText := strings.TrimSpace(dom.Find(dompaths.Title).Text())
-		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
+		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start + 1
 
-		if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-			if descText == "" {
-				descText = strings.TrimSpace(dom.Find("p.b_algoSlug").Text())
-			}
-			if strings.Contains(descText, "Web") {
-				descText = strings.Split(descText, "Web")[1]
-			}
-
-			pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
-			page := pageIndex + options.Pages.Start + 1
-
-			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
-			bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
-
+		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
+		valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+		if valid {
 			pageRankCounter[pageIndex]++
-		} else {
-			log.Trace().
-				Str("engine", Info.Name.String()).
-				Str("url", linkText).
-				Str("title", titleText).
-				Str("description", descText).
-				Msg("Matched result, but couldn't retrieve data")
 		}
 	})
 
@@ -109,7 +95,7 @@ func removeTelemetry(link string) string {
 		if err != nil {
 			log.Error().Err(err).Msg("bing.removeTelemetry(): failed decoding string from base64")
 		}
-		return parse.ParseURL(string(cleanUrl))
+		return string(cleanUrl)
 	}
 	return link
 }
