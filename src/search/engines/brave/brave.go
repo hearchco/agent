@@ -11,7 +11,6 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/parse"
 )
 
 func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
@@ -33,27 +32,22 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	})
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
-		dom := e.DOM
+		linkText, titleText, descText := _sedefaults.FieldsFromDOM(e.DOM, dompaths, Info.Name)
 
-		linkHref, hrefExists := dom.Find(dompaths.Link).Attr("href")
-		linkText := parse.ParseURL(linkHref)
-		titleText := strings.TrimSpace(dom.Find(dompaths.Title).Text())
-		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
+		if descText == "" {
+			descText = e.DOM.Find("div.product > div.flex-hcenter > div > div[class=\"text-sm text-gray\"]").Text()
+		}
+		if descText == "" {
+			descText = e.DOM.Find("p.snippet-description").Text()
+		}
+		descText = _sedefaults.SanitizeDescription(descText)
 
-		if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-			if descText == "" {
-				descText = strings.TrimSpace(dom.Find("div.product > div.flex-hcenter > div > div[class=\"text-sm text-gray\"]").Text())
-			}
-			if descText == "" {
-				descText = strings.TrimSpace(dom.Find("p.snippet-description").Text())
-			}
+		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start + 1
 
-			pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
-			page := pageIndex + options.Pages.Start + 1
-
-			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
-			bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
-
+		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
+		valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+		if valid {
 			pageRankCounter[pageIndex]++
 		}
 	})

@@ -16,6 +16,7 @@ var Info = engines.Info{
 var dompaths = engines.DOMPaths{
 	Result:      "table.result > tbody > tr",
 	Link:        "td.record > a",
+	Title:       "td.record > a",
 	Description: "td.record > div.text",
 }
 

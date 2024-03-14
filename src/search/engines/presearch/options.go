@@ -10,6 +10,7 @@ var Info = engines.Info{
 }
 
 /*
+// If the API is not used, these are the selectors for the page
 var dompaths engines.DOMPaths = engines.DOMPaths{
 	Result:      "div[x-data=\"searchResults(true)\"] > div.w-full > div.text-gray-300 > div > div > div",
 	Link:        "div > div > a.text-results-link",

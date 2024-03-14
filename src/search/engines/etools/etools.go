@@ -10,7 +10,6 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/rs/zerolog/log"
 )
 
@@ -25,30 +24,30 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 	pageRankCounter := make([]int, options.Pages.Max)
 
 	col.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
-		dom := e.DOM
+		linkText, titleText, descText := _sedefaults.RawFieldsFromDOM(e.DOM, dompaths, Info.Name) // telemetry url isnt valid link so cant pass it to FieldsFromDOM (?)
 
-		linkEl := dom.Find(dompaths.Link)
-		linkHref, hrefExists := linkEl.Attr("href")
-		var linkText string
-
-		if linkHref[0] == 'h' {
-			//normal link
-			linkText = parse.ParseURL(linkHref)
-		} else {
-			//telemetry link, e.g. //web.search.ch/r/redirect?event=website&origin=result!u377d618861533351/https://de.wikipedia.org/wiki/Charles_Paul_Wilp
-			linkText = parse.ParseURL("http" + strings.Split(linkHref, "http")[1]) //works for https, dont worry
+		// Need to perform this check here so the check below (linkText[0] != 'h') doesn't panic
+		if linkText == "" {
+			log.Error().
+				Str("title", titleText).
+				Str("description", descText).
+				Msg("etools.Search(): invalid result, url is empty.")
+			return
 		}
 
-		titleText := strings.TrimSpace(linkEl.Text())
-		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
+		if linkText[0] != 'h' {
+			//telemetry link, e.g. //web.search.ch/r/redirect?event=website&origin=result!u377d618861533351/https://de.wikipedia.org/wiki/Charles_Paul_Wilp
+			linkText = "http" + strings.Split(linkText, "http")[1] //works for https, dont worry
+		}
 
-		if hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-			pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
-			page := pageIndex + options.Pages.Start + 1
+		linkText, titleText, descText = _sedefaults.SanitizeFields(linkText, titleText, descText)
 
-			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
-			bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start + 1
 
+		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
+		valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+		if valid {
 			pageRankCounter[pageIndex]++
 		}
 	})

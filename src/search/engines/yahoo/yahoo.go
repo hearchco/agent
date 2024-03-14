@@ -12,7 +12,6 @@ import (
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/engines/_sedefaults"
-	"github.com/hearchco/hearchco/src/search/parse"
 	"github.com/rs/zerolog/log"
 )
 
@@ -36,19 +35,46 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		dom := e.DOM
 
 		titleEl := dom.Find(dompaths.Title)
-		linkHref, hrefExists := titleEl.Attr("href")
-		linkText := parse.ParseURL(removeTelemetry(linkHref))
 		titleAria, labelExists := titleEl.Attr("aria-label")
 		titleText := strings.TrimSpace(titleAria)
-		descText := strings.TrimSpace(dom.Find(dompaths.Description).Text())
 
-		if labelExists && hrefExists && linkText != "" && linkText != "#" && titleText != "" {
-			pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
-			page := pageIndex + options.Pages.Start + 1
+		linkHref, hrefExists := titleEl.Attr("href")
+		linkText := removeTelemetry(linkHref)
 
-			res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
-			bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+		descText := dom.Find(dompaths.Description).Text()
 
+		linkText, titleText, descText = _sedefaults.SanitizeFields(linkText, titleText, descText)
+
+		if !hrefExists {
+			log.Error().
+				Str("engine", Info.Name.String()).
+				Str("url", linkText).
+				Str("title", titleText).
+				Str("description", descText).
+				Str("link selector", dompaths.Link).
+				Msg("yahoo.Search(): href attribute doesn't exist on matched URL element")
+
+			return
+		}
+
+		if !labelExists {
+			log.Error().
+				Str("engine", Info.Name.String()).
+				Str("url", linkText).
+				Str("title", titleText).
+				Str("description", descText).
+				Str("title selector", dompaths.Title).
+				Msg("yahoo.Search(): aria attribute doesn't exist on matched title element")
+
+			return
+		}
+
+		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
+		page := pageIndex + options.Pages.Start + 1
+
+		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
+		valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+		if valid {
 			pageRankCounter[pageIndex]++
 		}
 	})
