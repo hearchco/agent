@@ -2,11 +2,11 @@ package googleimages
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
 
-	"github.com/goccy/go-json"
 	"github.com/gocolly/colly/v2"
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/config"

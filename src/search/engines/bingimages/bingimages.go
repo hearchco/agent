@@ -2,10 +2,10 @@ package bingimages
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 	"strings"
 
-	"github.com/goccy/go-json"
 	"github.com/gocolly/colly/v2"
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/config"

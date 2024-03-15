@@ -1,11 +1,9 @@
 package router
 
-import (
-	"net/http"
+import "github.com/gofiber/fiber/v2"
 
-	"github.com/gin-gonic/gin"
-)
-
-func HealthCheck(c *gin.Context) {
-	c.String(http.StatusOK, "OK")
+func HealthCheck(c *fiber.Ctx) error {
+	// TODO: check db health
+	// if err -> return c.Send(error)
+	return c.SendString("OK")
 }
