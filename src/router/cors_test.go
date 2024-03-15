@@ -12,6 +12,12 @@ type Tests struct {
 	Expected       bool
 }
 
+type E2ETests struct {
+	Origin         string
+	AllowedOrigins []string
+	Expected       bool
+}
+
 func TestUnderWildcard(t *testing.T) {
 	tests := []Tests{
 		// good inputs
@@ -50,6 +56,30 @@ func TestUnderWildcard(t *testing.T) {
 		ok := router.UnderWildcard(test.Origin, test.WildcardOrigin)
 		if ok != test.Expected {
 			t.Errorf("UnderWildcard(%q, %q) = \"%v\", want \"%v\"", test.Origin, test.WildcardOrigin, ok, test.Expected)
+		}
+	}
+}
+
+func TestCheckOrigin(t *testing.T) {
+	allowedOrigins := []string{
+		"http://localhost:5173",
+		"https://*hearch.co",
+		"https://*hearchco-frontend.pages.dev",
+	}
+
+	tests := []E2ETests{
+		{"http://localhost:5173", allowedOrigins, true},
+		{"http://localhost:8080", allowedOrigins, false},
+		{"https://hearch.co", allowedOrigins, true},
+		{"https://feat-image-search.hearch.co", allowedOrigins, true},
+		{"https://example.org", allowedOrigins, false},
+	}
+
+	for _, test := range tests {
+		fco := router.CheckOrigin(test.AllowedOrigins)
+		ok := fco(test.Origin)
+		if ok != test.Expected {
+			t.Errorf("CheckOrigin(%q) for %q = \"%v\", want \"%v\"", test.AllowedOrigins, test.Origin, ok, test.Expected)
 		}
 	}
 }
