@@ -33,14 +33,6 @@ func New(lgr zerolog.Logger, conf config.Config, db cache.DB, serveProfiler bool
 		app.Use(pprof.New())
 	}
 
-	// // create new graceful engine with config port
-	// rtr, err := graceful.New(gengine, graceful.WithAddr(":"+strconv.Itoa(serverConf.Port)))
-	// if err != nil {
-	// 	log.Error().
-	// 		Err(err).
-	// 		Msg("router.New(): failed creating new graceful router")
-	// }
-
 	return RouterWrapper{app: app, port: conf.Server.Port}
 }
 

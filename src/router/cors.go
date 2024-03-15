@@ -6,7 +6,7 @@ func isWildcardOrigin(origin string) bool {
 	return strings.Contains(origin, "*")
 }
 
-func underWildcard(origin, wildcardOrigin string) bool {
+func UnderWildcard(origin, wildcardOrigin string) bool {
 	// expects that wildcard appears only once
 	// returns slice of 2 elements if * is first or last char
 	// returns slice of 3 elements where * is the middle (index of 1)
@@ -29,7 +29,7 @@ func underWildcard(origin, wildcardOrigin string) bool {
 	return false
 }
 
-func checkOrigin(frontendUrls []string) func(origin string) bool {
+func CheckOrigin(frontendUrls []string) func(origin string) bool {
 	return func(origin string) bool {
 		for _, allowedOrigin := range frontendUrls {
 			// TODO: make sure only one * can exist when loading frontend urls config
@@ -41,7 +41,7 @@ func checkOrigin(frontendUrls []string) func(origin string) bool {
 			}
 
 			// allowedOrigin has wildcard
-			if dynamic && underWildcard(origin, allowedOrigin) {
+			if dynamic && UnderWildcard(origin, allowedOrigin) {
 				return true
 			}
 		}

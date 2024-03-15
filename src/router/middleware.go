@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
+	"github.com/gofiber/fiber/v2/middleware/healthcheck"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -38,10 +39,13 @@ func setupMiddlewares(app *fiber.App, lgr zerolog.Logger, frontendUrls []string)
 	// use CORS middleware
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     "",
-		AllowOriginsFunc: checkOrigin(frontendUrls),
+		AllowOriginsFunc: CheckOrigin(frontendUrls),
 	}))
 
 	log.Debug().
 		Strs("url", frontendUrls).
 		Msg("Using CORS")
+
+	// use liveness and readiness middleware
+	app.Use(healthcheck.New())
 }
