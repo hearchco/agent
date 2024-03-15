@@ -41,12 +41,12 @@ func checkOrigin(frontendUrls []string) func(origin string) bool {
 			}
 
 			// allowedOrigin has wildcard
-			if dynamic {
-				if underWildcard(origin, allowedOrigin) {
-					return true
-				}
+			if dynamic && underWildcard(origin, allowedOrigin) {
+				return true
 			}
 		}
+
+		// if no allowed origins match
 		return false
 	}
 }
