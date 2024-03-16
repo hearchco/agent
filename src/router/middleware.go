@@ -19,7 +19,7 @@ func setupMiddlewares(app *fiber.App, lgr zerolog.Logger, frontendUrls []string)
 	// use zerolog middleware
 	app.Use(fiberzerolog.New(fiberzerolog.Config{
 		Logger:   &lgr,
-		SkipURIs: []string{"/healthz"},
+		SkipURIs: []string{"/livez", "/readyz"},
 		Fields: []string{
 			fiberzerolog.FieldIP,
 			fiberzerolog.FieldLatency,
