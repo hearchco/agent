@@ -162,6 +162,9 @@ func New() Config {
 					Port: 6379,
 				},
 			},
+			Proxy: Proxy{
+				Timeout: 2 * time.Second,
+			},
 		},
 		Settings: NewSettings(),
 		Categories: map[category.Name]Category{

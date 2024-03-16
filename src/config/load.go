@@ -22,6 +22,10 @@ var LogDumpLocation string = "dump/"
 
 // passed as pointer since config is modified
 func (c *Config) fromReader(rc ReaderConfig) {
+	if rc.Server.Proxy.Salt == "" {
+		log.Fatal().Msg("config.fromReader(): proxy salt is empty")
+	}
+
 	nc := Config{
 		Server: Server{
 			Port:         rc.Server.Port,
@@ -29,11 +33,15 @@ func (c *Config) fromReader(rc ReaderConfig) {
 			Cache: Cache{
 				Type: rc.Server.Cache.Type,
 				TTL: TTL{
-					Time:        moretime.ConvertFancyTime(rc.Server.Cache.TTL.Time),
-					RefreshTime: moretime.ConvertFancyTime(rc.Server.Cache.TTL.RefreshTime),
+					Time:        moretime.ConvertFromFancyTime(rc.Server.Cache.TTL.Time),
+					RefreshTime: moretime.ConvertFromFancyTime(rc.Server.Cache.TTL.RefreshTime),
 				},
 				Badger: rc.Server.Cache.Badger,
 				Redis:  rc.Server.Cache.Redis,
+			},
+			Proxy: Proxy{
+				Salt:    rc.Server.Proxy.Salt,
+				Timeout: moretime.ConvertFromFancyTime(rc.Server.Proxy.Timeout),
 			},
 		},
 		Settings:   map[engines.Name]Settings{},
@@ -83,6 +91,7 @@ func (c *Config) fromReader(rc ReaderConfig) {
 	*c = nc
 }
 
+// called when loading default config, before merging with yaml and env
 func (c Config) getReader() ReaderConfig {
 	rc := ReaderConfig{
 		Server: ReaderServer{
@@ -96,6 +105,10 @@ func (c Config) getReader() ReaderConfig {
 				},
 				Badger: c.Server.Cache.Badger,
 				Redis:  c.Server.Cache.Redis,
+			},
+			Proxy: ReaderProxy{
+				Salt:    c.Server.Proxy.Salt,
+				Timeout: moretime.ConvertToFancyTime(c.Server.Proxy.Timeout),
 			},
 		},
 		RCategories: map[category.Name]ReaderCategory{},
