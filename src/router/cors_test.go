@@ -68,6 +68,8 @@ func TestCheckOrigin(t *testing.T) {
 	}
 
 	tests := []E2ETests{
+		{"https://example.org", []string{"*"}, true},
+		{"https://example.org", []string{"**"}, false}, // since we don't accept OriginWildcard with multiple wildcards
 		{"http://localhost:5173", allowedOrigins, true},
 		{"http://localhost:8080", allowedOrigins, false},
 		{"https://hearch.co", allowedOrigins, true},
