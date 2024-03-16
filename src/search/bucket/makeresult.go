@@ -1,6 +1,7 @@
 package bucket
 
 import (
+	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/result"
 )
@@ -33,6 +34,7 @@ func MakeSEImageResult(
 	src, srcUrl, thmbUrl string,
 	origH, origW, thmbH, thmbW int,
 	seName engines.Name, sePage, seOnPageRank int,
+	salt string,
 ) result.RetrievedResult {
 
 	ser := result.RetrievedRank{
@@ -44,6 +46,7 @@ func MakeSEImageResult(
 
 	res := result.RetrievedResult{
 		URL:         urll,
+		URLHash:     anonymize.HashToSHA256B64(urll + salt),
 		Title:       title,
 		Description: desc,
 		ImageResult: result.ImageResult{
@@ -55,9 +58,10 @@ func MakeSEImageResult(
 				Height: uint(thmbH),
 				Width:  uint(thmbW),
 			},
-			ThumbnailURL: thmbUrl,
-			Source:       src,
-			SourceURL:    srcUrl,
+			ThumbnailURL:     thmbUrl,
+			ThumbnailURLHash: anonymize.HashToSHA256B64(thmbUrl + salt),
+			Source:           src,
+			SourceURL:        srcUrl,
 		},
 		Rank: ser,
 	}

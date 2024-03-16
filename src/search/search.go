@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(query string, options engines.Options, db cache.DB, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) ([]result.Result, bool) {
+func Search(query string, options engines.Options, db cache.DB, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) ([]result.Result, bool) {
 	var results []result.Result
 	var foundInDB bool
 	gerr := db.Get(query, &results)
@@ -39,7 +39,7 @@ func Search(query string, options engines.Options, db cache.DB, settings map[eng
 			Msg("Nothing found in cache, doing a clean search")
 
 		// the main line
-		results = PerformSearch(query, options, settings, categories)
+		results = PerformSearch(query, options, settings, categories, salt)
 		result.Shorten(results, 2500)
 	}
 

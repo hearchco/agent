@@ -13,7 +13,7 @@ import (
 	"github.com/hearchco/hearchco/src/search/engines"
 )
 
-func Search(c *fiber.Ctx, db cache.DB, ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) error {
+func Search(c *fiber.Ctx, db cache.DB, ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) error {
 	var query, pagesStartS, pagesMaxS, visitPagesS, locale, categoryS, userAgent, safeSearchS, mobileS string
 
 	switch c.Method() {
@@ -137,12 +137,12 @@ func Search(c *fiber.Ctx, db cache.DB, ttlConf config.TTL, settings map[engines.
 	}
 
 	// search for results in db and web, afterwards return JSON
-	results, foundInDB := search.Search(query, options, db, settings, categories)
+	results, foundInDB := search.Search(query, options, db, settings, categories, salt)
 	err = c.JSON(results)
 
 	// run even if response errored out (dropped connection?)
 	// check if results need to be cached/updated and if so do it
-	search.CacheAndUpdateResults(query, options, db, ttlConf, settings, categories, results, foundInDB)
+	search.CacheAndUpdateResults(query, options, db, ttlConf, settings, categories, results, foundInDB, salt)
 
 	return err
 }

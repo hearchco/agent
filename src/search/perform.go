@@ -18,9 +18,9 @@ import (
 )
 
 // engine_searcher -> NewEngineStarter() uses this
-type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings) []error
+type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings, string) []error
 
-func PerformSearch(query string, options engines.Options, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) []result.Result {
+func PerformSearch(query string, options engines.Options, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) []result.Result {
 	if query == "" {
 		log.Trace().Msg("Empty search query.")
 		return []result.Result{}
@@ -47,7 +47,7 @@ func PerformSearch(query string, options engines.Options, settings map[engines.N
 	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")
 
-	resultMap := runEngines(enginesToRun, query, options, settings, timings)
+	resultMap := runEngines(enginesToRun, query, options, settings, timings, salt)
 
 	log.Debug().
 		Int64("ms", time.Since(resTimer).Milliseconds()).
@@ -71,7 +71,7 @@ func PerformSearch(query string, options engines.Options, settings map[engines.N
 	return results
 }
 
-func runEngines(engs []engines.Name, query string, options engines.Options, settings map[engines.Name]config.Settings, timings config.Timings) map[string]*result.Result {
+func runEngines(engs []engines.Name, query string, options engines.Options, settings map[engines.Name]config.Settings, timings config.Timings, salt string) map[string]*result.Result {
 	config.EnabledEngines = engs
 	log.Info().
 		Int("number", len(config.EnabledEngines)).
@@ -91,7 +91,7 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 			defer wg.Done()
 			// if an error can be handled inside, it won't be returned
 			// runs the Search function in the engine package
-			errs := engineStarter[eng](context.Background(), query, &relay, options, settings[eng], timings)
+			errs := engineStarter[eng](context.Background(), query, &relay, options, settings[eng], timings, salt)
 			if len(errs) > 0 {
 				log.Error().
 					Errs("errors", errs).

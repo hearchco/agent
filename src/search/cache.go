@@ -14,6 +14,7 @@ func CacheAndUpdateResults(
 	query string, options engines.Options, db cache.DB,
 	ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category,
 	results []result.Result, foundInDB bool,
+	salt string,
 ) {
 	if !foundInDB {
 		log.Debug().
@@ -45,7 +46,7 @@ func CacheAndUpdateResults(
 				Str("queryAnon", anonymize.String(query)).
 				Str("queryHash", anonymize.HashToSHA256B64(query)).
 				Msg("Updating results...")
-			newResults := PerformSearch(query, options, settings, categories)
+			newResults := PerformSearch(query, options, settings, categories, salt)
 			uerr := db.Set(query, newResults, ttlConf.Time)
 			if uerr != nil {
 				// Error in updating cache is not returned, just logged

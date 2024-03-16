@@ -46,6 +46,7 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 
 		result := result.Result{
 			URL:         seResult.URL,
+			URLHash:     seResult.URLHash,
 			Rank:        0,
 			Title:       seResult.Title,
 			Description: seResult.Description,

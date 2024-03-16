@@ -27,7 +27,7 @@ func New(lgr zerolog.Logger, conf config.Config, db cache.DB, serveProfiler bool
 	})
 
 	setupMiddlewares(app, lgr, conf.Server.FrontendUrls)
-	setupRoutes(app, db, conf.Server.Cache.TTL, conf.Settings, conf.Categories, conf.Server.Proxy)
+	setupRoutes(app, db, conf)
 
 	if serveProfiler {
 		app.Use(pprof.New())
