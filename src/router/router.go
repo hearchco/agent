@@ -2,12 +2,11 @@ package router
 
 import (
 	"context"
+	"net/http"
 	"strconv"
-	"sync"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/pprof"
+	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
@@ -15,58 +14,59 @@ import (
 	"github.com/hearchco/hearchco/src/config"
 )
 
-// it's okay to store pointer since fiber.New() returns a pointer
+// it's okay to store pointer since chi.NewRouter() returns a pointer
 type RouterWrapper struct {
-	app  *fiber.App
+	mux  *chi.Mux
 	port int
 }
 
 func New(lgr zerolog.Logger, conf config.Config, db cache.DB, serveProfiler bool) RouterWrapper {
-	app := fiber.New(fiber.Config{
-		DisableStartupMessage: true,
-	})
+	mux := chi.NewRouter()
 
-	setupMiddlewares(app, lgr, conf.Server.FrontendUrls)
-	setupRoutes(app, db, conf)
+	setupMiddlewares(mux, lgr, conf.Server.FrontendUrls, serveProfiler)
+	setupRoutes(mux, db, conf)
 
-	if serveProfiler {
-		app.Use(pprof.New())
-	}
-
-	return RouterWrapper{app: app, port: conf.Server.Port}
+	return RouterWrapper{mux: mux, port: conf.Server.Port}
 }
 
 func (rw RouterWrapper) Start(ctx context.Context) {
-	// shutdown on signal interrupt
-	var serverShutdown sync.WaitGroup
+	// create server
+	srv := http.Server{
+		Addr:    ":" + strconv.Itoa(rw.port),
+		Handler: rw.mux,
+	}
+
+	log.Info().
+		Int("port", rw.port).
+		Msg("Starting server")
+
+	// shut down server gracefully on context cancellation
 	go func() {
 		<-ctx.Done()
-		log.Info().Msg("Gracefully shutting down router...")
-		serverShutdown.Add(1)
-		defer serverShutdown.Done()
-		err := rw.app.ShutdownWithTimeout(60 * time.Second)
+		log.Info().Msg("Shutting down server")
+
+		// create a context with timeout of 5 seconds
+		timeout, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		// shutdown gracefully
+		// after timeout is reached, server will be shut down forcefully
+		err := srv.Shutdown(timeout)
 		if err != nil {
 			log.Error().
 				Err(err).
-				Msg("Router shut down failed")
+				Msg("Server shut down failed")
 		} else {
 			log.Info().
-				Msg("Router shut down")
+				Msg("Server shut down")
 		}
 	}()
 
-	// startup
-	log.Info().
-		Int("port", rw.port).
-		Msg("Started router")
-
-	err := rw.app.Listen(":" + strconv.Itoa(rw.port))
-	if err != nil {
+	// start server
+	err := srv.ListenAndServe()
+	if err != nil && err != http.ErrServerClosed {
 		log.Fatal().
 			Err(err).
-			Msg("Failed starting the router")
+			Msg("Failed to start server")
 	}
-
-	// wait for graceful shutdown with timeout
-	serverShutdown.Wait()
 }

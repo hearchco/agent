@@ -1,10 +1,11 @@
 package router
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/gotypelimits"
@@ -13,71 +14,61 @@ import (
 	"github.com/hearchco/hearchco/src/search/engines"
 )
 
-func Search(c *fiber.Ctx, db cache.DB, ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) error {
-	var query, pagesStartS, pagesMaxS, visitPagesS, locale, categoryS, userAgent, safeSearchS, mobileS string
+// returns response body, header and error
+func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) error {
+	r.ParseForm()
+	params := r.Form
 
-	switch c.Method() {
-	case "", "GET":
-		{
-			query = c.Query("q")
-			pagesStartS = c.Query("start", "1")
-			pagesMaxS = c.Query("pages", "1")
-			visitPagesS = c.Query("deep", "false")
-			locale = c.Query("locale", config.DefaultLocale)
-			categoryS = c.Query("category", "")
-			userAgent = c.Query("useragent", "")
-			safeSearchS = c.Query("safesearch", "false")
-			mobileS = c.Query("mobile", "false")
-		}
-	case "POST":
-		{
-			query = c.FormValue("q")
-			pagesStartS = c.FormValue("start", "1")
-			pagesMaxS = c.FormValue("pages", "1")
-			visitPagesS = c.FormValue("deep", "false")
-			locale = c.FormValue("locale", config.DefaultLocale)
-			categoryS = c.FormValue("category", "")
-			userAgent = c.FormValue("useragent", "")
-			safeSearchS = c.FormValue("safesearch", "false")
-			mobileS = c.FormValue("mobile", "false")
-		}
-	}
+	query := getParamOrDefault(params, "q")
+	pagesStartS := getParamOrDefault(params, "start", "1")
+	pagesMaxS := getParamOrDefault(params, "pages", "1")
+	visitPagesS := getParamOrDefault(params, "deep", "false")
+	locale := getParamOrDefault(params, "locale", config.DefaultLocale)
+	categoryS := getParamOrDefault(params, "category", "")
+	userAgent := getParamOrDefault(params, "useragent", "")
+	safeSearchS := getParamOrDefault(params, "safesearch", "false")
+	mobileS := getParamOrDefault(params, "mobile", "false")
 
 	// TODO: implement more cases when query is useless to process
 	if query == "" {
 		// return empty array of objects
-		return c.Status(fiber.StatusBadRequest).JSON([]struct{}{})
+		res, err := json.Marshal([]struct{}{})
+		if err != nil {
+			// server error
+			writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("failed to marshal empty array: %v", err))
+			return err
+		}
+		writeResponseJSON(w, http.StatusOK, res)
+		return nil
 	}
 
 	pagesMax, err := strconv.Atoi(pagesMaxS)
 	if err != nil {
-		return c.Status(fiber.StatusUnprocessableEntity).JSON(ErrorResponse{
-			Message: "Cannot convert pages value to int",
-			Value:   pagesMaxS,
-		})
+		// user error
+		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert pages value (%v) to int: %v", pagesMaxS, err))
+		return nil
 	}
+
 	// TODO: make upper limit configurable
 	pagesMaxUpperLimit := 10
 	if pagesMax < 1 || pagesMax > pagesMaxUpperLimit {
-		return c.Status(fiber.StatusBadRequest).JSON(ErrorResponse{
-			Message: fmt.Sprintf("Pages value must be at least 1 and at most %v", pagesMaxUpperLimit),
-			Value:   pagesMaxS,
-		})
+		// user error
+		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("pages value must be at least 1 and at most %v", pagesMaxUpperLimit))
+		return nil
 	}
 
 	pagesStart, err := strconv.Atoi(pagesStartS)
 	if err != nil {
-		return c.Status(fiber.StatusUnprocessableEntity).JSON(ErrorResponse{
-			Message: "Cannot convert start value to int",
-			Value:   pagesStartS,
-		})
+		// user error
+		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert start value (%v) to int: %v", pagesStartS, err))
+		return nil
 	}
+
 	// make sure that pagesStart can be safely added to pagesMax
 	if pagesStart < 1 || pagesStart > gotypelimits.MaxInt-pagesMaxUpperLimit {
-		return c.Status(fiber.StatusBadRequest).JSON(ErrorResponse{
-			Message: "Start value must be at least 1",
-			Value:   pagesStartS,
-		})
+		// user error
+		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("start value must be at least 1 and at most %v", gotypelimits.MaxInt-pagesMaxUpperLimit))
+		return nil
 	} else {
 		// since it's >=1, we decrement it to match the 0-based index
 		pagesStart -= 1
@@ -85,42 +76,37 @@ func Search(c *fiber.Ctx, db cache.DB, ttlConf config.TTL, settings map[engines.
 
 	visitPages, err := strconv.ParseBool(visitPagesS)
 	if err != nil {
-		return c.Status(fiber.StatusUnprocessableEntity).JSON(ErrorResponse{
-			Message: "Cannot convert deep value to bool",
-			Value:   visitPagesS,
-		})
+		// user error
+		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert deep value (%v) to bool: %v", visitPagesS, err))
+		return nil
 	}
 
 	err = engines.ValidateLocale(locale)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(ErrorResponse{
-			Message: "Invalid locale value, should be of the form \"en_US\"",
-			Value:   locale,
-		})
+		// user error
+		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("invalid locale value (%v): %v", locale, err))
+		return nil
 	}
 
 	categoryName := category.SafeFromString(categoryS)
 	if categoryName == category.UNDEFINED {
-		return c.Status(fiber.StatusBadRequest).JSON(ErrorResponse{
-			Message: "Invalid category value",
-			Value:   categoryS,
-		})
+		// user error
+		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("invalid category value (%v)", categoryS))
+		return nil
 	}
 
 	safeSearch, err := strconv.ParseBool(safeSearchS)
 	if err != nil {
-		return c.Status(fiber.StatusUnprocessableEntity).JSON(ErrorResponse{
-			Message: "Cannot convert safesearch value to bool",
-			Value:   safeSearchS,
-		})
+		// user error
+		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert safesearch value (%v) to bool: %v", safeSearchS, err))
+		return nil
 	}
 
 	mobile, err := strconv.ParseBool(mobileS)
 	if err != nil {
-		return c.Status(fiber.StatusUnprocessableEntity).JSON(ErrorResponse{
-			Message: "Cannot convert mobile value to bool",
-			Value:   mobileS,
-		})
+		// user error
+		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert mobile value (%v) to bool: %v", mobileS, err))
+		return nil
 	}
 
 	options := engines.Options{
@@ -138,11 +124,17 @@ func Search(c *fiber.Ctx, db cache.DB, ttlConf config.TTL, settings map[engines.
 
 	// search for results in db and web, afterwards return JSON
 	results, foundInDB := search.Search(query, options, db, settings, categories, salt)
-	err = c.JSON(results)
+	resultsJson, err := json.Marshal(results)
+	if err != nil {
+		// server error
+		writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("failed to marshal results: %v", err))
+		return err
+	}
 
-	// run even if response errored out (dropped connection?)
-	// check if results need to be cached/updated and if so do it
+	// send response as soon as possible
+	writeResponseJSON(w, http.StatusOK, []byte(resultsJson))
+	// don't return immediately, we want to cache results and update them if necessary
 	search.CacheAndUpdateResults(query, options, db, ttlConf, settings, categories, results, foundInDB, salt)
 
-	return err
+	return nil
 }

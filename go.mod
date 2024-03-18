@@ -8,9 +8,9 @@ require (
 	github.com/alecthomas/kong v0.9.0
 	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/fxamacker/cbor/v2 v2.6.0
+	github.com/go-chi/chi/v5 v5.0.12
+	github.com/go-chi/cors v1.2.1
 	github.com/gocolly/colly/v2 v2.1.1-0.20231020184023-3c987f1982ed
-	github.com/gofiber/contrib/fiberzerolog v1.0.0
-	github.com/gofiber/fiber/v2 v2.52.2
 	github.com/knadh/koanf/parsers/yaml v0.1.0
 	github.com/knadh/koanf/providers/env v0.1.0
 	github.com/knadh/koanf/providers/file v0.1.0
@@ -25,7 +25,6 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
-	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/bits-and-blooms/bitset v1.13.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
@@ -40,21 +39,16 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/flatbuffers v24.3.7+incompatible // indirect
 	github.com/google/pprof v0.0.0-20240227163752-401108e1b7e7 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.17.7 // indirect
 	github.com/knadh/koanf/maps v0.1.1 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
-	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/nlnwa/whatwg-url v0.4.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
+	github.com/rs/xid v1.5.0 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.52.0 // indirect
-	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/mod v0.16.0 // indirect

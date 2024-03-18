@@ -1,22 +1,50 @@
 package router
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog/log"
 
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/config"
 )
 
-func setupRoutes(app *fiber.App, db cache.DB, conf config.Config) {
-	app.Get("/search", func(c *fiber.Ctx) error {
-		return Search(c, db, conf.Server.Cache.TTL, conf.Settings, conf.Categories, conf.Server.Proxy.Salt)
+func setupRoutes(mux *chi.Mux, db cache.DB, conf config.Config) {
+	mux.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		writeResponse(w, http.StatusOK, "OK")
 	})
 
-	app.Post("/search", func(c *fiber.Ctx) error {
-		return Search(c, db, conf.Server.Cache.TTL, conf.Settings, conf.Categories, conf.Server.Proxy.Salt)
+	mux.Get("/search", func(w http.ResponseWriter, r *http.Request) {
+		err := Search(w, r, db, conf.Server.Cache.TTL, conf.Settings, conf.Categories, conf.Server.Proxy.Salt)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("path", r.URL.Path).
+				Str("method", r.Method).
+				Msg("Failed to search")
+		}
 	})
 
-	app.Get("/proxy", func(c *fiber.Ctx) error {
-		return Proxy(c, conf.Server.Proxy.Salt, conf.Server.Proxy.Timeout)
+	mux.Post("/search", func(w http.ResponseWriter, r *http.Request) {
+		err := Search(w, r, db, conf.Server.Cache.TTL, conf.Settings, conf.Categories, conf.Server.Proxy.Salt)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("path", r.URL.Path).
+				Str("method", r.Method).
+				Msg("Failed to search")
+		}
+	})
+
+	mux.Get("/proxy", func(w http.ResponseWriter, r *http.Request) {
+		err := Proxy(w, r, conf.Server.Proxy.Salt, conf.Server.Proxy.Timeout)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("path", r.URL.Path).
+				Str("method", r.Method).
+				Msg("Failed to proxy")
+		}
 	})
 }
