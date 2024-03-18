@@ -8,7 +8,7 @@ import (
 	"github.com/rs/zerolog/hlog"
 )
 
-func ignored(path string, skipPaths []string) bool {
+func ignoredPath(path string, skipPaths []string) bool {
 	for _, p := range skipPaths {
 		if p == path {
 			return true
@@ -21,7 +21,7 @@ func zerologMiddleware(lgr zerolog.Logger, skipPaths []string) [](func(http.Hand
 	newHandler := hlog.NewHandler(lgr)
 	fieldsHandler := hlog.AccessHandler(func(r *http.Request, status int, size int, duration time.Duration) {
 		// skip logging for ignored paths
-		if ignored(r.URL.Path, skipPaths) {
+		if ignoredPath(r.URL.Path, skipPaths) {
 			return
 		}
 
