@@ -1,5 +1,9 @@
 package router_test
 
+/* Left in case we need it in future
+   It was written when switching to GoFiber but
+   go-chi was used instead */
+
 // import (
 // 	"testing"
 
