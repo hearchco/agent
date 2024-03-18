@@ -16,7 +16,13 @@ import (
 
 // returns response body, header and error
 func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) error {
-	r.ParseForm()
+	err := r.ParseForm()
+	if err != nil {
+		// server error
+		writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("failed to parse form: %v", err))
+		return err
+	}
+
 	params := r.Form
 
 	query := getParamOrDefault(params, "q")
@@ -45,7 +51,7 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	pagesMax, err := strconv.Atoi(pagesMaxS)
 	if err != nil {
 		// user error
-		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert pages value (%v) to int: %v", pagesMaxS, err))
+		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert pages value to int: %v", err))
 		return nil
 	}
 
@@ -60,7 +66,7 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	pagesStart, err := strconv.Atoi(pagesStartS)
 	if err != nil {
 		// user error
-		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert start value (%v) to int: %v", pagesStartS, err))
+		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert start value to int: %v", err))
 		return nil
 	}
 
@@ -77,35 +83,35 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	visitPages, err := strconv.ParseBool(visitPagesS)
 	if err != nil {
 		// user error
-		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert deep value (%v) to bool: %v", visitPagesS, err))
+		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert deep value to bool: %v", err))
 		return nil
 	}
 
 	err = engines.ValidateLocale(locale)
 	if err != nil {
 		// user error
-		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("invalid locale value (%v): %v", locale, err))
+		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("invalid locale value: %v", err))
 		return nil
 	}
 
 	categoryName := category.SafeFromString(categoryS)
 	if categoryName == category.UNDEFINED {
 		// user error
-		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("invalid category value (%v)", categoryS))
+		writeResponse(w, http.StatusBadRequest, "invalid category value")
 		return nil
 	}
 
 	safeSearch, err := strconv.ParseBool(safeSearchS)
 	if err != nil {
 		// user error
-		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert safesearch value (%v) to bool: %v", safeSearchS, err))
+		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert safesearch value to bool: %v", err))
 		return nil
 	}
 
 	mobile, err := strconv.ParseBool(mobileS)
 	if err != nil {
 		// user error
-		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert mobile value (%v) to bool: %v", mobileS, err))
+		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert mobile value to bool: %v", err))
 		return nil
 	}
 

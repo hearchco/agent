@@ -11,7 +11,13 @@ import (
 )
 
 func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeout time.Duration) error {
-	r.ParseForm()
+	err := r.ParseForm()
+	if err != nil {
+		// server error
+		writeResponse(w, http.StatusInternalServerError, "failed to parse form")
+		return err
+	}
+
 	params := r.Form
 
 	urlParam := getParamOrDefault(params, "url")
