@@ -33,6 +33,10 @@ func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeout time.Dur
 	if !anonymize.CheckHash(hashParam, urlParam, salt) {
 		// user error
 		writeResponse(w, http.StatusUnauthorized, "invalid hash")
+		log.Debug().
+			Str("url", urlParam).
+			Str("hash", hashParam).
+			Msg("Invalid hash")
 		return nil
 	}
 
@@ -41,6 +45,9 @@ func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeout time.Dur
 	if err != nil {
 		// user error
 		writeResponse(w, http.StatusBadRequest, "invalid url")
+		log.Debug().
+			Str("url", urlParam).
+			Msg("Invalid url")
 		return nil
 	}
 
