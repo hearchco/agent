@@ -58,6 +58,11 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			resultJson := metadata.Result
 			textInGridJson := metadata.TextInGrid
 
+			// google images sometimes inverts original height and width
+			if (thmbImg.Height > thmbImg.Width) != (origImg.Height > origImg.Width) {
+				origImg.Height, origImg.Width = origImg.Width, origImg.Height
+			}
+			
 			if resultJson.ReferrerUrl != "" && origImg.Url != "" && thmbImg.Url != "" {
 				res := bucket.MakeSEImageResult(
 					origImg.Url, resultJson.PageTitle, textInGridJson.Snippet,
