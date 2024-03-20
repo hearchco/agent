@@ -1,12 +1,14 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"time"
 
 	"github.com/hearchco/hearchco/src/anonymize"
+	"github.com/hearchco/hearchco/src/search/useragent"
 	"github.com/rs/zerolog/log"
 )
 
@@ -51,19 +53,29 @@ func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeout time.Dur
 		return nil
 	}
 
-	log.Debug().
-		Str("url", target.String()).
-		Msg("Proxying request")
+	// create new request
+	nr := &http.Request{
+		URL: target,
+		Header: map[string][]string{
+			"User-Agent":      {useragent.RandomUserAgent()},
+			"Accept":          {"image/avif", "image/webp", "*/*"},
+			"Accept-Encoding": {"gzip", "deflate", "br"},
+			"Sec-GPC":         {"1"}, // don't share info with 3rd parties
+			"DNT":             {"1"}, // do not track
+		},
+	}
+
+	log.Trace().
+		Str("request", fmt.Sprint(nr)).
+		Msg("Created new request")
 
 	// TODO: implement timeout
 	// proxy the request
-	rp := httputil.ReverseProxy{Director: func(r *http.Request) {
-		r.URL.Scheme = target.Scheme
-		r.URL.Host = target.Host
-		r.URL.Path = target.Path
-		r.Host = target.Host
-	}}
-	rp.ServeHTTP(w, r)
+	rp := httputil.ReverseProxy{Director: func(r *http.Request) {}}
+	log.Debug().
+		Str("url", target.String()).
+		Msg("Proxying request")
+	rp.ServeHTTP(w, nr) // use new request
 
 	return nil
 }
