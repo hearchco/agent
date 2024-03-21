@@ -38,7 +38,7 @@ func setupRoutes(mux *chi.Mux, db cache.DB, conf config.Config) {
 	})
 
 	mux.Get("/proxy", func(w http.ResponseWriter, r *http.Request) {
-		err := Proxy(w, r, conf.Server.Proxy.Salt, conf.Server.Proxy.Timeout)
+		err := Proxy(w, r, conf.Server.Proxy.Salt, conf.Server.Proxy.Timeouts)
 		if err != nil {
 			log.Error().
 				Err(err).

@@ -163,7 +163,11 @@ func New() Config {
 				},
 			},
 			Proxy: Proxy{
-				Timeout: 2 * time.Second,
+				Timeouts: ProxyTimeouts{
+					Dial:         3 * time.Second,
+					KeepAlive:    3 * time.Second,
+					TLSHandshake: 2 * time.Second,
+				},
 			},
 		},
 		Settings: NewSettings(),

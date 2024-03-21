@@ -40,8 +40,12 @@ func (c *Config) fromReader(rc ReaderConfig) {
 				Redis:  rc.Server.Cache.Redis,
 			},
 			Proxy: Proxy{
-				Salt:    rc.Server.Proxy.Salt,
-				Timeout: moretime.ConvertFromFancyTime(rc.Server.Proxy.Timeout),
+				Salt: rc.Server.Proxy.Salt,
+				Timeouts: ProxyTimeouts{
+					Dial:         moretime.ConvertFromFancyTime(rc.Server.Proxy.Timeouts.Dial),
+					KeepAlive:    moretime.ConvertFromFancyTime(rc.Server.Proxy.Timeouts.KeepAlive),
+					TLSHandshake: moretime.ConvertFromFancyTime(rc.Server.Proxy.Timeouts.TLSHandshake),
+				},
 			},
 		},
 		Settings:   map[engines.Name]Settings{},
@@ -107,8 +111,12 @@ func (c Config) getReader() ReaderConfig {
 				Redis:  c.Server.Cache.Redis,
 			},
 			Proxy: ReaderProxy{
-				Salt:    c.Server.Proxy.Salt,
-				Timeout: moretime.ConvertToFancyTime(c.Server.Proxy.Timeout),
+				Salt: c.Server.Proxy.Salt,
+				Timeouts: ReaderProxyTimeouts{
+					Dial:         moretime.ConvertToFancyTime(c.Server.Proxy.Timeouts.Dial),
+					KeepAlive:    moretime.ConvertToFancyTime(c.Server.Proxy.Timeouts.KeepAlive),
+					TLSHandshake: moretime.ConvertToFancyTime(c.Server.Proxy.Timeouts.TLSHandshake),
+				},
 			},
 		},
 		RCategories: map[category.Name]ReaderCategory{},

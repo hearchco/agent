@@ -2,17 +2,18 @@ package router
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"time"
 
 	"github.com/hearchco/hearchco/src/anonymize"
+	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/search/useragent"
 	"github.com/rs/zerolog/log"
 )
 
-func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeout time.Duration) error {
+func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeouts config.ProxyTimeouts) error {
 	err := r.ParseForm()
 	if err != nil {
 		// server error
@@ -69,9 +70,17 @@ func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeout time.Dur
 		Str("request", fmt.Sprint(nr)).
 		Msg("Created new request")
 
-	// TODO: implement timeout
-	// proxy the request
+	// create reverse proxy with timeout
 	rp := httputil.ReverseProxy{Director: func(r *http.Request) {}}
+	rp.Transport = &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout:   timeouts.Dial,
+			KeepAlive: timeouts.KeepAlive,
+		}).DialContext,
+		TLSHandshakeTimeout: timeouts.TLSHandshake,
+	}
+
+	// proxy the request
 	log.Debug().
 		Str("url", target.String()).
 		Msg("Proxying request")

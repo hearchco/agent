@@ -81,13 +81,24 @@ type Cache struct {
 	Redis  Redis
 }
 
+type ReaderProxyTimeouts struct {
+	Dial         string `koanf:"dial"`
+	KeepAlive    string `koanf:"keepalive"`
+	TLSHandshake string `koanf:"tlshandshake"`
+}
+type ProxyTimeouts struct {
+	Dial         time.Duration
+	KeepAlive    time.Duration
+	TLSHandshake time.Duration
+}
+
 type ReaderProxy struct {
-	Salt    string `koanf:"salt"`
-	Timeout string `koanf:"timeout"`
+	Salt     string              `koanf:"salt"`
+	Timeouts ReaderProxyTimeouts `koanf:"timeouts"`
 }
 type Proxy struct {
-	Salt    string
-	Timeout time.Duration
+	Salt     string
+	Timeouts ProxyTimeouts
 }
 
 // ReaderServer is format in which the config is read from the config file
