@@ -17,6 +17,10 @@ func HashToSHA256B64(orig string) string {
 	return hashedString
 }
 
+func HashToSHA256B64Salted(orig string, salt string) string {
+	return HashToSHA256B64(orig + salt)
+}
+
 func CheckHash(hash string, orig string, salt string) bool {
-	return hash == HashToSHA256B64(orig+salt)
+	return hash == HashToSHA256B64Salted(orig, salt)
 }

@@ -46,7 +46,7 @@ func MakeSEImageResult(
 
 	res := result.RetrievedResult{
 		URL:         urll,
-		URLHash:     anonymize.HashToSHA256B64(urll + salt),
+		URLHash:     anonymize.HashToSHA256B64Salted(urll, salt),
 		Title:       title,
 		Description: desc,
 		ImageResult: result.ImageResult{
@@ -59,7 +59,7 @@ func MakeSEImageResult(
 				Width:  uint(thmbW),
 			},
 			ThumbnailURL:     thmbUrl,
-			ThumbnailURLHash: anonymize.HashToSHA256B64(thmbUrl + salt),
+			ThumbnailURLHash: anonymize.HashToSHA256B64Salted(thmbUrl, salt),
 			Source:           src,
 			SourceURL:        srcUrl,
 		},
