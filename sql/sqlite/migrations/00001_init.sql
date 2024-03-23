@@ -1,3 +1,4 @@
+-- +goose Up
 -- general results
 CREATE TABLE results (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,3 +35,8 @@ CREATE TABLE engine_ranks (
   result_id INTEGER NOT NULL,
   FOREIGN KEY (result_id) REFERENCES results (id) ON DELETE CASCADE
 );
+
+-- +goose Down
+DROP TABLE engine_ranks;
+DROP TABLE image_results;
+DROP TABLE results;

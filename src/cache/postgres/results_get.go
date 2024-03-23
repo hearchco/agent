@@ -8,7 +8,7 @@ import (
 	"github.com/hearchco/hearchco/src/search/result"
 )
 
-func createResultFromRow(row GetResultsByQueryWithEngineRanksNotOlderThanXminutesRow) (result.Result, error) {
+func createResultFromRow(row GetResultsByQueryWithEngineRanksNotOlderThanTimestampRow) (result.Result, error) {
 	engName, err := engines.NameString(row.EngineName)
 	if err != nil {
 		return result.Result{}, err
@@ -34,9 +34,9 @@ func createResultFromRow(row GetResultsByQueryWithEngineRanksNotOlderThanXminute
 }
 
 func (db DB) GetResults(query string) ([]result.Result, error) {
-	rows, err := db.queries.GetResultsByQueryWithEngineRanksNotOlderThanXminutes(db.ctx, GetResultsByQueryWithEngineRanksNotOlderThanXminutesParams{
-		Query:   query,
-		Column2: db.ttl,
+	rows, err := db.queries.GetResultsByQueryWithEngineRanksNotOlderThanTimestamp(db.ctx, GetResultsByQueryWithEngineRanksNotOlderThanTimestampParams{
+		Query:     query,
+		CreatedAt: db.Timestamp(),
 	})
 	if err != nil {
 		return []result.Result{}, fmt.Errorf("failed to get results: %w", err)
@@ -87,7 +87,7 @@ func (db DB) GetResults(query string) ([]result.Result, error) {
 	return results, nil
 }
 
-func createImageResultFromRow(row GetImageResultsByQueryWithEngineRanksNotOlderThanXminutesRow, salt string) (result.Result, error) {
+func createImageResultFromRow(row GetImageResultsByQueryWithEngineRanksNotOlderThanTimestampRow, salt string) (result.Result, error) {
 	engName, err := engines.NameString(row.EngineName)
 	if err != nil {
 		return result.Result{}, err
@@ -126,9 +126,9 @@ func createImageResultFromRow(row GetImageResultsByQueryWithEngineRanksNotOlderT
 }
 
 func (db DB) GetImageResults(query string, salt string) ([]result.Result, error) {
-	rows, err := db.queries.GetImageResultsByQueryWithEngineRanksNotOlderThanXminutes(db.ctx, GetImageResultsByQueryWithEngineRanksNotOlderThanXminutesParams{
-		Query:   query,
-		Column2: db.ttl,
+	rows, err := db.queries.GetImageResultsByQueryWithEngineRanksNotOlderThanTimestamp(db.ctx, GetImageResultsByQueryWithEngineRanksNotOlderThanTimestampParams{
+		Query:     query,
+		CreatedAt: db.Timestamp(),
 	})
 	if err != nil {
 		return []result.Result{}, fmt.Errorf("failed to get image results: %w", err)

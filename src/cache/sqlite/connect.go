@@ -14,7 +14,7 @@ import (
 
 type DB struct {
 	ctx     context.Context
-	ttl     uint64 // in minutes
+	ttl     time.Duration
 	db      *sql.DB
 	queries *Queries
 }
@@ -43,9 +43,13 @@ func Connect(ctx context.Context, ttl time.Duration, conf config.SQLite) (DB, er
 		return DB{}, err
 	}
 
-	return DB{ctx, uint64(ttl.Minutes()), db, New(db)}, nil
+	return DB{ctx, ttl, db, New(db)}, nil
 }
 
 func (db DB) Close() error {
 	return db.db.Close()
+}
+
+func (db DB) Timestamp() time.Time {
+	return time.Now().Add(-db.ttl)
 }
