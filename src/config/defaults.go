@@ -149,7 +149,7 @@ func New() Config {
 			Port:         3030,
 			FrontendUrls: []string{"http://localhost:5173"},
 			Cache: Cache{
-				Type: "badger",
+				Type: "sqlite",
 				TTL: TTL{
 					Time:        moretime.Week,
 					RefreshTime: 3 * moretime.Day,
