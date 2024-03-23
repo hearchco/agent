@@ -4,30 +4,30 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-type ImageFormat struct {
-	Height uint
-	Width  uint
+// Everything about some Result, calculated and compiled from multiple search engines
+// The URL is the primary key
+type Result struct {
+	URL         string
+	URLHash     string // don't store in cache since private salt might change
+	Rank        uint
+	Score       float64
+	Title       string
+	Description string
+	ImageResult ImageResult
+	EngineRanks []RetrievedRank
+	Response    *colly.Response // don't store in cache since it's too big
 }
 
 type ImageResult struct {
 	Original         ImageFormat
 	Thumbnail        ImageFormat
 	ThumbnailURL     string
-	ThumbnailURLHash string
+	ThumbnailURLHash string // don't store in cache since private salt might change
 	Source           string
 	SourceURL        string
 }
 
-// Everything about some Result, calculated and compiled from multiple search engines
-// The URL is the primary key
-type Result struct {
-	URL         string
-	URLHash     string
-	Rank        uint
-	Score       float64
-	Title       string
-	Description string
-	EngineRanks []RetrievedRank
-	ImageResult ImageResult
-	Response    *colly.Response
+type ImageFormat struct {
+	Height uint
+	Width  uint
 }

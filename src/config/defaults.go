@@ -154,12 +154,12 @@ func New() Config {
 					Time:        moretime.Week,
 					RefreshTime: 3 * moretime.Day,
 				},
-				Badger: Badger{
+				SQLite: SQLite{
 					Persist: true,
+					Path:    "database/hearchco.db",
 				},
-				Redis: Redis{
-					Host: "localhost",
-					Port: 6379,
+				Postgres: Postgres{
+					URI: "postgres://postgres:postgres@localhost:5432/postgres",
 				},
 			},
 			Proxy: Proxy{

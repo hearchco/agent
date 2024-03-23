@@ -11,7 +11,7 @@ import (
 )
 
 func CacheAndUpdateResults(
-	query string, options engines.Options, db cache.DB,
+	query string, cat category.Name, options engines.Options, db cache.DB,
 	ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category,
 	results []result.Result, foundInDB bool,
 	salt string,
@@ -21,10 +21,17 @@ func CacheAndUpdateResults(
 			Str("queryAnon", anonymize.String(query)).
 			Str("queryHash", anonymize.HashToSHA256B64(query)).
 			Msg("Caching results...")
-		serr := db.Set(query, results, ttlConf.Time)
-		if serr != nil {
+
+		var err error
+		if cat == category.IMAGES {
+			err = db.SetImageResults(query, results)
+		} else {
+			err = db.SetResults(query, results)
+		}
+
+		if err != nil {
 			log.Error().
-				Err(serr).
+				Err(err).
 				Str("queryAnon", anonymize.String(query)).
 				Str("queryHash", anonymize.HashToSHA256B64(query)).
 				Msg("cli.Run(): error updating database with search results")
@@ -34,24 +41,37 @@ func CacheAndUpdateResults(
 			Str("queryAnon", anonymize.String(query)).
 			Str("queryHash", anonymize.HashToSHA256B64(query)).
 			Msg("Checking if results need to be updated")
-		ttl, terr := db.GetTTL(query)
-		if terr != nil {
+
+		age, err := db.GetAge(query)
+		if err != nil {
 			log.Error().
-				Err(terr).
+				Err(err).
 				Str("queryAnon", anonymize.String(query)).
 				Str("queryHash", anonymize.HashToSHA256B64(query)).
 				Msg("cli.Run(): error getting TTL from database")
-		} else if ttl < ttlConf.RefreshTime {
+		}
+
+		if age > ttlConf.RefreshTime {
 			log.Info().
 				Str("queryAnon", anonymize.String(query)).
 				Str("queryHash", anonymize.HashToSHA256B64(query)).
 				Msg("Updating results...")
+
 			newResults := PerformSearch(query, options, settings, categories, salt)
-			uerr := db.Set(query, newResults, ttlConf.Time)
-			if uerr != nil {
+			var err error
+
+			// TODO: make this first delete old results and then add new ones
+			// or update the old results with new data (?)
+			if cat == category.IMAGES {
+				err = db.SetImageResults(query, newResults)
+			} else {
+				err = db.SetResults(query, newResults)
+			}
+
+			if err != nil {
 				// Error in updating cache is not returned, just logged
 				log.Error().
-					Err(uerr).
+					Err(err).
 					Str("queryAnon", anonymize.String(query)).
 					Str("queryHash", anonymize.HashToSHA256B64(query)).
 					Msg("cli.Run(): error replacing old results while updating database")

@@ -45,7 +45,7 @@ func main() {
 	conf.Load(cliFlags.DataDirPath, cliFlags.LogDirPath)
 
 	// setup cache
-	db, err := cache.New(ctx, cliFlags.DataDirPath, conf.Server.Cache)
+	db, err := cache.New(ctx, conf.Server.Cache)
 	if err != nil {
 		log.Fatal().
 			Err(err).

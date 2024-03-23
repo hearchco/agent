@@ -10,21 +10,27 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(query string, options engines.Options, db cache.DB, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) ([]result.Result, bool) {
+func Search(query string, options engines.Options, db cache.DB, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) ([]result.Result, bool, category.Name) {
 	var results []result.Result
-	var foundInDB bool
-	gerr := db.Get(query, &results)
-	if gerr != nil {
+	var err error
+
+	_, cat := category.GetCategory(query, options.Category)
+	if cat == category.IMAGES {
+		results, err = db.GetImageResults(query, salt)
+	} else {
+		results, err = db.GetResults(query)
+	}
+
+	foundInDB := false
+	if err != nil {
 		// Error in reading cache is not returned, just logged
 		log.Error().
-			Err(gerr).
+			Err(err).
 			Str("queryAnon", anonymize.String(query)).
 			Str("queryHash", anonymize.HashToSHA256B64(query)).
 			Msg("cli.Run(): failed accessing cache")
-	} else if results != nil {
+	} else if len(results) > 0 {
 		foundInDB = true
-	} else {
-		foundInDB = false
 	}
 
 	if foundInDB {
@@ -43,5 +49,5 @@ func Search(query string, options engines.Options, db cache.DB, settings map[eng
 		result.Shorten(results, 2500)
 	}
 
-	return results, foundInDB
+	return results, foundInDB, cat
 }

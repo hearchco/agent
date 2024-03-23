@@ -1,0 +1,17 @@
+version: "2"
+sql:
+  - engine: "sqlite"
+    queries: "sql/sqlite/query.sql"
+    schema: "sql/sqlite/schema.sql"
+    gen:
+      go:
+        package: "sqlite"
+        out: "src/cache/sqlite"
+  - engine: "postgresql"
+    queries: "sql/postgres/query.sql"
+    schema: "sql/postgres/schema.sql"
+    gen:
+      go:
+        package: "postgres"
+        out: "src/cache/postgres"
+        sql_package: "pgx/v5"

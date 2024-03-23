@@ -12,7 +12,7 @@ import (
 
 func procBang(query string, setCategory category.Name, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) (string, category.Name, config.Timings, []engines.Name) {
 	useSpec, specEng := procSpecificEngine(query, settings)
-	goodCat, cat := procCategory(query, setCategory)
+	goodCat, cat := category.GetCategory(query, setCategory)
 	if !goodCat && !useSpec && (query != "" && query[0] == '!') {
 		// cat is set to GENERAL
 		log.Debug().
@@ -60,16 +60,4 @@ func procSpecificEngine(query string, settings map[engines.Name]config.Settings)
 	}
 
 	return false, engines.UNDEFINED
-}
-
-// returns category in the query if a valid category is present
-func procCategory(query string, setCategory category.Name) (bool, category.Name) {
-	cat := category.FromQuery(query)
-	if cat != "" {
-		return true, cat
-	} else if setCategory == "" {
-		return false, category.GENERAL
-	} else {
-		return false, setCategory
-	}
 }

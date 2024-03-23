@@ -4,30 +4,30 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hearchco/hearchco/src/cache/badger"
 	"github.com/hearchco/hearchco/src/cache/nocache"
-	"github.com/hearchco/hearchco/src/cache/redis"
+	"github.com/hearchco/hearchco/src/cache/postgres"
+	"github.com/hearchco/hearchco/src/cache/sqlite"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/rs/zerolog/log"
 )
 
-func New(ctx context.Context, fileDbPath string, cacheConf config.Cache) (DB, error) {
+func New(ctx context.Context, cacheConf config.Cache) (DB, error) {
 	var db DB
 	var err error
 
 	switch cacheConf.Type {
-	case "badger":
-		db, err = badger.New(fileDbPath, cacheConf.Badger)
+	case "sqlite", "sqlite3":
+		db, err = sqlite.Connect(ctx, cacheConf.TTL.Time, cacheConf.SQLite)
 		if err != nil {
-			err = fmt.Errorf("failed creating a badger cache: %w", err)
+			err = fmt.Errorf("failed creating sqlite cache: %w", err)
 		}
-	case "redis":
-		db, err = redis.New(ctx, cacheConf.Redis)
+	case "postgres", "postgresql":
+		db, err = postgres.Connect(ctx, cacheConf.TTL.Time, cacheConf.Postgres)
 		if err != nil {
-			err = fmt.Errorf("failed creating a redis cache: %w", err)
+			err = fmt.Errorf("failed creating postgres cache: %w", err)
 		}
 	default:
-		db, err = nocache.New()
+		db, err = nocache.Connect()
 		if err != nil {
 			err = fmt.Errorf("failed creating a nocache: %w", err)
 		}

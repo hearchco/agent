@@ -1,10 +1,16 @@
 package cache
 
-import "time"
+import (
+	"time"
+
+	"github.com/hearchco/hearchco/src/search/result"
+)
 
 type DB interface {
-	Close()
-	Set(k string, v interface{}, ttl ...time.Duration) error
-	Get(k string, o interface{}, hashed ...bool) error
-	GetTTL(k string, hashed ...bool) (time.Duration, error)
+	Close() error
+	GetResults(query string) ([]result.Result, error)
+	GetImageResults(query string, salt string) ([]result.Result, error)
+	SetResults(query string, results []result.Result) error
+	SetImageResults(query string, results []result.Result) error
+	GetAge(query string) (time.Duration, error)
 }
