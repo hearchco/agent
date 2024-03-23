@@ -156,7 +156,7 @@ func New() Config {
 				},
 				SQLite: SQLite{
 					Persist: true,
-					Path:    "database/hearchco.db",
+					Path:    "./database",
 				},
 				Postgres: Postgres{
 					URI: "postgres://postgres:postgres@localhost:5432/postgres",

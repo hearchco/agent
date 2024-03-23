@@ -3,6 +3,9 @@ package sqlite
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"os"
+	"path"
 	"time"
 
 	"github.com/hearchco/hearchco/src/config"
@@ -17,13 +20,26 @@ type DB struct {
 }
 
 func Connect(ctx context.Context, ttl time.Duration, conf config.SQLite) (DB, error) {
-	connString := conf.Path
+	connString := path.Join(conf.Path, "hearchco.db")
 	if !conf.Persist {
-		connString = ":memory:" // TODO: check if this is correct
+		connString = ":memory:"
+	} else {
+		_, err := os.Stat(conf.Path)
+		if os.IsNotExist(err) {
+			if err := os.MkdirAll(conf.Path, 0755); err != nil {
+				return DB{}, fmt.Errorf("failed creating sqlite directory (%v): %w", conf.Path, err)
+			}
+		} else if err != nil {
+			return DB{}, fmt.Errorf("failed checking sqlite directory (%v): %w", conf.Path, err)
+		}
 	}
 
 	db, err := sql.Open("sqlite", connString)
 	if err != nil {
+		return DB{}, err
+	}
+
+	if err := db.Ping(); err != nil {
 		return DB{}, err
 	}
 

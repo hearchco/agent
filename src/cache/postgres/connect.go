@@ -11,19 +11,23 @@ import (
 type DB struct {
 	ctx     context.Context
 	ttl     uint64 // in minutes
-	conn    *pgx.Conn
+	db      *pgx.Conn
 	queries *Queries
 }
 
 func Connect(ctx context.Context, ttl time.Duration, conf config.Postgres) (DB, error) {
-	conn, err := pgx.Connect(ctx, conf.URI)
+	db, err := pgx.Connect(ctx, conf.URI)
 	if err != nil {
 		return DB{}, err
 	}
 
-	return DB{ctx, uint64(ttl.Minutes()), conn, New(conn)}, nil
+	if err := db.Ping(ctx); err != nil {
+		return DB{}, err
+	}
+
+	return DB{ctx, uint64(ttl.Minutes()), db, New(db)}, nil
 }
 
 func (db DB) Close() error {
-	return db.conn.Close(db.ctx)
+	return db.db.Close(db.ctx)
 }
