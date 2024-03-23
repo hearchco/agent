@@ -22,7 +22,8 @@ type DB struct {
 func Connect(ctx context.Context, ttl time.Duration, conf config.SQLite) (DB, error) {
 	connString := path.Join(conf.Path, "hearchco.db")
 	if !conf.Persist {
-		connString = ":memory:"
+		connString = ":memory:" // TODO: doesn't work since no migrations run in app
+		return DB{}, fmt.Errorf("in-memory sqlite not supported yet")
 	} else {
 		_, err := os.Stat(conf.Path)
 		if os.IsNotExist(err) {
