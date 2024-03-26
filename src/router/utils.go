@@ -1,39 +1,39 @@
 package router
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
-
-	"github.com/rs/zerolog/log"
 )
 
-func writeResponse(w http.ResponseWriter, status int, body string) {
+func writeResponse(w http.ResponseWriter, status int, body string) error {
 	w.WriteHeader(status)
 	_, err := w.Write([]byte(body))
-	if err != nil {
-		log.Error().
-			Err(err).
-			Str("body", string(body)).
-			Msg("Error writing response")
-	}
+	return err
 }
 
-func writeResponseJSON(w http.ResponseWriter, status int, body []byte) {
+func writeResponseJSON(w http.ResponseWriter, status int, body any) error {
+	res, err := json.Marshal(body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_, werr := w.Write([]byte("internal server error"))
+		if werr != nil {
+			return fmt.Errorf("%w: %w", werr, err)
+		}
+		return err
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	_, err := w.Write(body)
-	if err != nil {
-		log.Error().
-			Err(err).
-			Str("body", string(body)).
-			Msg("Error writing response")
-	}
+	_, err = w.Write(res)
+	return err
 }
 
-func getParamOrDefault(params url.Values, key string, def ...string) string {
+func getParamOrDefault(params url.Values, key string, fallback ...string) string {
 	val := params.Get(key)
-	if val == "" && len(def) > 0 {
-		return def[0]
+	if val == "" && len(fallback) > 0 {
+		return fallback[0]
 	}
 	return val
 }

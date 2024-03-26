@@ -17,7 +17,10 @@ func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeouts config.
 	err := r.ParseForm()
 	if err != nil {
 		// server error
-		writeResponse(w, http.StatusInternalServerError, "failed to parse form")
+		werr := writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("failed to parse form: %v", err))
+		if werr != nil {
+			return fmt.Errorf("%w: %w", werr, err)
+		}
 		return err
 	}
 
@@ -28,30 +31,27 @@ func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeouts config.
 
 	if urlParam == "" || hashParam == "" {
 		// user error
-		writeResponse(w, http.StatusBadRequest, "url and hash are required")
-		return nil
+		return writeResponse(w, http.StatusBadRequest, "url and hash are required")
 	}
 
 	// check if hash is valid
 	if !anonymize.CheckHash(hashParam, urlParam, salt) {
 		// user error
-		writeResponse(w, http.StatusUnauthorized, "invalid hash")
 		log.Debug().
 			Str("url", urlParam).
 			Str("hash", hashParam).
 			Msg("Invalid hash")
-		return nil
+		return writeResponse(w, http.StatusUnauthorized, "invalid hash")
 	}
 
 	// parse the url
 	target, err := url.Parse(urlParam)
 	if err != nil {
 		// user error
-		writeResponse(w, http.StatusBadRequest, "invalid url")
 		log.Debug().
 			Str("url", urlParam).
 			Msg("Invalid url")
-		return nil
+		return writeResponse(w, http.StatusBadRequest, "invalid url")
 	}
 
 	// create new request
