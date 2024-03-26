@@ -1,6 +1,9 @@
 package router
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -17,9 +20,6 @@ func setupMiddlewares(mux *chi.Mux, lgr zerolog.Logger, frontendUrls []string, s
 	// use recovery middleware
 	mux.Use(middleware.Recoverer)
 
-	// use trailing slash middleware
-	mux.Use(middleware.StripSlashes)
-
 	// use compression middleware
 	mux.Use(compress(5)...)
 
@@ -27,7 +27,7 @@ func setupMiddlewares(mux *chi.Mux, lgr zerolog.Logger, frontendUrls []string, s
 	mux.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   frontendUrls,
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
-		AllowedHeaders:   []string{"Content-Type", "Content-Encoding", "Accept-Encoding"},
+		AllowedHeaders:   []string{"Content-Type", "Accept-Encoding"},
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
@@ -36,8 +36,13 @@ func setupMiddlewares(mux *chi.Mux, lgr zerolog.Logger, frontendUrls []string, s
 		Strs("url", frontendUrls).
 		Msg("Using CORS")
 
-	// use profiler middleware if enabled
-	if serveProfiler {
+	// use strip slashes middleware except for pprof
+	mux.Use(middleware.Maybe(middleware.StripSlashes, func(r *http.Request) bool {
+		return !strings.HasPrefix(r.URL.Path, "/debug")
+	}))
+
+	// use pprof router if enabled
+	if !serveProfiler {
 		mux.Mount("/debug", middleware.Profiler())
 	}
 }
