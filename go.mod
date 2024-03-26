@@ -6,6 +6,7 @@ toolchain go1.22.0
 
 require (
 	github.com/alecthomas/kong v0.9.0
+	github.com/andybalholm/brotli v1.1.0
 	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/fxamacker/cbor/v2 v2.6.0
 	github.com/go-chi/chi/v5 v5.0.12
@@ -37,8 +38,8 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v1.2.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/flatbuffers v24.3.7+incompatible // indirect
-	github.com/google/pprof v0.0.0-20240227163752-401108e1b7e7 // indirect
+	github.com/google/flatbuffers v24.3.25+incompatible // indirect
+	github.com/google/pprof v0.0.0-20240320155624-b11c3daa6f07 // indirect
 	github.com/klauspost/compress v1.17.7 // indirect
 	github.com/knadh/koanf/maps v0.1.1 // indirect
 	github.com/kr/pretty v0.3.1 // indirect

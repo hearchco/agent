@@ -20,8 +20,8 @@ func setupMiddlewares(mux *chi.Mux, lgr zerolog.Logger, frontendUrls []string, s
 	// use trailing slash middleware
 	mux.Use(middleware.StripSlashes)
 
-	// use gzip middleware
-	mux.Use(middleware.Compress(5))
+	// use compression middleware
+	mux.Use(compress(5)...)
 
 	// use CORS middleware
 	mux.Use(cors.Handler(cors.Options{
