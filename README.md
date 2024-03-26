@@ -89,7 +89,7 @@ Hearchco's objectives:
   + privacy - no ads and no tracking, being a proxy to protect you from Big Tech
   + customizability - ranking, filtering and microserviced for a modular design
   + bangs - engine categories with specialized ranking for specialized searches
-  + cuteness - lil hamster
+  + cuteness - lil hamster 🐹
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
