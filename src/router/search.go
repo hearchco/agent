@@ -18,7 +18,10 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	err := r.ParseForm()
 	if err != nil {
 		// server error
-		werr := writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("failed to parse form: %v", err))
+		werr := writeResponseJSON(w, http.StatusInternalServerError, ErrorResponse{
+			Message: "failed to parse form",
+			Value:   fmt.Sprintf("%v", err),
+		})
 		if werr != nil {
 			return fmt.Errorf("%w: %w", werr, err)
 		}
@@ -46,26 +49,38 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	pagesMax, err := strconv.Atoi(pagesMaxS)
 	if err != nil {
 		// user error
-		return writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert pages value to int: %v", err))
+		return writeResponseJSON(w, http.StatusUnprocessableEntity, ErrorResponse{
+			Message: "cannot convert pages value to int",
+			Value:   fmt.Sprintf("%v", err),
+		})
 	}
 
 	// TODO: make upper limit configurable
 	pagesMaxUpperLimit := 10
 	if pagesMax < 1 || pagesMax > pagesMaxUpperLimit {
 		// user error
-		return writeResponse(w, http.StatusBadRequest, fmt.Sprintf("pages value must be at least 1 and at most %v", pagesMaxUpperLimit))
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: fmt.Sprintf("pages value must be at least 1 and at most %v", pagesMaxUpperLimit),
+			Value:   "out of range",
+		})
 	}
 
 	pagesStart, err := strconv.Atoi(pagesStartS)
 	if err != nil {
 		// user error
-		return writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert start value to int: %v", err))
+		return writeResponseJSON(w, http.StatusUnprocessableEntity, ErrorResponse{
+			Message: "cannot convert start value to int",
+			Value:   fmt.Sprintf("%v", err),
+		})
 	}
 
 	// make sure that pagesStart can be safely added to pagesMax
 	if pagesStart < 1 || pagesStart > gotypelimits.MaxInt-pagesMaxUpperLimit {
 		// user error
-		return writeResponse(w, http.StatusBadRequest, fmt.Sprintf("start value must be at least 1 and at most %v", gotypelimits.MaxInt-pagesMaxUpperLimit))
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: fmt.Sprintf("start value must be at least 1 and at most %v", gotypelimits.MaxInt-pagesMaxUpperLimit),
+			Value:   "out of range",
+		})
 	} else {
 		// since it's >=1, we decrement it to match the 0-based index
 		pagesStart -= 1
@@ -74,31 +89,46 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	visitPages, err := strconv.ParseBool(visitPagesS)
 	if err != nil {
 		// user error
-		return writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert deep value to bool: %v", err))
+		return writeResponseJSON(w, http.StatusUnprocessableEntity, ErrorResponse{
+			Message: "cannot convert deep value to bool",
+			Value:   fmt.Sprintf("%v", err),
+		})
 	}
 
 	err = engines.ValidateLocale(locale)
 	if err != nil {
 		// user error
-		return writeResponse(w, http.StatusBadRequest, fmt.Sprintf("invalid locale value: %v", err))
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: "invalid locale value",
+			Value:   fmt.Sprintf("%v", err),
+		})
 	}
 
 	categoryName := category.SafeFromString(categoryS)
 	if categoryName == category.UNDEFINED {
 		// user error
-		return writeResponse(w, http.StatusBadRequest, "invalid category value")
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: "invalid category value",
+			Value:   fmt.Sprintf("%v", category.UNDEFINED),
+		})
 	}
 
 	safeSearch, err := strconv.ParseBool(safeSearchS)
 	if err != nil {
 		// user error
-		return writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert safesearch value to bool: %v", err))
+		return writeResponseJSON(w, http.StatusUnprocessableEntity, ErrorResponse{
+			Message: "cannot convert safesearch value to bool",
+			Value:   fmt.Sprintf("%v", err),
+		})
 	}
 
 	mobile, err := strconv.ParseBool(mobileS)
 	if err != nil {
 		// user error
-		return writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert mobile value to bool: %v", err))
+		return writeResponseJSON(w, http.StatusUnprocessableEntity, ErrorResponse{
+			Message: "cannot convert mobile value to bool",
+			Value:   fmt.Sprintf("%v", err),
+		})
 	}
 
 	options := engines.Options{
