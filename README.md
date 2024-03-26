@@ -191,9 +191,9 @@ Distributed under the AGPL-3.0 License. See [LICENSE](LICENSE) for more informat
 <!-- CONTACT -->
 ## Contact
 
-+ Aleksa Siriški - [@aleksasiriski](https://github.com/aleksasiriski)
-+ ? ? - [@k4lizen](https://github.com/k4lizen)
-+ Matija Kljajić - [@matijakljajic](https://github.com/matijakljajic)
++ [@aleksasiriski](https://github.com/aleksasiriski)
++ [@k4lizen](https://github.com/k4lizen)
++ [@matijakljajic](https://github.com/matijakljajic)
 
 Project Link: [https://github.com/hearchco/hearchco](https://github.com/hearchco/hearchco)
 
