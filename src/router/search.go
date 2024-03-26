@@ -1,7 +1,6 @@
 package router
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -19,7 +18,10 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	err := r.ParseForm()
 	if err != nil {
 		// server error
-		writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("failed to parse form: %v", err))
+		werr := writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("failed to parse form: %v", err))
+		if werr != nil {
+			return fmt.Errorf("%w: %w", werr, err)
+		}
 		return err
 	}
 
@@ -37,44 +39,33 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 
 	// TODO: implement more cases when query is useless to process
 	if query == "" {
-		// return empty array of objects
-		res, err := json.Marshal([]struct{}{})
-		if err != nil {
-			// server error
-			writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("failed to marshal empty array: %v", err))
-			return err
-		}
-		writeResponseJSON(w, http.StatusOK, res)
-		return nil
+		// return empty array of structs
+		return writeResponseJSON(w, http.StatusOK, []struct{}{})
 	}
 
 	pagesMax, err := strconv.Atoi(pagesMaxS)
 	if err != nil {
 		// user error
-		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert pages value to int: %v", err))
-		return nil
+		return writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert pages value to int: %v", err))
 	}
 
 	// TODO: make upper limit configurable
 	pagesMaxUpperLimit := 10
 	if pagesMax < 1 || pagesMax > pagesMaxUpperLimit {
 		// user error
-		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("pages value must be at least 1 and at most %v", pagesMaxUpperLimit))
-		return nil
+		return writeResponse(w, http.StatusBadRequest, fmt.Sprintf("pages value must be at least 1 and at most %v", pagesMaxUpperLimit))
 	}
 
 	pagesStart, err := strconv.Atoi(pagesStartS)
 	if err != nil {
 		// user error
-		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert start value to int: %v", err))
-		return nil
+		return writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert start value to int: %v", err))
 	}
 
 	// make sure that pagesStart can be safely added to pagesMax
 	if pagesStart < 1 || pagesStart > gotypelimits.MaxInt-pagesMaxUpperLimit {
 		// user error
-		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("start value must be at least 1 and at most %v", gotypelimits.MaxInt-pagesMaxUpperLimit))
-		return nil
+		return writeResponse(w, http.StatusBadRequest, fmt.Sprintf("start value must be at least 1 and at most %v", gotypelimits.MaxInt-pagesMaxUpperLimit))
 	} else {
 		// since it's >=1, we decrement it to match the 0-based index
 		pagesStart -= 1
@@ -83,36 +74,31 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	visitPages, err := strconv.ParseBool(visitPagesS)
 	if err != nil {
 		// user error
-		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert deep value to bool: %v", err))
-		return nil
+		return writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert deep value to bool: %v", err))
 	}
 
 	err = engines.ValidateLocale(locale)
 	if err != nil {
 		// user error
-		writeResponse(w, http.StatusBadRequest, fmt.Sprintf("invalid locale value: %v", err))
-		return nil
+		return writeResponse(w, http.StatusBadRequest, fmt.Sprintf("invalid locale value: %v", err))
 	}
 
 	categoryName := category.SafeFromString(categoryS)
 	if categoryName == category.UNDEFINED {
 		// user error
-		writeResponse(w, http.StatusBadRequest, "invalid category value")
-		return nil
+		return writeResponse(w, http.StatusBadRequest, "invalid category value")
 	}
 
 	safeSearch, err := strconv.ParseBool(safeSearchS)
 	if err != nil {
 		// user error
-		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert safesearch value to bool: %v", err))
-		return nil
+		return writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert safesearch value to bool: %v", err))
 	}
 
 	mobile, err := strconv.ParseBool(mobileS)
 	if err != nil {
 		// user error
-		writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert mobile value to bool: %v", err))
-		return nil
+		return writeResponse(w, http.StatusUnprocessableEntity, fmt.Sprintf("cannot convert mobile value to bool: %v", err))
 	}
 
 	options := engines.Options{
@@ -130,17 +116,13 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 
 	// search for results in db and web, afterwards return JSON
 	results, foundInDB := search.Search(query, options, db, settings, categories, salt)
-	resultsJson, err := json.Marshal(results)
-	if err != nil {
-		// server error
-		writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("failed to marshal results: %v", err))
-		return err
-	}
 
 	// send response as soon as possible
-	writeResponseJSON(w, http.StatusOK, []byte(resultsJson))
+	err = writeResponseJSON(w, http.StatusOK, results)
+
 	// don't return immediately, we want to cache results and update them if necessary
 	search.CacheAndUpdateResults(query, options, db, ttlConf, settings, categories, results, foundInDB, salt)
 
-	return nil
+	// if writing response failed, return the error
+	return err
 }

@@ -12,7 +12,14 @@ import (
 
 func setupRoutes(mux *chi.Mux, db cache.DB, conf config.Config) {
 	mux.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		writeResponse(w, http.StatusOK, "OK")
+		err := writeResponse(w, http.StatusOK, "OK")
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("path", r.URL.Path).
+				Str("method", r.Method).
+				Msg("Failed to healthz")
+		}
 	})
 
 	mux.Get("/search", func(w http.ResponseWriter, r *http.Request) {
