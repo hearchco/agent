@@ -42,7 +42,7 @@ func setupMiddlewares(mux *chi.Mux, lgr zerolog.Logger, frontendUrls []string, s
 	}))
 
 	// use pprof router if enabled
-	if !serveProfiler {
+	if serveProfiler {
 		mux.Mount("/debug", middleware.Profiler())
 	}
 }
