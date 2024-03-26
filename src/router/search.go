@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/config"
@@ -40,9 +41,8 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	safeSearchS := getParamOrDefault(params, "safesearch", "false")
 	mobileS := getParamOrDefault(params, "mobile", "false")
 
-	// TODO: implement more cases when query is useless to process
-	if query == "" {
-		// return empty array of structs
+	if query == "" || strings.TrimSpace(query) == "" || category.FromQuery(query) != "" {
+		// return "[]" JSON when the query is empty or contains only category name
 		return writeResponseJSON(w, http.StatusOK, []struct{}{})
 	}
 
