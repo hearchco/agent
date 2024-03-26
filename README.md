@@ -85,11 +85,11 @@
 [![Product Name Screen Shot][product-screenshot]](https://hearch.co)
 
 Hearchco's objectives:
-    + speed - written in Go, built with caching and concurrency
-    + privacy - no ads and no tracking, being a proxy to protect you from Big Tech
-    + customizability - ranking, filtering and microserviced for a modular design
-    + bangs - engine categories with specialized ranking for specialized searches
-    + cuteness - lil hamster
+  + speed - written in Go, built with caching and concurrency
+  + privacy - no ads and no tracking, being a proxy to protect you from Big Tech
+  + customizability - ranking, filtering and microserviced for a modular design
+  + bangs - engine categories with specialized ranking for specialized searches
+  + cuteness - lil hamster
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
