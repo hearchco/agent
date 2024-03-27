@@ -41,7 +41,8 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	safeSearchS := getParamOrDefault(params, "safesearch", "false")
 	mobileS := getParamOrDefault(params, "mobile", "false")
 
-	if query == "" || strings.TrimSpace(query) == "" || category.FromQuery(query) != "" {
+	queryWithoutSpaces := strings.TrimSpace(query)
+	if queryWithoutSpaces == "" || "!"+string(category.FromQuery(query)) == queryWithoutSpaces {
 		// return "[]" JSON when the query is empty or contains only category name
 		return writeResponseJSON(w, http.StatusOK, []struct{}{})
 	}
