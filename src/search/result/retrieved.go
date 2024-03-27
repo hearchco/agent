@@ -14,6 +14,7 @@ type RetrievedRank struct {
 // The info a Search Engine returned about some Result
 type RetrievedResult struct {
 	URL         string
+	URLHash     string
 	Title       string
 	Description string
 	ImageResult ImageResult
