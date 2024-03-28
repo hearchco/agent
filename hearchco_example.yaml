@@ -2,6 +2,8 @@ server:
   frontendurls: http://localhost:5173,https://*hearch.co,https://*hearchco-frontend.pages.dev
   cache:
     type: none
+  proxy:
+    salt: changemepls
 # categories:
 #   science:
 #     engines:

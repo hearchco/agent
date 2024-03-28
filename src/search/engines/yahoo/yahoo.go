@@ -15,7 +15,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string) []error {
 	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
 	if err != nil {
 		return []error{err}

@@ -81,6 +81,26 @@ type Cache struct {
 	Redis  Redis
 }
 
+type ReaderProxyTimeouts struct {
+	Dial         string `koanf:"dial"`
+	KeepAlive    string `koanf:"keepalive"`
+	TLSHandshake string `koanf:"tlshandshake"`
+}
+type ProxyTimeouts struct {
+	Dial         time.Duration
+	KeepAlive    time.Duration
+	TLSHandshake time.Duration
+}
+
+type ReaderProxy struct {
+	Salt     string              `koanf:"salt"`
+	Timeouts ReaderProxyTimeouts `koanf:"timeouts"`
+}
+type Proxy struct {
+	Salt     string
+	Timeouts ProxyTimeouts
+}
+
 // ReaderServer is format in which the config is read from the config file
 type ReaderServer struct {
 	// port on which the API server listens
@@ -89,11 +109,14 @@ type ReaderServer struct {
 	FrontendUrls string `koanf:"frontendurls"`
 	// cache settings
 	Cache ReaderCache `koanf:"cache"`
+	// salt used for image proxy
+	Proxy ReaderProxy `koanf:"proxy"`
 }
 type Server struct {
 	Port         int
 	FrontendUrls []string
 	Cache        Cache
+	Proxy        Proxy
 }
 
 // ReaderEngine is format in which the config is read from the config file

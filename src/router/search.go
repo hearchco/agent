@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-
-	"github.com/gin-gonic/gin"
+	"strings"
 
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/config"
@@ -15,76 +14,74 @@ import (
 	"github.com/hearchco/hearchco/src/search/engines"
 )
 
-func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) error {
-	var query, pagesStartS, pagesMaxS, visitPagesS, locale, categoryS, userAgent, safeSearchS, mobileS string
-
-	switch c.Request.Method {
-	case "", "GET":
-		{
-			query = c.Query("q")
-			pagesStartS = c.DefaultQuery("start", "1")
-			pagesMaxS = c.DefaultQuery("pages", "1")
-			visitPagesS = c.DefaultQuery("deep", "false")
-			locale = c.DefaultQuery("locale", config.DefaultLocale)
-			categoryS = c.DefaultQuery("category", "")
-			userAgent = c.DefaultQuery("useragent", "")
-			safeSearchS = c.DefaultQuery("safesearch", "false")
-			mobileS = c.DefaultQuery("mobile", "false")
+// returns response body, header and error
+func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) error {
+	err := r.ParseForm()
+	if err != nil {
+		// server error
+		werr := writeResponseJSON(w, http.StatusInternalServerError, ErrorResponse{
+			Message: "failed to parse form",
+			Value:   fmt.Sprintf("%v", err),
+		})
+		if werr != nil {
+			return fmt.Errorf("%w: %w", werr, err)
 		}
-	case "POST":
-		{
-			query = c.PostForm("q")
-			pagesStartS = c.DefaultPostForm("start", "1")
-			pagesMaxS = c.DefaultPostForm("pages", "1")
-			visitPagesS = c.DefaultPostForm("deep", "false")
-			locale = c.DefaultPostForm("locale", config.DefaultLocale)
-			categoryS = c.DefaultPostForm("category", "")
-			userAgent = c.DefaultPostForm("useragent", "")
-			safeSearchS = c.DefaultPostForm("safesearch", "false")
-			mobileS = c.DefaultPostForm("mobile", "false")
-		}
+		return err
 	}
 
-	// TODO: implement more cases when query is useless to process
-	if query == "" {
-		// return empty array of objects
-		c.JSON(http.StatusOK, []struct{}{})
-		return nil
+	params := r.Form
+
+	query := getParamOrDefault(params, "q")
+	pagesStartS := getParamOrDefault(params, "start", "1")
+	pagesMaxS := getParamOrDefault(params, "pages", "1")
+	visitPagesS := getParamOrDefault(params, "deep", "false")
+	locale := getParamOrDefault(params, "locale", config.DefaultLocale)
+	categoryS := getParamOrDefault(params, "category", "")
+	userAgent := getParamOrDefault(params, "useragent", "")
+	safeSearchS := getParamOrDefault(params, "safesearch", "false")
+	mobileS := getParamOrDefault(params, "mobile", "false")
+
+	queryWithoutSpaces := strings.TrimSpace(query)
+	if queryWithoutSpaces == "" || "!"+string(category.FromQuery(query)) == queryWithoutSpaces {
+		// return "[]" JSON when the query is empty or contains only category name
+		return writeResponseJSON(w, http.StatusOK, []struct{}{})
 	}
 
 	pagesMax, err := strconv.Atoi(pagesMaxS)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Message: "Cannot convert pages value to int",
-			Value:   pagesMaxS,
+		// user error
+		return writeResponseJSON(w, http.StatusUnprocessableEntity, ErrorResponse{
+			Message: "cannot convert pages value to int",
+			Value:   fmt.Sprintf("%v", err),
 		})
-		return fmt.Errorf("router.Search(): cannot convert pages value %q to int: %w", pagesMaxS, err)
 	}
+
 	// TODO: make upper limit configurable
 	pagesMaxUpperLimit := 10
 	if pagesMax < 1 || pagesMax > pagesMaxUpperLimit {
-		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Message: fmt.Sprintf("Pages value must be at least 1 and at most %v", pagesMaxUpperLimit),
-			Value:   pagesMaxS,
+		// user error
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: fmt.Sprintf("pages value must be at least 1 and at most %v", pagesMaxUpperLimit),
+			Value:   "out of range",
 		})
-		return fmt.Errorf("router.Search(): pages value %q must be at least 1 and at most %v", pagesMaxS, pagesMaxUpperLimit)
 	}
 
 	pagesStart, err := strconv.Atoi(pagesStartS)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Message: "Cannot convert start value to int",
-			Value:   pagesStartS,
+		// user error
+		return writeResponseJSON(w, http.StatusUnprocessableEntity, ErrorResponse{
+			Message: "cannot convert start value to int",
+			Value:   fmt.Sprintf("%v", err),
 		})
-		return fmt.Errorf("router.Search(): cannot convert start value %q to int: %w", pagesStartS, err)
 	}
+
 	// make sure that pagesStart can be safely added to pagesMax
 	if pagesStart < 1 || pagesStart > gotypelimits.MaxInt-pagesMaxUpperLimit {
-		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Message: "Start value must be at least 1",
-			Value:   pagesStartS,
+		// user error
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: fmt.Sprintf("start value must be at least 1 and at most %v", gotypelimits.MaxInt-pagesMaxUpperLimit),
+			Value:   "out of range",
 		})
-		return fmt.Errorf("router.Search(): start value %q must be at least 1", pagesStartS)
 	} else {
 		// since it's >=1, we decrement it to match the 0-based index
 		pagesStart -= 1
@@ -92,47 +89,47 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 
 	visitPages, err := strconv.ParseBool(visitPagesS)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Message: "Cannot convert deep value to bool",
-			Value:   visitPagesS,
+		// user error
+		return writeResponseJSON(w, http.StatusUnprocessableEntity, ErrorResponse{
+			Message: "cannot convert deep value to bool",
+			Value:   fmt.Sprintf("%v", err),
 		})
-		return fmt.Errorf("router.Search(): cannot convert deep value %q to int: %w", visitPagesS, err)
 	}
 
 	err = engines.ValidateLocale(locale)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Message: "Invalid locale value, should be of the form \"en_US\"",
-			Value:   locale,
+		// user error
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: "invalid locale value",
+			Value:   fmt.Sprintf("%v", err),
 		})
-		return fmt.Errorf("router.Search(): invalid locale value %q: %w", locale, err)
 	}
 
 	categoryName := category.SafeFromString(categoryS)
 	if categoryName == category.UNDEFINED {
-		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Message: "Invalid category value",
-			Value:   categoryS,
+		// user error
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: "invalid category value",
+			Value:   fmt.Sprintf("%v", category.UNDEFINED),
 		})
-		return fmt.Errorf("router.Search(): invalid category value %q", categoryS)
 	}
 
 	safeSearch, err := strconv.ParseBool(safeSearchS)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Message: "Cannot convert safesearch value to bool",
-			Value:   safeSearchS,
+		// user error
+		return writeResponseJSON(w, http.StatusUnprocessableEntity, ErrorResponse{
+			Message: "cannot convert safesearch value to bool",
+			Value:   fmt.Sprintf("%v", err),
 		})
-		return fmt.Errorf("router.Search(): cannot convert safesearch value %q to bool: %w", safeSearchS, err)
 	}
 
 	mobile, err := strconv.ParseBool(mobileS)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, ErrorResponse{
-			Message: "Cannot convert mobile value to bool",
-			Value:   mobileS,
+		// user error
+		return writeResponseJSON(w, http.StatusUnprocessableEntity, ErrorResponse{
+			Message: "cannot convert mobile value to bool",
+			Value:   fmt.Sprintf("%v", err),
 		})
-		return fmt.Errorf("router.Search(): cannot convert mobile value %q to bool: %w", mobileS, err)
 	}
 
 	options := engines.Options{
@@ -148,9 +145,15 @@ func Search(c *gin.Context, db cache.DB, ttlConf config.TTL, settings map[engine
 		Mobile:     mobile,
 	}
 
-	results, foundInDB := search.Search(query, options, db, settings, categories)
-	c.JSON(http.StatusOK, results)
+	// search for results in db and web, afterwards return JSON
+	results, foundInDB := search.Search(query, options, db, settings, categories, salt)
 
-	search.CacheAndUpdateResults(query, options, db, ttlConf, settings, categories, results, foundInDB)
-	return nil
+	// send response as soon as possible
+	err = writeResponseJSON(w, http.StatusOK, results)
+
+	// don't return immediately, we want to cache results and update them if necessary
+	search.CacheAndUpdateResults(query, options, db, ttlConf, settings, categories, results, foundInDB, salt)
+
+	// if writing response failed, return the error
+	return err
 }

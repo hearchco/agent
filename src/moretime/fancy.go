@@ -22,7 +22,15 @@ func convertToDurationWithoutLastChar(s string) time.Duration {
 	return time.Duration(handleAtoi(s[:len(s)-1]))
 }
 
-func ConvertFancyTime(fancy string) time.Duration {
+// converts 1y to 1 year
+// converts 2M to 2 month
+// converts 3w to 3 week
+// converts 4d to 4 day
+// converts 5h to 5 hour
+// converts 6m to 6 minute
+// converts 7s to 7 second
+// converts 8 to 8 millisecond
+func ConvertFromFancyTime(fancy string) time.Duration {
 	switch fancy[len(fancy)-1] {
 	case 'y':
 		return convertToDurationWithoutLastChar(fancy) * Year
@@ -43,6 +51,7 @@ func ConvertFancyTime(fancy string) time.Duration {
 	}
 }
 
+// converts to milliseconds
 func ConvertToFancyTime(d time.Duration) string {
 	return strconv.Itoa(int(d.Milliseconds()))
 }

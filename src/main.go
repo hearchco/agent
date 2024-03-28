@@ -57,17 +57,8 @@ func main() {
 	if cliFlags.Cli {
 		cli.Run(cliFlags, db, conf)
 	} else {
-		rw, err := router.New(conf.Server, cliFlags.Verbosity, lgr)
-		if err != nil {
-			log.Fatal().Err(err).Msg("main.main(): failed creating a router")
-			// ^FATAL
-		}
-
-		err = rw.Start(ctx, db, conf, cliFlags.ServeProfiler)
-		if err != nil {
-			log.Fatal().Err(err).Msg("main.main(): failed starting the router")
-			// ^FATAL
-		}
+		rw := router.New(lgr, conf, db, cliFlags.ServeProfiler)
+		rw.Start(ctx)
 	}
 
 	// program cleanup

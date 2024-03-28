@@ -2,10 +2,10 @@ package bingimages
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 	"strings"
 
-	"github.com/goccy/go-json"
 	"github.com/gocolly/colly/v2"
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/config"
@@ -15,7 +15,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings) []error {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string) []error {
 	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
 	if err != nil {
 		return []error{err}
@@ -175,6 +175,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			source, jsonMetadata.PageURL, jsonMetadata.ThumbnailURL,
 			imgH, imgW, thmbH, thmbW,
 			Info.Name, page, pageRankCounter[pageIndex]+1,
+			salt,
 		)
 		valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
 		if valid {
