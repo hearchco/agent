@@ -7,6 +7,8 @@ toolchain go1.22.0
 require (
 	github.com/alecthomas/kong v0.9.0
 	github.com/andybalholm/brotli v1.1.0
+	github.com/aws/aws-lambda-go v1.46.0
+	github.com/awslabs/aws-lambda-go-api-proxy v0.16.1
 	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/fxamacker/cbor/v2 v2.6.0
 	github.com/go-chi/chi/v5 v5.0.12
@@ -25,7 +27,7 @@ require (
 )
 
 require (
-	github.com/BurntSushi/toml v1.2.1 // indirect
+	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/bits-and-blooms/bitset v1.13.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
