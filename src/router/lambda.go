@@ -9,7 +9,7 @@ import (
 )
 
 func (rw RouterWrapper) StartLambda() {
-	lambda.Start(func(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-		return chiadapter.New(rw.mux).ProxyWithContext(ctx, req)
+	lambda.Start(func(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
+		return chiadapter.NewV2(rw.mux).ProxyWithContextV2(ctx, req)
 	})
 }
