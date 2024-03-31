@@ -103,6 +103,8 @@ type Proxy struct {
 
 // ReaderServer is format in which the config is read from the config file
 type ReaderServer struct {
+	// environment in which the server is running (normal or lambda)
+	Environment string `koanf:"environment"`
 	// port on which the API server listens
 	Port int `koanf:"port"`
 	// urls used for CORS, comma separated (wildcards allowed) and converted into slice
@@ -113,6 +115,7 @@ type ReaderServer struct {
 	Proxy ReaderProxy `koanf:"proxy"`
 }
 type Server struct {
+	Environment  string
 	Port         int
 	FrontendUrls []string
 	Cache        Cache
