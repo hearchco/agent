@@ -25,20 +25,20 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-go@v5
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
           go-version: stable
 
-      # go:generate
       - name: Generate go code from go:generate comments
         run: make install
 
-      # goreleaser snapshot
-      - name: Snapshot
+      - name: Snapshot release
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
@@ -50,19 +50,19 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
           go-version: stable
 
-      # go:generate
       - name: Generate go code from go:generate comments
         run: make install
 
-      # go:build
       - name: Build project
         run: make build
 
-      # go:test
       - name: Test units
         run: make test

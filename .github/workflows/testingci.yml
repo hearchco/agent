@@ -18,14 +18,19 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
           go-version: stable
+
       - name: Generate go code from go:generate comments
         run: make install
-      # build
+
       - name: Build project
         run: make build
 
@@ -33,6 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
     services:
       redis:
         image: redis
@@ -43,17 +49,22 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
           go-version: stable
+
       - name: Generate go code from go:generate comments
         run: make install
-      # test
+
       - name: Test units (w/o engines & redis)
         run: make test
-      # test-redis
+
       - name: Test units (only redis)
         run: make test-redis
         env:
@@ -64,14 +75,19 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
           go-version: stable
+
       - name: Generate go code from go:generate comments
         run: make install
-      # test-engines
+
       - name: Test units (only engines)
         run: make test-engines
 
@@ -81,14 +97,19 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
           go-version: stable
+
       - name: Generate go code from go:generate comments
         run: make install
-      # lint
-      - uses: golangci/golangci-lint-action@v4
+
+      - name: Run linter
+        uses: golangci/golangci-lint-action@v4
         with:
           version: latest
           skip-pkg-cache: true
