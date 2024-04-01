@@ -12,6 +12,7 @@ import (
 	"github.com/hearchco/hearchco/src/search"
 	"github.com/hearchco/hearchco/src/search/category"
 	"github.com/hearchco/hearchco/src/search/engines"
+	"github.com/hearchco/hearchco/src/search/result"
 )
 
 // returns response body, header and error
@@ -148,8 +149,17 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	// search for results in db and web, afterwards return JSON
 	results, foundInDB := search.Search(query, options, db, settings, categories, salt)
 
+	// get category from query or options
+	cat := category.FromQueryWithFallback(query, options.Category)
+
 	// send response as soon as possible
-	err = writeResponseJSON(w, http.StatusOK, results)
+	if cat == category.IMAGES {
+		resultsOutput := result.ConvertToImageOutput(results)
+		err = writeResponseJSON(w, http.StatusOK, resultsOutput)
+	} else {
+		resultsOutput := result.ConvertToGeneralOutput(results)
+		err = writeResponseJSON(w, http.StatusOK, resultsOutput)
+	}
 
 	// don't return immediately, we want to cache results and update them if necessary
 	search.CacheAndUpdateResults(query, options, db, ttlConf, settings, categories, results, foundInDB, salt)
