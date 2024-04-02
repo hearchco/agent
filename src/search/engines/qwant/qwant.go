@@ -15,7 +15,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string) []error {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string, enabledEngines int) []error {
 	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
 	if err != nil {
 		return []error{err}
@@ -39,7 +39,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			log.Error().
 				Err(err).
 				Str("engine", Info.Name.String()).
-				Str("body", string(r.Body)).
+				Bytes("body", r.Body).
 				Msg("Failed body unmarshall to json")
 		}
 
@@ -53,7 +53,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				goodLink, goodTitle, goodDesc := _sedefaults.SanitizeFields(result.URL, result.Title, result.Description)
 
 				res := bucket.MakeSEResult(goodLink, goodTitle, goodDesc, Info.Name, page, counter)
-				valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+				valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol, enabledEngines)
 				if valid {
 					counter += 1
 				}
@@ -141,7 +141,7 @@ col.OnHTML("div[data-testid=\"sectionWeb\"] > div > div", func(e *colly.HTMLElem
 		page, _ := strconv.Atoi(pageStr)
 
 		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, idx+1)
-		bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+		bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol, enabledEngines)
 	} else {
 		log.Info().
 			Str("link", linkText).

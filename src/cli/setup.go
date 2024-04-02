@@ -22,7 +22,6 @@ func Setup() Flags {
 		kong.Vars{
 			"version":      fmt.Sprintf("%v (%v@%v)", Version, GitCommit, Timestamp),
 			"data_folder":  ".",
-			"log_folder":   "./log",
 			"query_string": "banana death",
 		},
 	)
