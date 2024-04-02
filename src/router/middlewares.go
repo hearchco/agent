@@ -25,9 +25,16 @@ func setupMiddlewares(mux *chi.Mux, lgr zerolog.Logger, frontendUrls []string, s
 
 	// use CORS middleware
 	mux.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   frontendUrls,
-		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
-		AllowedHeaders:   []string{"Content-Type", "Accept-Encoding"},
+		AllowedOrigins: frontendUrls,
+		AllowedMethods: []string{"GET", "POST", "OPTIONS"},
+		AllowedHeaders: []string{
+			"Accept",
+			"Accept-Encoding",
+			"Accept-Language",
+			"Access-Control-Request-Headers",
+			"Access-Control-Request-Method",
+			"Origin",
+		},
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
