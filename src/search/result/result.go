@@ -4,30 +4,30 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-// Everything about some Result, calculated and compiled from multiple search engines
-// The URL is the primary key
-type Result struct {
-	URL         string
-	URLHash     string // don't store in cache since private salt might change
-	Rank        uint
-	Score       float64
-	Title       string
-	Description string
-	ImageResult ImageResult
-	EngineRanks []RetrievedRank
-	Response    *colly.Response // don't store in cache since it's too big
+type ImageFormat struct {
+	Height uint `json:"height"`
+	Width  uint `json:"width"`
 }
 
 type ImageResult struct {
-	Original         ImageFormat
-	Thumbnail        ImageFormat
-	ThumbnailURL     string
-	ThumbnailURLHash string // don't store in cache since private salt might change
-	Source           string
-	SourceURL        string
+	Original         ImageFormat `json:"original"`
+	Thumbnail        ImageFormat `json:"thumbnail"`
+	ThumbnailURL     string      `json:"thumbnail_url"`
+	ThumbnailURLHash string      `json:"thumbnail_url_hash,omitempty"`
+	Source           string      `json:"source"`
+	SourceURL        string      `json:"source_url"`
 }
 
-type ImageFormat struct {
-	Height uint
-	Width  uint
+// Everything about some Result, calculated and compiled from multiple search engines
+// The URL is the primary key
+type Result struct {
+	URL         string          `json:"url"`
+	URLHash     string          `json:"url_hash,omitempty"`
+	Rank        uint            `json:"rank"`
+	Score       float64         `json:"score"`
+	Title       string          `json:"title"`
+	Description string          `json:"description"`
+	EngineRanks []RetrievedRank `json:"engine_ranks"`
+	ImageResult ImageResult     `json:"image_result"`
+	Response    *colly.Response `json:"-"`
 }

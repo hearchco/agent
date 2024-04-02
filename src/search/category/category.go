@@ -43,16 +43,14 @@ func SafeFromString(cat string) Name {
 	return ret
 }
 
-// returns TRUE and category in the query if a valid category is present
-// otherwise returns FALSE and the set category if not empty
-// otherwise returns FALSE and GENERAL category
-func GetCategory(query string, setCategory Name) (bool, Name) {
+// Returns category from query or fallback or GENERAL and whether the category is from the query or not
+func FromQueryWithFallback(query string, fallback Name) (Name, bool) {
 	cat := FromQuery(query)
 	if cat != "" {
-		return true, cat
-	} else if setCategory == "" {
-		return false, GENERAL
+		return cat, true
+	} else if fallback != "" {
+		return fallback, false
 	} else {
-		return false, setCategory
+		return GENERAL, false
 	}
 }

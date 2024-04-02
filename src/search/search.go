@@ -14,7 +14,7 @@ func Search(query string, options engines.Options, db cache.DB, settings map[eng
 	var results []result.Result
 	var err error
 
-	_, cat := category.GetCategory(query, options.Category)
+	cat, _ := category.FromQueryWithFallback(query, options.Category)
 	if cat == category.IMAGES {
 		results, err = db.GetImageResults(query, salt)
 	} else {
