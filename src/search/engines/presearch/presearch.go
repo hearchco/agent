@@ -15,7 +15,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string) []error {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string, enabledEngines int) []error {
 	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
 	if err != nil {
 		return []error{err}
@@ -46,7 +46,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				log.Error().
 					Err(err).
 					Str("engine", Info.Name.String()).
-					Str("body", string(r.Body)).
+					Bytes("body", r.Body).
 					Msg("Failed body unmarshall to json")
 			}
 
@@ -55,7 +55,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				goodURL, goodTitle, goodDesc := _sedefaults.SanitizeFields(result.Link, result.Title, result.Desc)
 
 				res := bucket.MakeSEResult(goodURL, goodTitle, goodDesc, Info.Name, page, counter)
-				valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+				valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol, enabledEngines)
 				if valid {
 					counter += 1
 				}

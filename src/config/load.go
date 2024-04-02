@@ -17,9 +17,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var EnabledEngines = make([]engines.Name, 0)
-var LogDumpLocation string = "dump/"
-
 // passed as pointer since config is modified
 func (c *Config) fromReader(rc ReaderConfig) {
 	if rc.Server.Proxy.Salt == "" {
@@ -150,11 +147,8 @@ func (c Config) getReader() ReaderConfig {
 }
 
 // passed as pointer since config is modified
-func (c *Config) Load(dataDirPath string, logDirPath string) {
+func (c *Config) Load(dataDirPath string) {
 	rc := c.getReader()
-
-	// Load vars
-	loadVars(logDirPath)
 
 	// Use "." as the key path delimiter. This can be "/" or any character.
 	k := koanf.New(".")
@@ -202,8 +196,4 @@ func (c *Config) Load(dataDirPath string, logDirPath string) {
 	}
 
 	c.fromReader(rc)
-}
-
-func loadVars(logDirPath string) {
-	LogDumpLocation = path.Join(logDirPath, LogDumpLocation)
 }

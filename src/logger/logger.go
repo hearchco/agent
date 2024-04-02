@@ -1,40 +1,22 @@
 package logger
 
 import (
-	"fmt"
-	"io"
 	"os"
-	"path"
 	"time"
 
-	"github.com/natefinch/lumberjack"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
-func Setup(verbosity int8, logDirPath ...string) zerolog.Logger {
-	logWriters := []io.Writer{zerolog.ConsoleWriter{
-		TimeFormat: time.Stamp,
-		Out:        os.Stderr,
-	}}
-
-	// Generate logfile name and ConsoleWriter to file
-	if len(logDirPath) > 0 {
-		logFilePath := path.Join(logDirPath[0], fmt.Sprintf("hearchco_%v.log", time.Now().Format("20060102")))
-		logWriters = append(logWriters, zerolog.ConsoleWriter{
-			TimeFormat: time.Stamp,
-			Out: &lumberjack.Logger{
-				Filename:   logFilePath,
-				MaxSize:    5,
-				MaxAge:     14,
-				MaxBackups: 5,
-			},
-			NoColor: true,
-		})
-	}
-
+func Setup(verbosity int8, pretty bool) zerolog.Logger {
 	// Setup logger
-	logger := log.Output(io.MultiWriter(logWriters...))
+	var logger zerolog.Logger
+	// if pretty use console writer
+	if pretty {
+		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.Stamp})
+	} else {
+		logger = zerolog.New(os.Stderr).With().Timestamp().Logger()
+	}
 
 	// Setup verbosity
 	switch {
@@ -43,7 +25,7 @@ func Setup(verbosity int8, logDirPath ...string) zerolog.Logger {
 		log.Logger = logger.Level(zerolog.DebugLevel)
 	// TRACE
 	case verbosity > 1:
-		log.Logger = logger.With().Caller().Logger().Level(zerolog.TraceLevel)
+		log.Logger = logger.Level(zerolog.TraceLevel)
 	// INFO
 	default:
 		log.Logger = logger.Level(zerolog.InfoLevel)

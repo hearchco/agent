@@ -78,13 +78,12 @@ func Run(flags Flags, db cache.DB, conf config.Config) {
 
 	results, foundInDB := search.Search(flags.Query, options, db, conf.Settings, conf.Categories, conf.Server.Proxy.Salt)
 
-	duration := time.Since(start)
 	if !flags.Silent {
 		printResults(results)
 	}
 	log.Info().
 		Int("number", len(results)).
-		Int64("ms", duration.Milliseconds()).
+		Dur("duration", time.Since(start)).
 		Msg("Found results")
 
 	search.CacheAndUpdateResults(flags.Query, options, db, conf.Server.Cache.TTL, conf.Settings, conf.Categories, results, foundInDB, conf.Server.Proxy.Salt)
