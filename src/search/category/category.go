@@ -42,3 +42,14 @@ func SafeFromString(cat string) Name {
 	}
 	return ret
 }
+
+func FromQueryWithFallback(query string, fallback Name) Name {
+	cat := FromQuery(query)
+	if cat != "" {
+		return cat
+	} else if fallback != "" {
+		return fallback
+	} else {
+		return GENERAL
+	}
+}
