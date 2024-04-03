@@ -12,10 +12,9 @@ type Flags struct {
 	// flags
 	Query       string `type:"string" default:"${query_string}" env:"HEARCHCO_QUERY" help:"Query string used for search"`
 	Cli         bool   `type:"bool" default:"false" env:"HEARCHCO_CLI" help:"Use CLI mode"`
+	Pretty      bool   `type:"bool" default:"false" env:"HEARCHCO_PRETTY" help:"Make logs pretty"`
 	Silent      bool   `type:"bool" default:"false" short:"s" env:"HEARCHCO_SILENT" help:"Should results be printed"`
 	DataDirPath string `type:"path" default:"${data_folder}" env:"HEARCHCO_DATA_DIR" help:"Data folder path"`
-	LogDirPath  string `type:"path" default:"${log_folder}" env:"HEARCHCO_LOG_DIR" help:"Log folder path"`
-	LogToFile   bool   `type:"bool" default:"false" env:"HEARCHCO_LOG_TO_FILE" help:"Should logs be written to file"`
 	Verbosity   int8   `type:"counter" default:"0" short:"v" env:"HEARCHCO_VERBOSITY" help:"Log level verbosity"`
 	// options
 	StartPage  int    `type:"counter" default:"1" env:"HEARCHCO_START_PAGE" help:"Page from which to start searching (>=1)"`

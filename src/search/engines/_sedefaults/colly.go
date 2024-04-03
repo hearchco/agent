@@ -2,14 +2,10 @@ package _sedefaults
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	"github.com/gocolly/colly/v2"
-	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/search/bucket"
 	"github.com/hearchco/hearchco/src/search/engines"
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -56,24 +52,6 @@ func colError(col *colly.Collector, seName engines.Name, visiting bool) {
 				Int("statusCode", r.StatusCode).
 				Str("response", string(r.Body)). // WARN: query can be present, depending on the response from the engine (example: google has the query in 3 places)
 				Msg("_sedefaults.colError(): request error for url")
-
-			if !visiting {
-				// dump file only in Trace logging mode
-				dumpPath := fmt.Sprintf("%v%v_col.log.html", config.LogDumpLocation, seName.String())
-				log.Trace().
-					Str("engine", seName.String()).
-					Str("responsePath", dumpPath).
-					Func(func(e *zerolog.Event) {
-						bodyWriteErr := os.WriteFile(dumpPath, r.Body, 0644)
-						if bodyWriteErr != nil {
-							log.Error().
-								Err(bodyWriteErr).
-								Str("engine", seName.String()).
-								Msg("_sedefaults.colError(): error writing html response body to file")
-						}
-					}).
-					Msg("_sedefaults.colError(): html response written")
-			}
 		}
 	})
 }
