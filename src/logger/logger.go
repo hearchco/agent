@@ -11,7 +11,6 @@ import (
 func Setup(verbosity int8, pretty bool) zerolog.Logger {
 	// Setup logger
 	var logger zerolog.Logger
-	// if pretty use console writer
 	if pretty {
 		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.Stamp})
 	} else {
@@ -31,7 +30,7 @@ func Setup(verbosity int8, pretty bool) zerolog.Logger {
 		logger = logger.Level(zerolog.InfoLevel)
 	}
 
-	// set the logger to global and return it
+	// Set the logger to global and return it
 	log.Logger = logger
 	return logger
 }
