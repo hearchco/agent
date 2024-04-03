@@ -16,9 +16,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// engine_searcher -> NewEngineStarter() uses this
-type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings, string, int) []error
-
 func PerformSearch(query string, options engines.Options, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) []result.Result {
 	if query == "" {
 		log.Trace().Msg("Empty search query.")
@@ -92,7 +89,7 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 			defer wg.Done()
 			// if an error can be handled inside, it won't be returned
 			// runs the Search function in the engine package
-			errs := engineStarter[eng](context.Background(), query, &relay, options, settings[eng], timings, salt, len(engs))
+			errs := engineStarter[eng].Search(context.Background(), query, &relay, options, settings[eng], timings, salt, len(engs))
 			if len(errs) > 0 {
 				log.Error().
 					Errs("errors", errs).
