@@ -20,16 +20,18 @@ func Setup(verbosity int8, pretty bool) zerolog.Logger {
 
 	// Setup verbosity
 	switch {
-	// DEBUG
-	case verbosity == 1:
-		log.Logger = logger.Level(zerolog.DebugLevel)
 	// TRACE
 	case verbosity > 1:
-		log.Logger = logger.Level(zerolog.TraceLevel)
+		logger = logger.Level(zerolog.TraceLevel)
+	// DEBUG
+	case verbosity == 1:
+		logger = logger.Level(zerolog.DebugLevel)
 	// INFO
 	default:
-		log.Logger = logger.Level(zerolog.InfoLevel)
+		logger = logger.Level(zerolog.InfoLevel)
 	}
 
+	// set the logger to global and return it
+	log.Logger = logger
 	return logger
 }
