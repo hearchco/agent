@@ -58,9 +58,8 @@ func PerformSearch(query string, options engines.Options, settings map[engines.N
 
 	results := rank.Rank(resultMap, categories[options.Category].Ranking)
 
-	rankTimeSince := time.Since(rankTimer)
 	log.Debug().
-		Dur("duration", rankTimeSince).
+		Dur("duration", time.Since(rankTimer)).
 		Msg("Finished ranking")
 
 	log.Debug().
