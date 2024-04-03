@@ -1,14 +1,13 @@
 ---
-name: Feature request for search engine
-about: Ask for adding a new search engine
-title: "[FEAT/SE]"
-labels: 'enhancement'
-assignees: ''
-
+name: Feature request
+about: Ask for adding a new feature
+title: "[FEAT]"
+labels: "enhancement"
+assignees: ""
 ---
 
 **Describe your feature request**
-Create a module for parsing [search engine name](https://example.com) search results
+A clear and concise description of what the feature request is.
 
 **Screenshots**
 If applicable, add screenshots to help explain your request.
