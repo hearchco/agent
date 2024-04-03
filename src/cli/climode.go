@@ -81,6 +81,7 @@ func Run(flags Flags, db cache.DB, conf config.Config) {
 	if !flags.Silent {
 		printResults(results)
 	}
+
 	log.Info().
 		Int("number", len(results)).
 		Dur("duration", time.Since(start)).

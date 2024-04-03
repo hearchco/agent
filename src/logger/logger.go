@@ -10,26 +10,27 @@ import (
 
 func Setup(verbosity int8, pretty bool) zerolog.Logger {
 	// Setup logger
-	var logger zerolog.Logger
-	// if pretty use console writer
+	var lgr zerolog.Logger
 	if pretty {
-		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.Stamp})
+		lgr = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.Stamp})
 	} else {
-		logger = zerolog.New(os.Stderr).With().Timestamp().Logger()
+		lgr = zerolog.New(os.Stderr).With().Timestamp().Logger()
 	}
 
 	// Setup verbosity
 	switch {
-	// DEBUG
-	case verbosity == 1:
-		log.Logger = logger.Level(zerolog.DebugLevel)
 	// TRACE
 	case verbosity > 1:
-		log.Logger = logger.Level(zerolog.TraceLevel)
+		lgr = lgr.With().Caller().Logger().Level(zerolog.TraceLevel)
+	// DEBUG
+	case verbosity == 1:
+		lgr = lgr.Level(zerolog.DebugLevel)
 	// INFO
 	default:
-		log.Logger = logger.Level(zerolog.InfoLevel)
+		lgr = lgr.Level(zerolog.InfoLevel)
 	}
 
-	return logger
+	// Set the logger to global and return it
+	log.Logger = lgr
+	return lgr
 }
