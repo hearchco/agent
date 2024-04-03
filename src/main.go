@@ -69,8 +69,8 @@ func main() {
 			Dur("duration", time.Since(mainTimer)).
 			Msg("Program finished")
 	} else {
-		// router mode could be running for a very long time
 		log.Info().
+			Dur("duration", time.Since(mainTimer)).
 			Msg("Program finished")
 	}
 }
