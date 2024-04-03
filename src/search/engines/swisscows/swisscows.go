@@ -15,7 +15,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string) []error {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string, enabledEngines int) []error {
 	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
 	if err != nil {
 		return []error{err}
@@ -69,7 +69,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 			goodLink, goodTitle, goodDesc := _sedefaults.SanitizeFields(result.URL, result.Title, result.Desc)
 
 			res := bucket.MakeSEResult(goodLink, goodTitle, goodDesc, Info.Name, page, counter)
-			valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+			valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol, enabledEngines)
 			if valid {
 				counter += 1
 			}
@@ -126,7 +126,7 @@ col.OnHTML("div.web-results > article.item-web", func(e *colly.HTMLElement) {
 		page, _ := strconv.Atoi(pageStr)
 
 		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, pageRankCounter[page]+1)
-		bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol)
+		bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol, enabledEngines)
 		pageRankCounter[page]++
 	} else {
 		log.Trace().

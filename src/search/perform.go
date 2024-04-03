@@ -2,7 +2,6 @@ package search
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 	"sync"
 	"time"
@@ -18,7 +17,7 @@ import (
 )
 
 // engine_searcher -> NewEngineStarter() uses this
-type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings, string) []error
+type EngineSearch func(context.Context, string, *bucket.Relay, engines.Options, config.Settings, config.Timings, string, int) []error
 
 func PerformSearch(query string, options engines.Options, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) []result.Result {
 	if query == "" {
@@ -70,10 +69,14 @@ func PerformSearch(query string, options engines.Options, settings map[engines.N
 }
 
 func runEngines(engs []engines.Name, query string, options engines.Options, settings map[engines.Name]config.Settings, timings config.Timings, salt string) map[string]*result.Result {
-	config.EnabledEngines = engs
+	engsStrs := make([]string, 0, len(engs))
+	for _, eng := range engs {
+		engsStrs = append(engsStrs, eng.String())
+	}
+
 	log.Info().
-		Int("number", len(config.EnabledEngines)).
-		Str("engines", fmt.Sprintf("%v", config.EnabledEngines)).
+		Int("number", len(engs)).
+		Strs("engines", engsStrs).
 		Msg("Enabled engines")
 
 	relay := bucket.Relay{
@@ -89,7 +92,7 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 			defer wg.Done()
 			// if an error can be handled inside, it won't be returned
 			// runs the Search function in the engine package
-			errs := engineStarter[eng](context.Background(), query, &relay, options, settings[eng], timings, salt)
+			errs := engineStarter[eng](context.Background(), query, &relay, options, settings[eng], timings, salt, len(engs))
 			if len(errs) > 0 {
 				log.Error().
 					Errs("errors", errs).
