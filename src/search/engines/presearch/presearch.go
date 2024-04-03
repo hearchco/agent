@@ -46,7 +46,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 				log.Error().
 					Err(err).
 					Str("engine", Info.Name.String()).
-					Str("body", string(r.Body)).
+					Bytes("body", r.Body).
 					Msg("Failed body unmarshall to json")
 			}
 

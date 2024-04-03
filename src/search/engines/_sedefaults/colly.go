@@ -50,7 +50,7 @@ func colError(col *colly.Collector, seName engines.Name, visiting bool) {
 				Str("engine", seName.String()).
 				// Str("url", urll). // can't reliably anonymize it (because it's engine dependent)
 				Int("statusCode", r.StatusCode).
-				Str("response", string(r.Body)). // WARN: query can be present, depending on the response from the engine (example: google has the query in 3 places)
+				Bytes("response", r.Body). // WARN: query can be present, depending on the response from the engine (example: google has the query in 3 places)
 				Msg("_sedefaults.colError(): request error for url")
 		}
 	})
