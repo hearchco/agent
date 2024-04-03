@@ -84,7 +84,7 @@ func Run(flags Flags, db cache.DB, conf config.Config) {
 	}
 	log.Info().
 		Int("number", len(results)).
-		Int64("ms", duration.Milliseconds()).
+		Dur("duration", duration).
 		Msg("Found results")
 
 	search.CacheAndUpdateResults(flags.Query, options, db, conf.Server.Cache.TTL, conf.Settings, conf.Categories, results, foundInDB, conf.Server.Proxy.Salt)

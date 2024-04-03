@@ -66,7 +66,7 @@ func main() {
 
 	if cliFlags.Cli {
 		log.Debug().
-			Int64("ms", time.Since(mainTimer).Milliseconds()).
+			Dur("duration", time.Since(mainTimer)).
 			Msg("Program finished")
 	} else {
 		// router mode could be running for a very long time

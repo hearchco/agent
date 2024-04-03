@@ -81,8 +81,7 @@ func (db DB) Set(k string, v interface{}, ttl ...time.Duration) error {
 	} else {
 		cacheTimeSince := time.Since(cacheTimer)
 		log.Trace().
-			Int64("ms", cacheTimeSince.Milliseconds()).
-			Int64("ns", cacheTimeSince.Nanoseconds()).
+			Dur("duration", cacheTimeSince).
 			Msg("Cached results")
 	}
 

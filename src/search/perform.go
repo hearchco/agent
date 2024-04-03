@@ -50,7 +50,7 @@ func PerformSearch(query string, options engines.Options, settings map[engines.N
 	resultMap := runEngines(enginesToRun, query, options, settings, timings, salt)
 
 	log.Debug().
-		Int64("ms", time.Since(resTimer).Milliseconds()).
+		Dur("duration", time.Since(resTimer)).
 		Msg("Got results")
 
 	rankTimer := time.Now()
@@ -60,12 +60,11 @@ func PerformSearch(query string, options engines.Options, settings map[engines.N
 
 	rankTimeSince := time.Since(rankTimer)
 	log.Debug().
-		Int64("ms", rankTimeSince.Milliseconds()).
-		Int64("ns", rankTimeSince.Nanoseconds()).
+		Dur("duration", rankTimeSince).
 		Msg("Finished ranking")
 
 	log.Debug().
-		Int64("ms", time.Since(searchTimer).Milliseconds()).
+		Dur("duration", time.Since(searchTimer)).
 		Msg("Found results")
 
 	return results
