@@ -56,13 +56,29 @@ func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeouts config.
 
 	// create new request
 	nr := &http.Request{
-		URL: target,
+		Method: http.MethodGet,
+		URL:    target,
+		Host:   target.Host,
+		// RemoteAddr: "127.0.0.1", // TODO: implement server IP getting (should be cached)
+		RequestURI: target.RequestURI(),
+		Proto:      "HTTP/1.1",
+		ProtoMajor: 1,
+		ProtoMinor: 1,
 		Header: map[string][]string{
-			"User-Agent":      {useragent.RandomUserAgent()},
-			"Accept":          {"image/avif", "image/webp", "*/*"},
-			"Accept-Encoding": {"gzip", "deflate", "br"},
-			"Sec-GPC":         {"1"}, // don't share info with 3rd parties
-			"DNT":             {"1"}, // do not track
+			"Accept":             {"image/avif", "image/webp", "*/*"},
+			"Accept-Encoding":    {"gzip", "deflate", "br"},
+			"Accept-Language":    {"en-US,en;q=0.5"},
+			"Connection":         {"keep-alive"},
+			"DNT":                {"1"}, // do not track
+			"sec-ch-ua":          {`"Google Chrome";v="118", "Chromium";v="118", "Not=A?Brand";v="24"`},
+			"sec-ch-ua-mobile":   {"?0"},
+			"sec-ch-ua-platform": {"\"Windows\""},
+			"Sec-Fetch-Dest":     {"image"},
+			"Sec-Fetch-Mode":     {"no-cors"},
+			"Sec-Fetch-Site":     {"same-site"},
+			"Sec-GPC":            {"1"}, // don't share info with 3rd parties
+			"TE":                 {"trailers"},
+			"User-Agent":         {useragent.RandomUserAgent()},
 		},
 	}
 
