@@ -177,7 +177,7 @@ func New() Config {
 				Engines: NewGeneral(),
 				Ranking: NewRanking(),
 				Timings: Timings{
-					Timeout:     1500 * time.Millisecond,
+					Timeout:     1000 * time.Millisecond,
 					PageTimeout: 1000 * time.Millisecond,
 				},
 			},
@@ -186,14 +186,14 @@ func New() Config {
 				Ranking: NewRanking(),
 				Timings: Timings{
 					Timeout:     1500 * time.Millisecond,
-					PageTimeout: 1000 * time.Millisecond,
+					PageTimeout: 1500 * time.Millisecond,
 				},
 			},
 			category.INFO: {
 				Engines: NewInfo(),
 				Ranking: NewRanking(),
 				Timings: Timings{
-					Timeout:     1500 * time.Millisecond,
+					Timeout:     1000 * time.Millisecond,
 					PageTimeout: 1000 * time.Millisecond,
 				},
 			},
@@ -209,7 +209,7 @@ func New() Config {
 				Engines: NewAllEnabled(),
 				Ranking: NewRanking(),
 				Timings: Timings{
-					Timeout:     1500 * time.Millisecond,
+					Timeout:     1000 * time.Millisecond,
 					PageTimeout: 1000 * time.Millisecond,
 				},
 			},
@@ -233,7 +233,7 @@ func New() Config {
 				Engines: NewAllEnabled(),
 				Ranking: NewRanking(),
 				Timings: Timings{
-					Timeout:     1500 * time.Millisecond,
+					Timeout:     1000 * time.Millisecond,
 					PageTimeout: 1000 * time.Millisecond,
 				},
 			},
