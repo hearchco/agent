@@ -11,7 +11,7 @@ primary_region = "cdg"
 
 [env]
   HEARCHCO_SERVER_CACHE_TYPE = "none" # currently caching has some bugs so it's disabled
-  HEARCHCO_SERVER_FRONTENDURLS = "http://localhost:5173,https://*hearch.co,https://*hearchco-frontend.pages.dev"
+  HEARCHCO_SERVER_FRONTENDURLS = "http://localhost:5173,https://hearch.co,https://frontend-*-hearchco.vercel.app"
 
 [http_service]
   internal_port = 3030
