@@ -79,10 +79,8 @@ func (db DB) Set(k string, v interface{}, ttl ...time.Duration) error {
 	}); err != nil {
 		return fmt.Errorf("badger.Set(): error setting KV to badger: %w", err)
 	} else {
-		cacheTimeSince := time.Since(cacheTimer)
 		log.Trace().
-			Int64("ms", cacheTimeSince.Milliseconds()).
-			Int64("ns", cacheTimeSince.Nanoseconds()).
+			Dur("duration", time.Since(cacheTimer)).
 			Msg("Cached results")
 	}
 
