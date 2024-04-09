@@ -13,7 +13,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string, enabledEngines int) []error {
+func Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string, nEnabledEngines int) []error {
 	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
 	if err != nil {
 		return []error{err}
@@ -46,7 +46,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		page := pageIndex + options.Pages.Start + 1
 
 		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, pageRankCounter[pageIndex]+1)
-		valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol, enabledEngines)
+		valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol, nEnabledEngines)
 		if valid {
 			pageRankCounter[pageIndex]++
 		}
