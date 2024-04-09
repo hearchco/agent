@@ -318,8 +318,8 @@ func (f *File) genDecl(node ast.Node) bool {
 func (g *Generator) buildOneRun(values []Value) {
 	g.Printf("\n")
 	// The generated code is simple enough to write as a Printf format.
-	g.Printf("\nfunc NewEngineStarter() [%d]Engine {", len(values))
-	g.Printf("\n\tvar engineArray [%d]Engine", len(values))
+	g.Printf("\nfunc NewEngineStarter() [%d]Searcher {", len(values))
+	g.Printf("\n\tvar engineArray [%d]Searcher", len(values))
 	for _, v := range values {
 		if validConst(v) {
 			g.Printf("\n\tengineArray[%s.%s] = %s.New()", g.pkg.name, v.name, strings.ToLower(v.name))
