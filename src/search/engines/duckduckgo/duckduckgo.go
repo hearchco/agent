@@ -22,7 +22,7 @@ func New() Engine {
 	return Engine{}
 }
 
-func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string, enabledEngines int) []error {
+func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string, nEnabledEngines int) []error {
 	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
 	if err != nil {
 		return []error{err}
@@ -75,7 +75,7 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 				}
 
 				res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, page, (i/4 + 1))
-				bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol, enabledEngines)
+				bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol, nEnabledEngines)
 			}
 		})
 	})

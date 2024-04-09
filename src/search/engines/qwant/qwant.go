@@ -21,7 +21,7 @@ func New() Engine {
 	return Engine{}
 }
 
-func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string, enabledEngines int) []error {
+func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.Timings, salt string, nEnabledEngines int) []error {
 	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
 	if err != nil {
 		return []error{err}
@@ -59,7 +59,7 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 				goodLink, goodTitle, goodDesc := _sedefaults.SanitizeFields(result.URL, result.Title, result.Description)
 
 				res := bucket.MakeSEResult(goodLink, goodTitle, goodDesc, Info.Name, page, counter)
-				valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol, enabledEngines)
+				valid := bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol, nEnabledEngines)
 				if valid {
 					counter += 1
 				}
@@ -147,7 +147,7 @@ col.OnHTML("div[data-testid=\"sectionWeb\"] > div > div", func(e *colly.HTMLElem
 		page, _ := strconv.Atoi(pageStr)
 
 		res := bucket.MakeSEResult(linkText, titleText, descText, Info.Name, -1, page, idx+1)
-		bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol, enabledEngines)
+		bucket.AddSEResult(&res, Info.Name, relay, options, pagesCol, nEnabledEngines)
 	} else {
 		log.Info().
 			Str("link", linkText).
