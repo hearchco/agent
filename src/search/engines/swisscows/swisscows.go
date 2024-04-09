@@ -58,7 +58,7 @@ func Search(ctx context.Context, query string, relay *bucket.Relay, options engi
 		if err != nil {
 			log.Error().
 				Err(err).
-				Str("body", string(r.Body)).
+				Bytes("body", r.Body).
 				Msg("swisscows.Search() -> col.OnResponse(): failed body unmarshall to json")
 
 			return

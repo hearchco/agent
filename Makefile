@@ -1,17 +1,17 @@
 run:
-	air
+	air --pretty
 run-cli:
-	go run ./src --cli
+	go run ./src --cli --pretty
 
 debug:
-	air -- -v
+	air -- -v --pretty
 debug-cli:
-	go run ./srv -v --cli
+	go run ./srv -v --cli --pretty
 
 trace:
-	air -- -vv
+	air -- -vv --pretty
 trace-cli:
-	go run ./src -vv --cli
+	go run ./src -vv --cli --pretty
 
 install:
 	go get ./...
