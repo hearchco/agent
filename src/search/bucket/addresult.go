@@ -2,7 +2,6 @@ package bucket
 
 import (
 	"github.com/gocolly/colly/v2"
-	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/result"
 	"github.com/rs/zerolog/log"
@@ -10,7 +9,7 @@ import (
 
 // Checks if the retrieved result is valid. Makes a result object and adds it to the relay.
 // Returns true if the result is valid (false otherwise).
-func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *Relay, options engines.Options, pagesCol *colly.Collector) bool {
+func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *Relay, options engines.Options, pagesCol *colly.Collector, nEnabledEngines int) bool {
 	if seResult == nil {
 		log.Error().
 			Str("engine", seName.String()).
@@ -41,7 +40,7 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 
 	if !exists {
 		// create engine ranks slice with capacity of enabled engines
-		engineRanks := make([]result.RetrievedRank, 0, len(config.EnabledEngines))
+		engineRanks := make([]result.RetrievedRank, 0, nEnabledEngines)
 		engineRanks = append(engineRanks, seResult.Rank)
 
 		result := result.Result{

@@ -17,8 +17,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var EnabledEngines = make([]engines.Name, 0)
-
 // passed as pointer since config is modified
 func (c *Config) fromReader(rc ReaderConfig) {
 	if rc.Server.Proxy.Salt == "" {
