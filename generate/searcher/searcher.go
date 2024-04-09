@@ -195,7 +195,7 @@ func (g *Generator) generate(typeName string) {
 	}
 	g.Printf("}\n")
 
-	g.buildOneRun(values, typeName)
+	g.buildOneRun(values)
 }
 
 // format returns the gofmt-ed contents of the Generator's buffer.
@@ -315,16 +315,16 @@ func (f *File) genDecl(node ast.Node) bool {
 }
 
 // buildOneRun generates the variables and NewEngineStarter func for a single run of contiguous values.
-func (g *Generator) buildOneRun(values []Value, typeName string) {
+func (g *Generator) buildOneRun(values []Value) {
 	g.Printf("\n")
 	// The generated code is simple enough to write as a Printf format.
-	g.Printf("\nfunc NewEngineStarter() []EngineSearch {")
-	g.Printf("\n\tmm := make([]EngineSearch, %d)", len(values))
+	g.Printf("\nfunc NewEngineStarter() [%d]Searcher {", len(values))
+	g.Printf("\n\tvar engineArray [%d]Searcher", len(values))
 	for _, v := range values {
 		if validConst(v) {
-			g.Printf("\n\tmm[%s.%s] = %s.Search", g.pkg.name, v.name, strings.ToLower(v.name))
+			g.Printf("\n\tengineArray[%s.%s] = %s.New()", g.pkg.name, v.name, strings.ToLower(v.name))
 		}
 	}
-	g.Printf("\n\treturn mm")
+	g.Printf("\n\treturn engineArray")
 	g.Printf("\n}")
 }
