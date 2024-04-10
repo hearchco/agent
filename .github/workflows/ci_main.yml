@@ -4,7 +4,7 @@ on:
   push:
     branches: ["main"]
     paths:
-      - ".github/workflows/dockerci.yml" # this file
+      - ".github/workflows/ci_main.yml" # this file
       - "go.mod"
       - "go.sum"
       - "Makefile"

@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: ["*"]
     paths:
-      - ".github/workflows/testingci.yml" # this file
+      - ".github/workflows/ci_test.yml" # this file
       - "go.mod"
       - "go.sum"
       - "Makefile"
