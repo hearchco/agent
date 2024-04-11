@@ -130,25 +130,34 @@ type ReaderEngine struct {
 // ReaderTimings is format in which the config is read from the config file
 // in miliseconds
 type ReaderTimings struct {
-	PreferredTimeout  uint `koanf:"preferredtimeout"`
-	AdditionalTimeout uint `koanf:"additionaltimeout"`
-	Timeout           uint `koanf:"timeout"`
-	PageTimeout       uint `koanf:"pagetimeout"`
-	Delay             uint `koanf:"delay"`
-	RandomDelay       uint `koanf:"randomdelay"`
-	Parallelism       int  `koanf:"parallelism"`
+	PreferredTimeout        uint `koanf:"preferredtimeout"`
+	PreferredTimeoutResults int  `koanf:"preferredtimeoutresults"`
+	AdditionalTimeout       uint `koanf:"additionaltimeout"`
+	HardTimeout             uint `koanf:"hardtimeout"`
+	Timeout                 uint `koanf:"timeout"`
+	PageTimeout             uint `koanf:"pagetimeout"`
+	Delay                   uint `koanf:"delay"`
+	RandomDelay             uint `koanf:"randomdelay"`
+	Parallelism             int  `koanf:"parallelism"`
 }
 
 // Delegates Timeout, PageTimeout to colly.Collector.SetRequestTimeout(); Note: See https://github.com/gocolly/colly/issues/644
 // Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit()
 type Timings struct {
-	PreferredTimeout  time.Duration
+	// preferred timeout if enough results are found
+	PreferredTimeout time.Duration
+	// number of results which if not met will trigger the additional timeout
+	PreferredTimeoutResults int
+	// additional timeout if not enough results are found (delay after which the number of results is checked)
 	AdditionalTimeout time.Duration
-	Timeout           time.Duration
-	PageTimeout       time.Duration
-	Delay             time.Duration
-	RandomDelay       time.Duration
-	Parallelism       int
+	// hard timeout after which the search is forcefully stopped
+	HardTimeout time.Duration
+	// colly settings
+	Timeout     time.Duration
+	PageTimeout time.Duration
+	Delay       time.Duration
+	RandomDelay time.Duration
+	Parallelism int
 }
 
 // ReaderCategory is format in which the config is read from the config file

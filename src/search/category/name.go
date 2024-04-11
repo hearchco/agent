@@ -9,8 +9,5 @@ const (
 	IMAGES    Name = "images"
 	INFO      Name = "info"
 	SCIENCE   Name = "science"
-	NEWS      Name = "news"
-	BLOG      Name = "blog"
-	SURF      Name = "surf"
-	NEWNEWS   Name = "newnews"
+	ALL       Name = "all"
 )
