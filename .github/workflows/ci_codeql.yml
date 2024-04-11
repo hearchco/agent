@@ -1,0 +1,65 @@
+name: CodeQL CI
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/ci_codeql.yml" # this file
+      - "go.mod"
+      - "go.sum"
+      - "Makefile"
+      - "generate/**/*"
+      - "src/**/*"
+  pull_request:
+    branches: ["*"]
+    paths:
+      - ".github/workflows/ci_codeql.yml" # this file
+      - "go.mod"
+      - "go.sum"
+      - "Makefile"
+      - "generate/**/*"
+      - "src/**/*"
+  schedule:
+    - cron: "38 14 * * 3"
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ["go"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Generate go code from go:generate comments
+        run: make install
+
+      - name: Build project
+        run: make build
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{matrix.language}}"
+        env:
+          HEARCHCO_CLI: true

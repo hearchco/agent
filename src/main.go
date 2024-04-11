@@ -49,7 +49,12 @@ func main() {
 		cli.Run(cliFlags, db, conf)
 	} else {
 		rw := router.New(lgr, conf, db, cliFlags.ServeProfiler)
-		rw.Start(ctx)
+		switch conf.Server.Environment {
+		case "lambda":
+			rw.StartLambda()
+		default:
+			rw.Start(ctx)
+		}
 	}
 
 	// program cleanup

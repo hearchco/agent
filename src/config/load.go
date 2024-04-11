@@ -25,6 +25,7 @@ func (c *Config) fromReader(rc ReaderConfig) {
 
 	nc := Config{
 		Server: Server{
+			Environment:  rc.Server.Environment,
 			Port:         rc.Server.Port,
 			FrontendUrls: strings.Split(rc.Server.FrontendUrls, ","),
 			Cache: Cache{
@@ -96,6 +97,7 @@ func (c *Config) fromReader(rc ReaderConfig) {
 func (c Config) getReader() ReaderConfig {
 	rc := ReaderConfig{
 		Server: ReaderServer{
+			Environment:  c.Server.Environment,
 			Port:         c.Server.Port,
 			FrontendUrls: strings.Join(c.Server.FrontendUrls, ","),
 			Cache: ReaderCache{

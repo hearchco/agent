@@ -35,17 +35,20 @@ checksum:
 changelog:
   filters:
     exclude:
+      - "^chore:"
+      - "^ci:"
       - "^docs:"
       - "^test:"
+      - "^merge:"
       - "^Merge branch"
 
 # Docker
 dockers:
-- image_templates:
-  - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:v{{ .Version }}-amd64"
-  use: buildx
-  dockerfile: ./docker/Dockerfile
-  build_flag_templates:
-  - --platform=linux/amd64
-  extra_files:
-  - docker
+  - image_templates:
+      - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:v{{ .Version }}-amd64"
+    use: buildx
+    dockerfile: ./docker/Dockerfile
+    build_flag_templates:
+      - --platform=linux/amd64
+    extra_files:
+      - docker
