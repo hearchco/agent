@@ -76,7 +76,7 @@ jobs:
     steps:
       - name: Trigger backend deployment workflow in the infrastructure repository
         run: |
-          repo_owner="${{ github.actor }}"
+          repo_owner="${{ github.repository_owner }}"
           repo_name="infra"
           event_type="deploy-backend"
           environment="prod"
