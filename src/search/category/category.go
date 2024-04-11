@@ -5,19 +5,13 @@ import (
 )
 
 var FromString = map[string]Name{
-	//main
 	"general": GENERAL,
 	"images":  IMAGES,
 	"info":    INFO,
+	"wiki":    INFO,
 	"science": SCIENCE,
-	"news":    NEWS,
-	"blog":    BLOG,
+	"sci":     SCIENCE,
 	"surf":    SURF,
-	"newnews": NEWNEWS,
-	//alternatives
-	"wiki":  INFO,
-	"sci":   SCIENCE,
-	"nnews": NEWNEWS,
 }
 
 // returns category

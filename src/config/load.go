@@ -76,12 +76,15 @@ func (c *Config) fromReader(rc ReaderConfig) {
 			}
 		}
 		tim := Timings{
-			// HardTimeout: time.Duration(val.RTimings.HardTimeout) * time.Millisecond,
-			Timeout:     time.Duration(val.RTimings.Timeout) * time.Millisecond,
-			PageTimeout: time.Duration(val.RTimings.PageTimeout) * time.Millisecond,
-			Delay:       time.Duration(val.RTimings.Delay) * time.Millisecond,
-			RandomDelay: time.Duration(val.RTimings.RandomDelay) * time.Millisecond,
-			Parallelism: val.RTimings.Parallelism,
+			PreferredTimeout:        time.Duration(val.RTimings.PreferredTimeout) * time.Millisecond,
+			PreferredTimeoutResults: val.RTimings.PreferredTimeoutResults,
+			AdditionalTimeout:       time.Duration(val.RTimings.AdditionalTimeout) * time.Millisecond,
+			HardTimeout:             time.Duration(val.RTimings.HardTimeout) * time.Millisecond,
+			Timeout:                 time.Duration(val.RTimings.Timeout) * time.Millisecond,
+			PageTimeout:             time.Duration(val.RTimings.PageTimeout) * time.Millisecond,
+			Delay:                   time.Duration(val.RTimings.Delay) * time.Millisecond,
+			RandomDelay:             time.Duration(val.RTimings.RandomDelay) * time.Millisecond,
+			Parallelism:             val.RTimings.Parallelism,
 		}
 		nc.Categories[key] = Category{
 			Ranking: val.Ranking,
@@ -124,12 +127,15 @@ func (c Config) getReader() ReaderConfig {
 
 	for key, val := range c.Categories {
 		tim := ReaderTimings{
-			// HardTimeout: uint(val.Timings.HardTimeout.Milliseconds()),
-			Timeout:     uint(val.Timings.Timeout.Milliseconds()),
-			PageTimeout: uint(val.Timings.PageTimeout.Milliseconds()),
-			Delay:       uint(val.Timings.Delay.Milliseconds()),
-			RandomDelay: uint(val.Timings.RandomDelay.Milliseconds()),
-			Parallelism: val.Timings.Parallelism,
+			PreferredTimeout:        uint(val.Timings.PreferredTimeout.Milliseconds()),
+			PreferredTimeoutResults: val.Timings.PreferredTimeoutResults,
+			AdditionalTimeout:       uint(val.Timings.AdditionalTimeout.Milliseconds()),
+			HardTimeout:             uint(val.Timings.HardTimeout.Milliseconds()),
+			Timeout:                 uint(val.Timings.Timeout.Milliseconds()),
+			PageTimeout:             uint(val.Timings.PageTimeout.Milliseconds()),
+			Delay:                   uint(val.Timings.Delay.Milliseconds()),
+			RandomDelay:             uint(val.Timings.RandomDelay.Milliseconds()),
+			Parallelism:             val.Timings.Parallelism,
 		}
 		rc.RCategories[key] = ReaderCategory{
 			Ranking:  val.Ranking,
