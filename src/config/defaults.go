@@ -221,15 +221,15 @@ func New() Config {
 					PageTimeout:             1 * time.Second,
 				},
 			},
-			category.ALL: {
-				Engines: NewAllEnabled(),
+			category.SURF: {
+				Engines: NewGeneral(),
 				Ranking: NewRanking(),
 				Timings: Timings{
 					PreferredTimeout:        2 * time.Second,
-					PreferredTimeoutResults: 50,
-					AdditionalTimeout:       150 * time.Millisecond,
-					HardTimeout:             5 * time.Second,
-					Timeout:                 5 * time.Second,
+					PreferredTimeoutResults: 60,
+					AdditionalTimeout:       100 * time.Millisecond,
+					HardTimeout:             4 * time.Second,
+					Timeout:                 4 * time.Second,
 					PageTimeout:             1 * time.Second,
 				},
 			},

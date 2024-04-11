@@ -11,7 +11,7 @@ var FromString = map[string]Name{
 	"wiki":    INFO,
 	"science": SCIENCE,
 	"sci":     SCIENCE,
-	"all":     ALL,
+	"surf":    SURF,
 }
 
 // returns category
