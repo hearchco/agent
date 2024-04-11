@@ -19,7 +19,8 @@ func main() {
 	mainTimer := time.Now()
 
 	// setup signal interrupt (CTRL+C)
-	ctx, _ := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	defer cancel()
 
 	// parse cli arguments
 	cliFlags := cli.Setup()

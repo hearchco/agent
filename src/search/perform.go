@@ -83,6 +83,10 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 	var wg sync.WaitGroup
 	engineStarter := NewEngineStarter()
 
+	start := time.Now()
+	ctx, cancelCtx := context.WithTimeout(context.Background(), timings.PreferredTimeout)
+	ctxHard, cancelCtxHard := context.WithTimeout(context.Background(), timings.Timeout)
+
 	for _, eng := range engs {
 		wg.Add(1)
 		go func() {
@@ -99,6 +103,45 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 		}()
 	}
 
-	wg.Wait()
+	waitCh := make(chan struct{})
+	go func() {
+		wg.Wait()
+		waitCh <- struct{}{}
+	}()
+
+Outer:
+	for {
+		select {
+		case <-ctx.Done():
+			log.Debug().
+				Dur("duration", time.Since(start)).
+				Msg("Timeout reached while waiting for engines")
+
+			// if there are not enough results, switch to additional timeout and wait again
+			// otherwise break the loop
+			if len(relay.ResultMap) < 30 {
+				cancelCtx() // cancel the current context before creating a new one to prevent context leak
+				ctx, cancelCtx = context.WithTimeout(context.Background(), timings.AdditionalTimeout)
+			} else {
+				break Outer
+			}
+
+		case <-ctxHard.Done():
+			log.Debug().
+				Dur("duration", time.Since(start)).
+				Msg("Hard timeout reached while waiting for engines")
+
+		case <-waitCh:
+			log.Debug().
+				Dur("duration", time.Since(start)).
+				Msg("All engines finished")
+			break Outer
+		}
+	}
+
+	// cancel the current contexts to prevent context leak
+	cancelCtx()
+	cancelCtxHard()
+
 	return relay.ResultMap
 }

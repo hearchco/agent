@@ -130,23 +130,25 @@ type ReaderEngine struct {
 // ReaderTimings is format in which the config is read from the config file
 // in miliseconds
 type ReaderTimings struct {
-	// HardTimeout uint `koanf:"hardTimeout"`
-	Timeout     uint `koanf:"timeout"`
-	PageTimeout uint `koanf:"pagetimeout"`
-	Delay       uint `koanf:"delay"`
-	RandomDelay uint `koanf:"randomdelay"`
-	Parallelism int  `koanf:"parallelism"`
+	PreferredTimeout  uint `koanf:"preferredtimeout"`
+	AdditionalTimeout uint `koanf:"additionaltimeout"`
+	Timeout           uint `koanf:"timeout"`
+	PageTimeout       uint `koanf:"pagetimeout"`
+	Delay             uint `koanf:"delay"`
+	RandomDelay       uint `koanf:"randomdelay"`
+	Parallelism       int  `koanf:"parallelism"`
 }
 
 // Delegates Timeout, PageTimeout to colly.Collector.SetRequestTimeout(); Note: See https://github.com/gocolly/colly/issues/644
 // Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit()
 type Timings struct {
-	// HardTimeout time.Duration
-	Timeout     time.Duration
-	PageTimeout time.Duration
-	Delay       time.Duration
-	RandomDelay time.Duration
-	Parallelism int
+	PreferredTimeout  time.Duration
+	AdditionalTimeout time.Duration
+	Timeout           time.Duration
+	PageTimeout       time.Duration
+	Delay             time.Duration
+	RandomDelay       time.Duration
+	Parallelism       int
 }
 
 // ReaderCategory is format in which the config is read from the config file
