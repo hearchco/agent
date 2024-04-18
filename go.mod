@@ -7,7 +7,7 @@ toolchain go1.22.0
 require (
 	github.com/alecthomas/kong v0.9.0
 	github.com/andybalholm/brotli v1.1.0
-	github.com/aws/aws-lambda-go v1.46.0
+	github.com/aws/aws-lambda-go v1.47.0
 	github.com/awslabs/aws-lambda-go-api-proxy v0.16.2
 	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/fxamacker/cbor/v2 v2.6.0
