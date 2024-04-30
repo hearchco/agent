@@ -62,7 +62,7 @@ jobs:
         run: make install
 
       - name: Build project
-        run: make build
+        run: make compile
 
-      - name: Test units
+      - name: Test units (w/o engines)
         run: make test

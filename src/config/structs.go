@@ -50,35 +50,16 @@ type TTL struct {
 	RefreshTime time.Duration
 }
 
-type Badger struct {
-	// setting this to false will result in badger not persisting the cache to disk
-	// that means that badger will run in memory only
-	Persist bool `koanf:"persist"`
-}
-
-type Redis struct {
-	Host     string `koanf:"host"`
-	Port     uint16 `koanf:"port"`
-	Password string `koanf:"password"`
-	Database uint8  `koanf:"database"`
-}
-
 // ReaderCache is format in which the config is read from the config file
 type ReaderCache struct {
 	// can be "none", "badger" or "redis"
 	Type string `koanf:"type"`
 	// has no effect if Type is "none"
 	TTL ReaderTTL `koanf:"ttl"`
-	// badger specific settings
-	Badger Badger `koanf:"badger"`
-	// redis specific settings
-	Redis Redis `koanf:"redis"`
 }
 type Cache struct {
-	Type   string
-	TTL    TTL
-	Badger Badger
-	Redis  Redis
+	Type string
+	TTL  TTL
 }
 
 type ReaderProxyTimeouts struct {

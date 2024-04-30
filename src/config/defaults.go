@@ -150,17 +150,10 @@ func New() Config {
 			Port:         3030,
 			FrontendUrls: []string{"http://localhost:5173"},
 			Cache: Cache{
-				Type: "badger",
+				Type: "none",
 				TTL: TTL{
 					Time:        moretime.Week,
 					RefreshTime: 3 * moretime.Day,
-				},
-				Badger: Badger{
-					Persist: true,
-				},
-				Redis: Redis{
-					Host: "localhost",
-					Port: 6379,
 				},
 			},
 			Proxy: Proxy{

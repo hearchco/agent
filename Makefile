@@ -19,28 +19,20 @@ install:
 	go generate ./...
 	go install github.com/cosmtrek/air@latest
 
-build:
+compile:
 	CGO_ENABLED=0 go build -ldflags "-s -w" -trimpath ./src/...
-build-linux:
+compile-linux:
 	CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -trimpath -o bin/hearchco ./src
-build-macos:
+compile-macos:
 	CGO_ENABLED=0 GOOS=darwin go build -ldflags "-s -w" -trimpath -o bin/hearchco ./src
-build-windows:
+compile-windows:
 	CGO_ENABLED=0 GOOS=windows go build -ldflags "-s -w" -trimpath -o bin/hearchco.exe ./src
 
 test:
 	sh ./scripts/test.sh
 test-engines:
 	sh ./scripts/test-engines.sh
-test-redis:
-	sh ./scripts/test-redis.sh
-test-redis-podman:
-	sh ./scripts/test-redis-podman.sh
-test-redis-docker:
-	sh ./scripts/test-redis-docker.sh
-test-all: test test-redis test-engines
-test-all-podman: test test-redis-podman test-engines
-test-all-docker: test test-redis-docker test-engines
+test-all: test test-engines
 
 update:
 	go get -u ./...
