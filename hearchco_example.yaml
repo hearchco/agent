@@ -1,5 +1,5 @@
 server:
-  frontendurls: http://localhost:5173,https://hearch.co,https://frontend-*-hearchco.vercel.app
+  frontendurls: http://localhost:5173,https://*hearch.co
   cache:
     type: none
   proxy:
