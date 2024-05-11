@@ -11,8 +11,8 @@ import (
 
 const DefaultLocale string = "en_US"
 
-func EmptyRanking() Ranking {
-	rnk := Ranking{
+func EmptyRanking() CategoryRanking {
+	rnk := CategoryRanking{
 		REXP:    0.5,
 		A:       1,
 		B:       0,
@@ -22,11 +22,11 @@ func EmptyRanking() Ranking {
 		TRB:     0,
 		TRC:     1,
 		TRD:     0,
-		Engines: map[string]EngineRanking{},
+		Engines: map[string]CategoryEngineRanking{},
 	}
 
 	for _, eng := range engines.Names() {
-		rnk.Engines[eng.ToLower()] = EngineRanking{
+		rnk.Engines[eng.ToLower()] = CategoryEngineRanking{
 			Mul:   1,
 			Const: 0,
 		}
@@ -35,7 +35,7 @@ func EmptyRanking() Ranking {
 	return rnk
 }
 
-func NewRanking() Ranking {
+func NewRanking() CategoryRanking {
 	return EmptyRanking()
 }
 
@@ -163,8 +163,8 @@ func New() Config {
 					Port: 6379,
 				},
 			},
-			Proxy: Proxy{
-				Timeouts: ProxyTimeouts{
+			Proxy: ImageProxy{
+				Timeouts: ImageProxyTimeouts{
 					Dial:         3 * time.Second,
 					KeepAlive:    3 * time.Second,
 					TLSHandshake: 2 * time.Second,
@@ -176,7 +176,7 @@ func New() Config {
 			category.GENERAL: {
 				Engines: NewGeneral(),
 				Ranking: NewRanking(),
-				Timings: Timings{
+				Timings: CategoryTimings{
 					PreferredTimeout:        1 * time.Second,
 					PreferredTimeoutResults: 20,
 					AdditionalTimeout:       50 * time.Millisecond,
@@ -188,7 +188,7 @@ func New() Config {
 			category.IMAGES: {
 				Engines: NewImage(),
 				Ranking: NewRanking(),
-				Timings: Timings{
+				Timings: CategoryTimings{
 					PreferredTimeout:        1 * time.Second,
 					PreferredTimeoutResults: 40,
 					AdditionalTimeout:       100 * time.Millisecond,
@@ -200,7 +200,7 @@ func New() Config {
 			category.INFO: {
 				Engines: NewInfo(),
 				Ranking: NewRanking(),
-				Timings: Timings{
+				Timings: CategoryTimings{
 					PreferredTimeout:        500 * time.Millisecond,
 					PreferredTimeoutResults: 10,
 					AdditionalTimeout:       25 * time.Millisecond,
@@ -212,7 +212,7 @@ func New() Config {
 			category.SCIENCE: {
 				Engines: NewScience(),
 				Ranking: NewRanking(),
-				Timings: Timings{
+				Timings: CategoryTimings{
 					PreferredTimeout:        1 * time.Second,
 					PreferredTimeoutResults: 10,
 					AdditionalTimeout:       100 * time.Millisecond,
@@ -224,7 +224,7 @@ func New() Config {
 			category.SURF: {
 				Engines: NewGeneral(),
 				Ranking: NewRanking(),
-				Timings: Timings{
+				Timings: CategoryTimings{
 					PreferredTimeout:        2 * time.Second,
 					PreferredTimeoutResults: 60,
 					AdditionalTimeout:       200 * time.Millisecond,

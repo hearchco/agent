@@ -13,7 +13,7 @@ import (
 )
 
 // it's okay to return pointers to collectors since colly.NewCollector() returns a pointer
-func InitializeCollectors(ctx context.Context, engineName engines.Name, options engines.Options, settings config.Settings, timings config.Timings, relay *bucket.Relay) (*colly.Collector, *colly.Collector) {
+func InitializeCollectors(ctx context.Context, engineName engines.Name, options engines.Options, settings config.Settings, timings config.CategoryTimings, relay *bucket.Relay) (*colly.Collector, *colly.Collector) {
 	col := colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 	pagesCol := colly.NewCollector(colly.MaxDepth(1), colly.UserAgent(options.UserAgent), colly.Async())
 

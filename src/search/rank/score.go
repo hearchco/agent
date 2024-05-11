@@ -8,7 +8,7 @@ import (
 )
 
 // package local func that gets result pointer passed down
-func getScore(result *result.Result, rconf *config.Ranking) float64 {
+func getScore(result *result.Result, rconf *config.CategoryRanking) float64 {
 	retRankScore := float64(0)
 	for _, er := range result.EngineRanks {
 		seMul := rconf.Engines[er.SearchEngine.ToLower()].Mul

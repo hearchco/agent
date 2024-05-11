@@ -65,7 +65,7 @@ func PerformSearch(query string, options engines.Options, settings map[engines.N
 	return results
 }
 
-func runEngines(engs []engines.Name, query string, options engines.Options, settings map[engines.Name]config.Settings, timings config.Timings, salt string) map[string]*result.Result {
+func runEngines(engs []engines.Name, query string, options engines.Options, settings map[engines.Name]config.Settings, timings config.CategoryTimings, salt string) map[string]*result.Result {
 	// create engine strings slice for logging
 	engsStrs := make([]string, 0, len(engs))
 	for _, eng := range engs {

@@ -13,7 +13,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeouts config.ProxyTimeouts) error {
+func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeouts config.ImageProxyTimeouts) error {
 	err := r.ParseForm()
 	if err != nil {
 		// server error

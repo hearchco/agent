@@ -4,7 +4,6 @@ import (
 	"os"
 	"path"
 	"strings"
-	"time"
 
 	"github.com/hearchco/hearchco/src/moretime"
 	"github.com/hearchco/hearchco/src/search/category"
@@ -37,9 +36,9 @@ func (c *Config) fromReader(rc ReaderConfig) {
 				Badger: rc.Server.Cache.Badger,
 				Redis:  rc.Server.Cache.Redis,
 			},
-			Proxy: Proxy{
+			Proxy: ImageProxy{
 				Salt: rc.Server.Proxy.Salt,
-				Timeouts: ProxyTimeouts{
+				Timeouts: ImageProxyTimeouts{
 					Dial:         moretime.ConvertFromFancyTime(rc.Server.Proxy.Timeouts.Dial),
 					KeepAlive:    moretime.ConvertFromFancyTime(rc.Server.Proxy.Timeouts.KeepAlive),
 					TLSHandshake: moretime.ConvertFromFancyTime(rc.Server.Proxy.Timeouts.TLSHandshake),
@@ -75,15 +74,15 @@ func (c *Config) fromReader(rc ReaderConfig) {
 				engArr = append(engArr, engineName)
 			}
 		}
-		tim := Timings{
-			PreferredTimeout:        time.Duration(val.RTimings.PreferredTimeout) * time.Millisecond,
+		tim := CategoryTimings{
+			PreferredTimeout:        moretime.ConvertFromFancyTime(val.RTimings.PreferredTimeout),
 			PreferredTimeoutResults: val.RTimings.PreferredTimeoutResults,
-			AdditionalTimeout:       time.Duration(val.RTimings.AdditionalTimeout) * time.Millisecond,
-			HardTimeout:             time.Duration(val.RTimings.HardTimeout) * time.Millisecond,
-			Timeout:                 time.Duration(val.RTimings.Timeout) * time.Millisecond,
-			PageTimeout:             time.Duration(val.RTimings.PageTimeout) * time.Millisecond,
-			Delay:                   time.Duration(val.RTimings.Delay) * time.Millisecond,
-			RandomDelay:             time.Duration(val.RTimings.RandomDelay) * time.Millisecond,
+			AdditionalTimeout:       moretime.ConvertFromFancyTime(val.RTimings.AdditionalTimeout),
+			HardTimeout:             moretime.ConvertFromFancyTime(val.RTimings.HardTimeout),
+			Timeout:                 moretime.ConvertFromFancyTime(val.RTimings.Timeout),
+			PageTimeout:             moretime.ConvertFromFancyTime(val.RTimings.PageTimeout),
+			Delay:                   moretime.ConvertFromFancyTime(val.RTimings.Delay),
+			RandomDelay:             moretime.ConvertFromFancyTime(val.RTimings.RandomDelay),
 			Parallelism:             val.RTimings.Parallelism,
 		}
 		nc.Categories[key] = Category{
@@ -112,9 +111,9 @@ func (c Config) getReader() ReaderConfig {
 				Badger: c.Server.Cache.Badger,
 				Redis:  c.Server.Cache.Redis,
 			},
-			Proxy: ReaderProxy{
+			Proxy: ReaderImageProxy{
 				Salt: c.Server.Proxy.Salt,
-				Timeouts: ReaderProxyTimeouts{
+				Timeouts: ReaderImageProxyTimeouts{
 					Dial:         moretime.ConvertToFancyTime(c.Server.Proxy.Timeouts.Dial),
 					KeepAlive:    moretime.ConvertToFancyTime(c.Server.Proxy.Timeouts.KeepAlive),
 					TLSHandshake: moretime.ConvertToFancyTime(c.Server.Proxy.Timeouts.TLSHandshake),
@@ -126,24 +125,24 @@ func (c Config) getReader() ReaderConfig {
 	}
 
 	for key, val := range c.Categories {
-		tim := ReaderTimings{
-			PreferredTimeout:        uint(val.Timings.PreferredTimeout.Milliseconds()),
+		tim := ReaderCategoryTimings{
+			PreferredTimeout:        moretime.ConvertToFancyTime(val.Timings.PreferredTimeout),
 			PreferredTimeoutResults: val.Timings.PreferredTimeoutResults,
-			AdditionalTimeout:       uint(val.Timings.AdditionalTimeout.Milliseconds()),
-			HardTimeout:             uint(val.Timings.HardTimeout.Milliseconds()),
-			Timeout:                 uint(val.Timings.Timeout.Milliseconds()),
-			PageTimeout:             uint(val.Timings.PageTimeout.Milliseconds()),
-			Delay:                   uint(val.Timings.Delay.Milliseconds()),
-			RandomDelay:             uint(val.Timings.RandomDelay.Milliseconds()),
+			AdditionalTimeout:       moretime.ConvertToFancyTime(val.Timings.AdditionalTimeout),
+			HardTimeout:             moretime.ConvertToFancyTime(val.Timings.HardTimeout),
+			Timeout:                 moretime.ConvertToFancyTime(val.Timings.Timeout),
+			PageTimeout:             moretime.ConvertToFancyTime(val.Timings.PageTimeout),
+			Delay:                   moretime.ConvertToFancyTime(val.Timings.Delay),
+			RandomDelay:             moretime.ConvertToFancyTime(val.Timings.RandomDelay),
 			Parallelism:             val.Timings.Parallelism,
 		}
 		rc.RCategories[key] = ReaderCategory{
 			Ranking:  val.Ranking,
-			REngines: map[string]ReaderEngine{},
+			REngines: map[string]ReaderCategoryEngine{},
 			RTimings: tim,
 		}
 		for _, eng := range val.Engines {
-			rc.RCategories[key].REngines[eng.ToLower()] = ReaderEngine{Enabled: true}
+			rc.RCategories[key].REngines[eng.ToLower()] = ReaderCategoryEngine{Enabled: true}
 		}
 	}
 
