@@ -11,8 +11,8 @@ import (
 
 const DefaultLocale string = "en_US"
 
-func EmptyRanking() Ranking {
-	rnk := Ranking{
+func EmptyRanking() CategoryRanking {
+	rnk := CategoryRanking{
 		REXP:    0.5,
 		A:       1,
 		B:       0,
@@ -22,11 +22,11 @@ func EmptyRanking() Ranking {
 		TRB:     0,
 		TRC:     1,
 		TRD:     0,
-		Engines: map[string]EngineRanking{},
+		Engines: map[string]CategoryEngineRanking{},
 	}
 
 	for _, eng := range engines.Names() {
-		rnk.Engines[eng.ToLower()] = EngineRanking{
+		rnk.Engines[eng.ToLower()] = CategoryEngineRanking{
 			Mul:   1,
 			Const: 0,
 		}
@@ -35,7 +35,7 @@ func EmptyRanking() Ranking {
 	return rnk
 }
 
-func NewRanking() Ranking {
+func NewRanking() CategoryRanking {
 	return EmptyRanking()
 }
 
@@ -129,9 +129,11 @@ func NewImage() []engines.Name {
 	}
 }
 
-func NewInfo() []engines.Name {
+func NewQuick() []engines.Name {
 	return []engines.Name{
 		engines.BING,
+		engines.BRAVE,
+		engines.DUCKDUCKGO,
 		engines.GOOGLE,
 		engines.MOJEEK,
 	}
@@ -163,8 +165,8 @@ func New() Config {
 					Port: 6379,
 				},
 			},
-			Proxy: Proxy{
-				Timeouts: ProxyTimeouts{
+			Proxy: ImageProxy{
+				Timeouts: ImageProxyTimeouts{
 					Dial:         3 * time.Second,
 					KeepAlive:    3 * time.Second,
 					TLSHandshake: 2 * time.Second,
@@ -176,61 +178,61 @@ func New() Config {
 			category.GENERAL: {
 				Engines: NewGeneral(),
 				Ranking: NewRanking(),
-				Timings: Timings{
-					PreferredTimeout:        1 * time.Second,
-					PreferredTimeoutResults: 20,
-					AdditionalTimeout:       50 * time.Millisecond,
-					HardTimeout:             1500 * time.Millisecond,
-					Timeout:                 1500 * time.Millisecond,
-					PageTimeout:             1 * time.Second,
+				Timings: CategoryTimings{
+					PreferredTimeoutMin:    1 * time.Second,
+					PreferredTimeoutMax:    2 * time.Second,
+					PreferredResultsNumber: 20,
+					StepTime:               50 * time.Millisecond,
+					MinimumResultsNumber:   10,
+					HardTimeout:            3 * time.Second,
 				},
 			},
 			category.IMAGES: {
 				Engines: NewImage(),
 				Ranking: NewRanking(),
-				Timings: Timings{
-					PreferredTimeout:        1 * time.Second,
-					PreferredTimeoutResults: 40,
-					AdditionalTimeout:       100 * time.Millisecond,
-					HardTimeout:             1500 * time.Millisecond,
-					Timeout:                 1500 * time.Millisecond,
-					PageTimeout:             1 * time.Second,
+				Timings: CategoryTimings{
+					PreferredTimeoutMin:    1 * time.Second,
+					PreferredTimeoutMax:    2 * time.Second,
+					PreferredResultsNumber: 40,
+					StepTime:               100 * time.Millisecond,
+					MinimumResultsNumber:   20,
+					HardTimeout:            3 * time.Second,
 				},
 			},
-			category.INFO: {
-				Engines: NewInfo(),
+			category.QUICK: {
+				Engines: NewQuick(),
 				Ranking: NewRanking(),
-				Timings: Timings{
-					PreferredTimeout:        500 * time.Millisecond,
-					PreferredTimeoutResults: 10,
-					AdditionalTimeout:       25 * time.Millisecond,
-					HardTimeout:             1200 * time.Millisecond,
-					Timeout:                 1200 * time.Millisecond,
-					PageTimeout:             1 * time.Second,
+				Timings: CategoryTimings{
+					PreferredTimeoutMin:    500 * time.Millisecond,
+					PreferredTimeoutMax:    1500 * time.Millisecond,
+					PreferredResultsNumber: 10,
+					StepTime:               25 * time.Millisecond,
+					MinimumResultsNumber:   5,
+					HardTimeout:            3 * time.Second,
 				},
 			},
 			category.SCIENCE: {
 				Engines: NewScience(),
 				Ranking: NewRanking(),
-				Timings: Timings{
-					PreferredTimeout:        1 * time.Second,
-					PreferredTimeoutResults: 10,
-					AdditionalTimeout:       100 * time.Millisecond,
-					HardTimeout:             3 * time.Second,
-					Timeout:                 3 * time.Second,
-					PageTimeout:             1 * time.Second,
+				Timings: CategoryTimings{
+					PreferredTimeoutMin:    1 * time.Second,
+					PreferredTimeoutMax:    2 * time.Second,
+					PreferredResultsNumber: 10,
+					StepTime:               100 * time.Millisecond,
+					MinimumResultsNumber:   5,
+					HardTimeout:            3 * time.Second,
 				},
 			},
-			category.SURF: {
+			category.BROAD: {
 				Engines: NewGeneral(),
 				Ranking: NewRanking(),
-				Timings: Timings{
-					PreferredTimeout:        2 * time.Second,
-					PreferredTimeoutResults: 60,
-					AdditionalTimeout:       200 * time.Millisecond,
-					HardTimeout:             4 * time.Second,
-					Timeout:                 4 * time.Second,
-					PageTimeout:             1 * time.Second,
+				Timings: CategoryTimings{
+					PreferredTimeoutMin:    1 * time.Second,
+					PreferredTimeoutMax:    3 * time.Second,
+					PreferredResultsNumber: 50,
+					StepTime:               100 * time.Millisecond,
+					MinimumResultsNumber:   30,
+					HardTimeout:            5 * time.Second,
 				},
 			},
 		},

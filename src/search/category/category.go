@@ -7,11 +7,12 @@ import (
 var FromString = map[string]Name{
 	"general": GENERAL,
 	"images":  IMAGES,
-	"info":    INFO,
-	"wiki":    INFO,
+	"quick":   QUICK,
+	"fast":    QUICK,
 	"science": SCIENCE,
 	"sci":     SCIENCE,
-	"surf":    SURF,
+	"broad":   BROAD,
+	"surf":    BROAD,
 }
 
 // returns category

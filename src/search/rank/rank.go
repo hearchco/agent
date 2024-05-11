@@ -7,7 +7,7 @@ import (
 	"github.com/hearchco/hearchco/src/search/result"
 )
 
-func Rank(resMap map[string]*result.Result, rconf config.Ranking) []result.Result {
+func Rank(resMap map[string]*result.Result, rconf config.CategoryRanking) []result.Result {
 	results := make([]result.Result, 0, len(resMap))
 	for _, res := range resMap {
 		// set res.EngineRanks slice's capacity to it's length

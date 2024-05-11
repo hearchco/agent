@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func procBang(query string, setCategory category.Name, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) (string, category.Name, config.Timings, []engines.Name) {
+func procBang(query string, setCategory category.Name, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category) (string, category.Name, config.CategoryTimings, []engines.Name) {
 	useSpec, specEng := procSpecificEngine(query, settings)
 	goodCat, cat := procCategory(query, setCategory)
 	if !goodCat && !useSpec && (query != "" && query[0] == '!') {
