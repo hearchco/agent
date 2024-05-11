@@ -32,14 +32,14 @@ func NewConfig(engineName engines.Name) config.Config {
 				Engines: []engines.Name{engineName},
 				Ranking: config.NewRanking(),
 				Timings: config.CategoryTimings{
-					Timeout: 10000 * time.Millisecond, // colly default
+					HardTimeout: 10000 * time.Millisecond,
 				},
 			},
 			category.IMAGES: {
 				Engines: []engines.Name{engineName},
 				Ranking: config.NewRanking(),
 				Timings: config.CategoryTimings{
-					Timeout: 10000 * time.Millisecond, // colly default
+					HardTimeout: 10000 * time.Millisecond,
 				},
 			},
 		},

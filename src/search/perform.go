@@ -87,7 +87,8 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 	engineStarter := NewEngineStarter()
 
 	start := time.Now()
-	ctx, cancelCtx := context.WithTimeout(context.Background(), timings.PreferredTimeout)
+	// initially set the preferred timeout minimum (will be reassigned to step time later)
+	ctx, cancelCtx := context.WithTimeout(context.Background(), timings.PreferredTimeoutMin)
 	ctxHard, cancelCtxHard := context.WithTimeout(context.Background(), timings.HardTimeout)
 
 	// run all engines concurrently
@@ -114,31 +115,55 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 		waitCh <- struct{}{}
 	}()
 
-	// break the loop if the preferred timeout is reached and there are enough results
+	// break the loop if the preferred number of results is found before the preferred timeout is reached
+	// otherwise break the loop when the minimum number of results if found
 	// or if the hard timeout is reached
 	// or if all engines finished
 Outer:
 	for {
 		select {
-		// preferred timeout reached
+		// preferred timeout (min/max) or step time reached
 		case <-ctx.Done():
-			log.Debug().
-				Dur("duration", time.Since(start)).
-				Msg("Timeout reached while waiting for engines")
-
-			// if there are not enough results, switch to additional timeout and wait again
-			// otherwise break the loop
-			if len(relay.ResultMap) < timings.PreferredTimeoutResults {
-				cancelCtx() // cancel the current context before creating a new one to prevent context leak
-				ctx, cancelCtx = context.WithTimeout(context.Background(), timings.AdditionalTimeout)
+			currTimeout := time.Since(start)
+			if currTimeout < timings.PreferredTimeoutMax {
+				// if the preferred number of results isn't reached, continue additional step time
+				if len(relay.ResultMap) < timings.PreferredResultsNumber {
+					log.Debug().
+						Dur("duration", currTimeout).
+						Int("results", len(relay.ResultMap)).
+						Msg("Timeout reached while waiting for engines, waiting additional step time")
+					cancelCtx() // cancel the current context before creating a new one to prevent context leak
+					ctx, cancelCtx = context.WithTimeout(context.Background(), timings.StepTime)
+				} else {
+					log.Debug().
+						Dur("duration", currTimeout).
+						Int("results", len(relay.ResultMap)).
+						Msg("Timeout reached while waiting for engines")
+					break Outer
+				}
 			} else {
-				break Outer
+				// if the minimum number of results isn't reached, continue additional step time
+				if len(relay.ResultMap) < timings.MinimumResultsNumber {
+					log.Debug().
+						Dur("duration", currTimeout).
+						Int("results", len(relay.ResultMap)).
+						Msg("Preferred timeout maximum reached, waiting for minimum results required")
+					cancelCtx() // cancel the current context before creating a new one to prevent context leak
+					ctx, cancelCtx = context.WithTimeout(context.Background(), timings.StepTime)
+				} else {
+					log.Debug().
+						Dur("duration", currTimeout).
+						Int("results", len(relay.ResultMap)).
+						Msg("Preferred timeout maximum reached")
+					break Outer
+				}
 			}
 
 		// hard timeout reached
 		case <-ctxHard.Done():
 			log.Debug().
 				Dur("duration", time.Since(start)).
+				Int("results", len(relay.ResultMap)).
 				Msg("Hard timeout reached while waiting for engines")
 			break Outer
 
@@ -146,6 +171,7 @@ Outer:
 		case <-waitCh:
 			log.Debug().
 				Dur("duration", time.Since(start)).
+				Int("results", len(relay.ResultMap)).
 				Msg("All engines finished")
 			break Outer
 		}

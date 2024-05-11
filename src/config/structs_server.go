@@ -97,9 +97,9 @@ type ImageProxy struct {
 }
 
 // ReaderProxyTimeouts is format in which the config is read from the config file
-// in <number><unit> format
-// example: 1s, 1m, 1h, 1d, 1w, 1M, 1y
-// if unit is not specified, it is assumed to be milliseconds
+// In <number><unit> format
+// Example: 1s, 1m, 1h, 1d, 1w, 1M, 1y
+// If unit is not specified, it is assumed to be milliseconds
 type ReaderImageProxyTimeouts struct {
 	Dial         string `koanf:"dial"`
 	KeepAlive    string `koanf:"keepalive"`

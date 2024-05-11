@@ -30,14 +30,6 @@ func InitializeCollectors(ctx context.Context, engineName engines.Name, options 
 			Msg("_sedefaults.InitializeCollectors(): failed adding new limit rule")
 	}
 
-	if timings.Timeout != 0 {
-		col.SetRequestTimeout(timings.Timeout)
-	}
-
-	if timings.PageTimeout != 0 {
-		pagesCol.SetRequestTimeout(timings.PageTimeout)
-	}
-
 	if settings.Proxies != nil {
 		log.Debug().
 			Strs("proxies", settings.Proxies).

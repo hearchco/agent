@@ -75,15 +75,15 @@ func (c *Config) fromReader(rc ReaderConfig) {
 			}
 		}
 		tim := CategoryTimings{
-			PreferredTimeout:        moretime.ConvertFromFancyTime(val.RTimings.PreferredTimeout),
-			PreferredTimeoutResults: val.RTimings.PreferredTimeoutResults,
-			AdditionalTimeout:       moretime.ConvertFromFancyTime(val.RTimings.AdditionalTimeout),
-			HardTimeout:             moretime.ConvertFromFancyTime(val.RTimings.HardTimeout),
-			Timeout:                 moretime.ConvertFromFancyTime(val.RTimings.Timeout),
-			PageTimeout:             moretime.ConvertFromFancyTime(val.RTimings.PageTimeout),
-			Delay:                   moretime.ConvertFromFancyTime(val.RTimings.Delay),
-			RandomDelay:             moretime.ConvertFromFancyTime(val.RTimings.RandomDelay),
-			Parallelism:             val.RTimings.Parallelism,
+			PreferredTimeoutMin:    moretime.ConvertFromFancyTime(val.RTimings.PreferredTimeoutMin),
+			PreferredTimeoutMax:    moretime.ConvertFromFancyTime(val.RTimings.PreferredTimeoutMax),
+			PreferredResultsNumber: val.RTimings.PreferredResultsNumber,
+			StepTime:               moretime.ConvertFromFancyTime(val.RTimings.StepTime),
+			MinimumResultsNumber:   val.RTimings.MinimumResultsNumber,
+			HardTimeout:            moretime.ConvertFromFancyTime(val.RTimings.HardTimeout),
+			Delay:                  moretime.ConvertFromFancyTime(val.RTimings.Delay),
+			RandomDelay:            moretime.ConvertFromFancyTime(val.RTimings.RandomDelay),
+			Parallelism:            val.RTimings.Parallelism,
 		}
 		nc.Categories[key] = Category{
 			Ranking: val.Ranking,
@@ -126,15 +126,15 @@ func (c Config) getReader() ReaderConfig {
 
 	for key, val := range c.Categories {
 		tim := ReaderCategoryTimings{
-			PreferredTimeout:        moretime.ConvertToFancyTime(val.Timings.PreferredTimeout),
-			PreferredTimeoutResults: val.Timings.PreferredTimeoutResults,
-			AdditionalTimeout:       moretime.ConvertToFancyTime(val.Timings.AdditionalTimeout),
-			HardTimeout:             moretime.ConvertToFancyTime(val.Timings.HardTimeout),
-			Timeout:                 moretime.ConvertToFancyTime(val.Timings.Timeout),
-			PageTimeout:             moretime.ConvertToFancyTime(val.Timings.PageTimeout),
-			Delay:                   moretime.ConvertToFancyTime(val.Timings.Delay),
-			RandomDelay:             moretime.ConvertToFancyTime(val.Timings.RandomDelay),
-			Parallelism:             val.Timings.Parallelism,
+			PreferredTimeoutMin:    moretime.ConvertToFancyTime(val.Timings.PreferredTimeoutMin),
+			PreferredTimeoutMax:    moretime.ConvertToFancyTime(val.Timings.PreferredTimeoutMax),
+			PreferredResultsNumber: val.Timings.PreferredResultsNumber,
+			StepTime:               moretime.ConvertToFancyTime(val.Timings.StepTime),
+			MinimumResultsNumber:   val.Timings.MinimumResultsNumber,
+			HardTimeout:            moretime.ConvertToFancyTime(val.Timings.HardTimeout),
+			Delay:                  moretime.ConvertToFancyTime(val.Timings.Delay),
+			RandomDelay:            moretime.ConvertToFancyTime(val.Timings.RandomDelay),
+			Parallelism:            val.Timings.Parallelism,
 		}
 		rc.RCategories[key] = ReaderCategory{
 			Ranking:  val.Ranking,
