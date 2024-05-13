@@ -7,7 +7,7 @@ const (
 	UNDEFINED Name = "undefined"
 	GENERAL   Name = "general"
 	IMAGES    Name = "images"
-	QUICK     Name = "quick"
 	SCIENCE   Name = "science"
-	BROAD     Name = "broad"
+	QUICK     Name = "quick"
+	THOROUGH  Name = "thorough"
 )

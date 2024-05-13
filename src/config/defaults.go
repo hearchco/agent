@@ -199,18 +199,6 @@ func New() Config {
 					HardTimeout:            3 * time.Second,
 				},
 			},
-			category.QUICK: {
-				Engines: NewQuick(),
-				Ranking: NewRanking(),
-				Timings: CategoryTimings{
-					PreferredTimeoutMin:    500 * time.Millisecond,
-					PreferredTimeoutMax:    1500 * time.Millisecond,
-					PreferredResultsNumber: 10,
-					StepTime:               25 * time.Millisecond,
-					MinimumResultsNumber:   5,
-					HardTimeout:            3 * time.Second,
-				},
-			},
 			category.SCIENCE: {
 				Engines: NewScience(),
 				Ranking: NewRanking(),
@@ -223,15 +211,27 @@ func New() Config {
 					HardTimeout:            3 * time.Second,
 				},
 			},
-			category.BROAD: {
+			category.QUICK: {
+				Engines: NewQuick(),
+				Ranking: NewRanking(),
+				Timings: CategoryTimings{
+					PreferredTimeoutMin:    500 * time.Millisecond,
+					PreferredTimeoutMax:    1500 * time.Millisecond,
+					PreferredResultsNumber: 10,
+					StepTime:               25 * time.Millisecond,
+					MinimumResultsNumber:   5,
+					HardTimeout:            3 * time.Second,
+				},
+			},
+			category.THOROUGH: {
 				Engines: NewGeneral(),
 				Ranking: NewRanking(),
 				Timings: CategoryTimings{
 					PreferredTimeoutMin:    1 * time.Second,
-					PreferredTimeoutMax:    3 * time.Second,
-					PreferredResultsNumber: 50,
+					PreferredTimeoutMax:    4 * time.Second,
+					PreferredResultsNumber: 70,
 					StepTime:               100 * time.Millisecond,
-					MinimumResultsNumber:   30,
+					MinimumResultsNumber:   50,
 					HardTimeout:            5 * time.Second,
 				},
 			},

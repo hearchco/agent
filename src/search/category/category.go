@@ -5,14 +5,14 @@ import (
 )
 
 var FromString = map[string]Name{
-	"general": GENERAL,
-	"images":  IMAGES,
-	"quick":   QUICK,
-	"fast":    QUICK,
-	"science": SCIENCE,
-	"sci":     SCIENCE,
-	"broad":   BROAD,
-	"surf":    BROAD,
+	"general":  GENERAL,
+	"images":   IMAGES,
+	"science":  SCIENCE,
+	"sci":      SCIENCE,
+	"quick":    QUICK,
+	"fast":     QUICK,
+	"thorough": THOROUGH,
+	"slow":     THOROUGH,
 }
 
 // returns category
