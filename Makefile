@@ -19,13 +19,13 @@ install:
 	go generate ./...
 	go install github.com/cosmtrek/air@latest
 
-build:
+compile:
 	CGO_ENABLED=0 go build -ldflags "-s -w" -trimpath ./src/...
-build-linux:
+compile-linux:
 	CGO_ENABLED=0 GOOS=linux go build -ldflags "-s -w" -trimpath -o bin/hearchco ./src
-build-macos:
+compile-macos:
 	CGO_ENABLED=0 GOOS=darwin go build -ldflags "-s -w" -trimpath -o bin/hearchco ./src
-build-windows:
+compile-windows:
 	CGO_ENABLED=0 GOOS=windows go build -ldflags "-s -w" -trimpath -o bin/hearchco.exe ./src
 
 test:
