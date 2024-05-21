@@ -55,7 +55,7 @@ jobs:
         run: make install
 
       - name: Build project
-        run: make build
+        run: make compile
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
