@@ -35,8 +35,6 @@ type ReaderCache struct {
 	Type string `koanf:"type"`
 	// Has no effect if type is "none"
 	TTL ReaderTTL `koanf:"ttl"`
-	// Badger specific settings
-	Badger Badger `koanf:"badger"`
 	// Redis specific settings
 	Redis Redis `koanf:"redis"`
 }
@@ -45,8 +43,6 @@ type Cache struct {
 	Type string
 	// Has no effect if type is "none"
 	TTL TTL
-	// Badger specific settings
-	Badger Badger
 	// Redis specific settings
 	Redis Redis
 }
@@ -72,11 +68,6 @@ type TTL struct {
 	// Setting this to 0 disables this feature
 	// Setting this to the same value (or higher) as Results will update the cache entry every time
 	RefreshTime time.Duration
-}
-
-type Badger struct {
-	// Setting this to false will result in badger not persisting the cache to disk making it run "in-memory"
-	Persist bool `koanf:"persist"`
 }
 
 type Redis struct {

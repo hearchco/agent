@@ -157,9 +157,6 @@ func New() Config {
 					Time:        moretime.Week,
 					RefreshTime: 3 * moretime.Day,
 				},
-				Badger: Badger{
-					Persist: true,
-				},
 				Redis: Redis{
 					Host: "localhost",
 					Port: 6379,
