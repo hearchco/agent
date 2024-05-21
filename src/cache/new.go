@@ -16,7 +16,7 @@ func New(ctx context.Context, fileDbPath string, cacheConf config.Cache) (DB, er
 
 	switch cacheConf.Type {
 	case "redis":
-		db, err = redis.New(ctx, cacheConf.Redis)
+		db, err = redis.New(ctx, cacheConf.KeyPrefix, cacheConf.Redis)
 		if err != nil {
 			err = fmt.Errorf("failed creating a redis cache: %w", err)
 		}

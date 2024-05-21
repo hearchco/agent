@@ -28,7 +28,8 @@ func (c *Config) fromReader(rc ReaderConfig) {
 			Port:         rc.Server.Port,
 			FrontendUrls: strings.Split(rc.Server.FrontendUrls, ","),
 			Cache: Cache{
-				Type: rc.Server.Cache.Type,
+				Type:      rc.Server.Cache.Type,
+				KeyPrefix: rc.Server.Cache.KeyPrefix,
 				TTL: TTL{
 					Time:        moretime.ConvertFromFancyTime(rc.Server.Cache.TTL.Time),
 					RefreshTime: moretime.ConvertFromFancyTime(rc.Server.Cache.TTL.RefreshTime),
@@ -102,7 +103,8 @@ func (c Config) getReader() ReaderConfig {
 			Port:         c.Server.Port,
 			FrontendUrls: strings.Join(c.Server.FrontendUrls, ","),
 			Cache: ReaderCache{
-				Type: c.Server.Cache.Type,
+				Type:      c.Server.Cache.Type,
+				KeyPrefix: c.Server.Cache.KeyPrefix,
 				TTL: ReaderTTL{
 					Time:        moretime.ConvertToFancyTime(c.Server.Cache.TTL.Time),
 					RefreshTime: moretime.ConvertToFancyTime(c.Server.Cache.TTL.RefreshTime),
