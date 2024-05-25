@@ -208,7 +208,7 @@ func New() Config {
 					PreferredTimeoutMin:    1 * time.Second,
 					PreferredTimeoutMax:    2 * time.Second,
 					PreferredResultsNumber: 50,
-					StepTime:               200 * time.Millisecond,
+					StepTime:               100 * time.Millisecond,
 					MinimumResultsNumber:   30,
 					HardTimeout:            3 * time.Second,
 				},
