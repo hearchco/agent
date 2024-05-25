@@ -129,16 +129,6 @@ func NewImage() []engines.Name {
 	}
 }
 
-func NewQuick() []engines.Name {
-	return []engines.Name{
-		engines.BING,
-		engines.BRAVE,
-		engines.DUCKDUCKGO,
-		engines.GOOGLE,
-		engines.MOJEEK,
-	}
-}
-
 func NewScience() []engines.Name {
 	return []engines.Name{
 		engines.GOOGLESCHOLAR,
@@ -179,11 +169,11 @@ func New() Config {
 				Engines: NewGeneral(),
 				Ranking: NewRanking(),
 				Timings: CategoryTimings{
-					PreferredTimeoutMin:    1 * time.Second,
-					PreferredTimeoutMax:    2 * time.Second,
+					PreferredTimeoutMin:    500 * time.Millisecond,
+					PreferredTimeoutMax:    1200 * time.Millisecond,
 					PreferredResultsNumber: 20,
 					StepTime:               50 * time.Millisecond,
-					MinimumResultsNumber:   10,
+					MinimumResultsNumber:   11,
 					HardTimeout:            3 * time.Second,
 				},
 			},
@@ -191,10 +181,10 @@ func New() Config {
 				Engines: NewImage(),
 				Ranking: NewRanking(),
 				Timings: CategoryTimings{
-					PreferredTimeoutMin:    1 * time.Second,
-					PreferredTimeoutMax:    2 * time.Second,
+					PreferredTimeoutMin:    500 * time.Millisecond,
+					PreferredTimeoutMax:    1200 * time.Millisecond,
 					PreferredResultsNumber: 40,
-					StepTime:               100 * time.Millisecond,
+					StepTime:               50 * time.Millisecond,
 					MinimumResultsNumber:   20,
 					HardTimeout:            3 * time.Second,
 				},
@@ -211,28 +201,16 @@ func New() Config {
 					HardTimeout:            3 * time.Second,
 				},
 			},
-			category.QUICK: {
-				Engines: NewQuick(),
-				Ranking: NewRanking(),
-				Timings: CategoryTimings{
-					PreferredTimeoutMin:    500 * time.Millisecond,
-					PreferredTimeoutMax:    1500 * time.Millisecond,
-					PreferredResultsNumber: 10,
-					StepTime:               25 * time.Millisecond,
-					MinimumResultsNumber:   5,
-					HardTimeout:            3 * time.Second,
-				},
-			},
 			category.THOROUGH: {
 				Engines: NewGeneral(),
 				Ranking: NewRanking(),
 				Timings: CategoryTimings{
 					PreferredTimeoutMin:    1 * time.Second,
-					PreferredTimeoutMax:    4 * time.Second,
-					PreferredResultsNumber: 70,
-					StepTime:               100 * time.Millisecond,
-					MinimumResultsNumber:   50,
-					HardTimeout:            5 * time.Second,
+					PreferredTimeoutMax:    2 * time.Second,
+					PreferredResultsNumber: 50,
+					StepTime:               200 * time.Millisecond,
+					MinimumResultsNumber:   30,
+					HardTimeout:            3 * time.Second,
 				},
 			},
 		},
