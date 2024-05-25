@@ -21,7 +21,7 @@ require (
 	github.com/knadh/koanf/v2 v2.1.1
 	github.com/pkg/profile v1.7.0
 	github.com/redis/go-redis/v9 v9.5.1
-	github.com/rs/zerolog v1.32.0
+	github.com/rs/zerolog v1.33.0
 	golang.org/x/tools v0.21.0
 )
 
