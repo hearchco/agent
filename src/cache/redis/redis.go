@@ -8,25 +8,24 @@ import (
 
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/config"
-	"github.com/hearchco/hearchco/src/search/result"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 )
 
-type DB struct {
+type DRV struct {
 	ctx       context.Context
 	keyPrefix string
-	rdb       *redis.Client
+	client    *redis.Client
 }
 
-func New(ctx context.Context, keyPrefix string, config config.Redis) (DB, error) {
-	rdb := redis.NewClient(&redis.Options{
+func New(ctx context.Context, keyPrefix string, config config.Redis) (DRV, error) {
+	client := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%v:%v", config.Host, config.Port),
 		Password: config.Password,
 		DB:       int(config.Database),
 	})
 
-	if err := rdb.Ping(ctx).Err(); err != nil {
+	if err := client.Ping(ctx).Err(); err != nil {
 		log.Error().
 			Err(err).
 			Str("address", fmt.Sprintf("%v:%v/%v", config.Host, config.Port, config.Database)).
@@ -37,18 +36,18 @@ func New(ctx context.Context, keyPrefix string, config config.Redis) (DB, error)
 			Msg("Successful connection to redis")
 	}
 
-	return DB{ctx: ctx, keyPrefix: keyPrefix, rdb: rdb}, nil
+	return DRV{ctx: ctx, keyPrefix: keyPrefix, client: client}, nil
 }
 
-func (db DB) Close() {
-	if err := db.rdb.Close(); err != nil {
+func (drv DRV) Close() {
+	if err := drv.client.Close(); err != nil {
 		log.Error().Err(err).Msg("redis.Close(): error disconnecting from redis")
 	} else {
 		log.Debug().Msg("Successfully disconnected from redis")
 	}
 }
 
-func (db DB) Set(k string, v any, ttl ...time.Duration) error {
+func (drv DRV) Set(k string, v any, ttl ...time.Duration) error {
 	log.Debug().Msg("Caching...")
 	cacheTimer := time.Now()
 
@@ -57,10 +56,10 @@ func (db DB) Set(k string, v any, ttl ...time.Duration) error {
 		setTTL = ttl[0]
 	}
 
-	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", db.keyPrefix, k))
+	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 	if val, err := json.Marshal(v); err != nil {
 		return fmt.Errorf("redis.Set(): error marshaling value: %w", err)
-	} else if err := db.rdb.Set(db.ctx, key, val, setTTL).Err(); err != nil {
+	} else if err := drv.client.Set(drv.ctx, key, val, setTTL).Err(); err != nil {
 		return fmt.Errorf("redis.Set(): error setting KV to redis: %w", err)
 	} else {
 		log.Trace().
@@ -71,13 +70,9 @@ func (db DB) Set(k string, v any, ttl ...time.Duration) error {
 	return nil
 }
 
-func (db DB) SetResults(query string, category string, results []result.Result, ttl ...time.Duration) error {
-	return db.Set(fmt.Sprintf("%v_%v", query, category), results, ttl...)
-}
-
-func (db DB) Get(k string, o any) error {
-	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", db.keyPrefix, k))
-	val, err := db.rdb.Get(db.ctx, key).Result()
+func (drv DRV) Get(k string, o any) error {
+	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
+	val, err := drv.client.Get(drv.ctx, key).Result()
 	if err == redis.Nil {
 		log.Trace().
 			Str("key", key).
@@ -91,18 +86,12 @@ func (db DB) Get(k string, o any) error {
 	return nil
 }
 
-func (db DB) GetResults(query string, category string) ([]result.Result, error) {
-	var results []result.Result
-	err := db.Get(fmt.Sprintf("%v_%v", query, category), &results)
-	return results, err
-}
-
 // returns time until the key expires, not the time it will be considered expired
-func (db DB) GetTTL(k string) (time.Duration, error) {
+func (drv DRV) GetTTL(k string) (time.Duration, error) {
 	kInput := anonymize.HashToSHA256B64(k)
 
 	// returns time with time.Second precision
-	expiresIn, err := db.rdb.TTL(db.ctx, kInput).Result()
+	expiresIn, err := drv.client.TTL(drv.ctx, kInput).Result()
 	if err == redis.Nil {
 		log.Trace().
 			Str("key", kInput).
@@ -122,8 +111,4 @@ func (db DB) GetTTL(k string) (time.Duration, error) {
 	}
 
 	return expiresIn, nil
-}
-
-func (db DB) GetResultsTTL(query string, category string) (time.Duration, error) {
-	return db.GetTTL(fmt.Sprintf("%v_%v", query, category))
 }

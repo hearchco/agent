@@ -11,9 +11,8 @@ import (
 )
 
 func Search(query string, options engines.Options, db cache.DB, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) ([]result.Result, bool) {
-	var results []result.Result
 	var foundInDB bool
-	gerr := db.Get(query, &results)
+	results, gerr := db.GetResults(query, options.Category)
 	if gerr != nil {
 		// Error in reading cache is not returned, just logged
 		log.Error().

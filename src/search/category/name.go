@@ -11,3 +11,7 @@ const (
 	QUICK     Name = "quick"
 	THOROUGH  Name = "thorough"
 )
+
+func (n Name) String() string {
+	return string(n)
+}
