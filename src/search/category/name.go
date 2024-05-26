@@ -8,7 +8,6 @@ const (
 	GENERAL   Name = "general"
 	IMAGES    Name = "images"
 	SCIENCE   Name = "science"
-	QUICK     Name = "quick"
 	THOROUGH  Name = "thorough"
 )
 

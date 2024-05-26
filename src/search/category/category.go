@@ -9,8 +9,6 @@ var FromString = map[string]Name{
 	"images":   IMAGES,
 	"science":  SCIENCE,
 	"sci":      SCIENCE,
-	"quick":    QUICK,
-	"fast":     QUICK,
 	"thorough": THOROUGH,
 	"slow":     THOROUGH,
 }
