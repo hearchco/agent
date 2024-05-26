@@ -10,7 +10,7 @@ import (
 )
 
 func TestNewInMemory(t *testing.T) {
-	_, err := badger.New("", config.Badger{Persist: false})
+	_, err := badger.New("", "", config.Badger{Persist: false})
 	if err != nil {
 		t.Errorf("error opening in-memory badger: %v", err)
 	}
@@ -18,14 +18,14 @@ func TestNewInMemory(t *testing.T) {
 
 func TestNewPersistence(t *testing.T) {
 	path := "./testdump/new"
-	_, err := badger.New(path, config.Badger{Persist: true})
+	_, err := badger.New(path, "", config.Badger{Persist: true})
 	if err != nil {
 		t.Errorf("error opening badger at %v: %v", path, err)
 	}
 }
 
 func TestCloseInMemory(t *testing.T) {
-	db, err := badger.New("", config.Badger{Persist: false})
+	db, err := badger.New("", "", config.Badger{Persist: false})
 	if err != nil {
 		t.Errorf("error opening in-memory badger: %v", err)
 	}
@@ -35,7 +35,7 @@ func TestCloseInMemory(t *testing.T) {
 
 func TestClosePersistence(t *testing.T) {
 	path := "./testdump/close"
-	db, err := badger.New(path, config.Badger{Persist: true})
+	db, err := badger.New(path, "", config.Badger{Persist: true})
 	if err != nil {
 		t.Errorf("error opening badger at %v: %v", path, err)
 	}
@@ -44,7 +44,7 @@ func TestClosePersistence(t *testing.T) {
 }
 
 func TestSetInMemory(t *testing.T) {
-	db, err := badger.New("", config.Badger{Persist: false})
+	db, err := badger.New("", "", config.Badger{Persist: false})
 	if err != nil {
 		t.Errorf("error opening in-memory badger: %v", err)
 	}
@@ -59,7 +59,7 @@ func TestSetInMemory(t *testing.T) {
 
 func TestSetPersistence(t *testing.T) {
 	path := "./testdump/set"
-	db, err := badger.New(path, config.Badger{Persist: true})
+	db, err := badger.New(path, "", config.Badger{Persist: true})
 	if err != nil {
 		t.Errorf("error opening badger at %v: %v", path, err)
 	}
@@ -73,7 +73,7 @@ func TestSetPersistence(t *testing.T) {
 }
 
 func TestSetTTLInMemory(t *testing.T) {
-	db, err := badger.New("", config.Badger{Persist: false})
+	db, err := badger.New("", "", config.Badger{Persist: false})
 	if err != nil {
 		t.Errorf("error opening in-memory badger: %v", err)
 	}
@@ -88,7 +88,7 @@ func TestSetTTLInMemory(t *testing.T) {
 
 func TestSetTTLPersistence(t *testing.T) {
 	path := "./testdump/setttl"
-	db, err := badger.New(path, config.Badger{Persist: true})
+	db, err := badger.New(path, "", config.Badger{Persist: true})
 	if err != nil {
 		t.Errorf("error opening badger at %v: %v", path, err)
 	}
@@ -102,7 +102,7 @@ func TestSetTTLPersistence(t *testing.T) {
 }
 
 func TestGetInMemory(t *testing.T) {
-	db, err := badger.New("", config.Badger{Persist: false})
+	db, err := badger.New("", "", config.Badger{Persist: false})
 	if err != nil {
 		t.Errorf("error opening in-memory badger: %v", err)
 	}
@@ -127,7 +127,7 @@ func TestGetInMemory(t *testing.T) {
 
 func TestGetPersistence(t *testing.T) {
 	path := "./testdump/get"
-	db, err := badger.New(path, config.Badger{Persist: true})
+	db, err := badger.New(path, "", config.Badger{Persist: true})
 	if err != nil {
 		t.Errorf("error opening badger at %v: %v", path, err)
 	}
@@ -151,7 +151,7 @@ func TestGetPersistence(t *testing.T) {
 }
 
 func TestGetTTLInMemory(t *testing.T) {
-	db, err := badger.New("", config.Badger{Persist: false})
+	db, err := badger.New("", "", config.Badger{Persist: false})
 	if err != nil {
 		t.Errorf("error opening in-memory badger: %v", err)
 	}
@@ -176,7 +176,7 @@ func TestGetTTLInMemory(t *testing.T) {
 
 func TestGetTTLPersistence(t *testing.T) {
 	path := "./testdump/getttl"
-	db, err := badger.New(path, config.Badger{Persist: true})
+	db, err := badger.New(path, "", config.Badger{Persist: true})
 	if err != nil {
 		t.Errorf("error opening badger at %v: %v", path, err)
 	}
@@ -200,7 +200,7 @@ func TestGetTTLPersistence(t *testing.T) {
 }
 
 func TestGetInMemoryExpired(t *testing.T) {
-	db, err := badger.New("", config.Badger{Persist: false})
+	db, err := badger.New("", "", config.Badger{Persist: false})
 	if err != nil {
 		t.Errorf("error opening in-memory badger: %v", err)
 	}
@@ -223,7 +223,7 @@ func TestGetInMemoryExpired(t *testing.T) {
 
 func TestGetPersistenceExpired(t *testing.T) {
 	path := "./testdump/getexpired"
-	db, err := badger.New(path, config.Badger{Persist: true})
+	db, err := badger.New(path, "", config.Badger{Persist: true})
 	if err != nil {
 		t.Errorf("error opening badger at %v: %v", path, err)
 	}
