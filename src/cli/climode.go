@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/hearchco/hearchco/src/anonymize"
@@ -54,29 +55,62 @@ func printResults(results []result.Result) {
 }
 
 func Run(flags Flags, db cache.DB, conf config.Config) {
-	log.Info().
-		Str("queryAnon", anonymize.String(flags.Query)).
-		Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
-		Int("maxPages", flags.MaxPages).
-		Bool("visit", flags.Visit).
-		Msg("Started hearching")
+	query := flags.Query
+	// convert query to only contain the actual query, w/o category or whitespaces
+	query = strings.TrimSpace(query)
+	catFromQuery := category.FromQuery(query)
+	if catFromQuery != "" {
+		// remove the category from the query
+		query = strings.TrimSpace(strings.TrimPrefix(query, "!"+catFromQuery.String()))
+	}
+
+	if query == "" {
+		log.Error().Msg("Empty query or only category found")
+		return
+	}
+
+	// convert category string to category.Name, either from query (takes precedence) or from parameters
+	var categoryName category.Name
+	if catFromQuery != "" {
+		categoryName = category.SafeFromString(catFromQuery.String())
+	} else {
+		categoryName = category.SafeFromString(flags.Category)
+	}
+
+	if categoryName == category.UNDEFINED {
+		log.Error().Msg("Invalid category")
+		return
+	}
 
 	options := engines.Options{
+		VisitPages: flags.Visit,
+		SafeSearch: flags.SafeSearch,
+		Mobile:     flags.Mobile,
 		Pages: engines.Pages{
 			Start: flags.StartPage,
 			Max:   flags.MaxPages,
 		},
-		VisitPages: flags.Visit,
-		Category:   category.FromString[flags.Category],
-		UserAgent:  flags.UserAgent,
-		Locale:     flags.Locale,
-		SafeSearch: flags.SafeSearch,
-		Mobile:     flags.Mobile,
+		UserAgent: flags.UserAgent,
+		Locale:    flags.Locale,
+		Category:  categoryName,
 	}
+
+	log.Info().
+		Str("queryAnon", anonymize.String(query)).
+		Str("queryHash", anonymize.HashToSHA256B64(query)).
+		Str("category", options.Category.String()).
+		Bool("visit", options.VisitPages).
+		Bool("safeSearch", options.SafeSearch).
+		Bool("mobile", options.Mobile).
+		Int("startPage", options.Pages.Start).
+		Int("maxPages", options.Pages.Max).
+		Str("userAgent", options.UserAgent).
+		Str("locale", options.Locale).
+		Msg("Started hearching")
 
 	start := time.Now()
 
-	results, foundInDB := search.Search(flags.Query, options, db, conf.Settings, conf.Categories, conf.Server.Proxy.Salt)
+	results, foundInDB := search.Search(query, options, db, conf.Settings, conf.Categories, conf.Server.Proxy.Salt)
 
 	if !flags.Silent {
 		printResults(results)
@@ -87,5 +121,5 @@ func Run(flags Flags, db cache.DB, conf config.Config) {
 		Dur("duration", time.Since(start)).
 		Msg("Found results")
 
-	search.CacheAndUpdateResults(flags.Query, options, db, conf.Server.Cache.TTL, conf.Settings, conf.Categories, results, foundInDB, conf.Server.Proxy.Salt)
+	search.CacheAndUpdateResults(query, options, db, conf.Server.Cache.TTL, conf.Settings, conf.Categories, results, foundInDB, conf.Server.Proxy.Salt)
 }
