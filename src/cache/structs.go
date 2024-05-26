@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hearchco/hearchco/src/cache/badger"
 	"github.com/hearchco/hearchco/src/cache/nocache"
 	"github.com/hearchco/hearchco/src/cache/redis"
 	"github.com/hearchco/hearchco/src/config"
@@ -19,6 +20,11 @@ func New(ctx context.Context, fileDbPath string, cacheConf config.Cache) (DB, er
 	var err error
 
 	switch cacheConf.Type {
+	case "badger":
+		drv, err = badger.New(fileDbPath, cacheConf.KeyPrefix, cacheConf.Badger)
+		if err != nil {
+			err = fmt.Errorf("failed creating a badger cache: %w", err)
+		}
 	case "redis":
 		drv, err = redis.New(ctx, cacheConf.KeyPrefix, cacheConf.Redis)
 		if err != nil {

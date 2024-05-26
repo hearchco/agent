@@ -34,7 +34,8 @@ func (c *Config) fromReader(rc ReaderConfig) {
 					Time:        moretime.ConvertFromFancyTime(rc.Server.Cache.TTL.Time),
 					RefreshTime: moretime.ConvertFromFancyTime(rc.Server.Cache.TTL.RefreshTime),
 				},
-				Redis: rc.Server.Cache.Redis,
+				Badger: rc.Server.Cache.Badger,
+				Redis:  rc.Server.Cache.Redis,
 			},
 			Proxy: ImageProxy{
 				Salt: rc.Server.Proxy.Salt,
@@ -109,7 +110,8 @@ func (c Config) getReader() ReaderConfig {
 					Time:        moretime.ConvertToFancyTime(c.Server.Cache.TTL.Time),
 					RefreshTime: moretime.ConvertToFancyTime(c.Server.Cache.TTL.RefreshTime),
 				},
-				Redis: c.Server.Cache.Redis,
+				Badger: c.Server.Cache.Badger,
+				Redis:  c.Server.Cache.Redis,
 			},
 			Proxy: ReaderImageProxy{
 				Salt: c.Server.Proxy.Salt,
