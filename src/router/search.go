@@ -33,19 +33,42 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	params := r.Form
 
 	query := getParamOrDefault(params, "q")
+	categoryS := getParamOrDefault(params, "category", "")
 	pagesStartS := getParamOrDefault(params, "start", "1")
 	pagesMaxS := getParamOrDefault(params, "pages", "1")
 	visitPagesS := getParamOrDefault(params, "deep", "false")
 	locale := getParamOrDefault(params, "locale", config.DefaultLocale)
-	categoryS := getParamOrDefault(params, "category", "")
 	userAgent := getParamOrDefault(params, "useragent", "")
 	safeSearchS := getParamOrDefault(params, "safesearch", "false")
 	mobileS := getParamOrDefault(params, "mobile", "false")
 
-	queryWithoutSpaces := strings.TrimSpace(query)
-	if queryWithoutSpaces == "" || "!"+string(category.FromQuery(query)) == queryWithoutSpaces {
-		// return "[]" JSON when the query is empty or contains only category name
+	// convert query to only contain the actual query, w/o category or whitespaces
+	query = strings.TrimSpace(query)
+	catFromQuery := category.FromQuery(query)
+	if catFromQuery != "" {
+		// remove the category from the query
+		query = strings.TrimSpace(strings.TrimPrefix(query, "!"+catFromQuery.String()))
+	}
+
+	// return "[]" JSON if the query is empty or contains only the category
+	if query == "" {
 		return writeResponseJSON(w, http.StatusOK, []struct{}{})
+	}
+
+	// convert category string to category.Name, either from query (takes precedence) or from parameters
+	var categoryName category.Name
+	if catFromQuery != "" {
+		categoryName = category.SafeFromString(catFromQuery.String())
+	} else {
+		categoryName = category.SafeFromString(categoryS)
+	}
+
+	if categoryName == category.UNDEFINED {
+		// user error
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: "invalid category value",
+			Value:   fmt.Sprintf("%v", category.UNDEFINED),
+		})
 	}
 
 	pagesMax, err := strconv.Atoi(pagesMaxS)
@@ -106,15 +129,6 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 		})
 	}
 
-	categoryName := category.SafeFromString(categoryS)
-	if categoryName == category.UNDEFINED {
-		// user error
-		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
-			Message: "invalid category value",
-			Value:   fmt.Sprintf("%v", category.UNDEFINED),
-		})
-	}
-
 	safeSearch, err := strconv.ParseBool(safeSearchS)
 	if err != nil {
 		// user error
@@ -134,26 +148,23 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	}
 
 	options := engines.Options{
+		VisitPages: visitPages,
+		SafeSearch: safeSearch,
+		Mobile:     mobile,
 		Pages: engines.Pages{
 			Start: pagesStart,
 			Max:   pagesMax,
 		},
-		VisitPages: visitPages,
-		Category:   categoryName,
-		UserAgent:  userAgent,
-		Locale:     locale,
-		SafeSearch: safeSearch,
-		Mobile:     mobile,
+		UserAgent: userAgent,
+		Locale:    locale,
+		Category:  categoryName,
 	}
 
 	// search for results in db and web, afterwards return JSON
 	results, foundInDB := search.Search(query, options, db, settings, categories, salt)
 
-	// get category from query or options
-	cat := category.FromQueryWithFallback(query, options.Category)
-
 	// send response as soon as possible
-	if cat == category.IMAGES {
+	if options.Category == category.IMAGES {
 		resultsOutput := result.ConvertToImageOutput(results)
 		err = writeResponseJSON(w, http.StatusOK, resultsOutput)
 	} else {
@@ -162,6 +173,7 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	}
 
 	// don't return immediately, we want to cache results and update them if necessary
+	// TODO: this won't get executed when running in AWS Lambda, since the function will be terminated after the response is sent
 	search.CacheAndUpdateResults(query, options, db, ttlConf, settings, categories, results, foundInDB, salt)
 
 	// if writing response failed, return the error

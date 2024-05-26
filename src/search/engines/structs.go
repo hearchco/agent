@@ -34,14 +34,13 @@ type Pages struct {
 }
 
 type Options struct {
-	VisitPages    bool
-	SafeSearch    bool
-	Mobile        bool
-	JustFirstPage bool
-	Pages         Pages
-	UserAgent     string
-	Locale        string //format: en_US
-	Category      category.Name
+	VisitPages bool
+	SafeSearch bool
+	Mobile     bool
+	Pages      Pages
+	UserAgent  string
+	Locale     string //format: en_US
+	Category   category.Name
 }
 
 func ValidateLocale(locale string) error {
