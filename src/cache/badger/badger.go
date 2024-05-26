@@ -1,12 +1,12 @@
 package badger
 
 import (
+	"encoding/json"
 	"fmt"
 	"path"
 	"time"
 
 	"github.com/dgraph-io/badger/v4"
-	"github.com/fxamacker/cbor/v2"
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/rs/zerolog/log"
@@ -57,7 +57,7 @@ func (drv DRV) Close() {
 	}
 }
 
-func (drv DRV) Set(k string, v interface{}, ttl ...time.Duration) error {
+func (drv DRV) Set(k string, v any, ttl ...time.Duration) error {
 	log.Debug().Msg("Caching...")
 	cacheTimer := time.Now()
 
@@ -66,14 +66,15 @@ func (drv DRV) Set(k string, v interface{}, ttl ...time.Duration) error {
 		setTtl = ttl[0]
 	}
 
-	if val, err := cbor.Marshal(v); err != nil {
+	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
+	if val, err := json.Marshal(v); err != nil {
 		return fmt.Errorf("badger.Set(): error marshaling value: %w", err)
 	} else if err := drv.client.Update(func(txn *badger.Txn) error {
 		var e *badger.Entry
 		if setTtl != 0 {
-			e = badger.NewEntry([]byte(anonymize.HashToSHA256B64(k)), val).WithTTL(ttl[0])
+			e = badger.NewEntry([]byte(key), val).WithTTL(ttl[0])
 		} else {
-			e = badger.NewEntry([]byte(anonymize.HashToSHA256B64(k)), val)
+			e = badger.NewEntry([]byte(key), val)
 		}
 		return txn.SetEntry(e)
 		// ^returns error into else if
@@ -88,12 +89,12 @@ func (drv DRV) Set(k string, v interface{}, ttl ...time.Duration) error {
 	return nil
 }
 
-func (drv DRV) Get(k string, o interface{}) error {
-	kInput := anonymize.HashToSHA256B64(k)
+func (drv DRV) Get(k string, o any) error {
+	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
 	var val []byte
 	err := drv.client.View(func(txn *badger.Txn) error {
-		item, err := txn.Get([]byte(kInput))
+		item, err := txn.Get([]byte(key))
 		if err != nil {
 			return err
 		}
@@ -106,12 +107,12 @@ func (drv DRV) Get(k string, o interface{}) error {
 
 	if err == badger.ErrKeyNotFound {
 		log.Trace().
-			Str("key", kInput).
+			Str("key", key).
 			Msg("Found no value in badger")
 	} else if err != nil {
-		return fmt.Errorf("badger.Get(): error getting value from badger for key %v: %w", kInput, err)
-	} else if err := cbor.Unmarshal(val, o); err != nil {
-		return fmt.Errorf("badger.Get(): failed unmarshaling value from badger for key %v: %w", kInput, err)
+		return fmt.Errorf("badger.Get(): error getting value from badger for key %v: %w", key, err)
+	} else if err := json.Unmarshal(val, o); err != nil {
+		return fmt.Errorf("badger.Get(): failed unmarshaling value from badger for key %v: %w", key, err)
 	}
 
 	return nil
@@ -119,11 +120,11 @@ func (drv DRV) Get(k string, o interface{}) error {
 
 // returns time until the key expires, not the time it will be considered expired
 func (drv DRV) GetTTL(k string) (time.Duration, error) {
-	kInput := anonymize.HashToSHA256B64(k)
+	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
 	var expiresIn time.Duration
 	err := drv.client.View(func(txn *badger.Txn) error {
-		item, err := txn.Get([]byte(kInput))
+		item, err := txn.Get([]byte(key))
 		if err != nil {
 			return err
 		}
@@ -141,10 +142,10 @@ func (drv DRV) GetTTL(k string) (time.Duration, error) {
 
 	if err == badger.ErrKeyNotFound {
 		log.Trace().
-			Str("key", kInput).
+			Str("key", key).
 			Msg("Found no value in badger")
 	} else if err != nil {
-		return expiresIn, fmt.Errorf("badger.Get(): error getting value from badger for key %v: %w", kInput, err)
+		return expiresIn, fmt.Errorf("badger.Get(): error getting value from badger for key %v: %w", key, err)
 	}
 
 	return expiresIn, nil

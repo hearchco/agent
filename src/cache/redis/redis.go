@@ -88,16 +88,16 @@ func (drv DRV) Get(k string, o any) error {
 
 // returns time until the key expires, not the time it will be considered expired
 func (drv DRV) GetTTL(k string) (time.Duration, error) {
-	kInput := anonymize.HashToSHA256B64(k)
+	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
 	// returns time with time.Second precision
-	expiresIn, err := drv.client.TTL(drv.ctx, kInput).Result()
+	expiresIn, err := drv.client.TTL(drv.ctx, key).Result()
 	if err == redis.Nil {
 		log.Trace().
-			Str("key", kInput).
+			Str("key", key).
 			Msg("Found no value in redis")
 	} else if err != nil {
-		return expiresIn, fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", kInput, err)
+		return expiresIn, fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", key, err)
 	}
 
 	/*
