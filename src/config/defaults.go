@@ -143,7 +143,7 @@ func New() Config {
 			Port:         3030,
 			FrontendUrls: []string{"http://localhost:5173"},
 			Cache: Cache{
-				Type:      "badger",
+				Type:      "none",
 				KeyPrefix: "HEARCHCO_",
 				TTL: TTL{
 					Time:        moretime.Week,
