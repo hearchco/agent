@@ -13,14 +13,14 @@ func CheckTestCases(tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResult
 
 	// TestCaseHasAnyResults
 	for _, tc := range tchar {
-		if results := search.PerformSearch(tc.Query, tc.Options, conf.Settings, conf.Categories, ""); len(results) == 0 {
+		if results := search.PerformSearch(tc.Query, tc.Options, conf.Categories[tc.Options.Category], conf.Settings, ""); len(results) == 0 {
 			defer t.Errorf("Got no results for %q", tc.Query)
 		}
 	}
 
 	// TestCaseContainsResults
 	for _, tc := range tccr {
-		results := search.PerformSearch(tc.Query, tc.Options, conf.Settings, conf.Categories, "")
+		results := search.PerformSearch(tc.Query, tc.Options, conf.Categories[tc.Options.Category], conf.Settings, "")
 		if len(results) == 0 {
 			defer t.Errorf("Got no results for %q", tc.Query)
 		} else {
@@ -43,7 +43,7 @@ func CheckTestCases(tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResult
 
 	// TestCaseRankedResults
 	for _, tc := range tcrr {
-		results := search.PerformSearch(tc.Query, tc.Options, conf.Settings, conf.Categories, "")
+		results := search.PerformSearch(tc.Query, tc.Options, conf.Categories[tc.Options.Category], conf.Settings, "")
 		if len(results) == 0 {
 			defer t.Errorf("Got no results for %q", tc.Query)
 		} else if len(results) < len(tc.ResultURL) {

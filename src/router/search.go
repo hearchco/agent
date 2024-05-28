@@ -32,7 +32,7 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 
 	params := r.Form
 
-	query := getParamOrDefault(params, "q")
+	query := strings.TrimSpace(getParamOrDefault(params, "q"))
 	pagesStartS := getParamOrDefault(params, "start", "1")
 	pagesMaxS := getParamOrDefault(params, "pages", "1")
 	visitPagesS := getParamOrDefault(params, "deep", "false")
@@ -42,10 +42,12 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	safeSearchS := getParamOrDefault(params, "safesearch", "false")
 	mobileS := getParamOrDefault(params, "mobile", "false")
 
-	queryWithoutSpaces := strings.TrimSpace(query)
-	if queryWithoutSpaces == "" || "!"+string(category.FromQuery(query)) == queryWithoutSpaces {
-		// return "[]" JSON when the query is empty or contains only category name
-		return writeResponseJSON(w, http.StatusOK, []struct{}{})
+	if query == "" {
+		// user error
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: "query cannot be empty or whitespace",
+			Value:   "empty query",
+		})
 	}
 
 	pagesMax, err := strconv.Atoi(pagesMaxS)
@@ -106,12 +108,12 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 		})
 	}
 
-	categoryName := category.SafeFromString(categoryS)
-	if categoryName == category.UNDEFINED {
+	categoryName, err := category.FromString(categoryS)
+	if err != nil {
 		// user error
 		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
 			Message: "invalid category value",
-			Value:   fmt.Sprintf("%v", category.UNDEFINED),
+			Value:   fmt.Sprintf("%v", categoryName),
 		})
 	}
 
@@ -147,13 +149,10 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	}
 
 	// search for results in db and web, afterwards return JSON
-	results, foundInDB := search.Search(query, options, db, settings, categories, salt)
-
-	// get category from query or options
-	cat := category.FromQueryWithFallback(query, options.Category)
+	results, foundInDB := search.Search(query, options, db, categories[options.Category], settings, salt)
 
 	// send response as soon as possible
-	if cat == category.IMAGES {
+	if categoryName == category.IMAGES {
 		resultsOutput := result.ConvertToImageOutput(results)
 		err = writeResponseJSON(w, http.StatusOK, resultsOutput)
 	} else {
@@ -162,7 +161,7 @@ func Search(w http.ResponseWriter, r *http.Request, db cache.DB, ttlConf config.
 	}
 
 	// don't return immediately, we want to cache results and update them if necessary
-	search.CacheAndUpdateResults(query, options, db, ttlConf, settings, categories, results, foundInDB, salt)
+	search.CacheAndUpdateResults(query, options, db, ttlConf, categories[options.Category], settings, results, foundInDB, salt)
 
 	// if writing response failed, return the error
 	return err

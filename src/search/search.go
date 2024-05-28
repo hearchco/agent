@@ -4,13 +4,12 @@ import (
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/config"
-	"github.com/hearchco/hearchco/src/search/category"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/result"
 	"github.com/rs/zerolog/log"
 )
 
-func Search(query string, options engines.Options, db cache.DB, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) ([]result.Result, bool) {
+func Search(query string, options engines.Options, db cache.DB, categoryConf config.Category, settings map[engines.Name]config.Settings, salt string) ([]result.Result, bool) {
 	var results []result.Result
 	var foundInDB bool
 	gerr := db.Get(query, &results)
@@ -39,7 +38,7 @@ func Search(query string, options engines.Options, db cache.DB, settings map[eng
 			Msg("Nothing found in cache, doing a clean search")
 
 		// the main line
-		results = PerformSearch(query, options, settings, categories, salt)
+		results = PerformSearch(query, options, categoryConf, settings, salt)
 		result.Shorten(results, 2500)
 	}
 

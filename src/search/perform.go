@@ -9,55 +9,47 @@ import (
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/hearchco/hearchco/src/search/bucket"
-	"github.com/hearchco/hearchco/src/search/category"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/rank"
 	"github.com/hearchco/hearchco/src/search/result"
 	"github.com/rs/zerolog/log"
 )
 
-func PerformSearch(query string, options engines.Options, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category, salt string) []result.Result {
+func PerformSearch(query string, options engines.Options, categoryConf config.Category, settings map[engines.Name]config.Settings, salt string) []result.Result {
+	// check for empty query
 	if query == "" {
 		log.Trace().Msg("Empty search query.")
 		return []result.Result{}
 	}
 
+	// start searching
 	searchTimer := time.Now()
-
-	query, cat, timings, enginesToRun := procBang(query, options.Category, settings, categories)
-	// set the new category only within the scope of this function
-	options.Category = cat
-	query = url.QueryEscape(query)
-
-	// check again after the bang is taken out
-	if query == "" {
-		log.Trace().Msg("Empty search query (with bang present).")
-		return []result.Result{}
-	}
-
 	log.Debug().
 		Str("queryAnon", anonymize.String(query)).
 		Str("queryHash", anonymize.HashToSHA256B64(query)).
-		Msg("Searching")
+		Msg("Searching...")
 
+	// getting results from engines
 	resTimer := time.Now()
 	log.Debug().Msg("Waiting for results from engines...")
 
-	resultMap := runEngines(enginesToRun, query, options, settings, timings, salt)
+	resultMap := runEngines(categoryConf.Engines, url.QueryEscape(query), options, settings, categoryConf.Timings, salt)
 
 	log.Debug().
 		Dur("duration", time.Since(resTimer)).
 		Msg("Got results")
 
+	// ranking results
 	rankTimer := time.Now()
 	log.Debug().Msg("Ranking...")
 
-	results := rank.Rank(resultMap, categories[options.Category].Ranking)
+	results := rank.Rank(resultMap, categoryConf.Ranking)
 
 	log.Debug().
 		Dur("duration", time.Since(rankTimer)).
 		Msg("Finished ranking")
 
+	// finish searching
 	log.Debug().
 		Dur("duration", time.Since(searchTimer)).
 		Msg("Found results")

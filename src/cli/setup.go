@@ -36,7 +36,7 @@ func Setup() Flags {
 		// ^FATAL
 	}
 
-	if category.SafeFromString(cli.Category) == category.UNDEFINED {
+	if _, err := category.FromString(cli.Category); err != nil {
 		log.Fatal().Msg("cli.Setup(): invalid category flag")
 		// ^FATAL
 	}

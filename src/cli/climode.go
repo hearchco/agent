@@ -61,13 +61,18 @@ func Run(flags Flags, db cache.DB, conf config.Config) {
 		Bool("visit", flags.Visit).
 		Msg("Started hearching")
 
+	categoryName, err := category.FromString(flags.Category)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Invalid category")
+	}
+
 	options := engines.Options{
 		Pages: engines.Pages{
 			Start: flags.StartPage,
 			Max:   flags.MaxPages,
 		},
 		VisitPages: flags.Visit,
-		Category:   category.FromString[flags.Category],
+		Category:   categoryName,
 		UserAgent:  flags.UserAgent,
 		Locale:     flags.Locale,
 		SafeSearch: flags.SafeSearch,
@@ -76,7 +81,7 @@ func Run(flags Flags, db cache.DB, conf config.Config) {
 
 	start := time.Now()
 
-	results, foundInDB := search.Search(flags.Query, options, db, conf.Settings, conf.Categories, conf.Server.Proxy.Salt)
+	results, foundInDB := search.Search(flags.Query, options, db, conf.Categories[options.Category], conf.Settings, conf.Server.Proxy.Salt)
 
 	if !flags.Silent {
 		printResults(results)
@@ -87,5 +92,5 @@ func Run(flags Flags, db cache.DB, conf config.Config) {
 		Dur("duration", time.Since(start)).
 		Msg("Found results")
 
-	search.CacheAndUpdateResults(flags.Query, options, db, conf.Server.Cache.TTL, conf.Settings, conf.Categories, results, foundInDB, conf.Server.Proxy.Salt)
+	search.CacheAndUpdateResults(flags.Query, options, db, conf.Server.Cache.TTL, conf.Categories[options.Category], conf.Settings, results, foundInDB, conf.Server.Proxy.Salt)
 }
