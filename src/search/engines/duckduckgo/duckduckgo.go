@@ -2,7 +2,6 @@ package duckduckgo
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -39,7 +38,6 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 	col.OnHTML(dompaths.ResultsContainer, func(e *colly.HTMLElement) {
 		var linkText, linkScheme, titleText, descText string
 		var hrefExists bool
-		var rrank int
 
 		pageIndex := _sedefaults.PageFromContext(e.Request.Ctx, Info.Name)
 		page := pageIndex + options.Pages.Start + 1
@@ -47,8 +45,6 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 		e.DOM.Children().Each(func(i int, row *goquery.Selection) {
 			switch i % 4 {
 			case 0:
-				rankText := strings.TrimSpace(row.Children().First().Text())
-				fmt.Sscanf(rankText, "%d", &rrank)
 				var linkHref string
 				linkHref, hrefExists = row.Find(dompaths.Link).Attr("href")
 				if strings.Contains(linkHref, "https") {
