@@ -69,7 +69,7 @@ func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeouts config.
 		ProtoMinor: 1,
 		Header: map[string][]string{
 			"Accept":          {"image/avif", "image/webp", "image/apng", "image/svg+xml", "image/*", "*/*;q=0.8"},
-			"Accept-Encoding": {"gzip", "deflate", "br"}, // Google Chrome also has "zstd" but that isn't supported by Firefox and Safari
+			"Accept-Encoding": {"gzip", "deflate", "br", "zstd"}, // Chromium-based browsers have "zstd" but that isn't supported by Firefox nor Safari
 			"Accept-Language": {"en-US,en;q=0.9"},
 			// "Connection":   {"keep-alive"}, // commented since it's not present by default in Google Chrome
 			// "DNT":          {"1"}, // do not track, commented since it's not present by default in Google Chrome
