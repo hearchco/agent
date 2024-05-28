@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/alecthomas/kong"
+	"github.com/hearchco/hearchco/src/gotypelimits"
 	"github.com/hearchco/hearchco/src/search/category"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/rs/zerolog/log"
@@ -27,34 +28,47 @@ func Setup() Flags {
 	)
 
 	if err := ctx.Validate(); err != nil {
-		log.Panic().Err(err).Msg("cli.Setup(): failed parsing cli") // panic is also run inside the library. when does this happen?
+		log.Panic().Caller().Err(err).Msg("failed parsing cli") // panic is also run inside the library. when does this happen?
 		// ^PANIC
 	}
 
-	if locErr := engines.ValidateLocale(cli.Locale); locErr != nil {
-		log.Fatal().Err(locErr).Msg("cli.Setup(): invalid locale flag")
+	if cli.Query == "" {
+		log.Fatal().Caller().Msg("query cannot be empty or whitespace")
+		// ^FATAL
+	}
+
+	// TODO: make upper limit configurable
+	pagesMaxUpperLimit := 10
+	if cli.PagesMax < 1 || cli.PagesMax > pagesMaxUpperLimit {
+		log.Fatal().
+			Caller().
+			Int("pages", cli.PagesMax).
+			Int("min", 1).
+			Int("max", pagesMaxUpperLimit).
+			Msg("pages value out of range")
+		// ^FATAL
+	}
+
+	if cli.PagesStart < 1 || cli.PagesStart > gotypelimits.MaxInt-pagesMaxUpperLimit {
+		log.Fatal().
+			Caller().
+			Int("start", cli.PagesStart).
+			Int("min", 1).
+			Int("max", gotypelimits.MaxInt-pagesMaxUpperLimit).
+			Msg("start value out of range")
+		// ^FATAL
+	} else {
+		// since it's >=1, we decrement it to match the 0-based index
+		cli.PagesStart -= 1
+	}
+
+	if err := engines.ValidateLocale(cli.Locale); err != nil {
+		log.Fatal().Caller().Err(err).Msg("invalid locale flag")
 		// ^FATAL
 	}
 
 	if _, err := category.FromString(cli.Category); err != nil {
-		log.Fatal().Msg("cli.Setup(): invalid category flag")
-		// ^FATAL
-	}
-
-	if cli.StartPage < 1 {
-		log.Fatal().
-			Int("startpage", cli.StartPage).
-			Msg("cli.Setup(): invalid start page flag (must be >= 1)")
-		// ^FATAL
-	} else {
-		// since it's >=1, we decrement it to match the 0-based index
-		cli.StartPage -= 1
-	}
-
-	if cli.MaxPages < 1 {
-		log.Fatal().
-			Int("maxpages", cli.MaxPages).
-			Msg("cli.Setup(): invalid max pages flag (must be >= 1)")
+		log.Fatal().Caller().Msg("invalid category flag")
 		// ^FATAL
 	}
 

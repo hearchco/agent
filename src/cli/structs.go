@@ -17,14 +17,12 @@ type Flags struct {
 	DataDirPath string `type:"path" default:"${data_folder}" env:"HEARCHCO_DATA_DIR" help:"Data folder path"`
 	Verbosity   int8   `type:"counter" default:"0" short:"v" env:"HEARCHCO_VERBOSITY" help:"Log level verbosity"`
 	// options
-	StartPage  int    `type:"counter" default:"1" env:"HEARCHCO_START_PAGE" help:"Page from which to start searching (>=1)"`
-	MaxPages   int    `type:"counter" default:"1" env:"HEARCHCO_MAX_PAGES" help:"Number of pages to search (>=1)"`
 	Visit      bool   `type:"bool" default:"false" env:"HEARCHCO_VISIT" help:"Should results be visited"`
-	Category   string `type:"string" default:"" short:"c" env:"HEARCHCO_CATEGORY" help:"Search result category. Can also be supplied through the query (e.g. \"!info smartphone\"). Supported values: info[/wiki], science[/sci], news, blog, surf, newnews[/nnews]"`
-	UserAgent  string `type:"string" default:"" env:"HEARCHCO_USER_AGENT" help:"The user agent"`
-	Locale     string `type:"string" default:"" env:"HEARCHCO_LOCALE" help:"Locale string specifying result language and region preference. The format is en_US"`
 	SafeSearch bool   `type:"bool" default:"false" env:"HEARCHCO_SAFE_SEARCH" help:"Whether to use safe search"`
-	Mobile     bool   `type:"bool" default:"false" env:"HEARCHCO_MOBILE" help:"Whether to gear results towards mobile"`
+	PagesStart int    `type:"counter" default:"1" env:"HEARCHCO_PAGES_START" help:"Page from which to start searching (>=1)"`
+	PagesMax   int    `type:"counter" default:"1" env:"HEARCHCO_PAGES_MAX" help:"Number of pages to search (>=1)"`
+	Locale     string `type:"string" default:"en_US" env:"HEARCHCO_LOCALE" help:"Locale string specifying result language and region preference. The format is en_US"`
+	Category   string `type:"string" default:"general" short:"c" env:"HEARCHCO_CATEGORY" help:"Search result category. Can also be supplied through the query (e.g. \"!images smartphone\")."`
 	// profiler
 	CPUProfile    bool `type:"bool" default:"false" env:"HEARCHCO_CPUPROFILE" help:"Use cpu profiling"`
 	HeapProfile   bool `type:"bool" default:"false" env:"HEARCHCO_HEAPPROFILE" help:"Use heap profiling"`
