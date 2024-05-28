@@ -10,7 +10,7 @@ import (
 )
 
 func Search(query string, options engines.Options, db cache.DB, categoryConf config.Category, settings map[engines.Name]config.Settings, salt string) ([]result.Result, bool) {
-	if results, err := db.GetResults(query, options.Category); err != nil {
+	if results, err := db.GetResults(query, options); err != nil {
 		// Error in reading cache is not returned, just logged
 		log.Error().
 			Caller().
