@@ -4,14 +4,14 @@ import (
 	"time"
 )
 
-type DB struct{}
+type DRV struct{}
 
-func New() (DB, error) { return DB{}, nil }
+func New() (DRV, error) { return DRV{}, nil }
 
-func (db DB) Close() {}
+func (drv DRV) Close() {}
 
-func (db DB) Set(k string, v interface{}, ttl ...time.Duration) error { return nil }
+func (drv DRV) Set(k string, v any, ttl ...time.Duration) error { return nil }
 
-func (db DB) Get(k string, o interface{}, hashed ...bool) error { return nil }
+func (drv DRV) Get(k string, o any) error { return nil }
 
-func (db DB) GetTTL(k string, hashed ...bool) (time.Duration, error) { return 0, nil }
+func (drv DRV) GetTTL(k string) (time.Duration, error) { return 0, nil }

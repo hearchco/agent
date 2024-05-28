@@ -1,10 +1,12 @@
 package cache
 
-import "time"
+import (
+	"time"
+)
 
-type DB interface {
+type Driver interface {
 	Close()
-	Set(k string, v interface{}, ttl ...time.Duration) error
-	Get(k string, o interface{}, hashed ...bool) error
-	GetTTL(k string, hashed ...bool) (time.Duration, error)
+	Set(k string, v any, ttl ...time.Duration) error
+	Get(k string, o any) error
+	GetTTL(k string) (time.Duration, error)
 }

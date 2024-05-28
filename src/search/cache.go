@@ -20,7 +20,7 @@ func CacheAndUpdateResults(
 			Str("queryAnon", anonymize.String(query)).
 			Str("queryHash", anonymize.HashToSHA256B64(query)).
 			Msg("Caching results...")
-		serr := db.Set(query, results, ttlConf.Time)
+		serr := db.SetResults(query, options.Category, results, ttlConf.Time)
 		if serr != nil {
 			log.Error().
 				Caller().
@@ -34,7 +34,7 @@ func CacheAndUpdateResults(
 			Str("queryAnon", anonymize.String(query)).
 			Str("queryHash", anonymize.HashToSHA256B64(query)).
 			Msg("Checking if results need to be updated")
-		ttl, terr := db.GetTTL(query)
+		ttl, terr := db.GetResultsTTL(query, options.Category)
 		if terr != nil {
 			log.Error().
 				Caller().
@@ -48,7 +48,7 @@ func CacheAndUpdateResults(
 				Str("queryHash", anonymize.HashToSHA256B64(query)).
 				Msg("Updating results...")
 			newResults := PerformSearch(query, options, categoryConf, settings, salt)
-			uerr := db.Set(query, newResults, ttlConf.Time)
+			uerr := db.SetResults(query, options.Category, newResults, ttlConf.Time)
 			if uerr != nil {
 				// Error in updating cache is not returned, just logged
 				log.Error().

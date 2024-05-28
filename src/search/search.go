@@ -10,38 +10,32 @@ import (
 )
 
 func Search(query string, options engines.Options, db cache.DB, categoryConf config.Category, settings map[engines.Name]config.Settings, salt string) ([]result.Result, bool) {
-	var results []result.Result
-	var foundInDB bool
-	gerr := db.Get(query, &results)
-	if gerr != nil {
+	if results, err := db.GetResults(query, options.Category); err != nil {
 		// Error in reading cache is not returned, just logged
 		log.Error().
 			Caller().
-			Err(gerr).
+			Err(err).
 			Str("queryAnon", anonymize.String(query)).
 			Str("queryHash", anonymize.HashToSHA256B64(query)).
 			Msg("Failed accessing cache")
 	} else if results != nil {
-		foundInDB = true
-	} else {
-		foundInDB = false
-	}
-
-	if foundInDB {
 		log.Debug().
 			Str("queryAnon", anonymize.String(query)).
 			Str("queryHash", anonymize.HashToSHA256B64(query)).
 			Msg("Found results in cache")
-	} else {
-		log.Debug().
-			Str("queryAnon", anonymize.String(query)).
-			Str("queryHash", anonymize.HashToSHA256B64(query)).
-			Msg("Nothing found in cache, doing a clean search")
 
-		// the main line
-		results = PerformSearch(query, options, categoryConf, settings, salt)
-		result.Shorten(results, 2500)
+		return results, true
 	}
 
-	return results, foundInDB
+	// if the cache is inaccesible or the query+category is not in the cache
+	log.Debug().
+		Str("queryAnon", anonymize.String(query)).
+		Str("queryHash", anonymize.HashToSHA256B64(query)).
+		Msg("Nothing found in cache, doing a clean search")
+
+	// the main line
+	results := PerformSearch(query, options, categoryConf, settings, salt)
+	result.Shorten(results, 2500)
+
+	return results, false
 }

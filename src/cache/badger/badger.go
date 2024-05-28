@@ -12,11 +12,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type DB struct {
-	bdb *badger.DB
+type DRV struct {
+	keyPrefix string
+	client    *badger.DB
 }
 
-func New(dataDirPath string, config config.Badger) (DB, error) {
+func New(dataDirPath string, keyPrefix string, config config.Badger) (DRV, error) {
 	badgerPath := path.Join(dataDirPath, "database")
 
 	var opt badger.Options
@@ -26,8 +27,7 @@ func New(dataDirPath string, config config.Badger) (DB, error) {
 		opt = badger.DefaultOptions("").WithInMemory(true).WithLoggingLevel(badger.WARNING)
 	}
 
-	bdb, err := badger.Open(opt)
-
+	client, err := badger.Open(opt)
 	if err != nil {
 		log.Error().
 			Err(err).
@@ -45,11 +45,11 @@ func New(dataDirPath string, config config.Badger) (DB, error) {
 			Msg("Successfully opened in-memory badger")
 	}
 
-	return DB{bdb: bdb}, err
+	return DRV{keyPrefix, client}, err
 }
 
-func (db DB) Close() {
-	if err := db.bdb.Close(); err != nil {
+func (drv DRV) Close() {
+	if err := drv.client.Close(); err != nil {
 		log.Error().
 			Err(err).
 			Msg("Error closing badger")
@@ -58,7 +58,7 @@ func (db DB) Close() {
 	}
 }
 
-func (db DB) Set(k string, v interface{}, ttl ...time.Duration) error {
+func (drv DRV) Set(k string, v any, ttl ...time.Duration) error {
 	log.Debug().Msg("Caching...")
 	cacheTimer := time.Now()
 
@@ -67,14 +67,15 @@ func (db DB) Set(k string, v interface{}, ttl ...time.Duration) error {
 		setTtl = ttl[0]
 	}
 
+	key := fmt.Sprintf("%v%v", drv.keyPrefix, k)
 	if val, err := json.Marshal(v); err != nil {
 		return fmt.Errorf("badger.Set(): error marshaling value: %w", err)
-	} else if err := db.bdb.Update(func(txn *badger.Txn) error {
+	} else if err := drv.client.Update(func(txn *badger.Txn) error {
 		var e *badger.Entry
 		if setTtl != 0 {
-			e = badger.NewEntry([]byte(anonymize.HashToSHA256B64(k)), val).WithTTL(ttl[0])
+			e = badger.NewEntry([]byte(key), val).WithTTL(ttl[0])
 		} else {
-			e = badger.NewEntry([]byte(anonymize.HashToSHA256B64(k)), val)
+			e = badger.NewEntry([]byte(key), val)
 		}
 		return txn.SetEntry(e)
 		// ^returns error into else if
@@ -89,17 +90,12 @@ func (db DB) Set(k string, v interface{}, ttl ...time.Duration) error {
 	return nil
 }
 
-func (db DB) Get(k string, o interface{}, hashed ...bool) error {
-	var kInput string
-	if len(hashed) > 0 && hashed[0] {
-		kInput = k
-	} else {
-		kInput = anonymize.HashToSHA256B64(k)
-	}
+func (drv DRV) Get(k string, o any) error {
+	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
 	var val []byte
-	err := db.bdb.View(func(txn *badger.Txn) error {
-		item, err := txn.Get([]byte(kInput))
+	err := drv.client.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte(key))
 		if err != nil {
 			return err
 		}
@@ -112,29 +108,24 @@ func (db DB) Get(k string, o interface{}, hashed ...bool) error {
 
 	if err == badger.ErrKeyNotFound {
 		log.Trace().
-			Str("key", kInput).
+			Str("key", key).
 			Msg("Found no value in badger")
 	} else if err != nil {
-		return fmt.Errorf("badger.Get(): error getting value from badger for key %v: %w", kInput, err)
+		return fmt.Errorf("badger.Get(): error getting value from badger for key %v: %w", key, err)
 	} else if err := json.Unmarshal(val, o); err != nil {
-		return fmt.Errorf("badger.Get(): failed unmarshaling value from badger for key %v: %w", kInput, err)
+		return fmt.Errorf("badger.Get(): failed unmarshaling value from badger for key %v: %w", key, err)
 	}
 
 	return nil
 }
 
 // returns time until the key expires, not the time it will be considered expired
-func (db DB) GetTTL(k string, hashed ...bool) (time.Duration, error) {
-	var kInput string
-	if len(hashed) > 0 && hashed[0] {
-		kInput = k
-	} else {
-		kInput = anonymize.HashToSHA256B64(k)
-	}
+func (drv DRV) GetTTL(k string) (time.Duration, error) {
+	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
 	var expiresIn time.Duration
-	err := db.bdb.View(func(txn *badger.Txn) error {
-		item, err := txn.Get([]byte(kInput))
+	err := drv.client.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte(key))
 		if err != nil {
 			return err
 		}
@@ -152,10 +143,10 @@ func (db DB) GetTTL(k string, hashed ...bool) (time.Duration, error) {
 
 	if err == badger.ErrKeyNotFound {
 		log.Trace().
-			Str("key", kInput).
+			Str("key", key).
 			Msg("Found no value in badger")
 	} else if err != nil {
-		return expiresIn, fmt.Errorf("badger.Get(): error getting value from badger for key %v: %w", kInput, err)
+		return expiresIn, fmt.Errorf("badger.Get(): error getting value from badger for key %v: %w", key, err)
 	}
 
 	return expiresIn, nil
