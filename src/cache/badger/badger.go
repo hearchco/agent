@@ -67,7 +67,7 @@ func (drv DRV) Set(k string, v any, ttl ...time.Duration) error {
 		setTtl = ttl[0]
 	}
 
-	key := fmt.Sprintf("%v%v", drv.keyPrefix, k)
+	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 	if val, err := json.Marshal(v); err != nil {
 		return fmt.Errorf("badger.Set(): error marshaling value: %w", err)
 	} else if err := drv.client.Update(func(txn *badger.Txn) error {
