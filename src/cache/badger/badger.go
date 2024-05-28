@@ -1,12 +1,12 @@
 package badger
 
 import (
+	"encoding/json"
 	"fmt"
 	"path"
 	"time"
 
 	"github.com/dgraph-io/badger/v4"
-	"github.com/fxamacker/cbor/v2"
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/rs/zerolog/log"
@@ -67,7 +67,7 @@ func (db DB) Set(k string, v interface{}, ttl ...time.Duration) error {
 		setTtl = ttl[0]
 	}
 
-	if val, err := cbor.Marshal(v); err != nil {
+	if val, err := json.Marshal(v); err != nil {
 		return fmt.Errorf("badger.Set(): error marshaling value: %w", err)
 	} else if err := db.bdb.Update(func(txn *badger.Txn) error {
 		var e *badger.Entry
@@ -116,7 +116,7 @@ func (db DB) Get(k string, o interface{}, hashed ...bool) error {
 			Msg("Found no value in badger")
 	} else if err != nil {
 		return fmt.Errorf("badger.Get(): error getting value from badger for key %v: %w", kInput, err)
-	} else if err := cbor.Unmarshal(val, o); err != nil {
+	} else if err := json.Unmarshal(val, o); err != nil {
 		return fmt.Errorf("badger.Get(): failed unmarshaling value from badger for key %v: %w", kInput, err)
 	}
 

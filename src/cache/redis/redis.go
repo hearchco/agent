@@ -2,10 +2,10 @@ package redis
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
-	"github.com/fxamacker/cbor/v2"
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/redis/go-redis/v9"
@@ -57,7 +57,7 @@ func (db DB) Set(k string, v interface{}, ttl ...time.Duration) error {
 		setTtl = ttl[0]
 	}
 
-	if val, err := cbor.Marshal(v); err != nil {
+	if val, err := json.Marshal(v); err != nil {
 		return fmt.Errorf("redis.Set(): error marshaling value: %w", err)
 	} else if err := db.rdb.Set(db.ctx, anonymize.HashToSHA256B64(k), val, setTtl).Err(); err != nil {
 		return fmt.Errorf("redis.Set(): error setting KV to redis: %w", err)
@@ -85,7 +85,7 @@ func (db DB) Get(k string, o interface{}, hashed ...bool) error {
 			Msg("Found no value in redis")
 	} else if err != nil {
 		return fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", kInput, err)
-	} else if err := cbor.Unmarshal([]byte(val), o); err != nil {
+	} else if err := json.Unmarshal([]byte(val), o); err != nil {
 		return fmt.Errorf("redis.Get(): failed unmarshaling value from redis for key %v: %w", kInput, err)
 	}
 
