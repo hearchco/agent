@@ -11,28 +11,36 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type DB struct {
+	driver Driver
+}
+
 func New(ctx context.Context, fileDbPath string, cacheConf config.Cache) (DB, error) {
-	var db DB
+	var drv Driver
 	var err error
 
 	switch cacheConf.Type {
 	case "badger":
-		db, err = badger.New(fileDbPath, cacheConf.Badger)
+		drv, err = badger.New(fileDbPath, cacheConf.KeyPrefix, cacheConf.Badger)
 		if err != nil {
 			err = fmt.Errorf("failed creating a badger cache: %w", err)
 		}
 	case "redis":
-		db, err = redis.New(ctx, cacheConf.Redis)
+		drv, err = redis.New(ctx, cacheConf.KeyPrefix, cacheConf.Redis)
 		if err != nil {
 			err = fmt.Errorf("failed creating a redis cache: %w", err)
 		}
 	default:
-		db, err = nocache.New()
+		drv, err = nocache.New()
 		if err != nil {
 			err = fmt.Errorf("failed creating a nocache: %w", err)
 		}
 		log.Warn().Msg("Running without caching!")
 	}
 
-	return db, err
+	return DB{drv}, err
+}
+
+func (db DB) Close() {
+	db.driver.Close()
 }

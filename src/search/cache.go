@@ -20,11 +20,11 @@ func CacheAndUpdateResults(
 			Str("queryAnon", anonymize.String(query)).
 			Str("queryHash", anonymize.HashToSHA256B64(query)).
 			Msg("Caching results...")
-		serr := db.Set(query, results, ttlConf.Time)
-		if serr != nil {
+		err := db.SetResults(query, options, results, ttlConf.Time)
+		if err != nil {
 			log.Error().
 				Caller().
-				Err(serr).
+				Err(err).
 				Str("queryAnon", anonymize.String(query)).
 				Str("queryHash", anonymize.HashToSHA256B64(query)).
 				Msg("Error updating database with search results")
@@ -34,11 +34,11 @@ func CacheAndUpdateResults(
 			Str("queryAnon", anonymize.String(query)).
 			Str("queryHash", anonymize.HashToSHA256B64(query)).
 			Msg("Checking if results need to be updated")
-		ttl, terr := db.GetTTL(query)
-		if terr != nil {
+		ttl, err := db.GetResultsTTL(query, options)
+		if err != nil {
 			log.Error().
 				Caller().
-				Err(terr).
+				Err(err).
 				Str("queryAnon", anonymize.String(query)).
 				Str("queryHash", anonymize.HashToSHA256B64(query)).
 				Msg("Error getting TTL from database")
@@ -48,12 +48,12 @@ func CacheAndUpdateResults(
 				Str("queryHash", anonymize.HashToSHA256B64(query)).
 				Msg("Updating results...")
 			newResults := PerformSearch(query, options, categoryConf, settings, salt)
-			uerr := db.Set(query, newResults, ttlConf.Time)
-			if uerr != nil {
+			err := db.SetResults(query, options, newResults, ttlConf.Time)
+			if err != nil {
 				// Error in updating cache is not returned, just logged
 				log.Error().
 					Caller().
-					Err(uerr).
+					Err(err).
 					Str("queryAnon", anonymize.String(query)).
 					Str("queryHash", anonymize.HashToSHA256B64(query)).
 					Msg("Error replacing old results while updating database")

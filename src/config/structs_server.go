@@ -33,6 +33,8 @@ type Server struct {
 type ReaderCache struct {
 	// Can be "none", "badger" or "redis"
 	Type string `koanf:"type"`
+	// Prefix to use for cache keys
+	KeyPrefix string `koanf:"keyprefix"`
 	// Has no effect if type is "none"
 	TTL ReaderTTL `koanf:"ttl"`
 	// Badger specific settings
@@ -43,6 +45,8 @@ type ReaderCache struct {
 type Cache struct {
 	// Can be "none", "badger" or "redis"
 	Type string
+	// Prefix to use for cache keys
+	KeyPrefix string
 	// Has no effect if type is "none"
 	TTL TTL
 	// Badger specific settings

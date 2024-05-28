@@ -2,29 +2,31 @@ package redis
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
-	"github.com/fxamacker/cbor/v2"
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/config"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 )
 
-type DB struct {
-	ctx context.Context
-	rdb *redis.Client
+type DRV struct {
+	ctx       context.Context
+	keyPrefix string
+	client    *redis.Client
 }
 
-func New(ctx context.Context, config config.Redis) (DB, error) {
-	rdb := redis.NewClient(&redis.Options{
+func New(ctx context.Context, keyPrefix string, config config.Redis) (DRV, error) {
+	client := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%v:%v", config.Host, config.Port),
 		Password: config.Password,
 		DB:       int(config.Database),
 	})
 
-	if err := rdb.Ping(ctx).Err(); err != nil {
+	err := client.Ping(ctx).Err()
+	if err != nil {
 		log.Error().
 			Err(err).
 			Str("address", fmt.Sprintf("%v:%v/%v", config.Host, config.Port, config.Database)).
@@ -35,11 +37,11 @@ func New(ctx context.Context, config config.Redis) (DB, error) {
 			Msg("Successfully connected to redis")
 	}
 
-	return DB{rdb: rdb, ctx: ctx}, nil
+	return DRV{ctx, keyPrefix, client}, err
 }
 
-func (db DB) Close() {
-	if err := db.rdb.Close(); err != nil {
+func (drv DRV) Close() {
+	if err := drv.client.Close(); err != nil {
 		log.Error().
 			Err(err).
 			Msg("Error closing connection to redis")
@@ -48,7 +50,7 @@ func (db DB) Close() {
 	}
 }
 
-func (db DB) Set(k string, v interface{}, ttl ...time.Duration) error {
+func (drv DRV) Set(k string, v any, ttl ...time.Duration) error {
 	log.Debug().Msg("Caching...")
 	cacheTimer := time.Now()
 
@@ -57,9 +59,9 @@ func (db DB) Set(k string, v interface{}, ttl ...time.Duration) error {
 		setTtl = ttl[0]
 	}
 
-	if val, err := cbor.Marshal(v); err != nil {
+	if val, err := json.Marshal(v); err != nil {
 		return fmt.Errorf("redis.Set(): error marshaling value: %w", err)
-	} else if err := db.rdb.Set(db.ctx, anonymize.HashToSHA256B64(k), val, setTtl).Err(); err != nil {
+	} else if err := drv.client.Set(drv.ctx, anonymize.HashToSHA256B64(k), val, setTtl).Err(); err != nil {
 		return fmt.Errorf("redis.Set(): error setting KV to redis: %w", err)
 	} else {
 		log.Trace().
@@ -70,45 +72,35 @@ func (db DB) Set(k string, v interface{}, ttl ...time.Duration) error {
 	return nil
 }
 
-func (db DB) Get(k string, o interface{}, hashed ...bool) error {
-	var kInput string
-	if len(hashed) > 0 && hashed[0] {
-		kInput = k
-	} else {
-		kInput = anonymize.HashToSHA256B64(k)
-	}
+func (drv DRV) Get(k string, o any) error {
+	key := anonymize.HashToSHA256B64(k)
 
-	val, err := db.rdb.Get(db.ctx, kInput).Result()
+	val, err := drv.client.Get(drv.ctx, key).Result()
 	if err == redis.Nil {
 		log.Trace().
-			Str("key", kInput).
+			Str("key", key).
 			Msg("Found no value in redis")
 	} else if err != nil {
-		return fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", kInput, err)
-	} else if err := cbor.Unmarshal([]byte(val), o); err != nil {
-		return fmt.Errorf("redis.Get(): failed unmarshaling value from redis for key %v: %w", kInput, err)
+		return fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", key, err)
+	} else if err := json.Unmarshal([]byte(val), o); err != nil {
+		return fmt.Errorf("redis.Get(): failed unmarshaling value from redis for key %v: %w", key, err)
 	}
 
 	return nil
 }
 
 // returns time until the key expires, not the time it will be considered expired
-func (db DB) GetTTL(k string, hashed ...bool) (time.Duration, error) {
-	var kInput string
-	if len(hashed) > 0 && hashed[0] {
-		kInput = k
-	} else {
-		kInput = anonymize.HashToSHA256B64(k)
-	}
+func (drv DRV) GetTTL(k string) (time.Duration, error) {
+	key := anonymize.HashToSHA256B64(k)
 
 	// returns time with time.Second precision
-	expiresIn, err := db.rdb.TTL(db.ctx, kInput).Result()
+	expiresIn, err := drv.client.TTL(drv.ctx, key).Result()
 	if err == redis.Nil {
 		log.Trace().
-			Str("key", kInput).
+			Str("key", key).
 			Msg("Found no value in redis")
 	} else if err != nil {
-		return expiresIn, fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", kInput, err)
+		return expiresIn, fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", key, err)
 	}
 
 	/*
