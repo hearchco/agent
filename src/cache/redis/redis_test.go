@@ -57,7 +57,7 @@ var redisConf = newRedisConf()
 
 func TestNew(t *testing.T) {
 	ctx := context.Background()
-	_, err := redis.New(ctx, "", redisConf)
+	_, err := redis.New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
@@ -65,7 +65,7 @@ func TestNew(t *testing.T) {
 
 func TestClose(t *testing.T) {
 	ctx := context.Background()
-	db, err := redis.New(ctx, "", redisConf)
+	db, err := redis.New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
@@ -75,7 +75,7 @@ func TestClose(t *testing.T) {
 
 func TestSet(t *testing.T) {
 	ctx := context.Background()
-	db, err := redis.New(ctx, "", redisConf)
+	db, err := redis.New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
@@ -90,7 +90,7 @@ func TestSet(t *testing.T) {
 
 func TestSetTTL(t *testing.T) {
 	ctx := context.Background()
-	db, err := redis.New(ctx, "", redisConf)
+	db, err := redis.New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
@@ -105,7 +105,7 @@ func TestSetTTL(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	ctx := context.Background()
-	db, err := redis.New(ctx, "", redisConf)
+	db, err := redis.New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
@@ -130,7 +130,7 @@ func TestGet(t *testing.T) {
 
 func TestGetTTL(t *testing.T) {
 	ctx := context.Background()
-	db, err := redis.New(ctx, "", redisConf)
+	db, err := redis.New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
@@ -155,7 +155,7 @@ func TestGetTTL(t *testing.T) {
 
 func TestGetExpired(t *testing.T) {
 	ctx := context.Background()
-	db, err := redis.New(ctx, "", redisConf)
+	db, err := redis.New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
