@@ -4,7 +4,6 @@ import (
 	"github.com/hearchco/hearchco/src/anonymize"
 	"github.com/hearchco/hearchco/src/cache"
 	"github.com/hearchco/hearchco/src/config"
-	"github.com/hearchco/hearchco/src/search/category"
 	"github.com/hearchco/hearchco/src/search/engines"
 	"github.com/hearchco/hearchco/src/search/result"
 	"github.com/rs/zerolog/log"
@@ -12,7 +11,7 @@ import (
 
 func CacheAndUpdateResults(
 	query string, options engines.Options, db cache.DB,
-	ttlConf config.TTL, settings map[engines.Name]config.Settings, categories map[category.Name]config.Category,
+	ttlConf config.TTL, categoryConf config.Category, settings map[engines.Name]config.Settings,
 	results []result.Result, foundInDB bool,
 	salt string,
 ) {
@@ -46,7 +45,7 @@ func CacheAndUpdateResults(
 				Str("queryAnon", anonymize.String(query)).
 				Str("queryHash", anonymize.HashToSHA256B64(query)).
 				Msg("Updating results...")
-			newResults := PerformSearch(query, options, settings, categories, salt)
+			newResults := PerformSearch(query, options, categoryConf, settings, salt)
 			uerr := db.Set(query, newResults, ttlConf.Time)
 			if uerr != nil {
 				// Error in updating cache is not returned, just logged
