@@ -14,9 +14,10 @@ func ParseURL(rawURL string) string {
 	urll, err := parseURL(rawURL)
 	if err != nil {
 		log.Error().
+			Caller().
 			Err(err).
 			Str("url", urll).
-			Msg("parse.ParseURL(): couldn't parse url")
+			Msg("Couldn't parse url")
 		return rawURL
 	}
 	return urll
@@ -42,9 +43,10 @@ func ParseTextWithHTML(rawHTML string) string {
 	text, err := parseTextWithHTML(rawHTML)
 	if err != nil {
 		log.Error().
+			Caller().
 			Err(err).
 			Str("html", rawHTML).
-			Msg("parse.ParseTextWithHTML(): failed parsing text with html")
+			Msg("Failed parsing text with html")
 		return rawHTML
 	}
 	return text
@@ -52,13 +54,16 @@ func ParseTextWithHTML(rawHTML string) string {
 
 func parseTextWithHTML(rawHTML string) (string, error) {
 	var result string = ""
-	htmlNode, perr := html.ParseFragment(strings.NewReader(rawHTML), nil)
-	if perr != nil {
-		return "", fmt.Errorf("parse.parseTextWithHTML(): failed html.ParseFragment on %v. error: %w", rawHTML, perr)
+
+	htmlNode, err := html.ParseFragment(strings.NewReader(rawHTML), nil)
+	if err != nil {
+		return "", fmt.Errorf("Failed html.ParseFragment on %v: %w", rawHTML, err)
 	}
+
 	for _, el := range htmlNode {
 		sel := goquery.NewDocumentFromNode(el)
 		result += sel.Text()
 	}
+
 	return result, nil
 }

@@ -86,6 +86,7 @@ func Proxy(w http.ResponseWriter, r *http.Request, salt string, timeouts config.
 	}
 
 	log.Trace().
+		Caller().
 		Str("request", fmt.Sprint(nr)).
 		Msg("Created new request")
 

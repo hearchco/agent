@@ -40,8 +40,9 @@ func main() {
 	db, err := cache.New(ctx, cliFlags.DataDirPath, conf.Server.Cache)
 	if err != nil {
 		log.Fatal().
+			Caller().
 			Err(err).
-			Msg("main.main(): failed creating a new db")
+			Msg("Failed creating a new db")
 		// ^FATAL
 	}
 

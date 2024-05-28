@@ -28,12 +28,17 @@ func Setup() Flags {
 	)
 
 	if err := ctx.Validate(); err != nil {
-		log.Panic().Caller().Err(err).Msg("failed parsing cli") // panic is also run inside the library. when does this happen?
+		log.Panic().
+			Caller().
+			Err(err).
+			Msg("Failed parsing cli")
 		// ^PANIC
 	}
 
 	if cli.Query == "" {
-		log.Fatal().Caller().Msg("query cannot be empty or whitespace")
+		log.Fatal().
+			Caller().
+			Msg("Query cannot be empty or whitespace")
 		// ^FATAL
 	}
 
@@ -45,7 +50,7 @@ func Setup() Flags {
 			Int("pages", cli.PagesMax).
 			Int("min", 1).
 			Int("max", pagesMaxUpperLimit).
-			Msg("pages value out of range")
+			Msg("Pages value out of range")
 		// ^FATAL
 	}
 
@@ -55,7 +60,7 @@ func Setup() Flags {
 			Int("start", cli.PagesStart).
 			Int("min", 1).
 			Int("max", gotypelimits.MaxInt-pagesMaxUpperLimit).
-			Msg("start value out of range")
+			Msg("Start value out of range")
 		// ^FATAL
 	} else {
 		// since it's >=1, we decrement it to match the 0-based index
@@ -63,12 +68,17 @@ func Setup() Flags {
 	}
 
 	if err := engines.ValidateLocale(cli.Locale); err != nil {
-		log.Fatal().Caller().Err(err).Msg("invalid locale flag")
+		log.Fatal().
+			Caller().
+			Err(err).
+			Msg("Invalid locale flag")
 		// ^FATAL
 	}
 
 	if _, err := category.FromString(cli.Category); err != nil {
-		log.Fatal().Caller().Msg("invalid category flag")
+		log.Fatal().
+			Caller().
+			Msg("Invalid category flag")
 		// ^FATAL
 	}
 

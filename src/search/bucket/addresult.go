@@ -12,19 +12,21 @@ import (
 func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *Relay, options engines.Options, pagesCol *colly.Collector, nEnabledEngines int) bool {
 	if seResult == nil {
 		log.Error().
+			Caller().
 			Str("engine", seName.String()).
-			Msg("bucket.AddSEResult(): nil result")
+			Msg("Result is nil")
 		return false
 	}
 
 	// TODO: add a check if image result is valid
 	if seResult.URL == "" || seResult.Title == "" {
 		log.Error().
+			Caller().
 			Str("engine", seName.String()).
 			Str("url", seResult.URL).
 			Str("title", seResult.Title).
 			Str("description", seResult.Description).
-			Msg("bucket.AddSEResult(): invalid result, some fields are empty")
+			Msg("Invalid result, some fields are empty")
 		return false
 	}
 
@@ -90,9 +92,10 @@ func AddSEResult(seResult *result.RetrievedResult, seName engines.Name, relay *R
 	if !exists && options.VisitPages {
 		if err := pagesCol.Visit(seResult.URL); err != nil {
 			log.Error().
+				Caller().
 				Err(err).
 				Str("url", seResult.URL).
-				Msg("bucket.AddSEResult(): failed visiting")
+				Msg("Failed visiting page")
 		}
 	}
 

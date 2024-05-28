@@ -41,8 +41,10 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 
 		if index == -1 {
 			log.Error().
+				Caller().
+				Str("engine", Info.Name.String()).
 				Str("body", body).
-				Msg("googleimages.Search() -> col.OnResponse: failed parsing response: failed finding start of JSON")
+				Msg("Failed parsing response, couldn't find the start of JSON")
 			return
 		}
 
@@ -50,8 +52,11 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 		var jsonResponse JsonResponse
 		if err := json.Unmarshal([]byte(body), &jsonResponse); err != nil {
 			log.Error().
+				Caller().
+				Err(err).
+				Str("engine", Info.Name.String()).
 				Str("body", body).
-				Msg("googleimages.Search() -> col.OnResponse: failed parsing response: failed unmarshalling JSON")
+				Msg("Failed parsing response, couldn't unmarshal JSON")
 			return
 		}
 
@@ -83,12 +88,13 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 				}
 			} else {
 				log.Error().
+					Caller().
 					Str("engine", Info.Name.String()).
 					Str("jsonMetadata", fmt.Sprintf("%v", metadata)).
 					Str("url", resultJson.ReferrerUrl).
 					Str("original", origImg.Url).
 					Str("thumbnail", thmbImg.Url).
-					Msg("googleimages.Search() -> col.OnResponse: Couldn't find image URL")
+					Msg("Couldn't find image URL")
 			}
 		}
 	})

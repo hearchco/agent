@@ -19,7 +19,9 @@ import (
 // passed as pointer since config is modified
 func (c *Config) fromReader(rc ReaderConfig) {
 	if rc.Server.Proxy.Salt == "" {
-		log.Fatal().Msg("config.fromReader(): proxy salt is empty")
+		log.Fatal().
+			Caller().
+			Msg("Image proxy salt is empty")
 	}
 
 	nc := Config{
@@ -53,9 +55,10 @@ func (c *Config) fromReader(rc ReaderConfig) {
 		keyName, err := engines.NameString(key)
 		if err != nil {
 			log.Panic().
+				Caller().
 				Err(err).
 				Str("engine", key).
-				Msg("config.fromReader(): invalid engine name")
+				Msg("Invalid engine name")
 			// ^PANIC
 		}
 		nc.Settings[keyName] = val
@@ -67,7 +70,10 @@ func (c *Config) fromReader(rc ReaderConfig) {
 			if eng.Enabled {
 				engineName, nameErr := engines.NameString(name)
 				if nameErr != nil {
-					log.Panic().Err(nameErr).Msg("failed converting string to engine name")
+					log.Panic().
+						Caller().
+						Err(nameErr).
+						Msg("Failed converting string to engine name")
 					// ^PANIC
 				}
 
@@ -164,7 +170,10 @@ func (c *Config) Load(dataDirPath string) {
 	// We provide a struct along with the struct tag `koanf` to the
 	// provider.
 	if err := k.Load(structs.Provider(&rc, "koanf"), nil); err != nil {
-		log.Panic().Err(err).Msg("config.Load(): failed loading default values")
+		log.Panic().
+			Caller().
+			Err(err).
+			Msg("Failed loading default values")
 		// ^PANIC
 	}
 
@@ -172,19 +181,27 @@ func (c *Config) Load(dataDirPath string) {
 	yamlPath := path.Join(dataDirPath, "hearchco.yaml")
 	if _, err := os.Stat(yamlPath); err != nil {
 		log.Trace().
+			Caller().
 			Str("path", yamlPath).
-			Msg("config.Load(): no yaml config found, looking for .yml")
+			Msg("No yaml (.yaml) config found, looking for .yml")
 		yamlPath = path.Join(dataDirPath, "hearchco.yml")
 		if _, errr := os.Stat(yamlPath); errr != nil {
 			log.Trace().
+				Caller().
 				Str("path", yamlPath).
-				Msg("config.Load(): no yaml config found")
+				Msg("No yaml (.yml) config found")
 		} else if errr := k.Load(file.Provider(yamlPath), yaml.Parser()); errr != nil {
-			log.Panic().Err(err).Msg("config.Load(): error loading yaml config")
+			log.Panic().
+				Caller().
+				Err(err).
+				Msg("Error loading yaml config")
 			// ^PANIC
 		}
 	} else if err := k.Load(file.Provider(yamlPath), yaml.Parser()); err != nil {
-		log.Panic().Err(err).Msg("config.Load(): error loading yaml config")
+		log.Panic().
+			Caller().
+			Err(err).
+			Msg("Error loading yaml config")
 		// ^PANIC
 	}
 
@@ -192,13 +209,19 @@ func (c *Config) Load(dataDirPath string) {
 	if err := k.Load(env.Provider("HEARCHCO_", ".", func(s string) string {
 		return strings.Replace(strings.ToLower(strings.TrimPrefix(s, "HEARCHCO_")), "_", ".", -1)
 	}), nil); err != nil {
-		log.Panic().Err(err).Msg("config.Load(): error loading env config")
+		log.Panic().
+			Caller().
+			Err(err).
+			Msg("Error loading env config")
 		// ^PANIC
 	}
 
 	// Unmarshal config into struct
 	if err := k.Unmarshal("", &rc); err != nil {
-		log.Panic().Err(err).Msg("config.Load(): failed unmarshaling koanf config")
+		log.Panic().
+			Caller().
+			Err(err).
+			Msg("Failed unmarshaling koanf config")
 		// ^PANIC
 	}
 

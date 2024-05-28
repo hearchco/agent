@@ -21,13 +21,16 @@ func (r ByRetrievedRank) Less(i, j int) bool {
 	if r[i].RetRank.Page != r[j].RetRank.Page {
 		return r[i].RetRank.Page < r[j].RetRank.Page
 	}
+
 	if r[i].RetRank.OnPageRank != r[j].RetRank.OnPageRank {
 		return r[i].RetRank.OnPageRank < r[j].RetRank.OnPageRank
 	}
 
 	log.Error().
+		Caller().
 		Str("comparableA", fmt.Sprintf("%v", r[i])).
 		Str("comparableB", fmt.Sprintf("%v", r[j])).
-		Msg("rank.(r ByRetrievedRank)Less(): failed at ranking")
+		Msg("Failed at ranking")
+
 	return true
 }

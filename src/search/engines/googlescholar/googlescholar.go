@@ -79,9 +79,10 @@ func removeTelemetry(link string) string {
 	parsedURL, err := url.Parse(link)
 	if err != nil {
 		log.Error().
+			Caller().
 			Err(err).
 			Str("link", link).
-			Msg("error parsing link")
+			Msg("Error parsing link")
 		return link
 	}
 

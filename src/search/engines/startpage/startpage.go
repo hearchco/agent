@@ -47,11 +47,11 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 		if strings.Contains(string(r.Body), "to prevent possible abuse of our service") {
 			log.Error().
 				Str("engine", Info.Name.String()).
-				Msg("Request blocked by engine due to scraping")
+				Msg("Request blocked due to scraping")
 		} else if strings.Contains(string(r.Body), "This page cannot function without javascript") {
 			log.Error().
 				Str("engine", Info.Name.String()).
-				Msg("Engine couldn't load requests, needs javascript")
+				Msg("Couldn't load requests, needs javascript")
 		}
 	})
 

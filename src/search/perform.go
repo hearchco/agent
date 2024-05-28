@@ -18,7 +18,9 @@ import (
 func PerformSearch(query string, options engines.Options, categoryConf config.Category, settings map[engines.Name]config.Settings, salt string) []result.Result {
 	// check for empty query
 	if query == "" {
-		log.Trace().Msg("Empty search query.")
+		log.Trace().
+			Caller().
+			Msg("Empty search query.")
 		return []result.Result{}
 	}
 
@@ -93,9 +95,10 @@ func runEngines(engs []engines.Name, query string, options engines.Options, sett
 			errs := engineStarter[eng].Search(context.Background(), query, &relay, options, settings[eng], timings, salt, len(engs))
 			if len(errs) > 0 {
 				log.Error().
+					Caller().
 					Errs("errors", errs).
 					Str("engine", eng.String()).
-					Msg("search.runEngines(): error while searching")
+					Msg("Error(s) while searching")
 			}
 		}()
 	}

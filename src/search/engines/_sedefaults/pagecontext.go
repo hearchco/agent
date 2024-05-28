@@ -13,10 +13,11 @@ func PageFromContext(ctx *colly.Context, seName engines.Name) int {
 	page, converr := strconv.Atoi(pageStr)
 	if converr != nil {
 		log.Panic().
+			Caller().
 			Err(converr).
 			Str("engine", seName.String()).
 			Str("page", pageStr).
-			Msg("_sedefaults.PageFromContext(): failed to convert page number to int")
+			Msg("Failed to convert page number to int")
 		// ^PANIC
 	}
 	return page

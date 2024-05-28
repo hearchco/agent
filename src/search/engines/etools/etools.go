@@ -35,9 +35,10 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 		// Need to perform this check here so the check below (linkText[0] != 'h') doesn't panic
 		if linkText == "" {
 			log.Error().
+				Caller().
 				Str("title", titleText).
 				Str("description", descText).
-				Msg("etools.Search(): invalid result, url is empty.")
+				Msg("Invalid result, url is empty")
 			return
 		}
 

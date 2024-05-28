@@ -40,13 +40,13 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 		page := pageIndex + options.Pages.Start + 1
 
 		var parsedResponse QwantResponse
-		err := json.Unmarshal(r.Body, &parsedResponse)
-		if err != nil {
+		if err := json.Unmarshal(r.Body, &parsedResponse); err != nil {
 			log.Error().
+				Caller().
 				Err(err).
 				Str("engine", Info.Name.String()).
 				Bytes("body", r.Body).
-				Msg("Failed body unmarshall to json")
+				Msg("Failed to parse response, couldn't unmarshal JSON")
 		}
 
 		mainline := parsedResponse.Data.Res.Items.Mainline
@@ -107,10 +107,12 @@ func getLocale(options engines.Options) string {
 			return "&locale=" + locale
 		}
 	}
+
 	log.Warn().
+		Caller().
 		Str("locale", options.Locale).
 		Strs("validLocales", validLocales[:]).
-		Msg("qwant.getLocale(): Invalid qwant locale supplied. Falling back to en_US. Qwant supports these (disregard specific formatting)")
+		Msg("Invalid locale supplied, falling back to en_US")
 	return "&locale=" + strings.ToLower(config.DefaultLocale)
 }
 

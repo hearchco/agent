@@ -27,11 +27,12 @@ func RawFieldsFromDOM(dom *goquery.Selection, dompaths engines.DOMPaths, seName 
 
 	if !hrefExists {
 		log.Error().
+			Caller().
 			Str("engine", seName.String()).
 			Str("url", linkText).
 			Str("title", titleText).
 			Str("description", descText).
-			Msgf("_sedefaults.RawFieldsFromDOM(): href attribute doesn't exist on matched URL element (%v)", dompaths.Link)
+			Msgf("Href attribute doesn't exist on matched URL element (%v)", dompaths.Link)
 
 		return "", "", ""
 	}
