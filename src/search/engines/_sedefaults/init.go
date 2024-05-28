@@ -46,9 +46,10 @@ func InitializeCollectors(ctx context.Context, engineName engines.Name, options 
 	}
 	if err := col.Limit(&limitRule); err != nil {
 		log.Error().
+			Caller().
 			Err(err).
 			Str("limitRule", fmt.Sprintf("%v", limitRule)).
-			Msg("_sedefaults.InitializeCollectors(): failed adding new limit rule")
+			Msg("Failed adding new limit rule")
 	}
 
 	// set collector proxies
@@ -61,9 +62,10 @@ func InitializeCollectors(ctx context.Context, engineName engines.Name, options 
 		rp, err := proxy.RoundRobinProxySwitcher(settings.Proxies...)
 		if err != nil {
 			log.Fatal().
+				Caller().
 				Err(err).
 				Strs("proxies", settings.Proxies).
-				Msg("_sedefaults.InitializeCollectors(): failed creating proxy switcher")
+				Msg("Failed creating proxy switcher")
 		}
 
 		col.SetProxyFunc(rp)

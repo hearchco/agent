@@ -28,11 +28,11 @@ func New(ctx context.Context, config config.Redis) (DB, error) {
 		log.Error().
 			Err(err).
 			Str("address", fmt.Sprintf("%v:%v/%v", config.Host, config.Port, config.Database)).
-			Msg("redis.New(): error connecting to redis")
+			Msg("Error creating new connection to redis")
 	} else {
 		log.Info().
 			Str("address", fmt.Sprintf("%v:%v/%v", config.Host, config.Port, config.Database)).
-			Msg("Successful connection to redis")
+			Msg("Successfully connected to redis")
 	}
 
 	return DB{rdb: rdb, ctx: ctx}, nil
@@ -40,7 +40,9 @@ func New(ctx context.Context, config config.Redis) (DB, error) {
 
 func (db DB) Close() {
 	if err := db.rdb.Close(); err != nil {
-		log.Error().Err(err).Msg("redis.Close(): error disconnecting from redis")
+		log.Error().
+			Err(err).
+			Msg("Error closing connection to redis")
 	} else {
 		log.Debug().Msg("Successfully disconnected from redis")
 	}

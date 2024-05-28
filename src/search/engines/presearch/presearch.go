@@ -50,10 +50,11 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 			err := json.Unmarshal(r.Body, &pr)
 			if err != nil {
 				log.Error().
+					Caller().
 					Err(err).
 					Str("engine", Info.Name.String()).
 					Bytes("body", r.Body).
-					Msg("Failed body unmarshall to json")
+					Msg("Failed to parse response, couldn't unmarshal JSON")
 			}
 
 			counter := 1
@@ -79,12 +80,12 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 				log.Trace().
 					Err(err).
 					Str("engine", Info.Name.String()).
-					Msg("failed requesting with API")
+					Msg("Failed requesting with API due to timeout")
 			} else if err != nil {
 				log.Error().
 					Err(err).
 					Str("engine", Info.Name.String()).
-					Msg("failed requesting with API")
+					Msg("Failed requesting with API")
 			}
 		}
 	})

@@ -54,6 +54,7 @@ func (rw RouterWrapper) Start(ctx context.Context) {
 		err := srv.Shutdown(timeout)
 		if err != nil {
 			log.Error().
+				Caller().
 				Err(err).
 				Msg("Server shut down failed")
 		} else {
@@ -66,6 +67,7 @@ func (rw RouterWrapper) Start(ctx context.Context) {
 	err := srv.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		log.Fatal().
+			Caller().
 			Err(err).
 			Msg("Failed to start server")
 	}

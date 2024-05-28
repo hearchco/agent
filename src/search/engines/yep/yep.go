@@ -43,11 +43,12 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 
 		if index != 0 || body[len(body)-1] != byte(end) {
 			log.Error().
+				Caller().
+				Str("engine", Info.Name.String()).
 				Str("body", body).
 				Str("start", start).
 				Str("end", string(end)).
-				Str("engine", Info.Name.String()).
-				Msg("failed parsing response: failed finding start and/or end of JSON")
+				Msg("Failed parsing response, couldn't find start/end of JSON")
 			return
 		}
 
@@ -57,11 +58,12 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 		var content JsonResponse
 		if err := json.Unmarshal([]byte(resultsJson), &content); err != nil {
 			log.Error().
+				Caller().
 				Err(err).
 				Str("engine", Info.Name.String()).
 				Str("body", body).
 				Str("content", resultsJson).
-				Msg("Failed unmarshalling content")
+				Msg("Failed parsing response, couldn't unmarshal JSON")
 			return
 		}
 

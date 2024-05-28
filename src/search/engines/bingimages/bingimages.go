@@ -45,20 +45,22 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 
 		if err := json.Unmarshal([]byte(metadataS), &jsonMetadata); err != nil {
 			log.Error().
+				Caller().
 				Err(err).
 				Str("jsonMetadata", metadataS).
-				Msg("bingimages.Search() -> onHTML: failed to unmarshal metadata")
+				Msg("Failed to unmarshal metadata")
 			return
 		}
 
 		if jsonMetadata.ImageURL == "" || jsonMetadata.PageURL == "" || jsonMetadata.ThumbnailURL == "" {
 			log.Error().
+				Caller().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
 				Str("url", jsonMetadata.PageURL).
 				Str("original", jsonMetadata.ImageURL).
 				Str("thumbnail", jsonMetadata.ThumbnailURL).
-				Msg("bingimages.Search() -> onHTML: Couldn't find image, thumbnail, or page URL")
+				Msg("Couldn't find image, thumbnail, or page URL")
 			return
 		}
 
@@ -66,9 +68,10 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 		if titleText == "" {
 			// could also use the json data ("t" field), it seems to include weird/erroneous characters though (particularly '\ue000' and '\ue001')
 			log.Error().
+				Caller().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
-				Msg("bingimages.Search() -> onHTML: Couldn't find title")
+				Msg("Couldn't find title")
 			return
 		}
 
@@ -76,10 +79,11 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 		imgFormatS := strings.TrimSpace(dom.Find(dompaths.ImgFormatStr).Text())
 		if imgFormatS == "" {
 			log.Trace().
+				Caller().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
-				Msg("bingimages.Search() -> onHTML: Couldn't find image format (probably a video)")
+				Msg("Couldn't find image format (probably a video)")
 			return
 		}
 
@@ -93,26 +97,28 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 		imgH, err := strconv.Atoi(imgFormat[0])
 		if err != nil {
 			log.Error().
+				Caller().
 				Err(err).
 				Str("engine", Info.Name.String()).
 				Str("height", imgFormat[0]).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Str("imgFormatS", imgFormatS).
-				Msg("bingimages.Search() -> onHTML: Failed to convert original height to int")
+				Msg("Failed to convert original height to int")
 			return
 		}
 
 		imgW, err := strconv.Atoi(imgFormat[1])
 		if err != nil {
 			log.Error().
+				Caller().
 				Err(err).
 				Str("engine", Info.Name.String()).
 				Str("width", imgFormat[1]).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Str("imgFormatS", imgFormatS).
-				Msg("bingimages.Search() -> onHTML: Failed to convert original width to int")
+				Msg("Failed to convert original width to int")
 			return
 		}
 
@@ -130,46 +136,50 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 
 		if !found {
 			log.Error().
+				Caller().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Str("height", thmbHS).
 				Str("width", thmbWS).
-				Msg("bingimages.Search() -> onHTML: Couldn't find thumbnail format")
+				Msg("Couldn't find thumbnail format")
 			return
 		}
 
 		thmbH, err := strconv.Atoi(thmbHS)
 		if err != nil {
 			log.Error().
+				Caller().
 				Err(err).
 				Str("engine", Info.Name.String()).
 				Str("height", thmbHS).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
-				Msg("bingimages.Search() -> onHTML: Failed to convert thumbnail height to int")
+				Msg("Failed to convert thumbnail height to int")
 			return
 		}
 
 		thmbW, err := strconv.Atoi(thmbWS)
 		if err != nil {
 			log.Error().
+				Caller().
 				Err(err).
 				Str("engine", Info.Name.String()).
 				Str("width", thmbWS).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
-				Msg("bingimages.Search() -> onHTML: Failed to convert thumbnail width to int")
+				Msg("Failed to convert thumbnail width to int")
 			return
 		}
 
 		source := strings.TrimSpace(dom.Find(dompaths.Source).Text())
 		if source == "" {
 			log.Error().
+				Caller().
 				Str("engine", Info.Name.String()).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
-				Msg("bingimages.Search() -> onHTML: Couldn't find source")
+				Msg("Couldn't find source")
 			return
 		}
 
@@ -191,7 +201,7 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 
 	col.OnResponse(func(r *colly.Response) {
 		if len(r.Body) == 0 {
-			log.Trace().
+			log.Error().
 				Str("engine", Info.Name.String()).
 				Msg("Got empty response, probably too many requests")
 		}

@@ -37,7 +37,10 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 		var qry string = "?" + r.URL.RawQuery
 		nonce, sig, err := generateAuth(qry)
 		if err != nil {
-			log.Error().Err(err).Msg("swisscows.Search() -> col.OnRequest: failed building request: failed generating auth")
+			log.Error().
+				Caller().
+				Err(err).
+				Msg("Failed building request, couldn't generate auth")
 			return
 		}
 
@@ -51,10 +54,11 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 		urll := r.Request.URL.String()
 		anonUrll := anonymize.Substring(urll, query)
 		log.Trace().
+			Str("engine", Info.Name.String()).
 			Str("url", anonUrll).
 			Str("nonce", r.Request.Headers.Get("X-Request-Nonce")).
 			Str("signature", r.Request.Headers.Get("X-Request-Signature")).
-			Msg("swisscows.Search() -> col.OnResponse()")
+			Msg("Got response")
 
 		pageIndex := _sedefaults.PageFromContext(r.Request.Ctx, Info.Name)
 		page := pageIndex + options.Pages.Start + 1
@@ -63,9 +67,10 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 		err := json.Unmarshal(r.Body, &parsedResponse)
 		if err != nil {
 			log.Error().
+				Caller().
 				Err(err).
 				Bytes("body", r.Body).
-				Msg("swisscows.Search() -> col.OnResponse(): failed body unmarshall to json")
+				Msg("Failed to parse response, couldn't unmarshal JSON")
 
 			return
 		}
@@ -140,7 +145,7 @@ col.OnHTML("div.web-results > article.item-web", func(e *colly.HTMLElement) {
 			Str("url", linkText).
 			Str("title", titleText).
 			Str("description", descText).
-			Msg("Matched Result, but couldn't retrieve data")
+			Msg("Matched result, but couldn't retrieve data")
 	}
 })
 */

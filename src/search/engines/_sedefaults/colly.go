@@ -14,14 +14,16 @@ func colRequest(col *colly.Collector, ctx context.Context, seName engines.Name, 
 		if err := ctx.Err(); err != nil {
 			if engines.IsTimeoutError(err) {
 				log.Trace().
+					Caller().
 					Err(err).
 					Str("engine", seName.String()).
-					Msg("_sedefaults.colRequest(): context timeout error")
+					Msg("Context timeout error")
 			} else {
 				log.Error().
+					Caller().
 					Err(err).
 					Str("engine", seName.String()).
-					Msg("_sedefaults.colRequest(): context error")
+					Msg("Context error")
 			}
 			r.Abort()
 			return
@@ -46,12 +48,13 @@ func colError(col *colly.Collector, seName engines.Name, visiting bool) {
 				event = log.Trace()
 			}
 			event.
+				Caller().
 				Err(err).
 				Str("engine", seName.String()).
 				// Str("url", urll). // can't reliably anonymize it (because it's engine dependent)
 				Int("statusCode", r.StatusCode).
 				Bytes("response", r.Body). // WARN: query can be present, depending on the response from the engine (example: google has the query in 3 places)
-				Msg("_sedefaults.colError(): request error for url")
+				Msg("Request error for url")
 		}
 	})
 }
@@ -61,15 +64,17 @@ func pagesColResponse(pagesCol *colly.Collector, seName engines.Name, relay *buc
 		urll := r.Ctx.Get("originalURL")
 		if urll == "" {
 			log.Error().
-				Msg("_sedefaults.pagesColResponse(): error getting original url")
+				Caller().
+				Msg("Error getting original url")
 			return
 		}
 
 		err := bucket.SetResultResponse(urll, r, relay, seName)
 		if err != nil {
 			log.Error().
+				Caller().
 				Err(err).
-				Msg("_sedefaults.pagesColResponse(): error setting result")
+				Msg("Error setting result")
 		}
 	})
 }

@@ -33,7 +33,7 @@ func New(dataDirPath string, config config.Badger) (DB, error) {
 			Err(err).
 			Bool("persistence", config.Persist).
 			Str("path", badgerPath).
-			Msg("badger.New(): error opening badger")
+			Msg("Error opening badger")
 	} else if config.Persist {
 		log.Info().
 			Bool("persistence", config.Persist).
@@ -50,7 +50,9 @@ func New(dataDirPath string, config config.Badger) (DB, error) {
 
 func (db DB) Close() {
 	if err := db.bdb.Close(); err != nil {
-		log.Error().Err(err).Msg("badger.Close(): error closing badger")
+		log.Error().
+			Err(err).
+			Msg("Error closing badger")
 	} else {
 		log.Debug().Msg("Successfully closed badger")
 	}

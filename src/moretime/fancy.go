@@ -11,8 +11,9 @@ func handleAtoi(s string) int64 {
 	i, err := strconv.Atoi(s)
 	if err != nil {
 		log.Panic().
+			Caller().
 			Err(err).
-			Msg("failed converting string to int")
+			Msg("Failed converting string to int")
 		// ^PANIC
 	}
 	return int64(i)

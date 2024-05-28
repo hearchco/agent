@@ -53,24 +53,26 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 
 		if !hrefExists {
 			log.Error().
+				Caller().
 				Str("engine", Info.Name.String()).
 				Str("url", linkText).
 				Str("title", titleText).
 				Str("description", descText).
 				Str("link selector", dompaths.Link).
-				Msg("yahoo.Search(): href attribute doesn't exist on matched URL element")
+				Msg("Href attribute doesn't exist on matched URL element")
 
 			return
 		}
 
 		if !labelExists {
 			log.Error().
+				Caller().
 				Str("engine", Info.Name.String()).
 				Str("url", linkText).
 				Str("title", titleText).
 				Str("description", descText).
 				Str("title selector", dompaths.Title).
-				Msg("yahoo.Search(): aria attribute doesn't exist on matched title element")
+				Msg("Aria attribute doesn't exist on matched title element")
 
 			return
 		}
@@ -118,16 +120,21 @@ func removeTelemetry(link string) string {
 	if !strings.Contains(link, "://r.search.yahoo.com/") {
 		return link
 	}
+
 	suff := strings.SplitAfterN(link, "/RU=http", 2)[1]
 	link = "http" + strings.SplitN(suff, "/RK=", 2)[0]
+
 	newLink, err := url.QueryUnescape(link)
 	if err != nil {
 		log.Error().
+			Caller().
 			Err(err).
 			Str("url", link).
-			Msg("yahoo.removeTelemetry(): couldn't parse url, url.QueryUnescape() failed")
+			Msg("Couldn't parse url, url.QueryUnescape() failed")
+
 		return ""
 	}
+
 	return newLink
 }
 

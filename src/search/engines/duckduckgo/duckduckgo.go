@@ -61,12 +61,13 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 			case 3:
 				if !hrefExists {
 					log.Error().
+						Caller().
 						Str("engine", Info.Name.String()).
 						Str("url", linkText).
 						Str("title", titleText).
 						Str("description", descText).
 						Str("link selector", dompaths.Link).
-						Msg("duckduckgo.Search(): href attribute doesn't exist on matched URL element")
+						Msg("Href attribute doesn't exist on matched URL element")
 					return
 				}
 

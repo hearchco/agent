@@ -90,7 +90,11 @@ func removeTelemetry(link string) string {
 	if strings.HasPrefix(link, "https://www.bing.com/ck/a?") {
 		parsedUrl, err := url.Parse(link)
 		if err != nil {
-			log.Error().Err(err).Str("url", link).Msg("bing.removeTelemetry(): error parsing url")
+			log.Error().
+				Caller().
+				Err(err).
+				Str("url", link).
+				Msg("Error parsing url")
 			return ""
 		}
 
@@ -99,7 +103,10 @@ func removeTelemetry(link string) string {
 
 		cleanUrl, err := base64.RawURLEncoding.DecodeString(encodedUrl)
 		if err != nil {
-			log.Error().Err(err).Msg("bing.removeTelemetry(): failed decoding string from base64")
+			log.Error().
+				Caller().
+				Err(err).
+				Msg("Failed decoding string from base64")
 		}
 		return string(cleanUrl)
 	}

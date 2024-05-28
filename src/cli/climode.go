@@ -59,11 +59,14 @@ func Run(flags Flags, db cache.DB, conf config.Config) {
 		Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
 		Int("maxPages", flags.PagesMax).
 		Bool("visit", flags.Visit).
-		Msg("Started hearching")
+		Msg("Started searching...")
 
 	categoryName, err := category.FromString(flags.Category)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Invalid category")
+		log.Fatal().
+			Caller().
+			Err(err).
+			Msg("Invalid category")
 	}
 
 	// all of these have default values set and are validated beforehand

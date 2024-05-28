@@ -16,10 +16,11 @@ func Search(query string, options engines.Options, db cache.DB, categoryConf con
 	if gerr != nil {
 		// Error in reading cache is not returned, just logged
 		log.Error().
+			Caller().
 			Err(gerr).
 			Str("queryAnon", anonymize.String(query)).
 			Str("queryHash", anonymize.HashToSHA256B64(query)).
-			Msg("cli.Run(): failed accessing cache")
+			Msg("Failed accessing cache")
 	} else if results != nil {
 		foundInDB = true
 	} else {

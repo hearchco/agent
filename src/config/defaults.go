@@ -92,8 +92,9 @@ func NewSettings() map[engines.Name]Settings {
 	for _, eng := range engines.Names() {
 		if _, ok := mp[eng]; !ok {
 			log.Fatal().
+				Caller().
 				Str("engine", eng.String()).
-				Msg("config.NewSettings(): no shortcut set")
+				Msg("No shortcut set")
 			// ^FATAL
 		}
 	}
