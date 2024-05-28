@@ -22,7 +22,7 @@ func New() Engine {
 }
 
 func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, options engines.Options, settings config.Settings, timings config.CategoryTimings, salt string, nEnabledEngines int) []error {
-	ctx, err := _sedefaults.Prepare(ctx, Info, Support, &options, &settings)
+	ctx, err := _sedefaults.Prepare(ctx, Info, Support, options, settings)
 	if err != nil {
 		return []error{err}
 	}
@@ -71,7 +71,6 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 
 	// static params
 	localeParam := getLocale(options)
-	deviceParam := getDevice(options)
 	safeSearchParam := getSafeSearch(options)
 	countParam := "&count=" + strconv.Itoa(settings.RequestedResultsPerPage)
 
@@ -84,7 +83,7 @@ func (e Engine) Search(ctx context.Context, query string, relay *bucket.Relay, o
 		offsetParam := "&offset=" + strconv.Itoa(i*settings.RequestedResultsPerPage)
 
 		urll := Info.URL + query + countParam + localeParam + offsetParam + safeSearchParam
-		anonUrll := Info.URL + anonymize.String(query) + countParam + localeParam + offsetParam + deviceParam + safeSearchParam
+		anonUrll := Info.URL + anonymize.String(query) + countParam + localeParam + offsetParam + safeSearchParam
 
 		err := _sedefaults.DoGetRequest(urll, anonUrll, colCtx, col, Info.Name)
 		if err != nil {
@@ -113,13 +112,6 @@ func getLocale(options engines.Options) string {
 		Strs("validLocales", validLocales[:]).
 		Msg("qwant.getLocale(): Invalid qwant locale supplied. Falling back to en_US. Qwant supports these (disregard specific formatting)")
 	return "&locale=" + strings.ToLower(config.DefaultLocale)
-}
-
-func getDevice(options engines.Options) string {
-	if options.Mobile {
-		return "&device=mobile"
-	}
-	return "&device=desktop"
 }
 
 func getSafeSearch(options engines.Options) string {

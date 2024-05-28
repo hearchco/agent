@@ -10,3 +10,7 @@ const (
 	SCIENCE   Name = "science"
 	THOROUGH  Name = "thorough"
 )
+
+func (cat Name) String() string {
+	return string(cat)
+}

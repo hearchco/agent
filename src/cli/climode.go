@@ -57,7 +57,7 @@ func Run(flags Flags, db cache.DB, conf config.Config) {
 	log.Info().
 		Str("queryAnon", anonymize.String(flags.Query)).
 		Str("queryHash", anonymize.HashToSHA256B64(flags.Query)).
-		Int("maxPages", flags.MaxPages).
+		Int("maxPages", flags.PagesMax).
 		Bool("visit", flags.Visit).
 		Msg("Started hearching")
 
@@ -66,17 +66,16 @@ func Run(flags Flags, db cache.DB, conf config.Config) {
 		log.Fatal().Err(err).Msg("Invalid category")
 	}
 
+	// all of these have default values set and are validated beforehand
 	options := engines.Options{
-		Pages: engines.Pages{
-			Start: flags.StartPage,
-			Max:   flags.MaxPages,
-		},
 		VisitPages: flags.Visit,
-		Category:   categoryName,
-		UserAgent:  flags.UserAgent,
-		Locale:     flags.Locale,
 		SafeSearch: flags.SafeSearch,
-		Mobile:     flags.Mobile,
+		Pages: engines.Pages{
+			Start: flags.PagesStart,
+			Max:   flags.PagesMax,
+		},
+		Locale:   flags.Locale,
+		Category: categoryName,
 	}
 
 	start := time.Now()

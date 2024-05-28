@@ -14,6 +14,5 @@ var Info = engines.Info{
 var Support = engines.SupportedSettings{
 	Locale:                  true,
 	SafeSearch:              true,
-	Mobile:                  true,
 	RequestedResultsPerPage: true,
 }
