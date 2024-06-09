@@ -7,7 +7,7 @@ import (
 var Info = engines.Info{
 	Domain:         "www.google.com",
 	Name:           engines.GOOGLE,
-	URL:            "https://www.google.com/search?q=",
+	URL:            "https://google.com/search?hl=en&lr=lang_en&q=",
 	ResultsPerPage: 10,
 }
 
