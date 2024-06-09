@@ -5,7 +5,7 @@ import "github.com/hearchco/hearchco/src/search/engines"
 var Info = engines.Info{
 	Domain:         "www.startpage.com",
 	Name:           engines.STARTPAGE,
-	URL:            "https://www.startpage.com/sp/search?q=",
+	URL:            "https://www.startpage.com/do/search?language=english&q=",
 	ResultsPerPage: 10,
 }
 
