@@ -38,7 +38,8 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 			Caller().
 			Msg("Matched result")
 
-		urlText, titleText, descText := parse.FieldsFromDOM(e.DOM, dompaths, se.Name) // the telemetry link is a valid link so it can be sanitized
+		// The telemetry link is a valid link so it can be sanitized.
+		urlText, titleText, descText := parse.FieldsFromDOM(e.DOM, dompaths, se.Name)
 
 		urlWOTelemetry, err := removeTelemetry(urlText)
 		if err != nil {
