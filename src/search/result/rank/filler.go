@@ -7,7 +7,7 @@ import (
 	"github.com/hearchco/agent/src/search/result"
 )
 
-// calculates Rank value of every EngineRank for each Search Engine individually by using Page and OnPageRank to sort
+// Calculates Rank value of every EngineRank for each Search Engine individually by using Page and OnPageRank to sort.
 func (res Results) fillEngineRankRank() {
 	seEngineRanks := make([][]*result.Rank, len(engines.NameValues()))
 

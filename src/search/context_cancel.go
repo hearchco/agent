@@ -14,9 +14,9 @@ import (
 
 func cancelHardTimeout(start time.Time, cancel context.CancelFunc, query string, wgRequiredEngines *sync.WaitGroup, requiredEngines []engines.Name, wgRequiredByOriginEngines *sync.WaitGroup, requiredByOriginEngines []engines.Name) {
 	var wg sync.WaitGroup
-	wg.Add(2)
 
 	// Wait for all required engines to finish.
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		wgRequiredEngines.Wait()
@@ -29,6 +29,7 @@ func cancelHardTimeout(start time.Time, cancel context.CancelFunc, query string,
 	}()
 
 	// Wait for all required by origin engines to finish.
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		wgRequiredByOriginEngines.Wait()

@@ -103,7 +103,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		ctx.Put("page", strconv.Itoa(i))
 
 		var err error
-		// eTools requires a request for the first page
+		// eTools requires a request for the first page.
 		if pageNum0 == 0 || firstRequest {
 			combinedParams := morestrings.JoinNonEmpty([]string{countryParam, languageParam, safeSearchParam}, "&", "&")
 
@@ -119,12 +119,12 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 			}
 
 			firstRequest = false
-			se.Wait() // Needed to save the JSESSION cookie
+			se.Wait() // Needed to save the JSESSION cookie.
 		}
 
 		// Since the above can happen for the first request and then we need to request the wanted page.
 		if pageNum0 > 0 {
-			// Query isn't needed as it's saved in the JSESSION cookie
+			// Query isn't needed as it's saved in the JSESSION cookie.
 			pageParam := fmt.Sprintf("%v=%v", params.Page, pageNum0+1)
 			urll := fmt.Sprintf("%v?%v", pageURL, pageParam)
 			err = se.Get(ctx, urll, urll)

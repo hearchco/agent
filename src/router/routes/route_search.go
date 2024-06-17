@@ -32,7 +32,8 @@ func routeSearch(w http.ResponseWriter, r *http.Request, catsConf map[category.N
 		return err
 	}
 
-	query := strings.TrimSpace(getParamOrDefault(r.Form, "q")) // query is required
+	// Query is required.
+	query := strings.TrimSpace(getParamOrDefault(r.Form, "q"))
 	if query == "" {
 		// User error.
 		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{

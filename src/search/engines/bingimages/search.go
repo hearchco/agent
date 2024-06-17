@@ -68,7 +68,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 
 		titleText := strings.TrimSpace(dom.Find(dompaths.Title).Text())
 		if titleText == "" {
-			// could also use the json data ("t" field), it seems to include weird/erroneous characters though (particularly '\ue000' and '\ue001')
+			// Could also use the json data ("t" field), it seems to include weird/erroneous characters though (particularly '\ue000' and '\ue001').
 			log.Error().
 				Caller().
 				Str("engine", se.Name.String()).
@@ -77,7 +77,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 			return
 		}
 
-		// this returns "2000 x 1500 · jpeg"
+		// This returns "2000 x 1500 · jpeg".
 		imgFormatS := strings.TrimSpace(dom.Find(dompaths.ImgFormatStr).Text())
 		if imgFormatS == "" {
 			log.Trace().
@@ -89,11 +89,11 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 			return
 		}
 
-		// convert to "2000x1500·jpeg"
+		// Convert to "2000x1500·jpeg".
 		imgFormatS = strings.ReplaceAll(imgFormatS, " ", "")
-		// remove everything after 2000x1500
+		// Remove everything after 2000x1500.
 		imgFormatS = strings.Split(imgFormatS, "·")[0]
-		// create height and width
+		// Create height and width.
 		imgFormat := strings.Split(imgFormatS, "x")
 
 		origH, err := strconv.Atoi(imgFormat[0])

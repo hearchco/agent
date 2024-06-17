@@ -131,7 +131,7 @@ func (c Config) getReader() ReaderConfig {
 	return rc
 }
 
-// passed as pointer since config is modified
+// Passed as pointer since config is modified.
 func (c *Config) fromReader(rc ReaderConfig) {
 	if rc.Server.ImageProxy.Salt == "" {
 		log.Fatal().
