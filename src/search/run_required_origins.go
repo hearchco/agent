@@ -37,18 +37,19 @@ func runRequiredByOriginEngines(enginers []scraper.Enginer, wgRequiredByOriginEn
 			continue
 		}
 
-		c := sync.Cond{L: &sync.Mutex{}}
-		go func() {
-			c.L.Lock()
-			c.Wait()
-			c.L.Unlock()
-			wgRequiredByOriginEngines.Done()
-		}()
+		var wgWorkers sync.WaitGroup
+		wgWorkers.Add(len(workers))
+		successOrigin := sync.Cond{L: &sync.Mutex{}}
+		go waitForSuccessOrFinish(&successOrigin, &wgWorkers, wgRequiredByOriginEngines)
+
 		for _, engName := range workers {
 			enginer := enginers[engName]
 			resChan := make(chan result.ResultScraped, 100)
 			engChan <- resChan
 			go func() {
+				// Indicate that the worker is done, successful or not.
+				defer wgWorkers.Done()
+
 				searchOnce[engName].Do(func() {
 					log.Trace().
 						Str("engine", engName.String()).
@@ -79,10 +80,12 @@ func runRequiredByOriginEngines(enginers []scraper.Enginer, wgRequiredByOriginEn
 						searchOnce[engName].Scraped()
 					}
 				})
+
+				// Indicate that the worker was successful.
 				if searchOnce[engName].Success() {
-					c.L.Lock()
-					c.Signal()
-					c.L.Unlock()
+					successOrigin.L.Lock()
+					successOrigin.Signal()
+					successOrigin.L.Unlock()
 				}
 			}()
 		}
