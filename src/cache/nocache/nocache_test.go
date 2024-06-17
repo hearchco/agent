@@ -1,20 +1,18 @@
-package nocache_test
+package nocache
 
 import (
 	"testing"
-
-	"github.com/hearchco/hearchco/src/cache/nocache"
 )
 
 func TestNew(t *testing.T) {
-	_, err := nocache.New()
+	_, err := New()
 	if err != nil {
 		t.Errorf("error creating nocache: %v", err)
 	}
 }
 
 func TestClose(t *testing.T) {
-	db, err := nocache.New()
+	db, err := New()
 	if err != nil {
 		t.Errorf("error creating nocache: %v", err)
 	}
@@ -23,7 +21,7 @@ func TestClose(t *testing.T) {
 }
 
 func TestSet(t *testing.T) {
-	db, err := nocache.New()
+	db, err := New()
 	if err != nil {
 		t.Errorf("error creating nocache: %v", err)
 	}
@@ -37,7 +35,7 @@ func TestSet(t *testing.T) {
 }
 
 func TestSetTTL(t *testing.T) {
-	db, err := nocache.New()
+	db, err := New()
 	if err != nil {
 		t.Errorf("error creating nocache: %v", err)
 	}
@@ -51,7 +49,7 @@ func TestSetTTL(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	db, err := nocache.New()
+	db, err := New()
 	if err != nil {
 		t.Errorf("error creating nocache: %v", err)
 	}
@@ -75,7 +73,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestGetTTL(t *testing.T) {
-	db, err := nocache.New()
+	db, err := New()
 	if err != nil {
 		t.Errorf("error creating nocache: %v", err)
 	}

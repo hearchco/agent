@@ -2,7 +2,7 @@ server:
   frontendurls: http://localhost:5173,https://*hearch.co
   cache:
     type: none
-  proxy:
+  imageproxy:
     salt: changemepls
 # categories:
 #   science:

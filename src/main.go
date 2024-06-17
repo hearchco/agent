@@ -5,70 +5,57 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
-	"github.com/hearchco/hearchco/src/cache"
-	"github.com/hearchco/hearchco/src/cli"
-	"github.com/hearchco/hearchco/src/config"
-	"github.com/hearchco/hearchco/src/logger"
-	"github.com/hearchco/hearchco/src/router"
 	"github.com/rs/zerolog/log"
+
+	"github.com/hearchco/agent/src/cache"
+	"github.com/hearchco/agent/src/cli"
+	"github.com/hearchco/agent/src/config"
+	"github.com/hearchco/agent/src/logger"
+	"github.com/hearchco/agent/src/profiler"
+	"github.com/hearchco/agent/src/router"
 )
 
 func main() {
-	mainTimer := time.Now()
-
-	// setup signal interrupt (CTRL+C)
+	// Setup signal interrupt (CTRL+C).
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
-	// parse cli arguments
+	// Parse cli flags.
 	cliFlags := cli.Setup()
 
-	// configure logger
+	// Configure logger.
 	lgr := logger.Setup(cliFlags.Verbosity, cliFlags.Pretty)
 
-	// start profiler
-	_, stopProfiler := runProfiler(cliFlags)
-	defer stopProfiler()
-
-	// load config file
+	// Load config file.
 	conf := config.New()
-	conf.Load(cliFlags.DataDirPath)
+	conf.Load(cliFlags.ConfigPath)
 
-	// setup cache
-	db, err := cache.New(ctx, cliFlags.DataDirPath, conf.Server.Cache)
+	// Setup cache database.
+	db, err := cache.New(ctx, conf.Server.Cache)
 	if err != nil {
 		log.Fatal().
 			Caller().
 			Err(err).
-			Msg("Failed creating a new db")
+			Msg("Failed creating a new cache database")
 		// ^FATAL
 	}
 
-	// startup
-	if cliFlags.Cli {
-		cli.Run(cliFlags, db, conf)
-	} else {
-		rw := router.New(lgr, conf, db, cliFlags.ServeProfiler)
-		switch conf.Server.Environment {
-		case "lambda":
-			rw.StartLambda()
-		default:
-			rw.Start(ctx)
-		}
+	// Start profiler if enabled.
+	_, stopProfiler := profiler.Run(cliFlags)
+	defer stopProfiler()
+
+	// Start router.
+	rw := router.New(lgr, conf, db, cliFlags.ProfilerServe, cli.VersionString())
+	switch conf.Server.Environment {
+	case "lambda":
+		rw.StartLambda()
+	default:
+		rw.Start(ctx)
 	}
 
-	// program cleanup
+	// Program cleanup.
 	db.Close()
 
-	if cliFlags.Cli {
-		log.Debug().
-			Dur("duration", time.Since(mainTimer)).
-			Msg("Program finished")
-	} else {
-		log.Info().
-			Dur("duration", time.Since(mainTimer)).
-			Msg("Program finished")
-	}
+	log.Info().Msg("Program finished")
 }

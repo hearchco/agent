@@ -3,41 +3,42 @@ package _engines_test
 import (
 	"time"
 
-	"github.com/hearchco/hearchco/src/config"
-	"github.com/hearchco/hearchco/src/search/category"
-	"github.com/hearchco/hearchco/src/search/engines"
+	"github.com/hearchco/agent/src/config"
+	"github.com/hearchco/agent/src/search/category"
+	"github.com/hearchco/agent/src/search/engines"
+	"github.com/hearchco/agent/src/search/engines/options"
 )
 
 type TestCaseHasAnyResults struct {
 	Query   string
-	Options engines.Options
+	Options options.Options
 }
 
 type TestCaseContainsResults struct {
-	Query     string
-	ResultURL []string
-	Options   engines.Options
+	Query      string
+	ResultURLs []string
+	Options    options.Options
 }
 
 type TestCaseRankedResults struct {
-	Query     string
-	ResultURL []string
-	Options   engines.Options
+	Query      string
+	ResultURLs []string
+	Options    options.Options
 }
 
-func NewConfig(engineName engines.Name) config.Config {
+func NewConfig(seName engines.Name) config.Config {
 	return config.Config{
 		Categories: map[category.Name]config.Category{
 			category.GENERAL: {
-				Engines: []engines.Name{engineName},
-				Ranking: config.NewRanking(),
+				Engines: []engines.Name{seName},
+				Ranking: config.EmptyRanking([]engines.Name{seName}),
 				Timings: config.CategoryTimings{
 					HardTimeout: 10000 * time.Millisecond,
 				},
 			},
 			category.IMAGES: {
-				Engines: []engines.Name{engineName},
-				Ranking: config.NewRanking(),
+				Engines: []engines.Name{seName},
+				Ranking: config.EmptyRanking([]engines.Name{seName}),
 				Timings: config.CategoryTimings{
 					HardTimeout: 10000 * time.Millisecond,
 				},
@@ -46,8 +47,10 @@ func NewConfig(engineName engines.Name) config.Config {
 	}
 }
 
-func NewOpts() engines.Options {
-	return engines.Options{
-		Pages: engines.Pages{Start: 0, Max: 1},
+func NewOpts() options.Options {
+	return options.Options{
+		Pages:      options.Pages{Start: 0, Max: 1},
+		Locale:     options.LocaleDefault,
+		SafeSearch: false,
 	}
 }

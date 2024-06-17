@@ -10,27 +10,28 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
-	"github.com/hearchco/hearchco/src/cache"
-	"github.com/hearchco/hearchco/src/config"
+	"github.com/hearchco/agent/src/cache"
+	"github.com/hearchco/agent/src/config"
+	"github.com/hearchco/agent/src/router/middlewares"
+	"github.com/hearchco/agent/src/router/routes"
 )
 
-// it's okay to store pointer since chi.NewRouter() returns a pointer
 type RouterWrapper struct {
 	mux  *chi.Mux
 	port int
 }
 
-func New(lgr zerolog.Logger, conf config.Config, db cache.DB, serveProfiler bool) RouterWrapper {
+func New(lgr zerolog.Logger, conf config.Config, db cache.DB, serveProfiler bool, version string) RouterWrapper {
 	mux := chi.NewRouter()
 
-	setupMiddlewares(mux, lgr, conf.Server.FrontendUrls, serveProfiler)
-	setupRoutes(mux, db, conf)
+	middlewares.Setup(mux, lgr, conf.Server.FrontendUrls, serveProfiler)
+	routes.Setup(mux, version, db, conf)
 
 	return RouterWrapper{mux: mux, port: conf.Server.Port}
 }
 
 func (rw RouterWrapper) Start(ctx context.Context) {
-	// create server
+	// Create server.
 	srv := http.Server{
 		Addr:    ":" + strconv.Itoa(rw.port),
 		Handler: rw.mux,
@@ -40,17 +41,17 @@ func (rw RouterWrapper) Start(ctx context.Context) {
 		Int("port", rw.port).
 		Msg("Starting server")
 
-	// shut down server gracefully on context cancellation
+	// Shut down server gracefully on context cancellation.
 	go func() {
 		<-ctx.Done()
 		log.Info().Msg("Shutting down server")
 
-		// create a context with timeout of 5 seconds
+		// Create a context with timeout of 5 seconds.
 		timeout, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		// shutdown gracefully
-		// after timeout is reached, server will be shut down forcefully
+		// Shutdown gracefully.
+		// After the timeout is reached, server will be shut down forcefully.
 		err := srv.Shutdown(timeout)
 		if err != nil {
 			log.Error().
@@ -63,7 +64,7 @@ func (rw RouterWrapper) Start(ctx context.Context) {
 		}
 	}()
 
-	// start server
+	// Start server.
 	err := srv.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		log.Fatal().
