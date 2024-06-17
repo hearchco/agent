@@ -37,18 +37,19 @@ func runPreferredByOriginEngines(enginers []scraper.Enginer, wgPreferredByOrigin
 			continue
 		}
 
-		c := sync.Cond{L: &sync.Mutex{}}
-		go func() {
-			c.L.Lock()
-			c.Wait()
-			c.L.Unlock()
-			wgPreferredByOriginEngines.Done()
-		}()
+		var wgWorkers sync.WaitGroup
+		wgWorkers.Add(len(workers))
+		successOrigin := sync.Cond{L: &sync.Mutex{}}
+		go waitForSuccessOrFinish(&successOrigin, &wgWorkers, wgPreferredByOriginEngines)
+
 		for _, engName := range workers {
 			enginer := enginers[engName]
 			resChan := make(chan result.ResultScraped, 100)
 			engChan <- resChan
 			go func() {
+				// Indicate that the worker is done, successful or not.
+				defer wgWorkers.Done()
+
 				searchOnce[engName].Do(func() {
 					log.Trace().
 						Str("engine", engName.String()).
@@ -80,10 +81,11 @@ func runPreferredByOriginEngines(enginers []scraper.Enginer, wgPreferredByOrigin
 					}
 				})
 
+				// Indicate that the worker was successful.
 				if searchOnce[engName].Success() {
-					c.L.Lock()
-					c.Signal()
-					c.L.Unlock()
+					successOrigin.L.Lock()
+					successOrigin.Signal()
+					successOrigin.L.Unlock()
 				}
 			}()
 		}

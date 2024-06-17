@@ -43,6 +43,6 @@ func generalRanking() CategoryRanking {
 }
 
 var generalTimings = CategoryTimings{
-	PreferredTimeout: 700 * time.Millisecond,
-	HardTimeout:      3 * time.Second,
+	PreferredTimeout: 500 * time.Millisecond,
+	HardTimeout:      1500 * time.Millisecond,
 }
