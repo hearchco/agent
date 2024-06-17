@@ -1,4 +1,4 @@
-package redis_test
+package redis
 
 import (
 	"context"
@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hearchco/hearchco/src/cache/redis"
-	"github.com/hearchco/hearchco/src/config"
-	redisog "github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9"
+
+	"github.com/hearchco/agent/src/config"
 )
 
 func newRedisConf() config.Redis {
@@ -57,7 +57,7 @@ var redisConf = newRedisConf()
 
 func TestNew(t *testing.T) {
 	ctx := context.Background()
-	_, err := redis.New(ctx, "TEST_", redisConf)
+	_, err := New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
@@ -65,7 +65,7 @@ func TestNew(t *testing.T) {
 
 func TestClose(t *testing.T) {
 	ctx := context.Background()
-	db, err := redis.New(ctx, "TEST_", redisConf)
+	db, err := New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
@@ -75,7 +75,7 @@ func TestClose(t *testing.T) {
 
 func TestSet(t *testing.T) {
 	ctx := context.Background()
-	db, err := redis.New(ctx, "TEST_", redisConf)
+	db, err := New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
@@ -90,7 +90,7 @@ func TestSet(t *testing.T) {
 
 func TestSetTTL(t *testing.T) {
 	ctx := context.Background()
-	db, err := redis.New(ctx, "TEST_", redisConf)
+	db, err := New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
@@ -105,7 +105,7 @@ func TestSetTTL(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	ctx := context.Background()
-	db, err := redis.New(ctx, "TEST_", redisConf)
+	db, err := New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
@@ -130,7 +130,7 @@ func TestGet(t *testing.T) {
 
 func TestGetTTL(t *testing.T) {
 	ctx := context.Background()
-	db, err := redis.New(ctx, "TEST_", redisConf)
+	db, err := New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
@@ -155,7 +155,7 @@ func TestGetTTL(t *testing.T) {
 
 func TestGetExpired(t *testing.T) {
 	ctx := context.Background()
-	db, err := redis.New(ctx, "TEST_", redisConf)
+	db, err := New(ctx, "TEST_", redisConf)
 	if err != nil {
 		t.Errorf("error creating redis: %v", err)
 	}
@@ -171,7 +171,7 @@ func TestGetExpired(t *testing.T) {
 
 	var value string
 	err = db.Get("testkeygetexpired", &value)
-	if err != nil && err != redisog.Nil {
+	if err != nil && err != redis.Nil {
 		t.Errorf("error getting value: %v", err)
 	}
 }

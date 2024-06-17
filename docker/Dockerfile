@@ -11,4 +11,4 @@ VOLUME [ "/data" ]
 
 EXPOSE 3030
 
-LABEL org.opencontainers.image.source="https://github.com/hearchco/hearchco"
+LABEL org.opencontainers.image.source="https://github.com/hearchco/agent"

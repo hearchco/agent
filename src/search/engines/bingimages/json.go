@@ -1,6 +1,6 @@
 package bingimages
 
-type JsonMetadata struct {
+type jsonMetadata struct {
 	PageURL      string `json:"purl"`
 	ThumbnailURL string `json:"turl"`
 	ImageURL     string `json:"murl"`

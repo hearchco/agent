@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hearchco/hearchco/src/anonymize"
-	"github.com/hearchco/hearchco/src/config"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
+
+	"github.com/hearchco/agent/src/config"
+	"github.com/hearchco/agent/src/utils/anonymize"
 )
 
 type DRV struct {
@@ -81,6 +82,7 @@ func (drv DRV) Get(k string, o any) error {
 		log.Trace().
 			Str("key", key).
 			Msg("Found no value in redis")
+		return nil
 	} else if err != nil {
 		return fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", key, err)
 	} else if err := json.Unmarshal([]byte(val), o); err != nil {

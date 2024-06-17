@@ -17,13 +17,15 @@ import (
 )
 
 var (
-	typeName      = flag.String("type", "", "type name; must be set")
-	output        = flag.String("output", "", "output file name; default srcdir/<type>_searcher.go")
-	trimprefix    = flag.String("trimprefix", "", "trim the `prefix` from the generated constant names")
-	buildTags     = flag.String("tags", "", "comma-separated list of build tags to apply")
-	packageName   = flag.String("packagename", "", "name of the package for generated code; default current package")
-	enginesImport = flag.String("enginesimport", "github.com/hearchco/hearchco/src/search/engines", "source of the engines import, which is prefixed to imports for consts; default github.com/hearchco/hearchco/src/search/engines")
-	linecomment   = flag.Bool("linecomment", false, "use line comment text as printed text when present")
+	typeName        = flag.String("type", "", "type name; must be set")
+	output          = flag.String("output", "", "output file name; default srcdir/<type>_searcher.go")
+	trimprefix      = flag.String("trimprefix", "", "trim the `prefix` from the generated constant names")
+	buildTags       = flag.String("tags", "", "comma-separated list of build tags to apply")
+	packageName     = flag.String("packagename", "", "name of the package for generated code; default current package")
+	interfaceImport = flag.String("interfaceimport", "github.com/hearchco/agent/src/search/scraper", "source of the interface import, which is prefixed to interfaces; default github.com/hearchco/agent/src/search/scraper")
+	interfaceName   = flag.String("interfacename", "scraper.Enginer", "name of the interface; default scraper.Enginer")
+	enginesImport   = flag.String("enginesimport", "github.com/hearchco/agent/src/search/engines", "source of the engines import, which is prefixed to imports for engines; default github.com/hearchco/agent/src/search/engines")
+	linecomment     = flag.Bool("linecomment", false, "use line comment text as printed text when present")
 )
 
 // Usage is a replacement usage function for the flags package.
@@ -90,7 +92,8 @@ func main() {
 	}
 	g.Printf("package %s", pkgName)
 	g.Printf("\n")
-	g.Printf("import \"%s\"\n", *enginesImport) // Used by all methods.
+	g.Printf("import \"%s\"\n", *interfaceImport)
+	g.Printf("import \"%s\"\n", *enginesImport)
 
 	// Run generate for each type.
 	for _, typeName := range types {
@@ -195,7 +198,7 @@ func (g *Generator) generate(typeName string) {
 	}
 	g.Printf("}\n")
 
-	g.buildOneRun(values)
+	g.printEnginer(values, *interfaceName)
 }
 
 // format returns the gofmt-ed contents of the Generator's buffer.
@@ -314,12 +317,10 @@ func (f *File) genDecl(node ast.Node) bool {
 	return false
 }
 
-// buildOneRun generates the variables and NewEngineStarter func for a single run of contiguous values.
-func (g *Generator) buildOneRun(values []Value) {
+func (g *Generator) printEnginer(values []Value, interfaceName string) {
 	g.Printf("\n")
-	// The generated code is simple enough to write as a Printf format.
-	g.Printf("\nfunc NewEngineStarter() [%d]Searcher {", len(values))
-	g.Printf("\n\tvar engineArray [%d]Searcher", len(values))
+	g.Printf("\nfunc enginerArray() [%d]%s {", len(values), interfaceName)
+	g.Printf("\n\tvar engineArray [%d]%s", len(values), interfaceName)
 	for _, v := range values {
 		if validConst(v) {
 			g.Printf("\n\tengineArray[%s.%s] = %s.New()", g.pkg.name, v.name, strings.ToLower(v.name))
@@ -327,4 +328,8 @@ func (g *Generator) buildOneRun(values []Value) {
 	}
 	g.Printf("\n\treturn engineArray")
 	g.Printf("\n}")
+
+	g.Printf("\n")
+	g.Printf("\nconst enginerLen = %d", len(values))
+	g.Printf("\n")
 }

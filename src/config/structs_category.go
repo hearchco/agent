@@ -3,24 +3,39 @@ package config
 import (
 	"time"
 
-	"github.com/hearchco/hearchco/src/search/engines"
+	"github.com/hearchco/agent/src/search/engines"
 )
 
-// ReaderCategory is format in which the config is read from the config file
+// ReaderCategory is format in which the config is read from the config file and environment variables.
 type ReaderCategory struct {
 	REngines map[string]ReaderCategoryEngine `koanf:"engines"`
 	Ranking  CategoryRanking                 `koanf:"ranking"`
 	RTimings ReaderCategoryTimings           `koanf:"timings"`
 }
 type Category struct {
-	Engines []engines.Name
-	Ranking CategoryRanking
-	Timings CategoryTimings
+	Engines                  []engines.Name
+	RequiredEngines          []engines.Name
+	RequiredByOriginEngines  []engines.Name
+	PreferredEngines         []engines.Name
+	PreferredByOriginEngines []engines.Name
+	Ranking                  CategoryRanking
+	Timings                  CategoryTimings
 }
 
-// ReaderEngine is format in which the config is read from the config file
+// ReaderEngine is format in which the config is read from the config file and environment variables.
 type ReaderCategoryEngine struct {
+	// If false, the engine will not be used and other options will be ignored.
 	Enabled bool `koanf:"enabled"`
+	// If true, the engine will be awaited unless the hard timeout is reached.
+	Required bool `koanf:"required"`
+	// If true, the fastest engine that has this engine in "Origins" will be awaited unless the hard timeout is reached.
+	// This means that we want to get results from this engine or any engine that has this engine in "Origins", whichever responds the fastest.
+	RequiredByOrigin bool `koanf:"requiredbyorigin"`
+	// If true, the engine will be awaited unless the preferred timeout is reached.
+	Preferred bool `koanf:"preferred"`
+	// If true, the fastest engine that has this engine in "Origins" will be awaited unless the preferred timeout is reached.
+	// This means that we want to get results from this engine or any engine that has this engine in "Origins", whichever responds the fastest.
+	PreferredByOrigin bool `koanf:"preferredbyorigin"`
 }
 
 type CategoryRanking struct {
@@ -41,58 +56,36 @@ type CategoryEngineRanking struct {
 	Const float64 `koanf:"const"`
 }
 
-// ReaderTimings is format in which the config is read from the config file
-// In <number><unit> format
-// Example: 1s, 1m, 1h, 1d, 1w, 1M, 1y
-// If unit is not specified, it is assumed to be milliseconds
-// Delegates Timeout, PageTimeout to colly.Collector.SetRequestTimeout(); Note: See https://github.com/gocolly/colly/issues/644
-// Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit()
+// ReaderTimings is format in which the config is read from the config file and environment variables.
+// In <number><unit> format.
+// Example: 1s, 1m, 1h, 1d, 1w, 1M, 1y.
+// If unit is not specified, it is assumed to be milliseconds.
+// Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit().
 type ReaderCategoryTimings struct {
-	// Minimum amount of time to wait before starting to check the number of results
-	// Search will wait for at least this amount of time (unless all engines respond)
-	PreferredTimeoutMin string `koanf:"preferredtimeoutmin"`
-	// Maximum amount of time to wait until the number of results is satisfactory
-	// Search will wait for at most this amount of time (unless all engines respond or the preferred number of results is found)
-	PreferredTimeoutMax string `koanf:"preferredtimeoutmax"`
-	// Preferred number of results to find
-	PreferredResultsNumber int `koanf:"preferredresultsnumber"`
-	// Time of the steps for checking if the number of results is satisfactory
-	StepTime string `koanf:"steptime"`
-	// Minimum number of results required after the maximum preferred time
-	// If this number isn't met, the search will continue after the maximum preferred time
-	MinimumResultsNumber int `koanf:"minimumresultsnumber"`
-	// Hard timeout after which the search is forcefully stopped (even if the engines didn't respond)
+	// Maximum amount of time to wait for the PreferredEngines (or ByOrigin) to respond.
+	// If the search is still waiting for the RequiredEngines (or ByOrigin) after this time, the search will continue.
+	PreferredTimeout string `koanf:"preferredtimeout"`
+	// Hard timeout after which the search is forcefully stopped (even if the engines didn't respond).
 	HardTimeout string `koanf:"hardtimeout"`
-	// Colly delay
+	// Colly delay.
 	Delay string `koanf:"delay"`
-	// Colly random delay
+	// Colly random delay.
 	RandomDelay string `koanf:"randomdelay"`
-	// Colly parallelism
+	// Colly parallelism.
 	Parallelism int `koanf:"parallelism"`
 }
 
-// Delegates Timeout, PageTimeout to colly.Collector.SetRequestTimeout(); Note: See https://github.com/gocolly/colly/issues/644
-// Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit()
+// Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit().
 type CategoryTimings struct {
-	// Minimum amount of time to wait before starting to check the number of results
-	// Search will wait for at least this amount of time (unless all engines respond)
-	PreferredTimeoutMin time.Duration
-	// Maximum amount of time to wait until the number of results is satisfactory
-	// Search will wait for at most this amount of time (unless all engines respond or the preferred number of results is found)
-	PreferredTimeoutMax time.Duration
-	// Preferred number of results to find
-	PreferredResultsNumber int
-	// Time of the steps for checking if the number of results is satisfactory
-	StepTime time.Duration
-	// Minimum number of results required after the maximum preferred time
-	// If this number isn't met, the search will continue after the maximum preferred time
-	MinimumResultsNumber int
-	// Hard timeout after which the search is forcefully stopped (even if the engines didn't respond)
+	// Maximum amount of time to wait for the PreferredEngines (or ByOrigin) to respond.
+	// If the search is still waiting for the RequiredEngines (or ByOrigin) after this time, the search will continue.
+	PreferredTimeout time.Duration
+	// Hard timeout after which the search is forcefully stopped (even if the engines didn't respond).
 	HardTimeout time.Duration
-	// Colly delay
+	// Colly delay.
 	Delay time.Duration
-	// Colly random delay
+	// Colly random delay.
 	RandomDelay time.Duration
-	// Colly parallelism
+	// Colly parallelism.
 	Parallelism int
 }
