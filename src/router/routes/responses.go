@@ -4,7 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/hearchco/agent/src/search/result"
 )
+
+type ErrorResponse struct {
+	Message string `json:"message"`
+	Value   string `json:"value"`
+}
+
+type ResultsResponse struct {
+	Version  string                `json:"version"`
+	Duration int64                 `json:"duration"`
+	Results  []result.ResultOutput `json:"results"`
+}
 
 func writeResponse(w http.ResponseWriter, status int, body string) error {
 	w.WriteHeader(status)

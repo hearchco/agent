@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/hearchco/agent/src/cache"
+	"github.com/hearchco/agent/src/cli"
 	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search"
 	"github.com/hearchco/agent/src/search/category"
@@ -149,7 +150,7 @@ func routeSearch(w http.ResponseWriter, r *http.Request, catsConf map[category.N
 	}
 
 	// Search for results.
-	scrapedRes, err := search.Search(query, categoryName, opts, catsConf[categoryName])
+	scrapedRes, dur, err := search.Search(query, categoryName, opts, catsConf[categoryName])
 	if err != nil {
 		// Server error.
 		werr := writeResponseJSON(w, http.StatusInternalServerError, ErrorResponse{
@@ -177,6 +178,13 @@ func routeSearch(w http.ResponseWriter, r *http.Request, catsConf map[category.N
 	// Convert the results to include the hashes (output format).
 	outpusRes := result.ConvertToOutput(rankedRes, salt)
 
+	// Create the response.
+	res := ResultsResponse{
+		Version:  cli.VersionString(),
+		Duration: dur.Milliseconds(),
+		Results:  outpusRes,
+	}
+
 	// If writing response failes, return the error.
-	return writeResponseJSON(w, http.StatusOK, outpusRes)
+	return writeResponseJSON(w, http.StatusOK, res)
 }

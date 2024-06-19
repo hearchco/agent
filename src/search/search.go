@@ -15,9 +15,12 @@ import (
 	"github.com/hearchco/agent/src/utils/anonymize"
 )
 
-func Search(query string, category category.Name, opts options.Options, catConf config.Category) ([]result.Result, error) {
+func Search(query string, category category.Name, opts options.Options, catConf config.Category) ([]result.Result, time.Duration, error) {
+	// Capture start time.
+	startTime := time.Now()
+
 	if err := validateParams(query, opts); err != nil {
-		return nil, err
+		return nil, time.Since(startTime), err
 	}
 
 	log.Debug().
@@ -35,9 +38,6 @@ func Search(query string, category category.Name, opts options.Options, catConf 
 		Dur("preferred_timeout", catConf.Timings.PreferredTimeout).
 		Dur("hard_timeout", catConf.Timings.HardTimeout).
 		Msg("Searching")
-
-	// Capture start time.
-	startTime := time.Now()
 
 	// Create contexts with timeout for HardTimeout and PreferredTimeout.
 	ctxHardTimeout, cancelHardTimeoutFunc := context.WithTimeout(context.Background(), catConf.Timings.HardTimeout)
@@ -105,8 +105,9 @@ func Search(query string, category category.Name, opts options.Options, catConf 
 		Int("results", len(results)).
 		Str("query", anonymize.String(query)).
 		Str("responders", fmt.Sprintf("%v", responders)).
+		Dur("duration", time.Since(startTime)).
 		Msg("Scraping finished")
 
 	// Return the results.
-	return results, nil
+	return results, time.Since(startTime), nil
 }
