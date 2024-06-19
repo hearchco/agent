@@ -9,4 +9,4 @@ const (
 	searchURL = "https://lite.duckduckgo.com/lite/"
 )
 
-var origins = [...]engines.Name{engines.DUCKDUCKGO, engines.BING}
+var origins = [...]engines.Name{seName, engines.BING}

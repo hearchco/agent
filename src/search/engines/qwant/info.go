@@ -9,4 +9,4 @@ const (
 	searchURL = "https://api.qwant.com/v3/search/web"
 )
 
-var origins = [...]engines.Name{engines.QWANT, engines.BING}
+var origins = [...]engines.Name{seName, engines.BING}

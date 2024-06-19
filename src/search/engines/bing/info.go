@@ -9,4 +9,4 @@ const (
 	searchURL = "https://www.bing.com/search"
 )
 
-var origins = [...]engines.Name{engines.BING}
+var origins = [...]engines.Name{seName}

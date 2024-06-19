@@ -10,4 +10,4 @@ const (
 	pageURL   = "https://www.etools.ch/search.do"
 )
 
-var origins = [...]engines.Name{engines.ETOOLS, engines.BING, engines.BRAVE, engines.DUCKDUCKGO, engines.GOOGLE, engines.MOJEEK, engines.QWANT, engines.YAHOO}
+var origins = [...]engines.Name{seName, engines.BING, engines.BRAVE, engines.DUCKDUCKGO, engines.GOOGLE, engines.MOJEEK, engines.QWANT, engines.YAHOO}

@@ -9,4 +9,4 @@ const (
 	searchURL = "https://presearch.com/search"
 )
 
-var origins = [...]engines.Name{engines.PRESEARCH, engines.GOOGLE}
+var origins = [...]engines.Name{seName, engines.GOOGLE}

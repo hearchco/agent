@@ -9,4 +9,4 @@ const (
 	searchURL = "https://www.startpage.com/sp/search"
 )
 
-var origins = [...]engines.Name{engines.STARTPAGE, engines.GOOGLE}
+var origins = [...]engines.Name{seName, engines.GOOGLE}

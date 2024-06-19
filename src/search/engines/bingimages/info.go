@@ -9,4 +9,4 @@ const (
 	searchURL = "https://www.bing.com/images/async"
 )
 
-var origins = [...]engines.Name{engines.BINGIMAGES}
+var origins = [...]engines.Name{seName}

@@ -9,4 +9,4 @@ package yep
 // 	searchURL = "https://api.yep.com/fs/2/search"
 // )
 
-// var origins = [...]engines.Name{engines.YEP}
+// var origins = [...]engines.Name{seName}

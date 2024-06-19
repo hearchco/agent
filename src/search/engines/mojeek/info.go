@@ -9,4 +9,4 @@ const (
 	searchURL = "https://www.mojeek.com/search"
 )
 
-var origins = [...]engines.Name{engines.MOJEEK}
+var origins = [...]engines.Name{seName}
