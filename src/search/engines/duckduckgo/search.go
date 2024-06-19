@@ -21,10 +21,10 @@ type Engine struct {
 	scraper.EngineBase
 }
 
-func New() *Engine {
-	return &Engine{EngineBase: scraper.EngineBase{
-		Name:    info.Name,
-		Origins: info.Origins,
+func New() scraper.Enginer {
+	return &Engine{scraper.EngineBase{
+		Name:    seName,
+		Origins: origins[:],
 	}}
 }
 
@@ -105,15 +105,15 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 
 		var err error
 		if pageNum0 == 0 {
-			urll := fmt.Sprintf("%v?q=%v", info.URL, query)
-			anonUrll := fmt.Sprintf("%v?q=%v", info.URL, anonymize.String(query))
+			urll := fmt.Sprintf("%v?q=%v", searchURL, query)
+			anonUrll := fmt.Sprintf("%v?q=%v", searchURL, anonymize.String(query))
 			err = se.Get(ctx, urll, anonUrll)
 		} else {
 			// This value changes depending on how many results were returned on the first page, so it's set to the lowest seen value.
-			pageParam := fmt.Sprintf("%v=%v", params.Page, pageNum0*20)
-			body := strings.NewReader(fmt.Sprintf("q=%v&%v", query, pageParam))
-			anonBody := fmt.Sprintf("q=%v&%v", anonymize.String(query), pageParam)
-			err = se.Post(ctx, info.URL, body, anonBody)
+			paramPage := fmt.Sprintf("%v=%v", paramKeyPage, pageNum0*20)
+			body := strings.NewReader(fmt.Sprintf("q=%v&%v", query, paramPage))
+			anonBody := fmt.Sprintf("q=%v&%v", anonymize.String(query), paramPage)
+			err = se.Post(ctx, searchURL, body, anonBody)
 		}
 
 		if err != nil {

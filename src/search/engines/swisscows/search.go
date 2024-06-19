@@ -21,10 +21,10 @@ type Engine struct {
 	scraper.EngineBase
 }
 
-func New() *Engine {
-	return &Engine{EngineBase: scraper.EngineBase{
-		Name:    info.Name,
-		Origins: info.Origins,
+func New() scraper.Enginer {
+	return &Engine{scraper.EngineBase{
+		Name:    seName,
+		Origins: origins[:],
 	}}
 }
 
@@ -101,7 +101,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 	})
 
 	// Static params.
-	localeParam := localeParamString(opts.Locale)
+	paramLocale := localeParamString(opts.Locale)
 
 	for i := range opts.Pages.Max {
 		pageNum0 := i + opts.Pages.Start
@@ -109,13 +109,14 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		ctx.Put("page", strconv.Itoa(i))
 
 		// Dynamic params.
-		pageParam := fmt.Sprintf("%v=%v", params.Page, pageNum0*10)
+		paramPage := fmt.Sprintf("%v=%v", paramKeyPage, pageNum0*10)
 
-		combinedParams := morestrings.JoinNonEmpty([]string{freshnessParam, itemsParam, pageParam}, "?", "&")
+		combinedParamsLeft := morestrings.JoinNonEmpty([]string{paramFreshness, paramItems, paramPage}, "?", "&")
+		combinedParamsRight := morestrings.JoinNonEmpty([]string{paramLocale}, "&", "&")
 
 		// Non standard order of parameters required
-		urll := fmt.Sprintf("%v%v&query=%v&%v", info.URL, combinedParams, query, localeParam)
-		anonUrll := fmt.Sprintf("%v%v&query=%v&%v", info.URL, combinedParams, anonymize.String(query), localeParam)
+		urll := fmt.Sprintf("%v%v&query=%v%v", searchURL, combinedParamsLeft, query, combinedParamsRight)
+		anonUrll := fmt.Sprintf("%v%v&query=%v%v", searchURL, combinedParamsLeft, anonymize.String(query), combinedParamsRight)
 
 		if err := se.Get(ctx, urll, anonUrll); err != nil {
 			retErrors = append(retErrors, err)

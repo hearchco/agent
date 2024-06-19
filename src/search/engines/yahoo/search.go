@@ -21,10 +21,10 @@ type Engine struct {
 	scraper.EngineBase
 }
 
-func New() *Engine {
-	return &Engine{EngineBase: scraper.EngineBase{
-		Name:    info.Name,
-		Origins: info.Origins,
+func New() scraper.Enginer {
+	return &Engine{scraper.EngineBase{
+		Name:    seName,
+		Origins: origins[:],
 	}}
 }
 
@@ -34,7 +34,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 	pageRankCounter := scraper.NewPageRankCounter(opts.Pages.Max)
 
 	se.OnRequest(func(r *colly.Request) {
-		r.Headers.Add("Cookie", fmt.Sprintf("%v&%v", safeSearchCookiePrefix, safeSearchCookieString(opts.SafeSearch)))
+		r.Headers.Add("Cookie", safeSearchCookieString(opts.SafeSearch))
 	})
 
 	se.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
@@ -108,15 +108,15 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		ctx.Put("page", strconv.Itoa(i))
 
 		// Dynamic params.
-		pageParam := ""
+		paramPage := ""
 		if pageNum0 > 0 {
-			pageParam = fmt.Sprintf("%v=%v", params.Page, (pageNum0-1)*7+8)
+			paramPage = fmt.Sprintf("%v=%v", paramKeyPage, (pageNum0-1)*7+8)
 		}
 
-		combinedParams := morestrings.JoinNonEmpty([]string{pageParam}, "&", "&")
+		combinedParams := morestrings.JoinNonEmpty([]string{paramPage}, "&", "&")
 
-		urll := fmt.Sprintf("%v?p=%v%v", info.URL, query, combinedParams)
-		anonUrll := fmt.Sprintf("%v?p=%v%v", info.URL, anonymize.String(query), combinedParams)
+		urll := fmt.Sprintf("%v?p=%v%v", searchURL, query, combinedParams)
+		anonUrll := fmt.Sprintf("%v?p=%v%v", searchURL, anonymize.String(query), combinedParams)
 
 		if err := se.Get(ctx, urll, anonUrll); err != nil {
 			retErrors = append(retErrors, err)

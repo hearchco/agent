@@ -1,4 +1,4 @@
-package etools
+package presearch
 
 import (
 	"fmt"
@@ -6,13 +6,10 @@ import (
 
 const (
 	paramKeyPage       = "page"
-	paramKeySafeSearch = "safeSearch" // Can be "true" or "false".
-
-	paramCountry  = "country=web"
-	paramLanguage = "language=all"
+	paramKeySafeSearch = "use_safe_search" // // Can be "true" or "false".
 )
 
-func safeSearchParamString(safesearch bool) string {
+func safeSearchCookieString(safesearch bool) string {
 	if safesearch {
 		return fmt.Sprintf("%v=%v", paramKeySafeSearch, "true")
 	} else {

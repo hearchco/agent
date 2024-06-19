@@ -5,6 +5,7 @@ package yep
 // 	"fmt"
 // 	"strconv"
 // 	"strings"
+// 	"sync/atomic"
 
 // 	"github.com/gocolly/colly/v2"
 // 	"github.com/rs/zerolog/log"
@@ -21,14 +22,15 @@ package yep
 // 	scraper.EngineBase
 // }
 
-// func New() *Engine {
-// 	return &Engine{EngineBase: scraper.EngineBase{
-// 		Name:    info.Name,
-// 		Origins: info.Origins,
+// func New() scraper.Enginer {
+// 	return &Engine{scraper.EngineBase{
+// 		Name:    seName,
+// 		Origins: origins[:],
 // 	}}
 // }
 
 // func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
+// 	foundResults := atomic.Bool{}
 // 	retErrors := make([]error, 0, opts.Pages.Max)
 // 	pageRankCounter := scraper.NewPageRankCounter(opts.Pages.Max)
 
@@ -94,13 +96,16 @@ package yep
 // 					Msg("Sending result to channel")
 // 				resChan <- r
 // 				pageRankCounter.Increment(pageIndex)
+// 				if !foundResults.Load() {
+// 					foundResults.Store(true)
+// 				}
 // 			}
 // 		}
 // 	})
 
 // 	// Static params.
-// 	localeParam := localeParamString(opts.Locale)
-// 	safeSearchParam := safeSearchParamString(opts.SafeSearch)
+// 	paramLocale := localeParamString(opts.Locale)
+// 	paramSafeSearch := safeSearchParamString(opts.SafeSearch)
 
 // 	for i := range opts.Pages.Max {
 // 		pageNum := i + opts.Pages.Start
@@ -108,17 +113,17 @@ package yep
 // 		ctx.Put("page", strconv.Itoa(i))
 
 // 		// Dynamic params.
-// 		pageParam := ""
+// 		paramPage := ""
 // 		if pageNum > 0 {
-// 			pageParam = fmt.Sprintf("%v=%v", params.Page, (pageNum+2)*10+1)
+// 			paramPage = fmt.Sprintf("%v=%v", paramKeyPage, (pageNum+2)*10+1)
 // 		}
 
-// 		combinedParamsLeft := morestrings.JoinNonEmpty([]string{clientParam, localeParam, pageParam, no_correctParam}, "&", "&")
-// 		combinedParamsRight := morestrings.JoinNonEmpty([]string{safeSearchParam, typeParam}, "&", "&")
+// 		combinedParamsLeft := morestrings.JoinNonEmpty([]string{paramClient, paramLocale, paramPage, paramNo_correct}, "?", "&")
+// 		combinedParamsRight := morestrings.JoinNonEmpty([]string{paramSafeSearch, paramType}, "&", "&")
 
 // 		// Non standard order of params required
-// 		urll := fmt.Sprintf("%v?%v&q=%v&%v", info.URL, combinedParamsLeft, query, combinedParamsRight)
-// 		anonUrll := fmt.Sprintf("%v?%v&q=%v&%v", info.URL, combinedParamsLeft, anonymize.String(query), combinedParamsRight)
+// 		urll := fmt.Sprintf("%v%v&q=%v%v", searchURL, combinedParamsLeft, query, combinedParamsRight)
+// 		anonUrll := fmt.Sprintf("%v%v&q=%v%v", searchURL, combinedParamsLeft, anonymize.String(query), combinedParamsRight)
 
 // 		if err := se.Get(ctx, urll, anonUrll); err != nil {
 // 			retErrors = append(retErrors, err)
