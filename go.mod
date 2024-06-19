@@ -10,7 +10,7 @@ require (
 	github.com/andybalholm/brotli v1.1.0
 	github.com/aws/aws-lambda-go v1.47.0
 	github.com/awslabs/aws-lambda-go-api-proxy v0.16.2
-	github.com/go-chi/chi/v5 v5.0.12
+	github.com/go-chi/chi/v5 v5.0.13
 	github.com/go-chi/cors v1.2.1
 	github.com/gocolly/colly/v2 v2.1.1-0.20231020184023-3c987f1982ed // Hearchco's PR
 	github.com/knadh/koanf/parsers/yaml v0.1.0
