@@ -7,7 +7,15 @@ import (
 	"github.com/hearchco/agent/src/search/engines/options"
 )
 
+const (
+	paramKeyPage   = "offset"
+	paramKeyLocale = "region" // Should be the same as Locale, only with "_" replaced by "-".
+
+	paramFreshness = "freshness=All"
+	paramItems     = "itemsCount=10"
+)
+
 func localeParamString(locale options.Locale) string {
 	region := strings.Replace(locale.String(), "_", "-", 1)
-	return fmt.Sprintf("%v=%v", params.Locale, region)
+	return fmt.Sprintf("%v=%v", paramKeyLocale, region)
 }

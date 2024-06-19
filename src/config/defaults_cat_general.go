@@ -29,7 +29,7 @@ var generalRequiredByOriginEngines = []engines.Name{
 }
 
 var generalPreferredEngines = []engines.Name{
-	engines.ETOOLS,
+	engines.ETOOLS, // Not in ByOrigin because it only gives 10 results across a lot of engines that it scrapes from.
 }
 
 var generalPreferredByOriginEngines = []engines.Name{

@@ -9,14 +9,11 @@ import (
 )
 
 func TestSearch(t *testing.T) {
-	// Search engine name
-	seName := info.Name
-
-	// testing options
+	// Testing options.
 	conf := _engines_test.NewConfig(seName)
 	opt := _engines_test.NewOpts()
 
-	// test cases
+	// Test cases.
 	tchar := []_engines_test.TestCaseHasAnyResults{{
 		Query:   "ping",
 		Options: opt,

@@ -21,10 +21,10 @@ type Engine struct {
 	scraper.EngineBase
 }
 
-func New() *Engine {
-	return &Engine{EngineBase: scraper.EngineBase{
-		Name:    info.Name,
-		Origins: info.Origins,
+func New() scraper.Enginer {
+	return &Engine{scraper.EngineBase{
+		Name:    seName,
+		Origins: origins[:],
 	}}
 }
 
@@ -95,7 +95,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 	firstRequest := true
 
 	// Static params.
-	safeSearchParam := safeSearchParamString(opts.SafeSearch)
+	paramSafeSearch := safeSearchParamString(opts.SafeSearch)
 
 	for i := range opts.Pages.Max {
 		pageNum0 := i + opts.Pages.Start
@@ -105,7 +105,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		var err error
 		// eTools requires a request for the first page.
 		if pageNum0 == 0 || firstRequest {
-			combinedParams := morestrings.JoinNonEmpty([]string{countryParam, languageParam, safeSearchParam}, "&", "&")
+			combinedParams := morestrings.JoinNonEmpty([]string{paramCountry, paramLanguage, paramSafeSearch}, "&", "&")
 
 			body := strings.NewReader(fmt.Sprintf("query=%v%v", query, combinedParams))
 			anonBody := fmt.Sprintf("query=%v%v", anonymize.String(query), combinedParams)
@@ -113,9 +113,9 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 			if firstRequest {
 				firstCtx := colly.NewContext()
 				firstCtx.Put("ignore", strconv.FormatBool(true))
-				err = se.Post(firstCtx, info.URL, body, anonBody)
+				err = se.Post(firstCtx, searchURL, body, anonBody)
 			} else {
-				err = se.Post(ctx, info.URL, body, anonBody)
+				err = se.Post(ctx, searchURL, body, anonBody)
 			}
 
 			firstRequest = false
@@ -125,8 +125,8 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		// Since the above can happen for the first request and then we need to request the wanted page.
 		if pageNum0 > 0 {
 			// Query isn't needed as it's saved in the JSESSION cookie.
-			pageParam := fmt.Sprintf("%v=%v", params.Page, pageNum0+1)
-			urll := fmt.Sprintf("%v?%v", pageURL, pageParam)
+			paramPage := fmt.Sprintf("%v=%v", paramKeyPage, pageNum0+1)
+			urll := fmt.Sprintf("%v?%v", pageURL, paramPage)
 			err = se.Get(ctx, urll, urll)
 		}
 
