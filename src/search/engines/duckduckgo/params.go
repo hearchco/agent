@@ -11,6 +11,9 @@ const (
 	paramKeyPage       = "dc"
 	paramKeyLocale     = "kl" // Should be Locale with _ replaced by - and first 2 letters as last and vice versa.
 	paramKeySafeSearch = ""   // Always enabled.
+
+	// Suggestions API params.
+	sugParamType = "type=list"
 )
 
 func localeCookieString(locale options.Locale) string {

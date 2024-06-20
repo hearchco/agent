@@ -1,4 +1,4 @@
-package google
+package duckduckgo
 
 import (
 	"github.com/hearchco/agent/src/search/engines/options"
