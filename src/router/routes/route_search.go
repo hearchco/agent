@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hearchco/agent/src/cache"
 	"github.com/hearchco/agent/src/cli"
@@ -20,6 +21,9 @@ import (
 )
 
 func routeSearch(w http.ResponseWriter, r *http.Request, catsConf map[category.Name]config.Category, ttlConf config.TTL, db cache.DB, salt string) error {
+	// Capture start time.
+	startTime := time.Now()
+
 	// Parse form data (including query params).
 	if err := r.ParseForm(); err != nil {
 		// Server error.
@@ -150,7 +154,7 @@ func routeSearch(w http.ResponseWriter, r *http.Request, catsConf map[category.N
 	}
 
 	// Search for results.
-	scrapedRes, dur, err := search.Search(query, categoryName, opts, catsConf[categoryName])
+	scrapedRes, err := search.Search(query, categoryName, opts, catsConf[categoryName])
 	if err != nil {
 		// Server error.
 		werr := writeResponseJSON(w, http.StatusInternalServerError, ErrorResponse{
@@ -181,7 +185,7 @@ func routeSearch(w http.ResponseWriter, r *http.Request, catsConf map[category.N
 	// Create the response.
 	res := ResultsResponse{
 		Version:  cli.VersionString(),
-		Duration: dur.Milliseconds(),
+		Duration: time.Since(startTime).Milliseconds(),
 		Results:  outpusRes,
 	}
 

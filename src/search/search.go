@@ -15,12 +15,12 @@ import (
 	"github.com/hearchco/agent/src/utils/anonymize"
 )
 
-func Search(query string, category category.Name, opts options.Options, catConf config.Category) ([]result.Result, time.Duration, error) {
+func Search(query string, category category.Name, opts options.Options, catConf config.Category) ([]result.Result, error) {
 	// Capture start time.
 	startTime := time.Now()
 
 	if err := validateParams(query, opts); err != nil {
-		return nil, time.Since(startTime), err
+		return nil, err
 	}
 
 	log.Debug().
@@ -109,5 +109,5 @@ func Search(query string, category category.Name, opts options.Options, catConf 
 		Msg("Scraping finished")
 
 	// Return the results.
-	return results, time.Since(startTime), nil
+	return results, nil
 }
