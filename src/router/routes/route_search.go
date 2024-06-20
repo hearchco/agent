@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/hearchco/agent/src/cache"
 	"github.com/hearchco/agent/src/cli"
 	"github.com/hearchco/agent/src/config"
@@ -16,7 +18,6 @@ import (
 	"github.com/hearchco/agent/src/search/result/rank"
 	"github.com/hearchco/agent/src/utils/anonymize"
 	"github.com/hearchco/agent/src/utils/gotypelimits"
-	"github.com/rs/zerolog/log"
 )
 
 func routeSearch(w http.ResponseWriter, r *http.Request, catsConf map[category.Name]config.Category, ttlConf config.TTL, db cache.DB, salt string) error {
