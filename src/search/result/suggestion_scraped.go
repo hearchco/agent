@@ -13,12 +13,12 @@ func (s SuggestionScraped) Rank() RankSimpleScraped {
 	return s.rank
 }
 
-func (r SuggestionScraped) Convert(erCap int) Suggestion {
+func (s SuggestionScraped) Convert(erCap int) Suggestion {
 	engineRanks := make([]RankSimple, 0, erCap)
-	engineRanks = append(engineRanks, r.Rank().Convert())
+	engineRanks = append(engineRanks, s.Rank().Convert())
 	return Suggestion{
 		suggestionJSON{
-			r.Value(),
+			s.Value(),
 			engineRanks,
 		},
 	}
