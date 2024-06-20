@@ -9,11 +9,11 @@ import (
 	"github.com/hearchco/agent/src/search/result"
 )
 
-// Interface that each search engine must implement to support searching.
-type Enginer interface {
+// Interface that each search engine must implement to support suggestions.
+type Suggester interface {
 	GetName() engines.Name
 	GetOrigins() []engines.Name
 	Init(context.Context, config.CategoryTimings)
 	ReInit(context.Context)
-	Search(string, options.Options, chan result.ResultScraped) ([]error, bool)
+	Suggest(string, options.Locale, chan result.SuggestionScraped) ([]error, bool)
 }

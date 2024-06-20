@@ -14,6 +14,9 @@ const (
 	paramKeySafeSearch = "safe" // Can be "off", "medium or "high".
 
 	paramFilter = "filter=0"
+
+	// Suggestions API params.
+	sugParamClient = "client=firefox"
 )
 
 func localeParamString(locale options.Locale) string {

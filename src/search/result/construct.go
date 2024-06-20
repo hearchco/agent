@@ -12,10 +12,12 @@ func ConstructResult(seName engines.Name, urll string, title string, description
 		title:       title,
 		description: description,
 		rank: RankScraped{
-			searchEngine: seName,
-			rank:         0, // This gets calculated when ranking the results.
-			page:         page,
-			onPageRank:   onPageRank,
+			RankSimpleScraped{
+				searchEngine: seName,
+				rank:         0, // This gets calculated when ranking the results.
+			},
+			page,
+			onPageRank,
 		},
 	}
 
