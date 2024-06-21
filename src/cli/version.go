@@ -16,10 +16,16 @@ func (v versionFlag) BeforeApply(app *kong.Kong, vars kong.Vars) error {
 	return nil
 }
 
-func VersionString() string {
-	if Version == "" {
+type version struct {
+	ver       string
+	timestamp string
+	commit    string
+}
+
+func (v version) String() string {
+	if v.ver == "" {
 		return "dev"
 	} else {
-		return fmt.Sprintf("%v (%v@%v)", Version, GitCommit, Timestamp)
+		return fmt.Sprintf("%v (%v@%v)", v.ver, v.commit, v.timestamp)
 	}
 }

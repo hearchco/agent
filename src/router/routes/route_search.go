@@ -10,7 +10,6 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/hearchco/agent/src/cache"
-	"github.com/hearchco/agent/src/cli"
 	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search"
 	"github.com/hearchco/agent/src/search/category"
@@ -21,7 +20,7 @@ import (
 	"github.com/hearchco/agent/src/utils/gotypelimits"
 )
 
-func routeSearch(w http.ResponseWriter, r *http.Request, catsConf map[category.Name]config.Category, ttlConf config.TTL, db cache.DB, salt string) error {
+func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf map[category.Name]config.Category, ttlConf config.TTL, db cache.DB, salt string) error {
 	// Capture start time.
 	startTime := time.Now()
 
@@ -185,7 +184,7 @@ func routeSearch(w http.ResponseWriter, r *http.Request, catsConf map[category.N
 
 	// Create the response.
 	res := ResultsResponse{
-		Version:  cli.VersionString(),
+		Version:  ver,
 		Duration: time.Since(startTime).Milliseconds(),
 		Results:  outpusRes,
 	}
