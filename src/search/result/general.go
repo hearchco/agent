@@ -68,6 +68,10 @@ func (r General) EngineRanks() []Rank {
 	return r.generalJSON.EngineRanks
 }
 
+func (r *General) InitEngineRanks() {
+	r.generalJSON.EngineRanks = make([]Rank, 0)
+}
+
 func (r *General) ShrinkEngineRanks() {
 	if r.generalJSON.EngineRanks == nil {
 		log.Panic().Msg("EngineRanks is nil")

@@ -10,6 +10,7 @@ type Result interface {
 	Score() float64
 	SetScore(float64)
 	EngineRanks() []Rank
+	InitEngineRanks()
 	ShrinkEngineRanks()
 	AppendEngineRanks(Rank)
 	ConvertToOutput(string) ResultOutput

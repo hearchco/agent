@@ -87,31 +87,11 @@ func TestShortenNegative(t *testing.T) {
 		{"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."},
 	}
 
-	// Create test results.
-	var results = make([]General, 0, len(tests))
-	for _, test := range tests {
-		v := General{
-			generalJSON: generalJSON{
-				Title:       test.orig,
-				Description: test.orig,
-			},
-		}
-		results = append(results, v)
-	}
-
-	// Shorten the results.
-	for i := range results {
-		results[i] = *results[i].Shorten(-1, -1).(*General)
-	}
-
 	// Check if the results are shortened as expected.
-	for i, test := range tests {
-		v := results[i]
-		if v.Title() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Title(), len(v.Title()), test.expected, len(test.expected))
-		}
-		if v.Description() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Description(), len(v.Description()), test.expected, len(test.expected))
+	for _, test := range tests {
+		short := shortString(test.orig, -1)
+		if short != test.expected {
+			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), short, len(short), test.expected, len(test.expected))
 		}
 	}
 }
@@ -130,31 +110,11 @@ func TestShortenZero(t *testing.T) {
 		{"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", ""},
 	}
 
-	// Create test results.
-	var results = make([]General, 0, len(tests))
-	for _, test := range tests {
-		v := General{
-			generalJSON: generalJSON{
-				Title:       test.orig,
-				Description: test.orig,
-			},
-		}
-		results = append(results, v)
-	}
-
-	// Shorten the results.
-	for i := range results {
-		results[i] = *results[i].Shorten(0, 0).(*General)
-	}
-
 	// Check if the results are shortened as expected.
-	for i, test := range tests {
-		v := results[i]
-		if v.Title() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Title(), len(v.Title()), test.expected, len(test.expected))
-		}
-		if v.Description() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Description(), len(v.Description()), test.expected, len(test.expected))
+	for _, test := range tests {
+		short := shortString(test.orig, 0)
+		if short != test.expected {
+			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), short, len(short), test.expected, len(test.expected))
 		}
 	}
 }
@@ -173,31 +133,11 @@ func TestShorten1(t *testing.T) {
 		{"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", "L"},
 	}
 
-	// Create test results.
-	var results = make([]General, 0, len(tests))
-	for _, test := range tests {
-		v := General{
-			generalJSON: generalJSON{
-				Title:       test.orig,
-				Description: test.orig,
-			},
-		}
-		results = append(results, v)
-	}
-
-	// Shorten the results.
-	for i := range results {
-		results[i] = *results[i].Shorten(1, 1).(*General)
-	}
-
 	// Check if the results are shortened as expected.
-	for i, test := range tests {
-		v := results[i]
-		if v.Title() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Title(), len(v.Title()), test.expected, len(test.expected))
-		}
-		if v.Description() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Description(), len(v.Description()), test.expected, len(test.expected))
+	for _, test := range tests {
+		short := shortString(test.orig, 1)
+		if short != test.expected {
+			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), short, len(short), test.expected, len(test.expected))
 		}
 	}
 }
@@ -216,31 +156,11 @@ func TestShorten2(t *testing.T) {
 		{"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", "Lo"},
 	}
 
-	// Create test results.
-	var results = make([]General, 0, len(tests))
-	for _, test := range tests {
-		v := General{
-			generalJSON: generalJSON{
-				Title:       test.orig,
-				Description: test.orig,
-			},
-		}
-		results = append(results, v)
-	}
-
-	// Shorten the results.
-	for i := range results {
-		results[i] = *results[i].Shorten(2, 2).(*General)
-	}
-
 	// Check if the results are shortened as expected.
-	for i, test := range tests {
-		v := results[i]
-		if v.Title() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Title(), len(v.Title()), test.expected, len(test.expected))
-		}
-		if v.Description() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Description(), len(v.Description()), test.expected, len(test.expected))
+	for _, test := range tests {
+		short := shortString(test.orig, 2)
+		if short != test.expected {
+			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), short, len(short), test.expected, len(test.expected))
 		}
 	}
 }
@@ -271,19 +191,11 @@ func TestShorten3(t *testing.T) {
 		results = append(results, v)
 	}
 
-	// Shorten the results.
-	for i := range results {
-		results[i] = *results[i].Shorten(3, 3).(*General)
-	}
-
 	// Check if the results are shortened as expected.
-	for i, test := range tests {
-		v := results[i]
-		if v.Title() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Title(), len(v.Title()), test.expected, len(test.expected))
-		}
-		if v.Description() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Description(), len(v.Description()), test.expected, len(test.expected))
+	for _, test := range tests {
+		short := shortString(test.orig, 3)
+		if short != test.expected {
+			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), short, len(short), test.expected, len(test.expected))
 		}
 	}
 }
@@ -302,31 +214,11 @@ func TestShorten4(t *testing.T) {
 		{"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", "L..."},
 	}
 
-	// Create test results.
-	var results = make([]General, 0, len(tests))
-	for _, test := range tests {
-		v := General{
-			generalJSON: generalJSON{
-				Title:       test.orig,
-				Description: test.orig,
-			},
-		}
-		results = append(results, v)
-	}
-
-	// Shorten the results.
-	for i := range results {
-		results[i] = *results[i].Shorten(4, 4).(*General)
-	}
-
 	// Check if the results are shortened as expected.
-	for i, test := range tests {
-		v := results[i]
-		if v.Title() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Title(), len(v.Title()), test.expected, len(test.expected))
-		}
-		if v.Description() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Description(), len(v.Description()), test.expected, len(test.expected))
+	for _, test := range tests {
+		short := shortString(test.orig, 4)
+		if short != test.expected {
+			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), short, len(short), test.expected, len(test.expected))
 		}
 	}
 }
@@ -345,31 +237,11 @@ func TestShorten400(t *testing.T) {
 		{"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa ..."},
 	}
 
-	// Create test results.
-	var results = make([]General, 0, len(tests))
-	for _, test := range tests {
-		v := General{
-			generalJSON: generalJSON{
-				Title:       test.orig,
-				Description: test.orig,
-			},
-		}
-		results = append(results, v)
-	}
-
-	// Shorten the results.
-	for i := range results {
-		results[i] = *results[i].Shorten(400, 400).(*General)
-	}
-
 	// Check if the results are shortened as expected.
-	for i, test := range tests {
-		v := results[i]
-		if v.Title() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Title(), len(v.Title()), test.expected, len(test.expected))
-		}
-		if v.Description() != test.expected {
-			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), v.Description(), len(v.Description()), test.expected, len(test.expected))
+	for _, test := range tests {
+		short := shortString(test.orig, 400)
+		if short != test.expected {
+			t.Errorf("\n\tShorten(%q)\n\tlen = %v\n\n\tGot: %q\n\tlen = %v\n\n\tWant: %q\n\tlen = %v", test.orig, len(test.orig), short, len(short), test.expected, len(test.expected))
 		}
 	}
 }

@@ -54,6 +54,8 @@ func TestFillEngineRankRank(t *testing.T) {
 	for _, rankPair := range ranksTests {
 		var resOrig result.Result = &result.General{}
 		var resExpected result.Result = &result.General{}
+		resOrig.InitEngineRanks()
+		resExpected.InitEngineRanks()
 
 		for _, rank := range rankPair.orig {
 			resOrig.AppendEngineRanks(rank.Convert())
