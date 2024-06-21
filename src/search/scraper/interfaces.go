@@ -28,5 +28,5 @@ type Searcher interface {
 type Suggester interface {
 	Enginer
 
-	Suggest(string, options.Locale, chan result.SuggestionScraped) ([]error, bool)
+	Suggest(string, options.Locale, chan result.SuggestionScraped) (error, bool)
 }

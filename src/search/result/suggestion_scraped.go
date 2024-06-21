@@ -1,8 +1,20 @@
 package result
 
+import (
+	"github.com/hearchco/agent/src/search/engines"
+)
+
 type SuggestionScraped struct {
 	value string
 	rank  RankSimpleScraped
+}
+
+func NewSuggestionScraped(value string, seName engines.Name, rank int) SuggestionScraped {
+	r := NewRankSimpleScraped(seName, rank)
+	return SuggestionScraped{
+		value,
+		r,
+	}
 }
 
 func (s SuggestionScraped) Value() string {
