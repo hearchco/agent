@@ -16,13 +16,20 @@ import (
 	"github.com/hearchco/agent/src/router"
 )
 
+var (
+	// Release variables.
+	Version   string
+	Timestamp string
+	GitCommit string
+)
+
 func main() {
 	// Setup signal interrupt (CTRL+C).
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
 	// Parse cli flags.
-	cliFlags := cli.Setup()
+	cliFlags, ver := cli.Setup(Version, Timestamp, GitCommit)
 
 	// Configure logger.
 	lgr := logger.Setup(cliFlags.Verbosity, cliFlags.Pretty)
@@ -46,7 +53,7 @@ func main() {
 	defer stopProfiler()
 
 	// Start router.
-	rw := router.New(lgr, conf, db, cliFlags.ProfilerServe, cli.VersionString())
+	rw := router.New(lgr, conf, db, cliFlags.ProfilerServe, ver)
 	switch conf.Server.Environment {
 	case "lambda":
 		rw.StartLambda()

@@ -5,15 +5,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var (
-	// Release variables.
-	Version   string
-	Timestamp string
-	GitCommit string
-)
-
 // Returns flags struct from parsed cli arguments.
-func Setup() Flags {
+func Setup(ver string, timestamp string, commit string) (Flags, string) {
+	verStruct := version{
+		ver:       ver,
+		timestamp: timestamp,
+		commit:    commit,
+	}
+
 	var cli Flags
 	ctx := kong.Parse(&cli,
 		kong.Name("hearchco"),
@@ -24,7 +23,7 @@ func Setup() Flags {
 			Compact: true,
 		}),
 		kong.Vars{
-			"version": VersionString(),
+			"version": verStruct.String(),
 		},
 	)
 
@@ -36,5 +35,5 @@ func Setup() Flags {
 		// ^PANIC
 	}
 
-	return cli
+	return cli, verStruct.String()
 }

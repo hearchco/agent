@@ -10,7 +10,7 @@ import (
 	"github.com/hearchco/agent/src/config"
 )
 
-func Setup(mux *chi.Mux, version string, db cache.DB, conf config.Config) {
+func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 	mux.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		err := writeResponse(w, http.StatusOK, "OK")
 		if err != nil {
@@ -23,7 +23,7 @@ func Setup(mux *chi.Mux, version string, db cache.DB, conf config.Config) {
 	})
 
 	mux.Get("/versionz", func(w http.ResponseWriter, r *http.Request) {
-		err := writeResponse(w, http.StatusOK, version)
+		err := writeResponse(w, http.StatusOK, ver)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -34,7 +34,7 @@ func Setup(mux *chi.Mux, version string, db cache.DB, conf config.Config) {
 	})
 
 	mux.Get("/search", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSearch(w, r, conf.Categories, conf.Server.Cache.TTL, db, conf.Server.ImageProxy.Salt)
+		err := routeSearch(w, r, ver, conf.Categories, conf.Server.Cache.TTL, db, conf.Server.ImageProxy.Salt)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -45,7 +45,7 @@ func Setup(mux *chi.Mux, version string, db cache.DB, conf config.Config) {
 	})
 
 	mux.Post("/search", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSearch(w, r, conf.Categories, conf.Server.Cache.TTL, db, conf.Server.ImageProxy.Salt)
+		err := routeSearch(w, r, ver, conf.Categories, conf.Server.Cache.TTL, db, conf.Server.ImageProxy.Salt)
 		if err != nil {
 			log.Error().
 				Err(err).
