@@ -55,7 +55,7 @@ func Search(query string, category category.Name, opts options.Options, catConf 
 	}()
 
 	// Initialize each engine.
-	enginers := initializeEnginers(searchCtx, catConf.Engines, catConf.Timings)
+	searchers := initializeSearchers(searchCtx, catConf.Engines, catConf.Timings)
 
 	// Create a channel of channels to receive the results from each engine.
 	engChan := make(chan chan result.ResultScraped, len(catConf.Engines))
@@ -66,24 +66,24 @@ func Search(query string, category category.Name, opts options.Options, catConf 
 	// Start a goroutine to receive the results from each engine and add them to results map.
 	go createReceiver(engChan, &resMap, len(catConf.Engines))
 
-	// Create a sync.Once wrapper for each enginer.Search() to ensure that the engine is only run once.
+	// Create a sync.Once wrapper for each searcher.Search() to ensure that the engine is only run once.
 	searchOnce := initOnceWrapper(catConf.Engines)
 
 	// Run all required engines. WaitGroup should be awaited unless the hard timeout is reached.
 	var wgRequiredEngines sync.WaitGroup
-	runRequiredEngines(enginers, &wgRequiredEngines, query, opts, catConf.RequiredEngines, engChan, searchOnce)
+	runRequiredEngines(searchers, &wgRequiredEngines, query, opts, catConf.RequiredEngines, engChan, searchOnce)
 
 	// Run all required by origin engines. Cond should be awaited unless the hard timeout is reached.
 	var wgRequiredByOriginEngines sync.WaitGroup
-	runRequiredByOriginEngines(enginers, &wgRequiredByOriginEngines, query, opts, catConf.RequiredByOriginEngines, catConf.Engines, engChan, searchOnce)
+	runRequiredByOriginEngines(searchers, &wgRequiredByOriginEngines, query, opts, catConf.RequiredByOriginEngines, catConf.Engines, engChan, searchOnce)
 
 	// Run all preferred engines. WaitGroup should be awaited unless the preferred timeout is reached.
 	var wgPreferredEngines sync.WaitGroup
-	runPreferredEngines(enginers, &wgPreferredEngines, query, opts, catConf.PreferredEngines, engChan, searchOnce)
+	runPreferredEngines(searchers, &wgPreferredEngines, query, opts, catConf.PreferredEngines, engChan, searchOnce)
 
 	// Run all preferred by origin engines. Cond should be awaited unless the preferred timeout is reached.
 	var wgPreferredByOriginEngines sync.WaitGroup
-	runPreferredByOriginEngines(enginers, &wgPreferredByOriginEngines, query, opts, catConf.PreferredByOriginEngines, catConf.Engines, engChan, searchOnce)
+	runPreferredByOriginEngines(searchers, &wgPreferredByOriginEngines, query, opts, catConf.PreferredByOriginEngines, catConf.Engines, engChan, searchOnce)
 
 	// Close the channel of channels (it's safe because each sending already happened sequentially).
 	close(engChan)

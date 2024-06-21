@@ -15,9 +15,10 @@ type Value struct {
 	// this matters is when sorting.
 	// Much of the time the str field is all we need; it is printed
 	// by Value.String.
-	value  uint64 // Will be converted to int64 when needed.
-	signed bool   // Whether the constant is a signed type.
-	str    string // The string representation given by the "go/constant" package.
+	value      uint64   // Will be converted to int64 when needed.
+	signed     bool     // Whether the constant is a signed type.
+	str        string   // The string representation given by the "go/constant" package.
+	interfaces []string // The interfaces that the constant implements.
 }
 
 // Generator holds the state of the analysis. Primarily used to buffer
@@ -26,8 +27,7 @@ type Generator struct {
 	buf bytes.Buffer // Accumulated output.
 	pkg *Package     // Package we are scanning.
 
-	trimPrefix  string
-	lineComment bool
+	trimPrefix string
 
 	logf func(format string, args ...interface{}) // test logging hook; nil when not testing
 }
@@ -40,8 +40,7 @@ type File struct {
 	typeName string  // Name of the constant type.
 	values   []Value // Accumulator for constant values of that type.
 
-	trimPrefix  string
-	lineComment bool
+	trimPrefix string
 }
 
 type Package struct {

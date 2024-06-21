@@ -12,10 +12,10 @@ import (
 	"github.com/hearchco/agent/src/utils/anonymize"
 )
 
-func runRequiredEngines(enginers []scraper.Enginer, wgRequiredEngines *sync.WaitGroup, query string, opts options.Options, requiredEngines []engines.Name, engChan chan chan result.ResultScraped, searchOnce map[engines.Name]*onceWrapper) {
+func runRequiredEngines(searchers []scraper.Searcher, wgRequiredEngines *sync.WaitGroup, query string, opts options.Options, requiredEngines []engines.Name, engChan chan chan result.ResultScraped, searchOnce map[engines.Name]*onceWrapper) {
 	wgRequiredEngines.Add(len(requiredEngines))
 	for _, engName := range requiredEngines {
-		enginer := enginers[engName]
+		searcher := searchers[engName]
 		resChan := make(chan result.ResultScraped, 100)
 		engChan <- resChan
 		go func() {
@@ -28,7 +28,7 @@ func runRequiredEngines(enginers []scraper.Enginer, wgRequiredEngines *sync.Wait
 					Msg("Started")
 
 				// Run the engine.
-				errs, scraped := enginer.Search(query, opts, resChan)
+				errs, scraped := searcher.Search(query, opts, resChan)
 
 				if len(errs) > 0 {
 					searchOnce[engName].Errored()

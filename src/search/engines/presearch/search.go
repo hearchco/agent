@@ -12,22 +12,10 @@ import (
 
 	"github.com/hearchco/agent/src/search/engines/options"
 	"github.com/hearchco/agent/src/search/result"
-	"github.com/hearchco/agent/src/search/scraper"
 	"github.com/hearchco/agent/src/search/scraper/parse"
 	"github.com/hearchco/agent/src/utils/anonymize"
 	"github.com/hearchco/agent/src/utils/morestrings"
 )
-
-type Engine struct {
-	scraper.EngineBase
-}
-
-func New() scraper.Enginer {
-	return &Engine{scraper.EngineBase{
-		Name:    seName,
-		Origins: origins[:],
-	}}
-}
 
 func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
 	foundResults := atomic.Bool{}

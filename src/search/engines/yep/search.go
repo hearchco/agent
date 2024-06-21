@@ -18,17 +18,6 @@ package yep
 // 	"github.com/hearchco/agent/src/utils/morestrings"
 // )
 
-// type Engine struct {
-// 	scraper.EngineBase
-// }
-
-// func New() scraper.Enginer {
-// 	return &Engine{scraper.EngineBase{
-// 		Name:    seName,
-// 		Origins: origins[:],
-// 	}}
-// }
-
 // func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
 // 	foundResults := atomic.Bool{}
 // 	retErrors := make([]error, 0, opts.Pages.Max)

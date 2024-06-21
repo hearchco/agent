@@ -3,12 +3,17 @@ package main
 import (
 	"log"
 	"os"
+	"slices"
 	"strings"
 )
 
 func validConst(v Value) bool {
 	lowerName := strings.ToLower(v.name)
 	return lowerName != "undefined" && isDirectory(lowerName)
+}
+
+func validInterfacer(v Value, interfaceName string) bool {
+	return slices.Contains(v.interfaces, strings.ToLower(interfaceName))
 }
 
 // isDirectory reports whether the named file is a directory.

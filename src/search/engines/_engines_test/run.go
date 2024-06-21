@@ -9,7 +9,7 @@ import (
 	"github.com/hearchco/agent/src/search/scraper"
 )
 
-func CheckTestCases(t *testing.T, e scraper.Enginer, tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResults, tcrr []TestCaseRankedResults) {
+func CheckTestCases(t *testing.T, e scraper.Searcher, tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResults, tcrr []TestCaseRankedResults) {
 	// TestCaseHasAnyResults
 	for _, tc := range tchar {
 		e.ReInit(context.Background())
