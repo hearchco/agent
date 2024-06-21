@@ -179,18 +179,6 @@ func TestShorten3(t *testing.T) {
 		{"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", "Lor"},
 	}
 
-	// Create test results.
-	var results = make([]General, 0, len(tests))
-	for _, test := range tests {
-		v := General{
-			generalJSON: generalJSON{
-				Title:       test.orig,
-				Description: test.orig,
-			},
-		}
-		results = append(results, v)
-	}
-
 	// Check if the results are shortened as expected.
 	for _, test := range tests {
 		short := shortString(test.orig, 3)

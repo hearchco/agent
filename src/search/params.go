@@ -18,7 +18,9 @@ func validateSuggestParams(query string, locale options.Locale) error {
 }
 
 func validateSearchParams(query string, opts options.Options) error {
-	validateSuggestParams(query, opts.Locale)
+	if err := validateSuggestParams(query, opts.Locale); err != nil {
+		return err
+	}
 
 	if opts.Pages.Start < 0 {
 		return fmt.Errorf("pages start can't be negative")
