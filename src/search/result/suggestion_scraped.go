@@ -17,6 +17,10 @@ func NewSuggestionScraped(value string, seName engines.Name, rank int) Suggestio
 	}
 }
 
+func (s SuggestionScraped) Key() string {
+	return s.Value()
+}
+
 func (s SuggestionScraped) Value() string {
 	return s.value
 }

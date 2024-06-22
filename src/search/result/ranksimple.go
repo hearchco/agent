@@ -24,3 +24,9 @@ func (r RankSimple) Rank() int {
 func (r *RankSimple) SetRank(rank int) {
 	r.rankSimpleJSON.Rank = rank
 }
+
+func (r *RankSimple) UpgradeIfBetter(newR RankSimple) {
+	if r.Rank() > newR.Rank() {
+		r.SetRank(newR.Rank())
+	}
+}

@@ -11,6 +11,10 @@ type GeneralScraped struct {
 	rank        RankScraped
 }
 
+func (r GeneralScraped) Key() string {
+	return r.URL()
+}
+
 func (r GeneralScraped) URL() string {
 	if r.url == "" {
 		log.Panic().Msg("url is empty")

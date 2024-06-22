@@ -61,7 +61,7 @@ func Search(query string, category category.Name, opts options.Options, catConf 
 	engChan := make(chan chan result.ResultScraped, len(catConf.Engines))
 
 	// Create a map for the results with RWMutex.
-	resMap := result.Map()
+	resMap := result.Map(len(catConf.Engines))
 
 	// Start a goroutine to receive the results from each engine and add them to results map.
 	go createReceiver(engChan, &resMap, len(catConf.Engines))
@@ -99,7 +99,7 @@ func Search(query string, category category.Name, opts options.Options, catConf 
 
 	// Extract the results and responders from the map.
 	// TODO: Make title and desc length configurable.
-	results, responders := resMap.ExtractResultsAndResponders(len(catConf.Engines), 100, 1000)
+	results, responders := resMap.ExtractResultsAndResponders(100, 1000)
 
 	log.Debug().
 		Int("results", len(results)).

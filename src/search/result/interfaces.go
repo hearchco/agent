@@ -1,6 +1,7 @@
 package result
 
 type Result interface {
+	Key() string
 	URL() string
 	Title() string
 	Description() string
@@ -18,6 +19,7 @@ type Result interface {
 }
 
 type ResultScraped interface {
+	Key() string
 	URL() string
 	Title() string
 	Description() string

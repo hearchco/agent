@@ -8,21 +8,24 @@ import (
 )
 
 type ConcurrentMap struct {
-	Mutex sync.RWMutex
-	Map   map[string]Result
+	enabledEnginesLen int
+	Mutex             sync.RWMutex
+	Map               map[string]Result
 }
 
-func Map() ConcurrentMap {
+func Map(enabledEnginesLen int) ConcurrentMap {
 	return ConcurrentMap{
-		Map: make(map[string]Result),
+		enabledEnginesLen: enabledEnginesLen,
+		Mutex:             sync.RWMutex{},
+		Map:               make(map[string]Result),
 	}
 }
 
-func (r *ConcurrentMap) ExtractResultsAndResponders(enabledEnginesLen, titleLen, descLen int) ([]Result, []engines.Name) {
+func (r *ConcurrentMap) ExtractResultsAndResponders(titleLen, descLen int) ([]Result, []engines.Name) {
 	r.Mutex.RLock()
 
 	results := make([]Result, 0, len(r.Map))
-	responders := make([]engines.Name, 0, enabledEnginesLen)
+	responders := make([]engines.Name, 0, r.enabledEnginesLen)
 
 	for _, res := range r.Map {
 		newRes := res.Shorten(titleLen, descLen)

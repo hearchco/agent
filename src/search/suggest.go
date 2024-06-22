@@ -1,17 +1,19 @@
 package search
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/hearchco/agent/src/search/engines"
+	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search/engines/options"
+	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/utils/anonymize"
 )
 
-func Suggest(query string, locale options.Locale) ([]string, error) {
+func Suggest(query string, locale options.Locale, hardTimeout time.Duration) ([]result.Suggestion, error) {
 	// Capture start time.
 	startTime := time.Now()
 
@@ -24,9 +26,34 @@ func Suggest(query string, locale options.Locale) ([]string, error) {
 		Str("locale", locale.String()).
 		Msg("Suggesting")
 
-	// TODO: Implement the suggest function.
-	suggestions := []string{}
-	responders := []engines.Name{}
+	// Create context with timeout for HardTimeout.
+	suggestCtx, cancelSuggestFunc := context.WithTimeout(context.Background(), hardTimeout)
+	defer cancelSuggestFunc()
+
+	// Initialize each engine.
+	suggesters := initializeSuggesters(suggestCtx, config.CategoryTimings{
+		HardTimeout: hardTimeout,
+	})
+
+	// Create a channel of channels to receive the suggestions from each engine.
+	engChan := make(chan chan result.SuggestionScraped, len(suggesters))
+
+	// Create a map for the suggestions with RWMutex.
+	sugMap := result.SuggestionMap(len(suggesters))
+
+	// Start a goroutine to receive the suggestions from each engine and add them to suggestions map.
+	go createSuggestionsReceiver(engChan, &sugMap, len(suggesters))
+
+	// Run the suggesters, cancellin the context when one engine finishes successfully or all engines finish (successful or not).
+	runSuggestionsEngines(suggesters, cancelSuggestFunc, query, locale, engChan)
+
+	// Close the channel of channels (it's safe because each sending already happened sequentially).
+	close(engChan)
+
+	// Wait for the suggesters to finish, either by success or by timeout.
+	<-suggestCtx.Done()
+
+	suggestions, responders := sugMap.ExtractSuggestionsAndResponders()
 
 	log.Debug().
 		Int("suggestions", len(suggestions)).

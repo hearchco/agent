@@ -17,6 +17,10 @@ type generalJSON struct {
 	EngineRanks []Rank  `json:"engine_ranks"`
 }
 
+func (r General) Key() string {
+	return r.URL()
+}
+
 func (r General) URL() string {
 	if r.generalJSON.URL == "" {
 		log.Panic().Msg("URL is empty")

@@ -32,6 +32,14 @@ func (r *Rank) SetOnPageRank(onPageRank int) {
 	r.rankJSON.OnPageRank = onPageRank
 }
 
+func (r *Rank) UpgradeIfBetter(newR Rank) {
+	if r.Page() > newR.Page() {
+		r.SetPage(newR.Page(), newR.OnPageRank())
+	} else if r.Page() == newR.Page() && r.OnPageRank() > newR.OnPageRank() {
+		r.SetOnPageRank(newR.OnPageRank())
+	}
+}
+
 func NewRank(searchEngine engines.Name, rank, page, onPageRank int) Rank {
 	return Rank{
 		RankSimple{
