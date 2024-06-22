@@ -30,7 +30,17 @@ func (e EngineBase) GetOrigins() []engines.Name {
 // Used to initialize the EngineBase collector.
 func (e *EngineBase) Init(ctx context.Context, timings config.CategoryTimings) {
 	e.timings = timings
-	e.initCollector(ctx)
+	e.initCollectorSearcher(ctx)
+	e.initLimitRule(timings)
+	e.initCollectorOnRequest(ctx)
+	e.initCollectorOnResponse()
+	e.initCollectorOnError()
+}
+
+// Used to initialize the EngineBase collector for suggesting.
+func (e *EngineBase) InitSuggest(ctx context.Context, timings config.CategoryTimings) {
+	e.timings = timings
+	e.initCollectorSuggester(ctx)
 	e.initLimitRule(timings)
 	e.initCollectorOnRequest(ctx)
 	e.initCollectorOnResponse()

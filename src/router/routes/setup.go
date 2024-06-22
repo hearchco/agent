@@ -44,6 +44,28 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 
+	mux.Post("/suggestions", func(w http.ResponseWriter, r *http.Request) {
+		err := routeSuggest(w, r)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("path", r.URL.Path).
+				Str("method", r.Method).
+				Msg("Failed to send response")
+		}
+	})
+
+	mux.Get("/suggestions", func(w http.ResponseWriter, r *http.Request) {
+		err := routeSuggest(w, r)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("path", r.URL.Path).
+				Str("method", r.Method).
+				Msg("Failed to send response")
+		}
+	})
+
 	mux.Post("/search", func(w http.ResponseWriter, r *http.Request) {
 		err := routeSearch(w, r, ver, conf.Categories, conf.Server.Cache.TTL, db, conf.Server.ImageProxy.Salt)
 		if err != nil {

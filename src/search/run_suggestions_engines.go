@@ -6,13 +6,14 @@ import (
 
 	"github.com/rs/zerolog/log"
 
+	"github.com/hearchco/agent/src/search/engines"
 	"github.com/hearchco/agent/src/search/engines/options"
 	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/search/scraper"
 	"github.com/hearchco/agent/src/utils/anonymize"
 )
 
-func runSuggestionsEngines(suggesters []scraper.Suggester, cancelCtx context.CancelFunc, query string, locale options.Locale, engChan chan chan result.SuggestionScraped) {
+func runSuggestionsEngines(suggesters []scraper.Suggester, cancelCtx context.CancelFunc, query string, locale options.Locale, enabledEngines []engines.Name, engChan chan chan result.SuggestionScraped) {
 	// Wait for any engine to successfully finish.
 	c := sync.NewCond(&sync.Mutex{})
 	go func() {
@@ -30,9 +31,10 @@ func runSuggestionsEngines(suggesters []scraper.Suggester, cancelCtx context.Can
 		cancelCtx()
 	}()
 
-	// Run each suggester.
-	for _, suggester := range suggesters {
-		sugChan := make(chan result.SuggestionScraped, 100)
+	// Run each engine.
+	for _, engName := range enabledEngines {
+		suggester := suggesters[engName]
+		sugChan := make(chan result.SuggestionScraped, 20)
 		engChan <- sugChan
 		go func() {
 			defer wg.Done()
