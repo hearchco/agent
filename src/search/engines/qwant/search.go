@@ -81,7 +81,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 
 		// Dynamic params.
 		paramPage := fmt.Sprintf("%v=%v", paramKeyPage, pageNum0*10)
-		combinedParams := morestrings.JoinNonEmpty([]string{paramCount, paramLocale, paramPage, paramSafeSearch}, "&", "&")
+		combinedParams := morestrings.JoinNonEmpty("&", "&", paramCount, paramLocale, paramPage, paramSafeSearch)
 
 		urll := fmt.Sprintf("%v?q=%v%v", searchURL, query, combinedParams)
 		anonUrll := fmt.Sprintf("%v?q=%v%v", searchURL, anonymize.String(query), combinedParams)

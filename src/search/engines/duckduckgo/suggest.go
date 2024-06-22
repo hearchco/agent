@@ -44,7 +44,7 @@ func (se Engine) Suggest(query string, locale options.Locale, sugChan chan resul
 	})
 
 	ctx := colly.NewContext()
-	combinedParams := morestrings.JoinNonEmpty([]string{sugParamType}, "&", "&")
+	combinedParams := morestrings.JoinNonEmpty("&", "&", sugParamType)
 
 	urll := fmt.Sprintf("%v?q=%v%v", suggestURL, query, combinedParams)
 	anonUrll := fmt.Sprintf("%v?q=%v%v", suggestURL, anonymize.String(query), combinedParams)

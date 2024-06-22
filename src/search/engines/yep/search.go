@@ -107,8 +107,8 @@ package yep
 // 			paramPage = fmt.Sprintf("%v=%v", paramKeyPage, (pageNum+2)*10+1)
 // 		}
 
-// 		combinedParamsLeft := morestrings.JoinNonEmpty([]string{paramClient, paramLocale, paramPage, paramNo_correct}, "?", "&")
-// 		combinedParamsRight := morestrings.JoinNonEmpty([]string{paramSafeSearch, paramType}, "&", "&")
+// 		combinedParamsLeft := morestrings.JoinNonEmpty("?", "&", paramClient, paramLocale, paramPage, paramNo_correct)
+// 		combinedParamsRight := morestrings.JoinNonEmpty("&", "&", paramSafeSearch, paramType)
 
 // 		// Non standard order of params required
 // 		urll := fmt.Sprintf("%v%v&q=%v%v", searchURL, combinedParamsLeft, query, combinedParamsRight)
