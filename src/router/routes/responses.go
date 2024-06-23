@@ -13,10 +13,21 @@ type ErrorResponse struct {
 	Value   string `json:"value"`
 }
 
+type responseBase struct {
+	Version  string `json:"version"`
+	Duration int64  `json:"duration"`
+}
+
 type ResultsResponse struct {
-	Version  string                `json:"version"`
-	Duration int64                 `json:"duration"`
-	Results  []result.ResultOutput `json:"results"`
+	responseBase
+
+	Results []result.ResultOutput `json:"results"`
+}
+
+type SuggestionsResponse struct {
+	responseBase
+
+	Suggestions []result.Suggestion `json:"suggestions"`
 }
 
 func writeResponse(w http.ResponseWriter, status int, body string) error {
@@ -42,7 +53,7 @@ func writeResponseJSON(w http.ResponseWriter, status int, body any) error {
 	return err
 }
 
-func writeResponseSuggestions(w http.ResponseWriter, status int, query string, suggestions []string, api bool) error {
+func writeResponseSuggestions(w http.ResponseWriter, status int, query string, suggestions []string) error {
 	jsonStruct := make([]any, 2)
 	jsonStruct[0] = query
 	jsonStruct[1] = suggestions
@@ -57,11 +68,7 @@ func writeResponseSuggestions(w http.ResponseWriter, status int, query string, s
 		return err
 	}
 
-	if api {
-		w.Header().Set("Content-Type", "application/x-suggestions+json")
-	} else {
-		w.Header().Set("Content-Type", "application/json")
-	}
+	w.Header().Set("Content-Type", "application/x-suggestions+json")
 	w.WriteHeader(status)
 	_, err = w.Write(res)
 	return err

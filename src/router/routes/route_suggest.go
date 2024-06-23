@@ -3,15 +3,21 @@ package routes
 import (
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
+	"time"
 
 	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search"
 	"github.com/hearchco/agent/src/search/engines/options"
 	"github.com/hearchco/agent/src/search/result"
+	"github.com/hearchco/agent/src/search/result/rank"
 )
 
-func routeSuggest(w http.ResponseWriter, r *http.Request, catConf config.Category) error {
+func routeSuggest(w http.ResponseWriter, r *http.Request, ver string, catConf config.Category) error {
+	// Capture start time.
+	startTime := time.Now()
+
 	// Parse form data (including query params).
 	if err := r.ParseForm(); err != nil {
 		// Server error.
@@ -59,15 +65,28 @@ func routeSuggest(w http.ResponseWriter, r *http.Request, catConf config.Categor
 		return err
 	}
 
-	// TODO: Rank the suggestions.
-	// rankedSugs := rank.Rank(scrapedSugs, Ranking)
-
-	// Convert the suggestions to output format.
-	outputSugs := result.ConvertSuggestionsToOutput(scrapedSugs)
+	// Rank the suggestions.
+	var rankedSugs rank.Suggestions = slices.Clone(scrapedSugs)
+	rankedSugs.Rank(catConf.Ranking)
 
 	// Check if the response should be in API format or normal JSON format.
-	api := strings.Contains(r.Header.Get("Accept"), "application/x-suggestions+json")
+	if strings.Contains(r.Header.Get("Accept"), "application/x-suggestions+json") {
+		// Convert the suggestions to slice of strings.
+		stringSugs := result.ConvertSuggestionsToOutput(rankedSugs)
 
-	// If writing response failes, return the error.
-	return writeResponseSuggestions(w, http.StatusOK, query, outputSugs, api)
+		// If writing response failes, return the error.
+		return writeResponseSuggestions(w, http.StatusOK, query, stringSugs)
+	} else {
+		// Create the response.
+		res := SuggestionsResponse{
+			responseBase{
+				ver,
+				time.Since(startTime).Milliseconds(),
+			},
+			rankedSugs,
+		}
+
+		// If writing response failes, return the error.
+		return writeResponseJSON(w, http.StatusOK, res)
+	}
 }

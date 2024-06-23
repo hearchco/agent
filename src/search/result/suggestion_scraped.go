@@ -34,8 +34,8 @@ func (s SuggestionScraped) Convert(erCap int) Suggestion {
 	engineRanks = append(engineRanks, s.Rank().Convert())
 	return Suggestion{
 		suggestionJSON{
-			s.Value(),
-			engineRanks,
+			Value:       s.Value(),
+			EngineRanks: engineRanks,
 		},
 	}
 }

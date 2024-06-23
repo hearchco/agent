@@ -19,7 +19,7 @@ func EmptyRanking(engs []engines.Name) CategoryRanking {
 	}
 
 	for _, eng := range engs {
-		rnk.Engines[eng.ToLower()] = CategoryEngineRanking{
+		rnk.Engines[eng.String()] = CategoryEngineRanking{
 			Mul:   1,
 			Const: 0,
 		}

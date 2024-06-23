@@ -3,6 +3,7 @@ package routes
 import (
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -168,7 +169,8 @@ func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf ma
 	}
 
 	// Rank the results.
-	rankedRes := rank.Rank(scrapedRes, catsConf[categoryName].Ranking)
+	var rankedRes rank.Results = slices.Clone(scrapedRes)
+	rankedRes.Rank(catsConf[categoryName].Ranking)
 
 	// Store the results in cache.
 	if err := db.SetResults(query, categoryName, opts, rankedRes, ttlConf.Time); err != nil {
@@ -184,9 +186,11 @@ func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf ma
 
 	// Create the response.
 	res := ResultsResponse{
-		Version:  ver,
-		Duration: time.Since(startTime).Milliseconds(),
-		Results:  outpusRes,
+		responseBase{
+			ver,
+			time.Since(startTime).Milliseconds(),
+		},
+		outpusRes,
 	}
 
 	// If writing response failes, return the error.

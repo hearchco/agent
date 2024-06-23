@@ -38,7 +38,7 @@ func (se Engine) Suggest(query string, locale options.Locale, sugChan chan resul
 				Strs("suggestions", suggs).
 				Msg("Sending suggestions to channel")
 			for i, sug := range suggs {
-				sugChan <- result.NewSuggestionScraped(sug, se.Name, i)
+				sugChan <- result.NewSuggestionScraped(sug, se.Name, i+1)
 			}
 			if !foundResults.Load() {
 				foundResults.Store(true)

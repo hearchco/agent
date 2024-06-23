@@ -10,11 +10,29 @@ type Suggestion struct {
 
 type suggestionJSON struct {
 	Value       string       `json:"value"`
+	Rank        int          `json:"rank"`
+	Score       float64      `json:"score"`
 	EngineRanks []RankSimple `json:"engine_ranks"`
 }
 
 func (s Suggestion) Value() string {
 	return s.suggestionJSON.Value
+}
+
+func (s Suggestion) Rank() int {
+	return s.suggestionJSON.Rank
+}
+
+func (s *Suggestion) SetRank(rank int) {
+	s.suggestionJSON.Rank = rank
+}
+
+func (s Suggestion) Score() float64 {
+	return s.suggestionJSON.Score
+}
+
+func (s *Suggestion) SetScore(score float64) {
+	s.suggestionJSON.Score = score
 }
 
 func (s Suggestion) EngineRanks() []RankSimple {

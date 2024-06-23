@@ -60,7 +60,7 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 
 	// /suggestions
 	mux.Get("/suggestions", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSuggest(w, r, conf.Categories[category.SUGGESTIONS])
+		err := routeSuggest(w, r, ver, conf.Categories[category.SUGGESTIONS])
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -70,7 +70,7 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 	mux.Post("/suggestions", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSuggest(w, r, conf.Categories[category.SUGGESTIONS])
+		err := routeSuggest(w, r, ver, conf.Categories[category.SUGGESTIONS])
 		if err != nil {
 			log.Error().
 				Err(err).
