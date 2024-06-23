@@ -3,6 +3,7 @@ package search
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -28,8 +29,22 @@ func Suggest(query string, locale options.Locale, hardTimeout time.Duration) ([]
 		Msg("Suggesting")
 
 	// Create context with timeout for HardTimeout.
-	suggestCtx, cancelSuggestFunc := context.WithTimeout(context.Background(), hardTimeout)
-	defer cancelSuggestFunc()
+	ctxHardTimeout, cancelHardTimeoutFunc := context.WithTimeout(context.Background(), hardTimeout)
+	defer cancelHardTimeoutFunc()
+
+	// Create a condition signal that indicates when the suggestions are received from any engine.
+	received := sync.Cond{L: &sync.Mutex{}}
+
+	// Create a context that cancels when both HardTimeout and received signal are done.
+	suggestCtx, cancelSuggest := context.WithCancel(context.Background())
+	defer cancelSuggest()
+	go func() {
+		<-ctxHardTimeout.Done()
+		received.L.Lock()
+		received.Wait()
+		received.L.Unlock()
+		cancelSuggest()
+	}()
 
 	// Initialize each engine.
 	// TODO: Make enabled engines and timing configurable.
@@ -39,16 +54,16 @@ func Suggest(query string, locale options.Locale, hardTimeout time.Duration) ([]
 	})
 
 	// Create a channel of channels to receive the suggestions from each engine.
-	engChan := make(chan chan result.SuggestionScraped, len(suggesters))
+	engChan := make(chan chan []result.SuggestionScraped, len(suggesters))
 
 	// Create a map for the suggestions with RWMutex.
 	sugMap := result.SuggestionMap(len(suggesters))
 
 	// Start a goroutine to receive the suggestions from each engine and add them to suggestions map.
-	go createSuggestionsReceiver(engChan, &sugMap, len(suggesters))
+	go createSuggestionsReceiver(&received, engChan, &sugMap, len(suggesters))
 
 	// Run the suggesters, cancellin the context when one engine finishes successfully or all engines finish (successful or not).
-	runSuggestionsEngines(suggesters, cancelSuggestFunc, query, locale, enabledEngines, engChan)
+	runSuggestionsEngines(suggesters, cancelHardTimeoutFunc, query, locale, enabledEngines, engChan)
 
 	// Close the channel of channels (it's safe because each sending already happened sequentially).
 	close(engChan)

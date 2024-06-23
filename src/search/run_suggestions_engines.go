@@ -13,7 +13,7 @@ import (
 	"github.com/hearchco/agent/src/utils/anonymize"
 )
 
-func runSuggestionsEngines(suggesters []scraper.Suggester, cancelCtx context.CancelFunc, query string, locale options.Locale, enabledEngines []engines.Name, engChan chan chan result.SuggestionScraped) {
+func runSuggestionsEngines(suggesters []scraper.Suggester, cancelCtx context.CancelFunc, query string, locale options.Locale, enabledEngines []engines.Name, engChan chan chan []result.SuggestionScraped) {
 	// Wait for any engine to successfully finish.
 	c := sync.NewCond(&sync.Mutex{})
 	go func() {
@@ -34,7 +34,7 @@ func runSuggestionsEngines(suggesters []scraper.Suggester, cancelCtx context.Can
 	// Run each engine.
 	for _, engName := range enabledEngines {
 		suggester := suggesters[engName]
-		sugChan := make(chan result.SuggestionScraped, 20)
+		sugChan := make(chan []result.SuggestionScraped)
 		engChan <- sugChan
 		go func() {
 			defer wg.Done()

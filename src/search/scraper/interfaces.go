@@ -29,5 +29,5 @@ type Suggester interface {
 	Enginer
 
 	InitSuggest(ctx context.Context, timings config.CategoryTimings)
-	Suggest(string, options.Locale, chan result.SuggestionScraped) (error, bool)
+	Suggest(string, options.Locale, chan []result.SuggestionScraped) (error, bool)
 }

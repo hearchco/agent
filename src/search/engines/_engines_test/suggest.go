@@ -10,7 +10,7 @@ import (
 )
 
 func CheckSuggest(t *testing.T, e scraper.Suggester, q string) {
-	sugChan := make(chan result.SuggestionScraped, 100)
+	sugChan := make(chan []result.SuggestionScraped)
 	go func() {
 		err, found := e.Suggest(q, options.LocaleDefault, sugChan)
 		if err != nil || !found {
@@ -19,8 +19,10 @@ func CheckSuggest(t *testing.T, e scraper.Suggester, q string) {
 	}()
 
 	suggs := make([]string, 0, 10)
-	for sug := range sugChan {
-		suggs = append(suggs, sug.Value())
+	for sugArr := range sugChan {
+		for _, sug := range sugArr {
+			suggs = append(suggs, sug.Value())
+		}
 	}
 	if len(suggs) == 0 {
 		t.Errorf("No suggestions returned")

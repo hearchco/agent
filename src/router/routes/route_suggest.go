@@ -63,14 +63,12 @@ func routeSuggest(w http.ResponseWriter, r *http.Request) error {
 	// Rank the suggestions.
 	// rankedSugs := rank.Rank(scrapedSugs, Ranking)
 
+	// Convert the suggestions to output format.
 	outputSugs := result.ConvertSuggestionsToOutput(scrapedSugs)
 
-	// Create the response.
-	res := [...]any{
-		query,
-		outputSugs,
-	}
+	// Check if the response should be in API format or normal JSON format.
+	api := strings.Contains(r.Header.Get("Accept"), "application/x-suggestions+json")
 
 	// If writing response failes, return the error.
-	return writeResponseJSON(w, http.StatusOK, res)
+	return writeResponseSuggestions(w, http.StatusOK, query, outputSugs, api)
 }

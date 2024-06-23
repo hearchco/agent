@@ -16,7 +16,7 @@ import (
 )
 
 const searcherAccept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
-const suggesterAccept = "application/json,*/*;q=0.01"
+const suggesterAccept = "application/x-suggestions+json,application/json;q=0.9,*/*;q=0.8"
 
 func (e *EngineBase) initCollectorSearcher(ctx context.Context) {
 	e.initCollector(ctx, searcherAccept)

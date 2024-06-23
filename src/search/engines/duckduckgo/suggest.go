@@ -13,7 +13,7 @@ import (
 	"github.com/hearchco/agent/src/utils/morestrings"
 )
 
-func (se Engine) Suggest(query string, locale options.Locale, sugChan chan result.SuggestionScraped) (error, bool) {
+func (se Engine) Suggest(query string, locale options.Locale, sugChan chan []result.SuggestionScraped) (error, bool) {
 	foundResults := false
 
 	se.OnResponse(func(e *colly.Response) {
@@ -27,18 +27,21 @@ func (se Engine) Suggest(query string, locale options.Locale, sugChan chan resul
 			log.Error().
 				Caller().
 				Err(err).
+				Bytes("body", e.Body).
 				Msg("Failed to convert response to suggestions")
 		} else {
+			log.Trace().
+				Caller().
+				Str("engine", se.Name.String()).
+				Strs("suggestions", suggs).
+				Msg("Sending suggestions to channel")
+			suggestions := make([]result.SuggestionScraped, 0, len(suggs))
 			for i, sug := range suggs {
-				log.Trace().
-					Caller().
-					Int("index", i).
-					Str("suggestion", sug).
-					Msg("Sending suggestion to channel")
-				sugChan <- result.NewSuggestionScraped(sug, se.Name, i)
-				if !foundResults {
-					foundResults = true
-				}
+				suggestions = append(suggestions, result.NewSuggestionScraped(sug, se.Name, i))
+			}
+			sugChan <- suggestions
+			if !foundResults {
+				foundResults = true
 			}
 		}
 	})

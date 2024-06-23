@@ -20,10 +20,15 @@ func SuggestRespToSuggestions(data []byte) ([]string, error) {
 		return nil, fmt.Errorf("unexpected JSON structure")
 	}
 
-	// Assert the second element is a slice of strings.
+	// Assert the second element is a slice.
 	strSlice, ok := resp[1].([]any)
 	if !ok {
 		return nil, fmt.Errorf("unexpected type for second element")
+	}
+
+	// Error if no suggestions returned.
+	if len(strSlice) == 0 {
+		return nil, fmt.Errorf("empty suggestions")
 	}
 
 	// Convert to slice of strings.
