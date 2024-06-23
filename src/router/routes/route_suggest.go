@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
+	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search"
 	"github.com/hearchco/agent/src/search/engines/options"
 	"github.com/hearchco/agent/src/search/result"
 )
 
-func routeSuggest(w http.ResponseWriter, r *http.Request) error {
+func routeSuggest(w http.ResponseWriter, r *http.Request, catConf config.Category) error {
 	// Parse form data (including query params).
 	if err := r.ParseForm(); err != nil {
 		// Server error.
@@ -46,8 +46,7 @@ func routeSuggest(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Search for suggestions.
-	// TODO: Make timeout configurable.
-	scrapedSugs, err := search.Suggest(query, locale, 1*time.Second)
+	scrapedSugs, err := search.Suggest(query, locale, catConf)
 	if err != nil {
 		// Server error.
 		werr := writeResponseJSON(w, http.StatusInternalServerError, ErrorResponse{
@@ -60,7 +59,7 @@ func routeSuggest(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	// Rank the suggestions.
+	// TODO: Rank the suggestions.
 	// rankedSugs := rank.Rank(scrapedSugs, Ranking)
 
 	// Convert the suggestions to output format.

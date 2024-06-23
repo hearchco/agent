@@ -7,11 +7,12 @@ import (
 type Name string
 
 const (
-	UNDEFINED Name = "undefined"
-	GENERAL   Name = "general"
-	IMAGES    Name = "images"
-	SCIENCE   Name = "science"
-	THOROUGH  Name = "thorough"
+	UNDEFINED   Name = "undefined"
+	SUGGESTIONS Name = "suggestions"
+	GENERAL     Name = "general"
+	IMAGES      Name = "images"
+	SCIENCE     Name = "science"
+	THOROUGH    Name = "thorough"
 )
 
 func (cat Name) String() string {
@@ -31,6 +32,8 @@ func FromString(cat string) (Name, error) {
 		return SCIENCE, nil
 	case THOROUGH.String():
 		return THOROUGH, nil
+	case SUGGESTIONS.String():
+		return UNDEFINED, fmt.Errorf("category %q is not allowed", cat)
 	default:
 		return UNDEFINED, fmt.Errorf("category %q is not defined", cat)
 	}

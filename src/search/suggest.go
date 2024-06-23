@@ -9,27 +9,12 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/hearchco/agent/src/config"
-	"github.com/hearchco/agent/src/search/engines"
 	"github.com/hearchco/agent/src/search/engines/options"
 	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/utils/anonymize"
 )
 
-func Suggest(query string, locale options.Locale, hardTimeout time.Duration) ([]result.Suggestion, error) {
-	// TODO: Implement category for this.
-	catConf := config.Category{
-		Engines:                  []engines.Name{engines.DUCKDUCKGO, engines.GOOGLE},
-		RequiredEngines:          []engines.Name{engines.DUCKDUCKGO, engines.GOOGLE},
-		RequiredByOriginEngines:  []engines.Name{},
-		PreferredEngines:         []engines.Name{},
-		PreferredByOriginEngines: []engines.Name{},
-		Ranking:                  config.CategoryRanking{},
-		Timings: config.CategoryTimings{
-			PreferredTimeout: hardTimeout,
-			HardTimeout:      hardTimeout,
-		},
-	}
-
+func Suggest(query string, locale options.Locale, catConf config.Category) ([]result.Suggestion, error) {
 	// Capture start time.
 	startTime := time.Now()
 

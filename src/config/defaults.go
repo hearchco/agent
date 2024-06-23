@@ -33,6 +33,15 @@ func New() Config {
 			},
 		},
 		Categories: map[category.Name]Category{
+			category.SUGGESTIONS: {
+				Engines:                  suggestionsEngines,
+				RequiredEngines:          suggestionsRequiredEngines,
+				RequiredByOriginEngines:  suggestionsRequiredByOriginEngines,
+				PreferredEngines:         suggestionsPreferredEngines,
+				PreferredByOriginEngines: suggestionsPreferredByOriginEngines,
+				Ranking:                  suggestionsRanking(),
+				Timings:                  suggestionsTimings,
+			},
 			category.GENERAL: {
 				Engines:                  generalEngines,
 				RequiredEngines:          generalRequiredEngines,
