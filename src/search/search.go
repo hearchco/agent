@@ -57,36 +57,28 @@ func Search(query string, category category.Name, opts options.Options, catConf 
 	// Initialize each engine.
 	searchers := initializeSearchers(searchCtx, catConf.Engines, catConf.Timings)
 
-	// Create a channel of channels to receive the results from each engine.
-	engChan := make(chan chan result.ResultScraped, len(catConf.Engines))
-
 	// Create a map for the results with RWMutex.
-	resMap := result.Map(len(catConf.Engines))
-
-	// Start a goroutine to receive the results from each engine and add them to results map.
-	go createReceiver(engChan, &resMap, len(catConf.Engines))
+	// TODO: Make title and desc length configurable.
+	concMap := result.NewResultMap(len(catConf.Engines), 100, 1000)
 
 	// Create a sync.Once wrapper for each searcher.Search() to ensure that the engine is only run once.
-	searchOnce := initOnceWrapper(catConf.Engines)
+	onceWrapMap := initOnceWrapper(catConf.Engines)
 
 	// Run all required engines. WaitGroup should be awaited unless the hard timeout is reached.
 	var wgRequiredEngines sync.WaitGroup
-	runRequiredEngines(searchers, &wgRequiredEngines, query, opts, catConf.RequiredEngines, engChan, searchOnce)
+	runRequiredSearchers(catConf.RequiredEngines, searchers, &wgRequiredEngines, &concMap, query, opts, onceWrapMap)
 
 	// Run all required by origin engines. Cond should be awaited unless the hard timeout is reached.
 	var wgRequiredByOriginEngines sync.WaitGroup
-	runRequiredByOriginEngines(searchers, &wgRequiredByOriginEngines, query, opts, catConf.RequiredByOriginEngines, catConf.Engines, engChan, searchOnce)
+	runRequiredByOriginSearchers(catConf.RequiredByOriginEngines, searchers, &wgRequiredByOriginEngines, &concMap, catConf.Engines, query, opts, onceWrapMap)
 
 	// Run all preferred engines. WaitGroup should be awaited unless the preferred timeout is reached.
 	var wgPreferredEngines sync.WaitGroup
-	runPreferredEngines(searchers, &wgPreferredEngines, query, opts, catConf.PreferredEngines, engChan, searchOnce)
+	runPreferredSearchers(catConf.PreferredEngines, searchers, &wgPreferredEngines, &concMap, query, opts, onceWrapMap)
 
 	// Run all preferred by origin engines. Cond should be awaited unless the preferred timeout is reached.
 	var wgPreferredByOriginEngines sync.WaitGroup
-	runPreferredByOriginEngines(searchers, &wgPreferredByOriginEngines, query, opts, catConf.PreferredByOriginEngines, catConf.Engines, engChan, searchOnce)
-
-	// Close the channel of channels (it's safe because each sending already happened sequentially).
-	close(engChan)
+	runPreferredByOriginSearchers(catConf.PreferredByOriginEngines, searchers, &wgPreferredByOriginEngines, &concMap, catConf.Engines, query, opts, onceWrapMap)
 
 	// Cancel the hard timeout after all required engines have finished and all required by origin engines have finished.
 	go cancelHardTimeout(startTime, cancelHardTimeoutFunc, query, &wgRequiredEngines, catConf.RequiredEngines, &wgRequiredByOriginEngines, catConf.RequiredByOriginEngines)
@@ -98,8 +90,7 @@ func Search(query string, category category.Name, opts options.Options, catConf 
 	<-searchCtx.Done()
 
 	// Extract the results and responders from the map.
-	// TODO: Make title and desc length configurable.
-	results, responders := resMap.ExtractResultsAndResponders(100, 1000)
+	results, responders := concMap.ExtractWithResponders()
 
 	log.Debug().
 		Int("results", len(results)).

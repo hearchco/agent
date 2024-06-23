@@ -2,6 +2,7 @@ package google
 
 import (
 	"fmt"
+	"sync/atomic"
 
 	"github.com/gocolly/colly/v2"
 	"github.com/rs/zerolog/log"
@@ -13,8 +14,9 @@ import (
 	"github.com/hearchco/agent/src/utils/morestrings"
 )
 
-func (se Engine) Suggest(query string, locale options.Locale, sugChan chan []result.SuggestionScraped) (error, bool) {
-	foundResults := false
+func (se Engine) Suggest(query string, locale options.Locale, sugChan chan result.SuggestionScraped) ([]error, bool) {
+	foundResults := atomic.Bool{}
+	retErrors := make([]error, 0, 1)
 
 	se.OnResponse(func(e *colly.Response) {
 		log.Trace().
@@ -35,13 +37,11 @@ func (se Engine) Suggest(query string, locale options.Locale, sugChan chan []res
 				Str("engine", se.Name.String()).
 				Strs("suggestions", suggs).
 				Msg("Sending suggestions to channel")
-			suggestions := make([]result.SuggestionScraped, 0, len(suggs))
 			for i, sug := range suggs {
-				suggestions = append(suggestions, result.NewSuggestionScraped(sug, se.Name, i))
+				sugChan <- result.NewSuggestionScraped(sug, se.Name, i)
 			}
-			sugChan <- suggestions
-			if !foundResults {
-				foundResults = true
+			if !foundResults.Load() {
+				foundResults.Store(true)
 			}
 		}
 	})
@@ -52,8 +52,11 @@ func (se Engine) Suggest(query string, locale options.Locale, sugChan chan []res
 	urll := fmt.Sprintf("%v%v&q=%v", suggestURL, combinedParams, query)
 	anonUrll := fmt.Sprintf("%v?q=%v%v", suggestURL, combinedParams, anonymize.String(query))
 	err := se.Get(ctx, urll, anonUrll)
+	if err != nil {
+		retErrors = append(retErrors, err)
+	}
 
 	se.Wait()
 	close(sugChan)
-	return err, foundResults
+	return retErrors[:len(retErrors):len(retErrors)], foundResults.Load()
 }

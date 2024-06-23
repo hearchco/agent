@@ -10,19 +10,17 @@ import (
 )
 
 func CheckSuggest(t *testing.T, e scraper.Suggester, q string) {
-	sugChan := make(chan []result.SuggestionScraped)
+	sugChan := make(chan result.SuggestionScraped)
 	go func() {
 		err, found := e.Suggest(q, options.LocaleDefault, sugChan)
-		if err != nil || !found {
+		if len(err) > 0 || !found {
 			t.Errorf("Failed to get suggestions: %v", err)
 		}
 	}()
 
 	suggs := make([]string, 0, 10)
-	for sugArr := range sugChan {
-		for _, sug := range sugArr {
-			suggs = append(suggs, sug.Value())
-		}
+	for sug := range sugChan {
+		suggs = append(suggs, sug.Value())
 	}
 	if len(suggs) == 0 {
 		t.Errorf("No suggestions returned")

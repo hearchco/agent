@@ -16,6 +16,20 @@ import (
 )
 
 func Suggest(query string, locale options.Locale, hardTimeout time.Duration) ([]result.Suggestion, error) {
+	// TODO: Implement category for this.
+	catConf := config.Category{
+		Engines:                  []engines.Name{engines.DUCKDUCKGO, engines.GOOGLE},
+		RequiredEngines:          []engines.Name{engines.DUCKDUCKGO, engines.GOOGLE},
+		RequiredByOriginEngines:  []engines.Name{},
+		PreferredEngines:         []engines.Name{},
+		PreferredByOriginEngines: []engines.Name{},
+		Ranking:                  config.CategoryRanking{},
+		Timings: config.CategoryTimings{
+			PreferredTimeout: hardTimeout,
+			HardTimeout:      hardTimeout,
+		},
+	}
+
 	// Capture start time.
 	startTime := time.Now()
 
@@ -28,50 +42,57 @@ func Suggest(query string, locale options.Locale, hardTimeout time.Duration) ([]
 		Str("locale", locale.String()).
 		Msg("Suggesting")
 
-	// Create context with timeout for HardTimeout.
-	ctxHardTimeout, cancelHardTimeoutFunc := context.WithTimeout(context.Background(), hardTimeout)
+	// Create contexts with timeout for HardTimeout and PreferredTimeout.
+	ctxHardTimeout, cancelHardTimeoutFunc := context.WithTimeout(context.Background(), catConf.Timings.HardTimeout)
 	defer cancelHardTimeoutFunc()
+	ctxPreferredTimeout, cancelPreferredTimeoutFunc := context.WithTimeout(context.Background(), catConf.Timings.PreferredTimeout)
+	defer cancelPreferredTimeoutFunc()
 
-	// Create a condition signal that indicates when the suggestions are received from any engine.
-	received := sync.Cond{L: &sync.Mutex{}}
-
-	// Create a context that cancels when both HardTimeout and received signal are done.
+	// Create a context that cancels when both HardTimeout and PreferredTimeout are done.
 	suggestCtx, cancelSuggest := context.WithCancel(context.Background())
 	defer cancelSuggest()
 	go func() {
 		<-ctxHardTimeout.Done()
-		received.L.Lock()
-		received.Wait()
-		received.L.Unlock()
+		<-ctxPreferredTimeout.Done()
 		cancelSuggest()
 	}()
 
 	// Initialize each engine.
-	// TODO: Make enabled engines and timing configurable.
-	enabledEngines := []engines.Name{engines.DUCKDUCKGO, engines.GOOGLE}
-	suggesters := initializeSuggesters(suggestCtx, enabledEngines, config.CategoryTimings{
-		HardTimeout: hardTimeout,
-	})
-
-	// Create a channel of channels to receive the suggestions from each engine.
-	engChan := make(chan chan []result.SuggestionScraped, len(suggesters))
+	suggesters := initializeSuggesters(suggestCtx, catConf.Engines, catConf.Timings)
 
 	// Create a map for the suggestions with RWMutex.
-	sugMap := result.SuggestionMap(len(suggesters))
+	concMap := result.NewSuggestionMap(len(catConf.Engines))
 
-	// Start a goroutine to receive the suggestions from each engine and add them to suggestions map.
-	go createSuggestionsReceiver(&received, engChan, &sugMap, len(suggesters))
+	// Create a sync.Once wrapper for each suggester.Suggest() to ensure that the engine is only run once.
+	onceWrapMap := initOnceWrapper(catConf.Engines)
 
-	// Run the suggesters, cancellin the context when one engine finishes successfully or all engines finish (successful or not).
-	runSuggestionsEngines(suggesters, cancelHardTimeoutFunc, query, locale, enabledEngines, engChan)
+	// Run all required engines. WaitGroup should be awaited unless the hard timeout is reached.
+	var wgRequiredEngines sync.WaitGroup
+	runRequiredSuggesters(catConf.RequiredEngines, suggesters, &wgRequiredEngines, &concMap, query, locale, onceWrapMap)
 
-	// Close the channel of channels (it's safe because each sending already happened sequentially).
-	close(engChan)
+	// Run all required by origin engines. Cond should be awaited unless the hard timeout is reached.
+	var wgRequiredByOriginEngines sync.WaitGroup
+	runRequiredByOriginSuggesters(catConf.RequiredByOriginEngines, suggesters, &wgRequiredByOriginEngines, &concMap, catConf.Engines, query, locale, onceWrapMap)
 
-	// Wait for the suggesters to finish, either by success or by timeout.
+	// Run all preferred engines. WaitGroup should be awaited unless the preferred timeout is reached.
+	var wgPreferredEngines sync.WaitGroup
+	runPreferredSuggesters(catConf.PreferredEngines, suggesters, &wgPreferredEngines, &concMap, query, locale, onceWrapMap)
+
+	// Run all preferred by origin engines. Cond should be awaited unless the preferred timeout is reached.
+	var wgPreferredByOriginEngines sync.WaitGroup
+	runPreferredByOriginSuggesters(catConf.PreferredByOriginEngines, suggesters, &wgPreferredByOriginEngines, &concMap, catConf.Engines, query, locale, onceWrapMap)
+
+	// Cancel the hard timeout after all required engines have finished and all required by origin engines have finished.
+	go cancelHardTimeout(startTime, cancelHardTimeoutFunc, query, &wgRequiredEngines, catConf.RequiredEngines, &wgRequiredByOriginEngines, catConf.RequiredByOriginEngines)
+
+	// Cancel the preferred timeout after all preferred engines have finished and all preferred by origin engines have finished.
+	go cancelPreferredTimeout(startTime, cancelPreferredTimeoutFunc, query, &wgPreferredEngines, catConf.PreferredEngines, &wgPreferredByOriginEngines, catConf.PreferredByOriginEngines)
+
+	// Wait for both hard timeout and preferred timeout to finish.
 	<-suggestCtx.Done()
 
-	suggestions, responders := sugMap.ExtractSuggestionsAndResponders()
+	// Extract the suggestions and responders from the map.
+	suggestions, responders := concMap.ExtractWithResponders()
 
 	log.Debug().
 		Int("suggestions", len(suggestions)).

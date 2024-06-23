@@ -7,21 +7,24 @@ import (
 	"github.com/hearchco/agent/src/search/engines"
 )
 
-type SuggestionConcMap struct {
+type ResultConcMap struct {
 	enabledEnginesLen int
+	titleLen, descLen int
 	Mutex             sync.RWMutex
-	Map               map[string]Suggestion
+	Map               map[string]Result
 }
 
-func NewSuggestionMap(enabledEnginesLen int) SuggestionConcMap {
-	return SuggestionConcMap{
+func NewResultMap(enabledEnginesLen, titleLen, descLen int) ResultConcMap {
+	return ResultConcMap{
 		enabledEnginesLen: enabledEnginesLen,
+		titleLen:          titleLen,
+		descLen:           descLen,
 		Mutex:             sync.RWMutex{},
-		Map:               make(map[string]Suggestion),
+		Map:               make(map[string]Result),
 	}
 }
 
-func (m *SuggestionConcMap) AddOrUpgrade(val SuggestionScraped) {
+func (m *ResultConcMap) AddOrUpgrade(val ResultScraped) {
 	// Lock the map due to modifications.
 	m.Mutex.Lock()
 
@@ -30,7 +33,7 @@ func (m *SuggestionConcMap) AddOrUpgrade(val SuggestionScraped) {
 		// Add the result to the map.
 		m.Map[val.Key()] = val.Convert(m.enabledEnginesLen)
 	} else {
-		var alreadyIn *RankSimple
+		var alreadyIn *Rank
 
 		// Check if the engine rank is already in the result.
 		for i, er := range mapVal.EngineRanks() {
@@ -46,22 +49,28 @@ func (m *SuggestionConcMap) AddOrUpgrade(val SuggestionScraped) {
 		} else {
 			alreadyIn.UpgradeIfBetter(val.Rank().Convert())
 		}
+
+		// Update the description if the new description is longer.
+		if len(mapVal.Description()) < len(val.Description()) {
+			mapVal.SetDescription(val.Description())
+		}
 	}
 
 	// Unlock the map.
 	m.Mutex.Unlock()
 }
 
-func (m *SuggestionConcMap) ExtractWithResponders() ([]Suggestion, []engines.Name) {
+func (m *ResultConcMap) ExtractWithResponders() ([]Result, []engines.Name) {
 	m.Mutex.RLock()
 
-	suggestions := make([]Suggestion, 0, len(m.Map))
+	results := make([]Result, 0, len(m.Map))
 	responders := make([]engines.Name, 0, m.enabledEnginesLen)
 
-	for _, sug := range m.Map {
-		sug.ShrinkEngineRanks()
-		suggestions = append(suggestions, sug)
-		for _, rank := range sug.EngineRanks() {
+	for _, res := range m.Map {
+		newRes := res.Shorten(m.titleLen, m.descLen)
+		newRes.ShrinkEngineRanks()
+		results = append(results, newRes)
+		for _, rank := range res.EngineRanks() {
 			if !slices.Contains(responders, rank.SearchEngine()) {
 				responders = append(responders, rank.SearchEngine())
 			}
@@ -70,5 +79,5 @@ func (m *SuggestionConcMap) ExtractWithResponders() ([]Suggestion, []engines.Nam
 
 	m.Mutex.RUnlock()
 
-	return suggestions, responders
+	return results, responders
 }

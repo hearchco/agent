@@ -12,18 +12,31 @@ import (
 	"github.com/hearchco/agent/src/utils/anonymize"
 )
 
-func cancelHardTimeout(start time.Time, cancel context.CancelFunc, query string, wgRequiredEngines *sync.WaitGroup, requiredEngines []engines.Name, wgRequiredByOriginEngines *sync.WaitGroup, requiredByOriginEngines []engines.Name) {
+// Hard timeout is associated with the required engines.
+func cancelHardTimeout(start time.Time, cancel context.CancelFunc, query string, wgEngs *sync.WaitGroup, engs []engines.Name, wgByOriginEngs *sync.WaitGroup, byOriginEngs []engines.Name) {
+	groupNames := [...]string{groupRequired, groupRequiredByOrigin}
+	cancelTimeout(groupNames, start, cancel, query, wgEngs, engs, wgByOriginEngs, byOriginEngs)
+}
+
+// Preferred timeout is associated with the preferred engines.
+func cancelPreferredTimeout(start time.Time, cancel context.CancelFunc, query string, wgEngs *sync.WaitGroup, engs []engines.Name, wgByOriginEngs *sync.WaitGroup, byOriginEngs []engines.Name) {
+	groupNames := [...]string{groupPreferred, groupPreferredByOrigin}
+	cancelTimeout(groupNames, start, cancel, query, wgEngs, engs, wgByOriginEngs, byOriginEngs)
+}
+
+// Cancel timeout for the provided engines.
+func cancelTimeout(groupNames [2]string, start time.Time, cancel context.CancelFunc, query string, wgEngs *sync.WaitGroup, engs []engines.Name, wgByOriginEngs *sync.WaitGroup, byOriginEngs []engines.Name) {
 	var wg sync.WaitGroup
 
 	// Wait for all required engines to finish.
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		wgRequiredEngines.Wait()
+		wgEngs.Wait()
 		log.Debug().
 			Str("query", anonymize.String(query)).
-			Str("group", "required").
-			Str("engines", fmt.Sprintf("%v", requiredEngines)).
+			Str("group", groupNames[0]).
+			Str("engines", fmt.Sprintf("%v", engs)).
 			Dur("duration", time.Since(start)).
 			Msg("Scraping group finished")
 	}()
@@ -32,49 +45,15 @@ func cancelHardTimeout(start time.Time, cancel context.CancelFunc, query string,
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		wgRequiredByOriginEngines.Wait()
+		wgByOriginEngs.Wait()
 		log.Debug().
 			Str("query", anonymize.String(query)).
-			Str("group", "required by origin").
-			Str("engines", fmt.Sprintf("%v", requiredByOriginEngines)).
+			Str("group", groupNames[1]).
+			Str("engines", fmt.Sprintf("%v", byOriginEngs)).
 			Dur("duration", time.Since(start)).
 			Msg("Scraping group finished")
 	}()
 
-	wg.Wait()
-	cancel()
-}
-
-func cancelPreferredTimeout(start time.Time, cancel context.CancelFunc, query string, wgPreferredEngines *sync.WaitGroup, preferredEngines []engines.Name, wgPreferredByOriginEngines *sync.WaitGroup, preferredByOriginEngines []engines.Name) {
-	var wg sync.WaitGroup
-
-	// Wait for all preferred engines to finish.
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		wgPreferredEngines.Wait()
-		log.Debug().
-			Str("query", anonymize.String(query)).
-			Str("group", "preferred").
-			Str("engines", fmt.Sprintf("%v", preferredEngines)).
-			Dur("duration", time.Since(start)).
-			Msg("Scraping group finished")
-	}()
-
-	// Wait for all preferred by origin engines to finish.
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		wgPreferredByOriginEngines.Wait()
-		log.Debug().
-			Str("query", anonymize.String(query)).
-			Str("group", "preferred by origin").
-			Str("engines", fmt.Sprintf("%v", preferredByOriginEngines)).
-			Dur("duration", time.Since(start)).
-			Msg("Scraping group finished")
-	}()
-
-	// Wait for both groups to finish.
 	wg.Wait()
 	cancel()
 }
