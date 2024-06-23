@@ -1,9 +1,5 @@
 package result
 
-import (
-	"github.com/hearchco/agent/src/search/engines"
-)
-
 type Result interface {
 	Key() string
 	URL() string
@@ -31,15 +27,6 @@ type ResultScraped interface {
 	Convert(int) Result
 }
 
-type ConcReceiver[T Ranker] interface {
-	Rank() T
-}
-
-type Ranker interface {
-	SearchEngine() engines.Name
-}
-
-type ConcMapper[T any, V any] interface {
-	AddOrUpgrade(V)
-	ExtractWithResponders() ([]T, []engines.Name)
+type ConcMapper[T any] interface {
+	AddOrUpgrade(T)
 }

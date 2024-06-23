@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/hearchco/agent/src/search/engines"
+	"github.com/rs/zerolog/log"
 )
 
 type ResultConcMap struct {
@@ -25,6 +26,13 @@ func NewResultMap(enabledEnginesLen, titleLen, descLen int) ResultConcMap {
 }
 
 func (m *ResultConcMap) AddOrUpgrade(val ResultScraped) {
+	if val.Rank().SearchEngine().String() == "" || val.Rank().SearchEngine() == engines.UNDEFINED {
+		log.Panic().
+			Str("engine", val.Rank().SearchEngine().String()).
+			Msg("Received a result with an undefined search engine")
+		// ^PANIC - Assert because it should never happen.
+	}
+
 	// Lock the map due to modifications.
 	m.Mutex.Lock()
 

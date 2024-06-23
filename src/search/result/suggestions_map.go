@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/hearchco/agent/src/search/engines"
+	"github.com/rs/zerolog/log"
 )
 
 type SuggestionConcMap struct {
@@ -22,6 +23,13 @@ func NewSuggestionMap(enabledEnginesLen int) SuggestionConcMap {
 }
 
 func (m *SuggestionConcMap) AddOrUpgrade(val SuggestionScraped) {
+	if val.Rank().SearchEngine().String() == "" || val.Rank().SearchEngine() == engines.UNDEFINED {
+		log.Panic().
+			Str("engine", val.Rank().SearchEngine().String()).
+			Msg("Received a suggestion with an undefined search engine")
+		// ^PANIC - Assert because it should never happen.
+	}
+
 	// Lock the map due to modifications.
 	m.Mutex.Lock()
 
