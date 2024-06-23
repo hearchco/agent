@@ -54,10 +54,7 @@ func writeResponseJSON(w http.ResponseWriter, status int, body any) error {
 }
 
 func writeResponseSuggestions(w http.ResponseWriter, status int, query string, suggestions []string) error {
-	jsonStruct := make([]any, 2)
-	jsonStruct[0] = query
-	jsonStruct[1] = suggestions
-
+	jsonStruct := [...]any{query, suggestions}
 	res, err := json.Marshal(jsonStruct)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
