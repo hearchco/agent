@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"regexp"
 	"strconv"
 
 	"github.com/rs/zerolog/log"
@@ -14,9 +13,11 @@ import (
 	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search/useragent"
 	"github.com/hearchco/agent/src/utils/anonymize"
+	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
 func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeouts config.ImageProxyTimeouts) error {
+	// Parse the form.
 	err := r.ParseForm()
 	if err != nil {
 		// Server error.
@@ -27,42 +28,46 @@ func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeouts co
 		return err
 	}
 
+	// Get the parameters.
 	params := r.Form
-
 	urlParam := getParamOrDefault(params, "url")
 	hashParam := getParamOrDefault(params, "hash")
 	faviconParam := getParamOrDefault(params, "favicon", strconv.FormatBool(false))
 
+	// Check the required parameters.
 	if urlParam == "" || hashParam == "" {
 		// User error.
 		return writeResponse(w, http.StatusBadRequest, "url and hash are required")
 	}
 
-	urlToProxy := urlParam
-	if val, err := strconv.ParseBool(faviconParam); err != nil {
+	// Check if only favicon is requested.
+	favicon, err := strconv.ParseBool(faviconParam)
+	if err != nil {
 		// User error.
 		return writeResponse(w, http.StatusBadRequest, "favicon must be a boolean")
-	} else if val {
-		faviconUrl, err := getFaviconURL(urlParam)
-		if err != nil {
-			// User error.
-			log.Debug().
-				Err(err).
-				Str("url", urlParam).
-				Str("favicon", faviconUrl).
-				Msg("Failed to create favicon URL")
-			return writeResponse(w, http.StatusBadRequest, err.Error())
-		} else {
-			urlToProxy = faviconUrl
-		}
+	}
+
+	// Get url to verify and to proxy.
+	urlToVerify, urlToProxy, err := getUrlToVerifyAndToProxy(urlParam, favicon)
+	if err != nil {
+		// User error.
+		log.Debug().
+			Err(err).
+			Str("url", urlParam).
+			Str("url_to_verify", urlToVerify).
+			Str("url_to_proxy", urlToProxy).
+			Str("hash", hashParam).
+			Str("favicon", faviconParam).
+			Msg("Failed to get URL to verify and to proxy")
+		return writeResponse(w, http.StatusBadRequest, fmt.Sprintf("failed to get URL to verify and to proxy: %v", err))
 	}
 
 	// Check if hash is valid.
-	if !anonymize.VerifyHash(hashParam, urlToProxy, salt) {
+	if !anonymize.VerifyHash(hashParam, urlToVerify, salt) {
 		// User error.
 		log.Debug().
 			Str("url", urlParam).
-			Str("url_to_proxy", urlToProxy).
+			Str("url_to_verify", urlToVerify).
 			Str("hash", hashParam).
 			Str("favicon", faviconParam).
 			Msg("Invalid hash")
@@ -74,7 +79,8 @@ func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeouts co
 	if err != nil {
 		// User error.
 		log.Debug().
-			Str("url", urlToProxy).
+			Str("url", urlParam).
+			Str("url_to_proxy", urlToProxy).
 			Msg("Invalid url")
 		return writeResponse(w, http.StatusBadRequest, "invalid url")
 	}
@@ -98,28 +104,40 @@ func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeouts co
 	return nil
 }
 
+func getUrlToVerifyAndToProxy(urlParam string, favicon bool) (string, string, error) {
+	urlToVerify := urlParam
+	urlToProxy := urlParam
+
+	if favicon {
+		// Get the URI to verify.
+		urlUri, err := moreurls.GetURIToVerify(urlParam)
+		if err != nil {
+			return "", "", fmt.Errorf("failed to extract URI from URL: %w", err)
+		}
+
+		// Get the favicon URL.
+		faviconUrl, err := getFaviconURL(urlParam)
+		if err != nil {
+			return "", "", fmt.Errorf("failed to extract favicon URL: %w", err)
+		}
+
+		// Set the URLs.
+		urlToVerify = urlUri
+		urlToProxy = faviconUrl
+	}
+
+	return urlToVerify, urlToProxy, nil
+}
+
 // Appends the path to favicon to the URI of the URL.
 func getFaviconURL(urll string) (string, error) {
 	// TODO: Impl getting the favicon path from the html head.
 	const faviconPath = "/favicon.ico"
-	uri, err := getURI(urll)
+	uri, err := moreurls.GetURI(urll)
 	if err != nil {
 		return "", err
 	} else {
 		return uri + faviconPath, nil
-	}
-}
-
-// Extracts the URI from the URL.
-// https://www.example.com/some/path -> https://www.example.com
-func getURI(urll string) (string, error) {
-	const uriPattern = "^(http(s?))(://)([^/]+)"
-	re := regexp.MustCompile(uriPattern)
-	ss := re.FindString(urll)
-	if ss == "" {
-		return "", fmt.Errorf("failed to extract URI from URL")
-	} else {
-		return ss, nil
 	}
 }
 
