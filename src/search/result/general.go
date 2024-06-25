@@ -1,6 +1,8 @@
 package result
 
 import (
+	"github.com/hearchco/agent/src/utils/anonymize"
+	"github.com/hearchco/agent/src/utils/moreurls"
 	"github.com/rs/zerolog/log"
 )
 
@@ -96,5 +98,18 @@ func (r *General) AppendEngineRanks(rank Rank) {
 }
 
 func (r General) ConvertToOutput(salt string) ResultOutput {
-	return r
+	urlToVerify, err := moreurls.GetURIToVerify(r.URL())
+	if err != nil {
+		log.Panic().
+			Err(err).
+			Str("url", r.URL()).
+			Msg("Failed to get URI to verify")
+		// ^PANIC - This should never happen.
+	}
+	return GeneralOutput{
+		generalOutputJSON{
+			r,
+			anonymize.HashToSHA256B64Salted(urlToVerify, salt),
+		},
+	}
 }
