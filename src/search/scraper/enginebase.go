@@ -7,18 +7,7 @@ import (
 
 	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search/engines"
-	"github.com/hearchco/agent/src/search/engines/options"
-	"github.com/hearchco/agent/src/search/result"
 )
-
-// Base interface used by each category specific interface.
-type Enginer interface {
-	GetName() engines.Name
-	GetOrigins() []engines.Name
-	Init(context.Context, config.CategoryTimings)
-	ReInit(context.Context)
-	Search(string, options.Options, chan result.ResultScraped) ([]error, bool)
-}
 
 // Base struct for every search engine.
 type EngineBase struct {
@@ -41,7 +30,17 @@ func (e EngineBase) GetOrigins() []engines.Name {
 // Used to initialize the EngineBase collector.
 func (e *EngineBase) Init(ctx context.Context, timings config.CategoryTimings) {
 	e.timings = timings
-	e.initCollector(ctx)
+	e.initCollectorSearcher(ctx)
+	e.initLimitRule(timings)
+	e.initCollectorOnRequest(ctx)
+	e.initCollectorOnResponse()
+	e.initCollectorOnError()
+}
+
+// Used to initialize the EngineBase collector for suggesting.
+func (e *EngineBase) InitSuggest(ctx context.Context, timings config.CategoryTimings) {
+	e.timings = timings
+	e.initCollectorSuggester(ctx)
 	e.initLimitRule(timings)
 	e.initCollectorOnRequest(ctx)
 	e.initCollectorOnResponse()

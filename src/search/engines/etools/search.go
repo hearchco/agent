@@ -17,17 +17,6 @@ import (
 	"github.com/hearchco/agent/src/utils/morestrings"
 )
 
-type Engine struct {
-	scraper.EngineBase
-}
-
-func New() scraper.Enginer {
-	return &Engine{scraper.EngineBase{
-		Name:    seName,
-		Origins: origins[:],
-	}}
-}
-
 func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
 	foundResults := atomic.Bool{}
 	retErrors := make([]error, 0, opts.Pages.Max)
@@ -105,7 +94,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		var err error
 		// eTools requires a request for the first page.
 		if pageNum0 == 0 || firstRequest {
-			combinedParams := morestrings.JoinNonEmpty([]string{paramCountry, paramLanguage, paramSafeSearch}, "&", "&")
+			combinedParams := morestrings.JoinNonEmpty("&", "&", paramCountry, paramLanguage, paramSafeSearch)
 
 			body := strings.NewReader(fmt.Sprintf("query=%v%v", query, combinedParams))
 			anonBody := fmt.Sprintf("query=%v%v", anonymize.String(query), combinedParams)

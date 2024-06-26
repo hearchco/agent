@@ -11,22 +11,10 @@ import (
 
 	"github.com/hearchco/agent/src/search/engines/options"
 	"github.com/hearchco/agent/src/search/result"
-	"github.com/hearchco/agent/src/search/scraper"
 	"github.com/hearchco/agent/src/search/scraper/parse"
 	"github.com/hearchco/agent/src/utils/anonymize"
 	"github.com/hearchco/agent/src/utils/morestrings"
 )
-
-type Engine struct {
-	scraper.EngineBase
-}
-
-func New() scraper.Enginer {
-	return &Engine{scraper.EngineBase{
-		Name:    seName,
-		Origins: origins[:],
-	}}
-}
 
 func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
 	foundResults := atomic.Bool{}
@@ -111,8 +99,8 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		// Dynamic params.
 		paramPage := fmt.Sprintf("%v=%v", paramKeyPage, pageNum0*10)
 
-		combinedParamsLeft := morestrings.JoinNonEmpty([]string{paramFreshness, paramItems, paramPage}, "?", "&")
-		combinedParamsRight := morestrings.JoinNonEmpty([]string{paramLocale}, "&", "&")
+		combinedParamsLeft := morestrings.JoinNonEmpty("?", "&", paramFreshness, paramItems, paramPage)
+		combinedParamsRight := morestrings.JoinNonEmpty("&", "&", paramLocale)
 
 		// Non standard order of parameters required
 		urll := fmt.Sprintf("%v%v&query=%v%v", searchURL, combinedParamsLeft, query, combinedParamsRight)

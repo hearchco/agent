@@ -18,17 +18,6 @@ package yep
 // 	"github.com/hearchco/agent/src/utils/morestrings"
 // )
 
-// type Engine struct {
-// 	scraper.EngineBase
-// }
-
-// func New() scraper.Enginer {
-// 	return &Engine{scraper.EngineBase{
-// 		Name:    seName,
-// 		Origins: origins[:],
-// 	}}
-// }
-
 // func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
 // 	foundResults := atomic.Bool{}
 // 	retErrors := make([]error, 0, opts.Pages.Max)
@@ -118,8 +107,8 @@ package yep
 // 			paramPage = fmt.Sprintf("%v=%v", paramKeyPage, (pageNum+2)*10+1)
 // 		}
 
-// 		combinedParamsLeft := morestrings.JoinNonEmpty([]string{paramClient, paramLocale, paramPage, paramNo_correct}, "?", "&")
-// 		combinedParamsRight := morestrings.JoinNonEmpty([]string{paramSafeSearch, paramType}, "&", "&")
+// 		combinedParamsLeft := morestrings.JoinNonEmpty("?", "&", paramClient, paramLocale, paramPage, paramNo_correct)
+// 		combinedParamsRight := morestrings.JoinNonEmpty("&", "&", paramSafeSearch, paramType)
 
 // 		// Non standard order of params required
 // 		urll := fmt.Sprintf("%v%v&q=%v%v", searchURL, combinedParamsLeft, query, combinedParamsRight)

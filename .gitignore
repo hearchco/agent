@@ -38,7 +38,7 @@ profiling/
 # go generate
 *_stringer.go
 *_enumer.go
-*_searcher.go
+*_enginer.go
 
 # test dump
 testdump*

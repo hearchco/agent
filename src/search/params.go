@@ -6,13 +6,22 @@ import (
 	"github.com/hearchco/agent/src/search/engines/options"
 )
 
-func validateParams(query string, opts options.Options) error {
+func validateSuggestParams(query string, locale options.Locale) error {
 	if query == "" {
 		return fmt.Errorf("query can't be empty")
 	}
-	if opts.Locale == "" {
+	if locale == "" {
 		return fmt.Errorf("locale can't be empty")
 	}
+
+	return nil
+}
+
+func validateSearchParams(query string, opts options.Options) error {
+	if err := validateSuggestParams(query, opts.Locale); err != nil {
+		return err
+	}
+
 	if opts.Pages.Start < 0 {
 		return fmt.Errorf("pages start can't be negative")
 	}

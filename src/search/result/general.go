@@ -1,5 +1,9 @@
 package result
 
+import (
+	"github.com/rs/zerolog/log"
+)
+
 type General struct {
 	generalJSON
 }
@@ -13,11 +17,25 @@ type generalJSON struct {
 	EngineRanks []Rank  `json:"engine_ranks"`
 }
 
+func (r General) Key() string {
+	return r.URL()
+}
+
 func (r General) URL() string {
+	if r.generalJSON.URL == "" {
+		log.Panic().Msg("URL is empty")
+		// ^PANIC - Assert because the URL should never be empty.
+	}
+
 	return r.generalJSON.URL
 }
 
 func (r General) Title() string {
+	if r.generalJSON.Title == "" {
+		log.Panic().Msg("Title is empty")
+		// ^PANIC - Assert because the Title should never be empty.
+	}
+
 	return r.generalJSON.Title
 }
 
@@ -46,17 +64,32 @@ func (r *General) SetScore(score float64) {
 }
 
 func (r General) EngineRanks() []Rank {
+	if r.generalJSON.EngineRanks == nil {
+		log.Panic().Msg("EngineRanks is nil")
+		// ^PANIC - Assert because the EngineRanks should never be nil.
+	}
+
 	return r.generalJSON.EngineRanks
 }
 
+func (r *General) InitEngineRanks() {
+	r.generalJSON.EngineRanks = make([]Rank, 0)
+}
+
 func (r *General) ShrinkEngineRanks() {
+	if r.generalJSON.EngineRanks == nil {
+		log.Panic().Msg("EngineRanks is nil")
+		// ^PANIC - Assert because the EngineRanks should never be nil.
+	}
+
 	ranksLen := len(r.generalJSON.EngineRanks)
 	r.generalJSON.EngineRanks = r.generalJSON.EngineRanks[:ranksLen:ranksLen]
 }
 
 func (r *General) AppendEngineRanks(rank Rank) {
 	if r.generalJSON.EngineRanks == nil {
-		r.generalJSON.EngineRanks = make([]Rank, 0)
+		log.Panic().Msg("EngineRanks is nil")
+		// ^PANIC - Assert because the EngineRanks should never be nil.
 	}
 
 	r.generalJSON.EngineRanks = append(r.generalJSON.EngineRanks, rank)

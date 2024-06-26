@@ -1,5 +1,9 @@
 package result
 
+import (
+	"github.com/rs/zerolog/log"
+)
+
 type GeneralScraped struct {
 	url         string
 	title       string
@@ -7,11 +11,25 @@ type GeneralScraped struct {
 	rank        RankScraped
 }
 
+func (r GeneralScraped) Key() string {
+	return r.URL()
+}
+
 func (r GeneralScraped) URL() string {
+	if r.url == "" {
+		log.Panic().Msg("url is empty")
+		// ^PANIC - Assert because the url should never be empty.
+	}
+
 	return r.url
 }
 
 func (r GeneralScraped) Title() string {
+	if r.title == "" {
+		log.Panic().Msg("title is empty")
+		// ^PANIC - Assert because the title should never be empty.
+	}
+
 	return r.title
 }
 

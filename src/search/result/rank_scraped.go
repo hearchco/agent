@@ -5,18 +5,10 @@ import (
 )
 
 type RankScraped struct {
-	searchEngine engines.Name
-	rank         int
-	page         int
-	onPageRank   int
-}
+	RankSimpleScraped
 
-func (r RankScraped) SearchEngine() engines.Name {
-	return r.searchEngine
-}
-
-func (r RankScraped) Rank() int {
-	return r.rank
+	page       int
+	onPageRank int
 }
 
 func (r RankScraped) Page() int {
@@ -28,21 +20,21 @@ func (r RankScraped) OnPageRank() int {
 }
 
 func (r RankScraped) Convert() Rank {
+	rankSimple := r.RankSimpleScraped.Convert()
 	return Rank{
-		rankJSON: rankJSON{
-			SearchEngine: r.searchEngine,
-			Rank:         r.rank,
-			Page:         r.page,
-			OnPageRank:   r.onPageRank,
+		rankSimple,
+		rankJSON{
+			r.page,
+			r.onPageRank,
 		},
 	}
 }
 
 func NewRankScraped(searchEngine engines.Name, rank, page, onPageRank int) RankScraped {
+	rankSimpleScraped := NewRankSimpleScraped(searchEngine, rank)
 	return RankScraped{
-		searchEngine: searchEngine,
-		rank:         rank,
-		page:         page,
-		onPageRank:   onPageRank,
+		rankSimpleScraped,
+		page,
+		onPageRank,
 	}
 }

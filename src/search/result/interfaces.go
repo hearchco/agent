@@ -1,6 +1,7 @@
 package result
 
 type Result interface {
+	Key() string
 	URL() string
 	Title() string
 	Description() string
@@ -10,6 +11,7 @@ type Result interface {
 	Score() float64
 	SetScore(float64)
 	EngineRanks() []Rank
+	InitEngineRanks()
 	ShrinkEngineRanks()
 	AppendEngineRanks(Rank)
 	ConvertToOutput(string) ResultOutput
@@ -17,6 +19,7 @@ type Result interface {
 }
 
 type ResultScraped interface {
+	Key() string
 	URL() string
 	Title() string
 	Description() string
@@ -24,12 +27,6 @@ type ResultScraped interface {
 	Convert(int) Result
 }
 
-type ResultOutput interface{}
-
-func ConvertToOutput(results []Result, salt string) []ResultOutput {
-	var output = make([]ResultOutput, 0, len(results))
-	for _, r := range results {
-		output = append(output, r.ConvertToOutput(salt))
-	}
-	return output
+type ConcMapper[T any] interface {
+	AddOrUpgrade(T)
 }

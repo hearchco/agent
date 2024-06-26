@@ -14,15 +14,15 @@ type onceWrapper struct {
 }
 
 func initOnceWrapper(engs []engines.Name) map[engines.Name]*onceWrapper {
-	searchOnce := make(map[engines.Name]*onceWrapper, len(engs))
+	onceWrapMap := make(map[engines.Name]*onceWrapper, len(engs))
 	for _, eng := range engs {
-		searchOnce[eng] = &onceWrapper{
+		onceWrapMap[eng] = &onceWrapper{
 			once:    &sync.Once{},
 			errored: atomic.Bool{},
 			scraped: atomic.Bool{},
 		}
 	}
-	return searchOnce
+	return onceWrapMap
 }
 
 func (ow *onceWrapper) Do(f func()) {

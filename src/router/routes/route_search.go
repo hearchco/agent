@@ -3,9 +3,12 @@ package routes
 import (
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/hearchco/agent/src/cache"
 	"github.com/hearchco/agent/src/config"
@@ -16,7 +19,6 @@ import (
 	"github.com/hearchco/agent/src/search/result/rank"
 	"github.com/hearchco/agent/src/utils/anonymize"
 	"github.com/hearchco/agent/src/utils/gotypelimits"
-	"github.com/rs/zerolog/log"
 )
 
 func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf map[category.Name]config.Category, ttlConf config.TTL, db cache.DB, salt string) error {
@@ -167,7 +169,8 @@ func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf ma
 	}
 
 	// Rank the results.
-	rankedRes := rank.Rank(scrapedRes, catsConf[categoryName].Ranking)
+	var rankedRes rank.Results = slices.Clone(scrapedRes)
+	rankedRes.Rank(catsConf[categoryName].Ranking)
 
 	// Store the results in cache.
 	if err := db.SetResults(query, categoryName, opts, rankedRes, ttlConf.Time); err != nil {
@@ -183,9 +186,11 @@ func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf ma
 
 	// Create the response.
 	res := ResultsResponse{
-		Version:  ver,
-		Duration: time.Since(startTime).Milliseconds(),
-		Results:  outpusRes,
+		responseBase{
+			ver,
+			time.Since(startTime).Milliseconds(),
+		},
+		outpusRes,
 	}
 
 	// If writing response failes, return the error.

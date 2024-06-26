@@ -1,5 +1,9 @@
 package result
 
+import (
+	"github.com/rs/zerolog/log"
+)
+
 type ImagesScraped struct {
 	GeneralScraped
 
@@ -11,14 +15,35 @@ type ImagesScraped struct {
 }
 
 func (r ImagesScraped) OriginalSize() scrapedImageFormat {
+	if r.originalSize.height == 0 || r.originalSize.width == 0 {
+		log.Panic().
+			Int("height", r.originalSize.height).
+			Int("width", r.originalSize.width).
+			Msg("OriginalSize is zero")
+		// ^PANIC - Assert because the OriginalSize should never be zero.
+	}
+
 	return r.originalSize
 }
 
 func (r ImagesScraped) ThumbnailSize() scrapedImageFormat {
+	if r.thumbnailSize.height == 0 || r.thumbnailSize.width == 0 {
+		log.Panic().
+			Int("height", r.thumbnailSize.height).
+			Int("width", r.thumbnailSize.width).
+			Msg("ThumbnailSize is zero")
+		// ^PANIC - Assert because the ThumbnailSize should never be zero.
+	}
+
 	return r.thumbnailSize
 }
 
 func (r ImagesScraped) ThumbnailURL() string {
+	if r.thumbnailURL == "" {
+		log.Panic().Msg("ThumbnailURL is empty")
+		// ^PANIC - Assert because the ThumbnailURL should never be empty.
+	}
+
 	return r.thumbnailURL
 }
 
@@ -58,10 +83,20 @@ type scrapedImageFormat struct {
 }
 
 func (i scrapedImageFormat) GetHeight() int {
+	if i.height == 0 {
+		log.Panic().Msg("Height is zero")
+		// ^PANIC - Assert because the Height should never be zero.
+	}
+
 	return i.height
 }
 
 func (i scrapedImageFormat) GetWidth() int {
+	if i.width == 0 {
+		log.Panic().Msg("Width is zero")
+		// ^PANIC - Assert because the Width should never be zero.
+	}
+
 	return i.width
 }
 

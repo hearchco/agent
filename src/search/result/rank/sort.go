@@ -8,11 +8,11 @@ import (
 	"github.com/hearchco/agent/src/search/result"
 )
 
-type ByScore []result.Result
+type ByScore[T scoreRanker] []T
 
-func (r ByScore) Len() int           { return len(r) }
-func (r ByScore) Swap(i, j int)      { r[i], r[j] = r[j], r[i] }
-func (r ByScore) Less(i, j int) bool { return r[i].Score() > r[j].Score() }
+func (r ByScore[T]) Len() int           { return len(r) }
+func (r ByScore[T]) Swap(i, j int)      { r[i], r[j] = r[j], r[i] }
+func (r ByScore[T]) Less(i, j int) bool { return r[i].Score() > r[j].Score() }
 
 type ByPageAndOnPageRank []*result.Rank
 
