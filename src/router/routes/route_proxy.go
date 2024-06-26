@@ -6,15 +6,18 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strconv"
 
 	"github.com/rs/zerolog/log"
 
 	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search/useragent"
 	"github.com/hearchco/agent/src/utils/anonymize"
+	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
 func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeouts config.ImageProxyTimeouts) error {
+	// Parse the form.
 	err := r.ParseForm()
 	if err != nil {
 		// Server error.
@@ -25,41 +28,125 @@ func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeouts co
 		return err
 	}
 
+	// Get the parameters.
 	params := r.Form
-
 	urlParam := getParamOrDefault(params, "url")
 	hashParam := getParamOrDefault(params, "hash")
+	faviconParam := getParamOrDefault(params, "favicon", strconv.FormatBool(false))
 
+	// Check the required parameters.
 	if urlParam == "" || hashParam == "" {
 		// User error.
 		return writeResponse(w, http.StatusBadRequest, "url and hash are required")
 	}
 
+	// Check if only favicon is requested.
+	favicon, err := strconv.ParseBool(faviconParam)
+	if err != nil {
+		// User error.
+		return writeResponse(w, http.StatusBadRequest, "favicon must be a boolean")
+	}
+
+	// Get url to verify and to proxy.
+	urlToVerify, urlToProxy, err := getUrlToVerifyAndToProxy(urlParam, favicon)
+	if err != nil {
+		// User error.
+		log.Debug().
+			Err(err).
+			Str("url", urlParam).
+			Str("url_to_verify", urlToVerify).
+			Str("url_to_proxy", urlToProxy).
+			Str("hash", hashParam).
+			Str("favicon", faviconParam).
+			Msg("Failed to get URL to verify and to proxy")
+		return writeResponse(w, http.StatusBadRequest, fmt.Sprintf("failed to get URL to verify and to proxy: %v", err))
+	}
+
 	// Check if hash is valid.
-	if !anonymize.VerifyHash(hashParam, urlParam, salt) {
+	if !anonymize.VerifyHash(hashParam, urlToVerify, salt) {
 		// User error.
 		log.Debug().
 			Str("url", urlParam).
+			Str("url_to_verify", urlToVerify).
 			Str("hash", hashParam).
+			Str("favicon", faviconParam).
 			Msg("Invalid hash")
 		return writeResponse(w, http.StatusUnauthorized, "invalid hash")
 	}
 
 	// Parse the url.
-	target, err := url.Parse(urlParam)
+	target, err := url.Parse(urlToProxy)
 	if err != nil {
 		// User error.
 		log.Debug().
 			Str("url", urlParam).
+			Str("url_to_proxy", urlToProxy).
 			Msg("Invalid url")
 		return writeResponse(w, http.StatusBadRequest, "invalid url")
 	}
 
+	// Create a new request.
+	nr := createAnonRequest(r, target)
+	log.Trace().
+		Caller().
+		Str("request", fmt.Sprint(nr)).
+		Msg("Created a new anon request")
+
+	// Create reverse proxy with timeout.
+	rp := createReverseProxy(timeouts)
+
+	// Proxy the request.
+	log.Debug().
+		Str("url", target.String()).
+		Msg("Proxying request")
+	rp.ServeHTTP(w, &nr) // Use the new request.
+
+	return nil
+}
+
+func getUrlToVerifyAndToProxy(urlParam string, favicon bool) (string, string, error) {
+	urlToVerify := urlParam
+	urlToProxy := urlParam
+
+	if favicon {
+		// Get the URI to verify.
+		urlUri, err := moreurls.GetURIToVerify(urlParam)
+		if err != nil {
+			return "", "", fmt.Errorf("failed to extract URI from URL: %w", err)
+		}
+
+		// Get the favicon URL.
+		faviconUrl, err := getFaviconURL(urlParam)
+		if err != nil {
+			return "", "", fmt.Errorf("failed to extract favicon URL: %w", err)
+		}
+
+		// Set the URLs.
+		urlToVerify = urlUri
+		urlToProxy = faviconUrl
+	}
+
+	return urlToVerify, urlToProxy, nil
+}
+
+// Appends the path to favicon to the URI of the URL.
+func getFaviconURL(urll string) (string, error) {
+	// TODO: Impl getting the favicon path from the html head.
+	const faviconPath = "/favicon.ico"
+	uri, err := moreurls.GetURI(urll)
+	if err != nil {
+		return "", err
+	} else {
+		return uri + faviconPath, nil
+	}
+}
+
+func createAnonRequest(r *http.Request, target *url.URL) http.Request {
 	// Get random UserAgent with corresponding Sec-Ch-Ua headers.
 	ua := useragent.RandomUserAgentWithHeaders()
 
 	// Create a new request.
-	nr := &http.Request{
+	return http.Request{
 		Method:     http.MethodGet,
 		URL:        target,
 		Host:       target.Host,
@@ -80,12 +167,9 @@ func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeouts co
 			"User-Agent":         {ua.UserAgent},
 		},
 	}
+}
 
-	log.Trace().
-		Caller().
-		Str("request", fmt.Sprint(nr)).
-		Msg("Created a new request")
-
+func createReverseProxy(timeouts config.ImageProxyTimeouts) httputil.ReverseProxy {
 	// Create reverse proxy with timeout.
 	rp := httputil.ReverseProxy{Director: func(r *http.Request) {}}
 	rp.Transport = &http.Transport{
@@ -95,12 +179,5 @@ func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeouts co
 		}).DialContext,
 		TLSHandshakeTimeout: timeouts.TLSHandshake,
 	}
-
-	// Proxy the request.
-	log.Debug().
-		Str("url", target.String()).
-		Msg("Proxying request")
-	rp.ServeHTTP(w, nr) // Use the new request.
-
-	return nil
+	return rp
 }
