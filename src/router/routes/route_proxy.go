@@ -2,21 +2,20 @@ package routes
 
 import (
 	"fmt"
-	"net"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search/useragent"
 	"github.com/hearchco/agent/src/utils/anonymize"
 	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
-func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeouts config.ImageProxyTimeouts) error {
+func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeout time.Duration) error {
 	// Parse the form.
 	err := r.ParseForm()
 	if err != nil {
@@ -93,15 +92,23 @@ func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeouts co
 		Msg("Created a new anon request")
 
 	// Create reverse proxy with timeout.
-	rp := createReverseProxy(timeouts)
-
-	// Proxy the request.
 	log.Debug().
 		Str("url", target.String()).
 		Msg("Proxying request")
-	rp.ServeHTTP(w, &nr) // Use the new request.
 
-	return nil
+	// Use the new request.
+	resp, err := requestResponse(&nr, timeout)
+	if err != nil {
+		// Server error.
+		log.Debug().
+			Err(err).
+			Str("url", target.String()).
+			Msg("Failed to proxy request")
+		return writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("failed to proxy request: %v", err))
+	}
+
+	// Proxy the response.
+	return writeResponseImageProxy(w, resp)
 }
 
 func getUrlToVerifyAndToProxy(urlParam string, favicon bool) (string, string, error) {
@@ -150,7 +157,6 @@ func createAnonRequest(r *http.Request, target *url.URL) http.Request {
 		Method:     http.MethodGet,
 		URL:        target,
 		Host:       target.Host,
-		RequestURI: target.RequestURI(),
 		Proto:      "HTTP/2",
 		ProtoMajor: 2,
 		ProtoMinor: 0,
@@ -169,15 +175,23 @@ func createAnonRequest(r *http.Request, target *url.URL) http.Request {
 	}
 }
 
-func createReverseProxy(timeouts config.ImageProxyTimeouts) httputil.ReverseProxy {
-	// Create reverse proxy with timeout.
-	rp := httputil.ReverseProxy{Director: func(r *http.Request) {}}
-	rp.Transport = &http.Transport{
-		DialContext: (&net.Dialer{
-			Timeout:   timeouts.Dial,
-			KeepAlive: timeouts.KeepAlive,
-		}).DialContext,
-		TLSHandshakeTimeout: timeouts.TLSHandshake,
+func requestResponse(r *http.Request, timeout time.Duration) (*http.Response, error) {
+	// Create a reverse proxy.
+	client := http.Client{Timeout: timeout}
+	resp, err := client.Do(r)
+	if err != nil {
+		return nil, err
 	}
-	return rp
+
+	// Check if the response is OK.
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("response status code is not OK: %v", resp.StatusCode)
+	}
+
+	// Check if the response is of image type.
+	if !strings.HasPrefix(resp.Header.Get("Content-Type"), "image/") {
+		return nil, fmt.Errorf("response content type is not an image: %v", resp.Header.Get("Content-Type"))
+	}
+
+	return resp, nil
 }

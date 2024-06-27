@@ -25,11 +25,7 @@ func New() Config {
 				},
 			},
 			ImageProxy: ImageProxy{
-				Timeouts: ImageProxyTimeouts{
-					Dial:         3 * time.Second,
-					KeepAlive:    3 * time.Second,
-					TLSHandshake: 2 * time.Second,
-				},
+				Timeout: 3 * time.Second,
 			},
 		},
 		Categories: map[category.Name]Category{

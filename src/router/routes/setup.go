@@ -82,7 +82,7 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 
 	// /proxy
 	mux.Get("/proxy", func(w http.ResponseWriter, r *http.Request) {
-		err := routeProxy(w, r, conf.Server.ImageProxy.Salt, conf.Server.ImageProxy.Timeouts)
+		err := routeProxy(w, r, conf.Server.ImageProxy.Salt, conf.Server.ImageProxy.Timeout)
 		if err != nil {
 			log.Error().
 				Err(err).

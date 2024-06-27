@@ -85,12 +85,8 @@ func (c Config) getReader() ReaderConfig {
 				Redis: c.Server.Cache.Redis,
 			},
 			ImageProxy: ReaderImageProxy{
-				Salt: c.Server.ImageProxy.Salt,
-				Timeouts: ReaderImageProxyTimeouts{
-					Dial:         moretime.ConvertToFancyTime(c.Server.ImageProxy.Timeouts.Dial),
-					KeepAlive:    moretime.ConvertToFancyTime(c.Server.ImageProxy.Timeouts.KeepAlive),
-					TLSHandshake: moretime.ConvertToFancyTime(c.Server.ImageProxy.Timeouts.TLSHandshake),
-				},
+				Salt:    c.Server.ImageProxy.Salt,
+				Timeout: moretime.ConvertToFancyTime(c.Server.ImageProxy.Timeout),
 			},
 		},
 		// Initialize the categories map.
@@ -153,12 +149,8 @@ func (c *Config) fromReader(rc ReaderConfig) {
 				Redis: rc.Server.Cache.Redis,
 			},
 			ImageProxy: ImageProxy{
-				Salt: rc.Server.ImageProxy.Salt,
-				Timeouts: ImageProxyTimeouts{
-					Dial:         moretime.ConvertFromFancyTime(rc.Server.ImageProxy.Timeouts.Dial),
-					KeepAlive:    moretime.ConvertFromFancyTime(rc.Server.ImageProxy.Timeouts.KeepAlive),
-					TLSHandshake: moretime.ConvertFromFancyTime(rc.Server.ImageProxy.Timeouts.TLSHandshake),
-				},
+				Salt:    rc.Server.ImageProxy.Salt,
+				Timeout: moretime.ConvertFromFancyTime(rc.Server.ImageProxy.Timeout),
 			},
 		},
 		// Initialize the categories map.
