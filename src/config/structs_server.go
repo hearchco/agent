@@ -76,26 +76,14 @@ type Redis struct {
 }
 
 // ReaderProxy is format in which the config is read from the config file and environment variables.
-type ReaderImageProxy struct {
-	Salt     string                   `koanf:"salt"`
-	Timeouts ReaderImageProxyTimeouts `koanf:"timeouts"`
-}
-type ImageProxy struct {
-	Salt     string
-	Timeouts ImageProxyTimeouts
-}
-
-// ReaderProxyTimeouts is format in which the config is read from the config file and environment variables.
 // In <number><unit> format.
 // Example: 1s, 1m, 1h, 1d, 1w, 1M, 1y.
 // If unit is not specified, it is assumed to be milliseconds.
-type ReaderImageProxyTimeouts struct {
-	Dial         string `koanf:"dial"`
-	KeepAlive    string `koanf:"keepalive"`
-	TLSHandshake string `koanf:"tlshandshake"`
+type ReaderImageProxy struct {
+	Salt    string `koanf:"salt"`
+	Timeout string `koanf:"timeout"`
 }
-type ImageProxyTimeouts struct {
-	Dial         time.Duration
-	KeepAlive    time.Duration
-	TLSHandshake time.Duration
+type ImageProxy struct {
+	Salt    string
+	Timeout time.Duration
 }
