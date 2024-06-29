@@ -51,6 +51,15 @@ func routeSuggest(w http.ResponseWriter, r *http.Request, ver string, catConf co
 		})
 	}
 
+	output := getParamOrDefault(r.Form, "output", "x-suggestions")
+	if output != "x-suggestions" && output != "json" {
+		// User error.
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: "invalid output value",
+			Value:   "output must be either 'x-suggestions' or 'json'",
+		})
+	}
+
 	// Search for suggestions.
 	scrapedSugs, err := search.Suggest(query, locale, catConf)
 	if err != nil {
@@ -70,7 +79,7 @@ func routeSuggest(w http.ResponseWriter, r *http.Request, ver string, catConf co
 	rankedSugs.Rank(catConf.Ranking)
 
 	// Check if the response should be in API format or normal JSON format.
-	if strings.Contains(r.Header.Get("Accept"), "application/x-suggestions+json") {
+	if output == "x-suggestions" {
 		// Convert the suggestions to slice of strings.
 		stringSugs := result.ConvertSuggestionsToOutput(rankedSugs)
 
