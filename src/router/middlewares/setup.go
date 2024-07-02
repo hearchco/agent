@@ -20,8 +20,10 @@ func Setup(mux *chi.Mux, lgr zerolog.Logger, frontendUrls []string, serveProfile
 	// Use recovery middleware.
 	mux.Use(middleware.Recoverer)
 
-	// Use compression middleware.
-	mux.Use(compress(5)...)
+	// Use compression middleware, except for image proxy since the response is copied over.
+	mux.Use(middleware.Maybe(compress(3), func(r *http.Request) bool {
+		return !strings.HasPrefix(r.URL.Path, "/proxy")
+	}))
 
 	// Use CORS middleware.
 	mux.Use(cors.Handler(cors.Options{

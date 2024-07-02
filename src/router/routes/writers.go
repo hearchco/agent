@@ -49,9 +49,18 @@ func writeResponseSuggestions(w http.ResponseWriter, status int, query string, s
 }
 
 func writeResponseImageProxy(w http.ResponseWriter, resp *http.Response) error {
-	w.Header().Set("Content-Encoding", resp.Header.Get("Content-Encoding"))
-	w.Header().Set("Content-Length", resp.Header.Get("Content-Length"))
-	w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+	if ce := resp.Header.Get("Content-Encoding"); ce != "" {
+		w.Header().Set("Content-Encoding", ce)
+	}
+
+	if cl := resp.Header.Get("Content-Length"); cl != "" {
+		w.Header().Set("Content-Length", cl)
+	}
+
+	if ct := resp.Header.Get("Content-Type"); ct != "" {
+		w.Header().Set("Content-Type", ct)
+	}
+
 	w.WriteHeader(resp.StatusCode)
 	_, err := io.Copy(w, resp.Body)
 	return err
