@@ -9,6 +9,7 @@ import (
 
 	"github.com/andybalholm/brotli"
 	"github.com/gocolly/colly/v2"
+	"github.com/klauspost/compress/zstd"
 	"github.com/rs/zerolog/log"
 
 	"github.com/hearchco/agent/src/config"
@@ -39,7 +40,7 @@ func (e *EngineBase) initCollector(ctx context.Context, acceptS string) {
 		colly.UserAgent(ua.UserAgent),
 		colly.Headers(map[string]string{
 			"Accept":             acceptS,
-			"Accept-Encoding":    "gzip, deflate, br",
+			"Accept-Encoding":    "gzip, deflate, br, zstd",
 			"Accept-Language":    "en-US,en;q=0.9",
 			"Sec-Ch-Ua":          ua.SecCHUA,
 			"Sec-Ch-Ua-Mobile":   ua.SecCHUAMobile,
@@ -102,6 +103,28 @@ func (e *EngineBase) initCollectorOnResponse() {
 					Err(err).
 					Str("engine", e.Name.String()).
 					Msg("Failed to decode brotli response")
+				return
+			}
+
+			r.Body = body
+		} else if strings.Contains(r.Headers.Get("Content-Encoding"), "zstd") {
+			reader, err := zstd.NewReader(bytes.NewReader(r.Body))
+			if err != nil {
+				log.Error().
+					Caller().
+					Err(err).
+					Str("engine", e.Name.String()).
+					Msg("Failed to create zstd reader")
+				return
+			}
+
+			body, err := io.ReadAll(reader)
+			if err != nil {
+				log.Error().
+					Caller().
+					Err(err).
+					Str("engine", e.Name.String()).
+					Msg("Failed to decode zstd response")
 				return
 			}
 

@@ -107,6 +107,11 @@ func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeout tim
 		return writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("failed to proxy request: %v", err))
 	}
 
+	log.Trace().
+		Caller().
+		Str("response", fmt.Sprint(resp)).
+		Msg("Got a response")
+
 	// Proxy the response.
 	return writeResponseImageProxy(w, resp)
 }

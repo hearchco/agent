@@ -6,19 +6,29 @@ import (
 
 	"github.com/andybalholm/brotli"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/klauspost/compress/zstd"
+	"github.com/rs/zerolog/log"
 )
 
-func compress(lvl int, types ...string) [](func(http.Handler) http.Handler) {
-	// Deflate & GZIP.
-	dig := middleware.Compress(lvl, types...)
+func compress(lvl int, types ...string) func(next http.Handler) http.Handler {
+	// Already has deflate and gzip.
+	comp := middleware.NewCompressor(lvl, types...)
 
-	// Brotli.
-	br := middleware.NewCompressor(lvl, types...)
-	br.SetEncoder("br", func(w io.Writer, lvl int) io.Writer {
+	// Add brotli.
+	comp.SetEncoder("br", func(w io.Writer, lvl int) io.Writer {
 		return brotli.NewWriterOptions(w, brotli.WriterOptions{
 			Quality: lvl,
 		})
 	})
 
-	return [](func(http.Handler) http.Handler){dig, br.Handler}
+	// Add zstd.
+	comp.SetEncoder("zstd", func(w io.Writer, lvl int) io.Writer {
+		writer, err := zstd.NewWriter(w, zstd.WithEncoderLevel(zstd.EncoderLevel(lvl)))
+		if err != nil {
+			log.Panic().Err(err).Msg("Failed to create zstd writer")
+		}
+		return writer
+	})
+
+	return comp.Handler
 }
