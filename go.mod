@@ -25,6 +25,8 @@ require (
 	golang.org/x/tools v0.22.0
 )
 
+require github.com/klauspost/compress v1.17.9
+
 require (
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/antchfx/htmlquery v1.3.2 // indirect
