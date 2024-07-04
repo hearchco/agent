@@ -14,17 +14,17 @@ import (
 	"github.com/hearchco/agent/src/utils/anonymize"
 )
 
-func Suggest(query string, locale options.Locale, catConf config.Category) ([]result.Suggestion, error) {
+func Suggest(query string, opts options.Options, catConf config.Category) ([]result.Suggestion, error) {
 	// Capture start time.
 	startTime := time.Now()
 
-	if err := validateSuggestParams(query, locale); err != nil {
+	if err := validateParams(query, opts); err != nil {
 		return nil, err
 	}
 
 	log.Debug().
 		Str("query", anonymize.String(query)).
-		Str("locale", locale.String()).
+		Str("locale", opts.Locale.String()).
 		Msg("Suggesting")
 
 	// Create contexts with timeout for HardTimeout and PreferredTimeout.
@@ -53,19 +53,19 @@ func Suggest(query string, locale options.Locale, catConf config.Category) ([]re
 
 	// Run all required engines. WaitGroup should be awaited unless the hard timeout is reached.
 	var wgRequiredEngines sync.WaitGroup
-	runRequiredSuggesters(catConf.RequiredEngines, suggesters, &wgRequiredEngines, &concMap, query, locale, onceWrapMap)
+	runRequiredSuggesters(catConf.RequiredEngines, suggesters, &wgRequiredEngines, &concMap, query, opts, onceWrapMap)
 
 	// Run all required by origin engines. Cond should be awaited unless the hard timeout is reached.
 	var wgRequiredByOriginEngines sync.WaitGroup
-	runRequiredByOriginSuggesters(catConf.RequiredByOriginEngines, suggesters, &wgRequiredByOriginEngines, &concMap, catConf.Engines, query, locale, onceWrapMap)
+	runRequiredByOriginSuggesters(catConf.RequiredByOriginEngines, suggesters, &wgRequiredByOriginEngines, &concMap, catConf.Engines, query, opts, onceWrapMap)
 
 	// Run all preferred engines. WaitGroup should be awaited unless the preferred timeout is reached.
 	var wgPreferredEngines sync.WaitGroup
-	runPreferredSuggesters(catConf.PreferredEngines, suggesters, &wgPreferredEngines, &concMap, query, locale, onceWrapMap)
+	runPreferredSuggesters(catConf.PreferredEngines, suggesters, &wgPreferredEngines, &concMap, query, opts, onceWrapMap)
 
 	// Run all preferred by origin engines. Cond should be awaited unless the preferred timeout is reached.
 	var wgPreferredByOriginEngines sync.WaitGroup
-	runPreferredByOriginSuggesters(catConf.PreferredByOriginEngines, suggesters, &wgPreferredByOriginEngines, &concMap, catConf.Engines, query, locale, onceWrapMap)
+	runPreferredByOriginSuggesters(catConf.PreferredByOriginEngines, suggesters, &wgPreferredByOriginEngines, &concMap, catConf.Engines, query, opts, onceWrapMap)
 
 	// Cancel the hard timeout after all required engines have finished and all required by origin engines have finished.
 	go cancelHardTimeout(startTime, cancelHardTimeoutFunc, query, &wgRequiredEngines, catConf.RequiredEngines, &wgRequiredByOriginEngines, catConf.RequiredByOriginEngines)

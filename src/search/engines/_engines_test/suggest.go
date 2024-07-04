@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hearchco/agent/src/search/engines/options"
 	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/search/scraper"
 )
@@ -12,7 +11,7 @@ import (
 func CheckSuggest(t *testing.T, e scraper.Suggester, q string) {
 	sugChan := make(chan result.SuggestionScraped)
 	go func() {
-		err, found := e.Suggest(q, options.LocaleDefault, sugChan)
+		err, found := e.Suggest(q, NewOpts(), sugChan)
 		if len(err) > 0 || !found {
 			t.Errorf("Failed to get suggestions: %v", err)
 		}

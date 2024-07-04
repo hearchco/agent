@@ -12,7 +12,7 @@ import (
 func CheckTestCases(t *testing.T, e scraper.Searcher, tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResults, tcrr []TestCaseRankedResults) {
 	// TestCaseHasAnyResults
 	for _, tc := range tchar {
-		e.ReInit(context.Background())
+		e.ReInitSearcher(context.Background())
 
 		resChan := make(chan result.ResultScraped, 100)
 		go e.Search(tc.Query, tc.Options, resChan)
@@ -29,7 +29,7 @@ func CheckTestCases(t *testing.T, e scraper.Searcher, tchar []TestCaseHasAnyResu
 
 	// TestCaseContainsResults
 	for _, tc := range tccr {
-		e.ReInit(context.Background())
+		e.ReInitSearcher(context.Background())
 
 		resChan := make(chan result.ResultScraped, 100)
 		go e.Search(tc.Query, tc.Options, resChan)
@@ -61,7 +61,7 @@ func CheckTestCases(t *testing.T, e scraper.Searcher, tchar []TestCaseHasAnyResu
 
 	// TestCaseRankedResults
 	for _, tc := range tcrr {
-		e.ReInit(context.Background())
+		e.ReInitSearcher(context.Background())
 
 		resChan := make(chan result.ResultScraped, 100)
 		go e.Search(tc.Query, tc.Options, resChan)

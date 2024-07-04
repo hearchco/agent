@@ -57,7 +57,7 @@ func runByOriginSearchers(groupName string, engs []engines.Name, searchers []scr
 				defer wgWorkers.Done()
 
 				// Run the engine.
-				runSearcher(groupName, onceWrapMap[engName], concMap, engName, searcher, query, opts)
+				runEngine(groupName, onceWrapMap[engName], concMap, engName, searcher.Search, query, opts)
 
 				// Indicate that the engine was successful.
 				if onceWrapMap[engName].Success() {
@@ -71,17 +71,17 @@ func runByOriginSearchers(groupName string, engs []engines.Name, searchers []scr
 }
 
 // Run required engines.
-func runRequiredByOriginSuggesters(engs []engines.Name, suggesters []scraper.Suggester, wgByOriginEngines *sync.WaitGroup, concMap *result.SuggestionConcMap, enabledEngines []engines.Name, query string, locale options.Locale, onceWrapMap map[engines.Name]*onceWrapper) {
-	runByOriginSuggesters(groupRequiredByOrigin, engs, suggesters, wgByOriginEngines, concMap, enabledEngines, query, locale, onceWrapMap)
+func runRequiredByOriginSuggesters(engs []engines.Name, suggesters []scraper.Suggester, wgByOriginEngines *sync.WaitGroup, concMap *result.SuggestionConcMap, enabledEngines []engines.Name, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
+	runByOriginSuggesters(groupRequiredByOrigin, engs, suggesters, wgByOriginEngines, concMap, enabledEngines, query, opts, onceWrapMap)
 }
 
 // Run preferred engines.
-func runPreferredByOriginSuggesters(engs []engines.Name, suggesters []scraper.Suggester, wgByOriginEngines *sync.WaitGroup, concMap *result.SuggestionConcMap, enabledEngines []engines.Name, query string, locale options.Locale, onceWrapMap map[engines.Name]*onceWrapper) {
-	runByOriginSuggesters(groupPreferredByOrigin, engs, suggesters, wgByOriginEngines, concMap, enabledEngines, query, locale, onceWrapMap)
+func runPreferredByOriginSuggesters(engs []engines.Name, suggesters []scraper.Suggester, wgByOriginEngines *sync.WaitGroup, concMap *result.SuggestionConcMap, enabledEngines []engines.Name, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
+	runByOriginSuggesters(groupPreferredByOrigin, engs, suggesters, wgByOriginEngines, concMap, enabledEngines, query, opts, onceWrapMap)
 }
 
 // Run passed engines by origin.
-func runByOriginSuggesters(groupName string, engs []engines.Name, suggesters []scraper.Suggester, wg *sync.WaitGroup, concMap *result.SuggestionConcMap, enabledEngines []engines.Name, query string, locale options.Locale, onceWrapMap map[engines.Name]*onceWrapper) {
+func runByOriginSuggesters(groupName string, engs []engines.Name, suggesters []scraper.Suggester, wg *sync.WaitGroup, concMap *result.SuggestionConcMap, enabledEngines []engines.Name, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
 	// Create a map of slices of all the engines that contain origins from the engines by origin.
 	engsMap := make(map[engines.Name][]engines.Name, len(engs))
 	for _, originName := range engs {
@@ -117,7 +117,7 @@ func runByOriginSuggesters(groupName string, engs []engines.Name, suggesters []s
 				defer wgWorkers.Done()
 
 				// Run the engine.
-				runSuggester(groupName, onceWrapMap[engName], concMap, engName, suggester, query, locale)
+				runEngine(groupName, onceWrapMap[engName], concMap, engName, suggester.Suggest, query, opts)
 
 				// Indicate that the engine was successful.
 				if onceWrapMap[engName].Success() {

@@ -26,29 +26,29 @@ func runSearchers(groupName string, engs []engines.Name, searchers []scraper.Sea
 			defer wgRequiredEngines.Done()
 
 			// Run the engine.
-			runSearcher(groupName, onceWrapMap[engName], concMap, engName, searcher, query, opts)
+			runEngine(groupName, onceWrapMap[engName], concMap, engName, searcher.Search, query, opts)
 		}()
 	}
 }
 
-func runRequiredSuggesters(engs []engines.Name, suggesters []scraper.Suggester, wgRequiredEngines *sync.WaitGroup, concMap *result.SuggestionConcMap, query string, locale options.Locale, onceWrapMap map[engines.Name]*onceWrapper) {
-	runSuggesters(groupRequired, engs, suggesters, wgRequiredEngines, concMap, query, locale, onceWrapMap)
+func runRequiredSuggesters(engs []engines.Name, suggesters []scraper.Suggester, wgRequiredEngines *sync.WaitGroup, concMap *result.SuggestionConcMap, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
+	runSuggesters(groupRequired, engs, suggesters, wgRequiredEngines, concMap, query, opts, onceWrapMap)
 }
 
-func runPreferredSuggesters(engs []engines.Name, suggesters []scraper.Suggester, wgPreferredEngines *sync.WaitGroup, concMap *result.SuggestionConcMap, query string, locale options.Locale, onceWrapMap map[engines.Name]*onceWrapper) {
-	runSuggesters(groupPreferred, engs, suggesters, wgPreferredEngines, concMap, query, locale, onceWrapMap)
+func runPreferredSuggesters(engs []engines.Name, suggesters []scraper.Suggester, wgPreferredEngines *sync.WaitGroup, concMap *result.SuggestionConcMap, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
+	runSuggesters(groupPreferred, engs, suggesters, wgPreferredEngines, concMap, query, opts, onceWrapMap)
 }
 
-func runSuggesters(groupName string, engs []engines.Name, suggesters []scraper.Suggester, wgRequiredEngines *sync.WaitGroup, concMap *result.SuggestionConcMap, query string, locale options.Locale, onceWrapMap map[engines.Name]*onceWrapper) {
+func runSuggesters(groupName string, engs []engines.Name, suggesters []scraper.Suggester, wgRequiredEngines *sync.WaitGroup, concMap *result.SuggestionConcMap, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
 	wgRequiredEngines.Add(len(engs))
 	for _, engName := range engs {
-		searcher := suggesters[engName]
+		suggester := suggesters[engName]
 		go func() {
 			// Indicate that the engine is done.
 			defer wgRequiredEngines.Done()
 
 			// Run the engine.
-			runSuggester(groupName, onceWrapMap[engName], concMap, engName, searcher, query, locale)
+			runEngine(groupName, onceWrapMap[engName], concMap, engName, suggester.Suggest, query, opts)
 		}()
 	}
 }
