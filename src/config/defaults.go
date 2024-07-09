@@ -23,6 +23,9 @@ func New() Config {
 					Host: "localhost",
 					Port: 6379,
 				},
+				DynamoDB: DynamoDB{
+					Table: "hearchco",
+				},
 			},
 			ImageProxy: ImageProxy{
 				Timeout: 3 * time.Second,

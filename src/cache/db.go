@@ -6,6 +6,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
+	"github.com/hearchco/agent/src/cache/dynamodb"
 	"github.com/hearchco/agent/src/cache/nocache"
 	"github.com/hearchco/agent/src/cache/redis"
 	"github.com/hearchco/agent/src/config"
@@ -24,6 +25,11 @@ func New(ctx context.Context, cacheConf config.Cache) (DB, error) {
 		drv, err = redis.New(ctx, cacheConf.KeyPrefix, cacheConf.Redis)
 		if err != nil {
 			err = fmt.Errorf("failed creating a redis cache: %w", err)
+		}
+	case "dynamodb":
+		drv, err = dynamodb.New(ctx, cacheConf.KeyPrefix, cacheConf.DynamoDB)
+		if err != nil {
+			err = fmt.Errorf("failed creating a dynamodb cache: %w", err)
 		}
 	default:
 		drv, err = nocache.New()

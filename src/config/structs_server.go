@@ -51,6 +51,8 @@ type Cache struct {
 	TTL TTL
 	// Redis specific settings.
 	Redis Redis
+	// DynamoDB specific settings.
+	DynamoDB DynamoDB
 }
 
 // ReaderTTL is format in which the config is read from the config file and environment variables.
@@ -73,6 +75,11 @@ type Redis struct {
 	Port     uint16 `koanf:"port"`
 	Password string `koanf:"password"`
 	Database uint8  `koanf:"database"`
+}
+
+type DynamoDB struct {
+	Region string `koanf:"region"`
+	Table  string `koanf:"table"`
 }
 
 // ReaderProxy is format in which the config is read from the config file and environment variables.
