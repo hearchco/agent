@@ -26,15 +26,24 @@ test:
 	sh ./scripts/test.sh
 test-engines:
 	sh ./scripts/test-engines.sh
+
 test-redis:
 	sh ./scripts/test-redis.sh
 test-redis-podman:
 	sh ./scripts/test-redis-podman.sh
 test-redis-docker:
 	sh ./scripts/test-redis-docker.sh
-test-all: test test-redis test-engines
-test-all-podman: test test-redis-podman test-engines
-test-all-docker: test test-redis-docker test-engines
+
+test-dynamodb:
+	sh ./scripts/test-dynamodb.sh
+test-dynamodb-podman:
+	sh ./scripts/test-dynamodb-podman.sh
+test-dynamodb-docker:
+	sh ./scripts/test-dynamodb-docker.sh
+
+test-all: test test-redis test-dynamodb test-engines
+test-all-podman: test test-redis-podman test-dynamodb-podman test-engines
+test-all-docker: test test-redis-docker test-dynamodb-docker test-engines
 
 update:
 	go get -u ./...
