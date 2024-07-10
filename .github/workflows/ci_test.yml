@@ -82,6 +82,8 @@ jobs:
 
       - name: Setup AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: "eu-central-1"
 
       - name: Setup DynamoDB table KV
         env:
