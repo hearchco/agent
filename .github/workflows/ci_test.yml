@@ -82,13 +82,12 @@ jobs:
 
       - name: Setup AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: "hearchco"
-          aws-secret-access-key: "hearchco"
-          aws-region: "hearchco-test-1"
 
       - name: Setup DynamoDB table KV
         env:
+          AWS_REGION: "hearchco-test-1"
+          AWS_ACCESS_KEY_ID: "hearchco"
+          AWS_SECRET_ACCESS_KEY: "hearchco"
           DYNAMODB_TABLE: "hearchco"
           DYNAMODB_ENDPOINT: "http://localhost:8000"
         run: >-
@@ -101,6 +100,9 @@ jobs:
 
       - name: Setup DynamoDB table TTL
         env:
+          AWS_REGION: "hearchco-test-1"
+          AWS_ACCESS_KEY_ID: "hearchco"
+          AWS_SECRET_ACCESS_KEY: "hearchco"
           DYNAMODB_TABLE: "hearchco"
           DYNAMODB_ENDPOINT: "http://localhost:8000"
         run: >-
@@ -113,6 +115,8 @@ jobs:
         run: make test-dynamodb
         env:
           AWS_REGION: "hearchco-test-1"
+          AWS_ACCESS_KEY_ID: "hearchco"
+          AWS_SECRET_ACCESS_KEY: "hearchco"
           DYNAMODB_TABLE: "hearchco"
           DYNAMODB_ENDPOINT: "http://localhost:8000"
 
