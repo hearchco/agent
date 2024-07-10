@@ -80,14 +80,20 @@ jobs:
           REDIS_HOST: localhost
           REDIS_PORT: "6379"
 
-      - name: Setup AWS CLI
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: "eu-central-1"
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Configure AWS CLI for Local DynamoDB
+        run: |
+          aws configure set aws_access_key_id dummy
+          aws configure set aws_secret_access_key dummy
+          aws configure set region eu-central-1
 
       - name: Setup DynamoDB table KV
         env:
-          AWS_REGION: "hearchco-test-1"
+          AWS_REGION: "eu-central-1"
           AWS_ACCESS_KEY_ID: "hearchco"
           AWS_SECRET_ACCESS_KEY: "hearchco"
           DYNAMODB_TABLE: "hearchco"
@@ -102,7 +108,7 @@ jobs:
 
       - name: Setup DynamoDB table TTL
         env:
-          AWS_REGION: "hearchco-test-1"
+          AWS_REGION: "eu-central-1"
           AWS_ACCESS_KEY_ID: "hearchco"
           AWS_SECRET_ACCESS_KEY: "hearchco"
           DYNAMODB_TABLE: "hearchco"
@@ -116,7 +122,7 @@ jobs:
       - name: Test units (only dynamodb)
         run: make test-dynamodb
         env:
-          AWS_REGION: "hearchco-test-1"
+          AWS_REGION: "eu-central-1"
           AWS_ACCESS_KEY_ID: "hearchco"
           AWS_SECRET_ACCESS_KEY: "hearchco"
           DYNAMODB_TABLE: "hearchco"
