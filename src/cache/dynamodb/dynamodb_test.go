@@ -20,7 +20,12 @@ func newDynamoDBConf() config.DynamoDB {
 		panic("DYNAMODB_TABLE environment variable not set")
 	}
 
-	return config.DynamoDB{Region: awsRegion, Table: tableName}
+	endpoint := os.Getenv("DYNAMODB_ENDPOINT")
+	if endpoint == "" {
+		panic("DYNAMODB_ENDPOINT environment variable not set")
+	}
+
+	return config.DynamoDB{Region: awsRegion, Table: tableName, Endpoint: endpoint}
 }
 
 var (
@@ -134,7 +139,11 @@ func TestGetExpired(t *testing.T) {
 
 	var value string
 	err = db.Get("testkeygetexpired", &value)
-	if err == nil || value != "" {
+	if err != nil {
+		t.Errorf("error getting value: %v", err)
+	}
+
+	if value != "" {
 		t.Errorf("expected no value, got: %v, err: %v", value, err)
 	}
 }

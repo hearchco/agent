@@ -31,7 +31,19 @@ func New(ctx context.Context, keyPrefix string, conf config.DynamoDB) (DRV, erro
 		return DRV{}, err
 	}
 
-	client := dynamodb.NewFromConfig(cfg)
+	var client *dynamodb.Client
+	if conf.Endpoint != "" {
+		log.Warn().
+			Str("endpoint", conf.Endpoint).
+			Msg("Using custom endpoint")
+
+		cfg.BaseEndpoint = &conf.Endpoint
+		resolver := dynamodb.NewDefaultEndpointResolverV2()
+		client = dynamodb.NewFromConfig(cfg, dynamodb.WithEndpointResolverV2(resolver))
+	} else {
+		client = dynamodb.NewFromConfig(cfg)
+	}
+
 	return DRV{ctx, keyPrefix, client, conf.Table}, nil
 }
 
@@ -87,6 +99,22 @@ func (drv DRV) Get(k string, o any) error {
 			Str("key", key).
 			Msg("Found no value in dynamodb")
 		return nil
+	}
+
+	// Required because TTL isn't guaranteed to remove the item immediately
+	if result.Item["TTL"] != nil {
+		expirationTime, err := strconv.ParseInt(result.Item["TTL"].(*types.AttributeValueMemberN).Value, 10, 64)
+		if err != nil {
+			return fmt.Errorf("dynamodb.Get(): error parsing TTL value for key %v: %w", key, err)
+		}
+
+		expiresIn := time.Until(time.Unix(expirationTime, 0))
+		if expiresIn < 0 {
+			log.Trace().
+				Str("key", key).
+				Msg("Value has expired")
+			return nil
+		}
 	}
 
 	value := result.Item["Value"].(*types.AttributeValueMemberS).Value

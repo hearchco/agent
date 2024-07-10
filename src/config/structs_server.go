@@ -80,6 +80,8 @@ type Redis struct {
 type DynamoDB struct {
 	Region string `koanf:"region"`
 	Table  string `koanf:"table"`
+	// Endpoint is used for local testing.
+	Endpoint string `koanf:"endpoint"`
 }
 
 // ReaderProxy is format in which the config is read from the config file and environment variables.
