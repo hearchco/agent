@@ -19,7 +19,7 @@ func Search(query string, category category.Name, opts options.Options, catConf 
 	// Capture start time.
 	startTime := time.Now()
 
-	if err := validateSearchParams(query, opts); err != nil {
+	if err := validateParams(query, opts); err != nil {
 		return nil, err
 	}
 
