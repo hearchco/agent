@@ -11,7 +11,7 @@ import (
 	"github.com/hearchco/agent/src/exchange/currency"
 )
 
-func (e Exchange) Exchange(base currency.Currency) (map[currency.Currency]float64, error) {
+func (e Exchange) Exchange(base currency.Currency) (currency.Currencies, error) {
 	// Get data from the API.
 	api := e.apiUrlWithBaseCurrency(base)
 	resp, err := http.Get(api)
@@ -37,7 +37,7 @@ func (e Exchange) Exchange(base currency.Currency) (map[currency.Currency]float6
 	}
 
 	// Convert the rates to proper currency types with their rates.
-	rates := make(map[currency.Currency]float64, len(data.Rates))
+	rates := make(currency.Currencies, len(data.Rates))
 	for currS, rate := range data.Rates {
 		curr, err := currency.Convert(currS)
 		if err != nil {

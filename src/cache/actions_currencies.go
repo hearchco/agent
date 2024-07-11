@@ -8,14 +8,14 @@ import (
 	"github.com/hearchco/agent/src/exchange/engines"
 )
 
-func (db DB) SetCurrencies(engs []engines.Name, currencies map[currency.Currency]float64, ttl ...time.Duration) error {
+func (db DB) SetCurrencies(engs []engines.Name, currencies currency.Currencies, ttl ...time.Duration) error {
 	key := combineExchangeEnginesNames(engs)
 	return db.driver.Set(key, currencies, ttl...)
 }
 
-func (db DB) GetCurrencies(engs []engines.Name) (map[currency.Currency]float64, error) {
+func (db DB) GetCurrencies(engs []engines.Name) (currency.Currencies, error) {
 	key := combineExchangeEnginesNames(engs)
-	var currencies map[currency.Currency]float64
+	var currencies currency.Currencies
 	err := db.driver.Get(key, &currencies)
 	return currencies, err
 }

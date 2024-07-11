@@ -4,6 +4,8 @@ import (
 	"sync"
 )
 
+type Currencies map[Currency]float64
+
 type CurrencyMap struct {
 	currs map[Currency][]float64
 	lock  sync.RWMutex
@@ -15,7 +17,7 @@ func NewCurrencyMap() CurrencyMap {
 	}
 }
 
-func (c *CurrencyMap) Append(currs map[Currency]float64) {
+func (c *CurrencyMap) Append(currs Currencies) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
@@ -24,11 +26,11 @@ func (c *CurrencyMap) Append(currs map[Currency]float64) {
 	}
 }
 
-func (c *CurrencyMap) Extract() map[Currency]float64 {
+func (c *CurrencyMap) Extract() Currencies {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 
-	avg := make(map[Currency]float64)
+	avg := make(Currencies)
 	for curr, rates := range c.currs {
 		var sum float64
 		for _, rate := range rates {

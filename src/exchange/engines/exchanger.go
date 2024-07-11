@@ -5,5 +5,5 @@ import (
 )
 
 type Exchanger interface {
-	Exchange(base currency.Currency) (map[currency.Currency]float64, error)
+	Exchange(base currency.Currency) (currency.Currencies, error)
 }
