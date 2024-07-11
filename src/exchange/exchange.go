@@ -9,12 +9,24 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func Exchange(base currency.Currency, from currency.Currency, to currency.Currency, amount float64) (float64, error) {
-	// TODO: Load currency map from cache if available for the given engines (they should be part of the PK).
+// TODO: Test caching with private fields.
+type Exchange struct {
+	base       currency.Currency
+	currencies currency.Currencies
+}
 
-	enabledEngines := []engines.Name{engines.CURRENCYAPI, engines.EXCHANGERATEAPI, engines.FRANKFURTER}
+func NewExchange(base currency.Currency, enabledEngines []engines.Name, currencies ...currency.Currencies) Exchange {
+	// If currencies are provided, use them.
+	if len(currencies) > 0 {
+		return Exchange{
+			base,
+			currencies[0],
+		}
+	}
+
+	// Otherwise, fetch the currencies from the enabled engines.
 	exchangers := exchangerArray()
-	currencyArrayMap := currency.NewCurrencyMap()
+	currencyMap := currency.NewCurrencyMap()
 
 	var wg sync.WaitGroup
 	wg.Add(enginerLen - 1) // -1 because of UNDEFINED
@@ -30,28 +42,35 @@ func Exchange(base currency.Currency, from currency.Currency, to currency.Curren
 					Msg("Error while exchanging")
 				return
 			}
-			currencyArrayMap.Append(currs)
+			currencyMap.Append(currs)
 		}()
 	}
 	wg.Wait()
 
-	// TODO: Cache the currency map.
-	// Extract the averaged currency map.
-	currencyMap := currencyArrayMap.Extract()
+	return Exchange{
+		base,
+		currencyMap.Extract(),
+	}
+}
 
+func (e Exchange) Currencies() currency.Currencies {
+	return e.currencies
+}
+
+func (e Exchange) Convert(from currency.Currency, to currency.Currency, amount float64) (float64, error) {
 	// Check if FROM and TO currencies are supported.
-	if _, ok := currencyMap[from]; !ok {
+	if _, ok := e.currencies[from]; !ok {
 		return -1, fmt.Errorf("unsupported FROM currency: %s", from)
 	}
-	if _, ok := currencyMap[to]; !ok {
+	if _, ok := e.currencies[to]; !ok {
 		return -1, fmt.Errorf("unsupported TO currency: %s", to)
 	}
 
 	// Convert the amount in FROM currency to base currency.
-	basedAmount := amount / currencyMap[from]
+	basedAmount := amount / e.currencies[from]
 
 	// Convert the amount in base currency to TO currency.
-	convertedAmount := basedAmount * currencyMap[to]
+	convertedAmount := basedAmount * e.currencies[to]
 
 	return convertedAmount, nil
 }

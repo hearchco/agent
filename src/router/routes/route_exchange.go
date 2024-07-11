@@ -7,11 +7,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hearchco/agent/src/cache"
 	"github.com/hearchco/agent/src/exchange"
 	"github.com/hearchco/agent/src/exchange/currency"
+	"github.com/hearchco/agent/src/exchange/engines"
+	"github.com/rs/zerolog/log"
 )
 
-func routeExchange(w http.ResponseWriter, r *http.Request, ver string) error {
+func routeExchange(w http.ResponseWriter, r *http.Request, ver string, db cache.DB, ttl time.Duration) error {
 	// Capture start time.
 	startTime := time.Now()
 
@@ -88,9 +91,32 @@ func routeExchange(w http.ResponseWriter, r *http.Request, ver string) error {
 		})
 	}
 
-	// TODO: Make base currency configurable.
+	// TODO: Make base currency and enabled engines configurable.
 	const base currency.Currency = "EUR"
-	convertedAmount, err := exchange.Exchange(base, from, to, amount)
+	enabledEngines := [...]engines.Name{engines.CURRENCYAPI, engines.EXCHANGERATEAPI, engines.FRANKFURTER}
+
+	// Get the cached currencies.
+	currencies, err := db.GetCurrencies(base, enabledEngines[:])
+	if err != nil {
+		log.Error().
+			Err(err).
+			Str("base", base.String()).
+			Str("engines", fmt.Sprintf("%v", enabledEngines)).
+			Msg("Error while getting currencies from cache")
+	}
+
+	// Create the exchange.
+	var exch exchange.Exchange
+	if currencies == nil {
+		// Fetch the currencies from the enabled engines.
+		exch = exchange.NewExchange(base, enabledEngines[:])
+	} else {
+		// Use the cached currencies.
+		exch = exchange.NewExchange(base, enabledEngines[:], currencies)
+	}
+
+	// Convert the amount.
+	convAmount, err := exch.Convert(from, to, amount)
 	if err != nil {
 		// Server error.
 		werr := writeResponseJSON(w, http.StatusInternalServerError, ErrorResponse{
@@ -103,6 +129,18 @@ func routeExchange(w http.ResponseWriter, r *http.Request, ver string) error {
 		return err
 	}
 
+	// Cache the currencies.
+	if currencies == nil {
+		err := db.SetCurrencies(base, enabledEngines[:], exch.Currencies(), ttl)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("base", base.String()).
+				Str("engines", fmt.Sprintf("%v", enabledEngines)).
+				Msg("Error while setting currencies in cache")
+		}
+	}
+
 	return writeResponseJSON(w, http.StatusOK, ExchangeResponse{
 		responseBase{
 			ver,
@@ -112,6 +150,6 @@ func routeExchange(w http.ResponseWriter, r *http.Request, ver string) error {
 		from,
 		to,
 		amount,
-		convertedAmount,
+		convAmount,
 	})
 }

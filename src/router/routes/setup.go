@@ -9,6 +9,7 @@ import (
 	"github.com/hearchco/agent/src/cache"
 	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search/category"
+	"github.com/hearchco/agent/src/utils/moretime"
 )
 
 func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
@@ -80,9 +81,12 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 
+	// TODO: Make exchange TTL configurable.
+	exchTTL := moretime.Day
+
 	// /exchange
 	mux.Get("/exchange", func(w http.ResponseWriter, r *http.Request) {
-		err := routeExchange(w, r, ver)
+		err := routeExchange(w, r, ver, db, exchTTL)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -92,7 +96,7 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 	mux.Post("/exchange", func(w http.ResponseWriter, r *http.Request) {
-		err := routeExchange(w, r, ver)
+		err := routeExchange(w, r, ver, db, exchTTL)
 		if err != nil {
 			log.Error().
 				Err(err).

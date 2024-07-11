@@ -8,21 +8,25 @@ import (
 	"github.com/hearchco/agent/src/exchange/engines"
 )
 
-func (db DB) SetCurrencies(engs []engines.Name, currencies currency.Currencies, ttl ...time.Duration) error {
-	key := combineExchangeEnginesNames(engs)
+func (db DB) SetCurrencies(base currency.Currency, engs []engines.Name, currencies currency.Currencies, ttl ...time.Duration) error {
+	key := combineBaseWithExchangeEnginesNames(base, engs)
 	return db.driver.Set(key, currencies, ttl...)
 }
 
-func (db DB) GetCurrencies(engs []engines.Name) (currency.Currencies, error) {
-	key := combineExchangeEnginesNames(engs)
+func (db DB) GetCurrencies(base currency.Currency, engs []engines.Name) (currency.Currencies, error) {
+	key := combineBaseWithExchangeEnginesNames(base, engs)
 	var currencies currency.Currencies
 	err := db.driver.Get(key, &currencies)
 	return currencies, err
 }
 
-func (db DB) GetCurrenciesTTL(engs []engines.Name) (time.Duration, error) {
-	key := combineExchangeEnginesNames(engs)
+func (db DB) GetCurrenciesTTL(base currency.Currency, engs []engines.Name) (time.Duration, error) {
+	key := combineBaseWithExchangeEnginesNames(base, engs)
 	return db.driver.GetTTL(key)
+}
+
+func combineBaseWithExchangeEnginesNames(base currency.Currency, engs []engines.Name) string {
+	return fmt.Sprintf("%v_%v", base.String(), combineExchangeEnginesNames(engs))
 }
 
 func combineExchangeEnginesNames(engs []engines.Name) string {
