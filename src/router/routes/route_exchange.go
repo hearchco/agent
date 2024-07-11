@@ -110,27 +110,7 @@ func routeExchange(w http.ResponseWriter, r *http.Request, ver string, db cache.
 	if currencies == nil {
 		// Fetch the currencies from the enabled engines.
 		exch = exchange.NewExchange(base, enabledEngines[:])
-	} else {
-		// Use the cached currencies.
-		exch = exchange.NewExchange(base, enabledEngines[:], currencies)
-	}
-
-	// Convert the amount.
-	convAmount, err := exch.Convert(from, to, amount)
-	if err != nil {
-		// Server error.
-		werr := writeResponseJSON(w, http.StatusInternalServerError, ErrorResponse{
-			Message: "failed to exchange",
-			Value:   fmt.Sprintf("%v", err),
-		})
-		if werr != nil {
-			return fmt.Errorf("%w: %w", werr, err)
-		}
-		return err
-	}
-
-	// Cache the currencies.
-	if currencies == nil {
+		// Cache the currencies.
 		err := db.SetCurrencies(base, enabledEngines[:], exch.Currencies(), ttl)
 		if err != nil {
 			log.Error().
@@ -139,7 +119,29 @@ func routeExchange(w http.ResponseWriter, r *http.Request, ver string, db cache.
 				Str("engines", fmt.Sprintf("%v", enabledEngines)).
 				Msg("Error while setting currencies in cache")
 		}
+	} else {
+		// Use the cached currencies.
+		exch = exchange.NewExchange(base, enabledEngines[:], currencies)
 	}
+
+	// Check if FROM and TO are supported currencies.
+	if !exch.SupportsCurrency(from) {
+		// User error.
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: "unsupported from currency",
+			Value:   from.String(),
+		})
+	}
+	if !exch.SupportsCurrency(to) {
+		// User error.
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: "unsupported to currency",
+			Value:   to.String(),
+		})
+	}
+
+	// Convert the amount.
+	convAmount := exch.Convert(from, to, amount)
 
 	return writeResponseJSON(w, http.StatusOK, ExchangeResponse{
 		responseBase{

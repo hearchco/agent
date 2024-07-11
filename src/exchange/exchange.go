@@ -1,7 +1,6 @@
 package exchange
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/hearchco/agent/src/exchange/currency"
@@ -9,7 +8,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// TODO: Test caching with private fields.
 type Exchange struct {
 	base       currency.Currency
 	currencies currency.Currencies
@@ -57,13 +55,19 @@ func (e Exchange) Currencies() currency.Currencies {
 	return e.currencies
 }
 
-func (e Exchange) Convert(from currency.Currency, to currency.Currency, amount float64) (float64, error) {
-	// Check if FROM and TO currencies are supported.
-	if _, ok := e.currencies[from]; !ok {
-		return -1, fmt.Errorf("unsupported FROM currency: %s", from)
-	}
-	if _, ok := e.currencies[to]; !ok {
-		return -1, fmt.Errorf("unsupported TO currency: %s", to)
+func (e Exchange) SupportsCurrency(curr currency.Currency) bool {
+	_, ok := e.currencies[curr]
+	return ok
+}
+
+func (e Exchange) Convert(from currency.Currency, to currency.Currency, amount float64) float64 {
+	// Check if FROM and TO are supported currencies.
+	if !e.SupportsCurrency(from) || !e.SupportsCurrency(to) {
+		log.Panic().
+			Str("from", from.String()).
+			Str("to", to.String()).
+			Msg("Unsupported currencies")
+		// ^PANIC - This should never happen.
 	}
 
 	// Convert the amount in FROM currency to base currency.
@@ -72,5 +76,5 @@ func (e Exchange) Convert(from currency.Currency, to currency.Currency, amount f
 	// Convert the amount in base currency to TO currency.
 	convertedAmount := basedAmount * e.currencies[to]
 
-	return convertedAmount, nil
+	return convertedAmount
 }
