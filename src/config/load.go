@@ -244,6 +244,7 @@ func (c *Config) fromReader(rc ReaderConfig) {
 			log.Panic().
 				Caller().
 				Err(err).
+				Str("engine", engS).
 				Msg("Failed converting string to engine name")
 			// ^PANIC
 		}
