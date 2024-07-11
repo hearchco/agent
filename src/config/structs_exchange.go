@@ -30,8 +30,6 @@ type ReaderExchangeTimings struct {
 	// Hard timeout after which the search is forcefully stopped (even if the engines didn't respond).
 	HardTimeout string `koanf:"hardtimeout"`
 }
-
-// Delegates Delay, RandomDelay, Parallelism to colly.Collector.Limit().
 type ExchangeTimings struct {
 	// Hard timeout after which the search is forcefully stopped (even if the engines didn't respond).
 	HardTimeout time.Duration
