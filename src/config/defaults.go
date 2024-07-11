@@ -17,7 +17,8 @@ func New() Config {
 				Type:      "none",
 				KeyPrefix: "HEARCHCO_",
 				TTL: TTL{
-					Time: moretime.Week,
+					Results:    moretime.Week,
+					Currencies: moretime.Day,
 				},
 				Redis: Redis{
 					Host: "localhost",
@@ -77,6 +78,10 @@ func New() Config {
 				Ranking:                  thoroughRanking(),
 				Timings:                  thoroughTimings,
 			},
+		},
+		Exchange: Exchange{
+			Engines: exchangeEngines,
+			Timings: exchangeTimings,
 		},
 	}
 }

@@ -1,10 +1,12 @@
 package exchange
 
 import (
+	"context"
+	"fmt"
 	"sync"
 
+	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/exchange/currency"
-	"github.com/hearchco/agent/src/exchange/engines"
 	"github.com/rs/zerolog/log"
 )
 
@@ -13,7 +15,7 @@ type Exchange struct {
 	currencies currency.Currencies
 }
 
-func NewExchange(base currency.Currency, enabledEngines []engines.Name, currencies ...currency.Currencies) Exchange {
+func NewExchange(base currency.Currency, conf config.Exchange, currencies ...currency.Currencies) Exchange {
 	// If currencies are provided, use them.
 	if len(currencies) > 0 {
 		return Exchange{
@@ -26,9 +28,23 @@ func NewExchange(base currency.Currency, enabledEngines []engines.Name, currenci
 	exchangers := exchangerArray()
 	currencyMap := currency.NewCurrencyMap()
 
+	// Create context with HardTimeout.
+	ctxHardTimeout, cancelHardTimeoutFunc := context.WithTimeout(context.Background(), conf.Timings.HardTimeout)
+	defer cancelHardTimeoutFunc()
+
+	// Create a WaitGroup for all engines.
 	var wg sync.WaitGroup
-	wg.Add(enginerLen - 1) // -1 because of UNDEFINED
-	for _, eng := range enabledEngines {
+	wg.Add(len(conf.Engines))
+
+	// Create a context that cancels when the WaitGroup is done.
+	exchangeCtx, cancelExchange := context.WithCancel(context.Background())
+	defer cancelExchange()
+	go func() {
+		wg.Wait()
+		cancelExchange()
+	}()
+
+	for _, eng := range conf.Engines {
 		exch := exchangers[eng]
 		go func() {
 			defer wg.Done()
@@ -43,7 +59,20 @@ func NewExchange(base currency.Currency, enabledEngines []engines.Name, currenci
 			currencyMap.Append(currs)
 		}()
 	}
-	wg.Wait()
+
+	// Wait for either all engines to finish or the HardTimeout.
+	select {
+	case <-exchangeCtx.Done():
+		log.Trace().
+			Dur("timeout", conf.Timings.HardTimeout).
+			Str("engines", fmt.Sprintf("%v", conf.Engines)).
+			Msg("All engines finished")
+	case <-ctxHardTimeout.Done():
+		log.Trace().
+			Dur("timeout", conf.Timings.HardTimeout).
+			Str("engines", fmt.Sprintf("%v", conf.Engines)).
+			Msg("HardTimeout reached")
+	}
 
 	return Exchange{
 		base,

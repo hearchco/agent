@@ -21,7 +21,7 @@ import (
 	"github.com/hearchco/agent/src/utils/gotypelimits"
 )
 
-func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf map[category.Name]config.Category, ttlConf config.TTL, db cache.DB, salt string) error {
+func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf map[category.Name]config.Category, db cache.DB, ttl time.Duration, salt string) error {
 	// Capture start time.
 	startTime := time.Now()
 
@@ -173,7 +173,7 @@ func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf ma
 	rankedRes.Rank(catsConf[categoryName].Ranking)
 
 	// Store the results in cache.
-	if err := db.SetResults(query, categoryName, opts, rankedRes, ttlConf.Time); err != nil {
+	if err := db.SetResults(query, categoryName, opts, rankedRes, ttl); err != nil {
 		log.Error().
 			Err(err).
 			Str("query", anonymize.String(query)).

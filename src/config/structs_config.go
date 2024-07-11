@@ -8,8 +8,10 @@ import (
 type ReaderConfig struct {
 	Server      ReaderServer                     `koanf:"server"`
 	RCategories map[category.Name]ReaderCategory `koanf:"categories"`
+	RExchange   ReaderExchange                   `koanf:"exchange"`
 }
 type Config struct {
 	Server     Server
 	Categories map[category.Name]Category
+	Exchange   Exchange
 }

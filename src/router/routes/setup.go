@@ -9,7 +9,6 @@ import (
 	"github.com/hearchco/agent/src/cache"
 	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search/category"
-	"github.com/hearchco/agent/src/utils/moretime"
 )
 
 func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
@@ -39,7 +38,7 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 
 	// /search
 	mux.Get("/search", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSearch(w, r, ver, conf.Categories, conf.Server.Cache.TTL, db, conf.Server.ImageProxy.Salt)
+		err := routeSearch(w, r, ver, conf.Categories, db, conf.Server.Cache.TTL.Results, conf.Server.ImageProxy.Salt)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -49,7 +48,7 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 	mux.Post("/search", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSearch(w, r, ver, conf.Categories, conf.Server.Cache.TTL, db, conf.Server.ImageProxy.Salt)
+		err := routeSearch(w, r, ver, conf.Categories, db, conf.Server.Cache.TTL.Results, conf.Server.ImageProxy.Salt)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -81,12 +80,9 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 
-	// TODO: Make exchange TTL configurable.
-	exchTTL := moretime.Day
-
 	// /exchange
 	mux.Get("/exchange", func(w http.ResponseWriter, r *http.Request) {
-		err := routeExchange(w, r, ver, db, exchTTL)
+		err := routeExchange(w, r, ver, conf.Exchange, db, conf.Server.Cache.TTL.Currencies)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -96,7 +92,7 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 	mux.Post("/exchange", func(w http.ResponseWriter, r *http.Request) {
-		err := routeExchange(w, r, ver, db, exchTTL)
+		err := routeExchange(w, r, ver, conf.Exchange, db, conf.Server.Cache.TTL.Currencies)
 		if err != nil {
 			log.Error().
 				Err(err).

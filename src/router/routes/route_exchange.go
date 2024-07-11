@@ -8,13 +8,13 @@ import (
 	"time"
 
 	"github.com/hearchco/agent/src/cache"
+	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/exchange"
 	"github.com/hearchco/agent/src/exchange/currency"
-	"github.com/hearchco/agent/src/exchange/engines"
 	"github.com/rs/zerolog/log"
 )
 
-func routeExchange(w http.ResponseWriter, r *http.Request, ver string, db cache.DB, ttl time.Duration) error {
+func routeExchange(w http.ResponseWriter, r *http.Request, ver string, conf config.Exchange, db cache.DB, ttl time.Duration) error {
 	// Capture start time.
 	startTime := time.Now()
 
@@ -91,17 +91,13 @@ func routeExchange(w http.ResponseWriter, r *http.Request, ver string, db cache.
 		})
 	}
 
-	// TODO: Make base currency and enabled engines configurable.
-	const base currency.Currency = "EUR"
-	enabledEngines := [...]engines.Name{engines.CURRENCYAPI, engines.EXCHANGERATEAPI, engines.FRANKFURTER}
-
 	// Get the cached currencies.
-	currencies, err := db.GetCurrencies(base, enabledEngines[:])
+	currencies, err := db.GetCurrencies(currency.Base, conf.Engines)
 	if err != nil {
 		log.Error().
 			Err(err).
-			Str("base", base.String()).
-			Str("engines", fmt.Sprintf("%v", enabledEngines)).
+			Str("base", currency.Base.String()).
+			Str("engines", fmt.Sprintf("%v", conf.Engines)).
 			Msg("Error while getting currencies from cache")
 	}
 
@@ -109,19 +105,21 @@ func routeExchange(w http.ResponseWriter, r *http.Request, ver string, db cache.
 	var exch exchange.Exchange
 	if currencies == nil {
 		// Fetch the currencies from the enabled engines.
-		exch = exchange.NewExchange(base, enabledEngines[:])
-		// Cache the currencies.
-		err := db.SetCurrencies(base, enabledEngines[:], exch.Currencies(), ttl)
-		if err != nil {
-			log.Error().
-				Err(err).
-				Str("base", base.String()).
-				Str("engines", fmt.Sprintf("%v", enabledEngines)).
-				Msg("Error while setting currencies in cache")
+		exch = exchange.NewExchange(currency.Base, conf)
+		// Cache the currencies if any have been fetched.
+		if len(exch.Currencies()) > 0 {
+			err := db.SetCurrencies(currency.Base, conf.Engines, exch.Currencies(), ttl)
+			if err != nil {
+				log.Error().
+					Err(err).
+					Str("base", currency.Base.String()).
+					Str("engines", fmt.Sprintf("%v", conf.Engines)).
+					Msg("Error while setting currencies in cache")
+			}
 		}
 	} else {
 		// Use the cached currencies.
-		exch = exchange.NewExchange(base, enabledEngines[:], currencies)
+		exch = exchange.NewExchange(currency.Base, conf, currencies)
 	}
 
 	// Check if FROM and TO are supported currencies.
@@ -148,7 +146,7 @@ func routeExchange(w http.ResponseWriter, r *http.Request, ver string, db cache.
 			ver,
 			time.Since(startTime).Milliseconds(),
 		},
-		base,
+		currency.Base,
 		from,
 		to,
 		amount,

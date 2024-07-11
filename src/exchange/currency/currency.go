@@ -5,8 +5,11 @@ import (
 	"strings"
 )
 
-// Format: ISO 4217 (3-letter code) e.g. USD, EUR, GBP
+// Format: ISO 4217 (3-letter code) e.g. USD, EUR, GBP.
 type Currency string
+
+// TODO: Make base currency configurable.
+const Base Currency = "EUR"
 
 func (c Currency) String() string {
 	return string(c)
