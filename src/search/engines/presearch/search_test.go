@@ -32,7 +32,7 @@ func TestSearch(t *testing.T) {
 	}}
 
 	se := New()
-	se.Init(context.Background(), conf.Categories[category.GENERAL].Timings)
+	se.InitSearcher(context.Background(), conf.Categories[category.GENERAL].Timings)
 
 	_engines_test.CheckTestCases(t, se, tchar, tccr, tcrr)
 }

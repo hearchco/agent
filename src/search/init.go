@@ -11,7 +11,7 @@ import (
 func initializeSearchers(ctx context.Context, engs []engines.Name, timings config.CategoryTimings) []scraper.Searcher {
 	searchers := searcherArray()
 	for _, engName := range engs {
-		searchers[engName].Init(ctx, timings)
+		searchers[engName].InitSearcher(ctx, timings)
 	}
 	return searchers[:]
 }
@@ -19,7 +19,7 @@ func initializeSearchers(ctx context.Context, engs []engines.Name, timings confi
 func initializeSuggesters(ctx context.Context, engs []engines.Name, timings config.CategoryTimings) []scraper.Suggester {
 	suggesters := suggesterArray()
 	for _, engName := range engs {
-		suggesters[engName].InitSuggest(ctx, timings)
+		suggesters[engName].InitSuggester(ctx, timings)
 	}
 	return suggesters[:]
 }

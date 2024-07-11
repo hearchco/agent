@@ -10,6 +10,6 @@ import (
 
 func TestSuggest(t *testing.T) {
 	se := New()
-	se.Init(context.Background(), config.CategoryTimings{})
+	se.InitSuggester(context.Background(), config.CategoryTimings{})
 	_engines_test.CheckSuggest(t, se, "test")
 }

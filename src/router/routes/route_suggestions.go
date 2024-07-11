@@ -60,8 +60,18 @@ func routeSuggest(w http.ResponseWriter, r *http.Request, ver string, catConf co
 		})
 	}
 
+	// All of these have default values set and validated.
+	opts := options.Options{
+		Pages: options.Pages{
+			Start: 0,
+			Max:   1,
+		},
+		Locale:     locale,
+		SafeSearch: false,
+	}
+
 	// Search for suggestions.
-	scrapedSugs, err := search.Suggest(query, locale, catConf)
+	scrapedSugs, err := search.Suggest(query, opts, catConf)
 	if err != nil {
 		// Server error.
 		werr := writeResponseJSON(w, http.StatusInternalServerError, ErrorResponse{

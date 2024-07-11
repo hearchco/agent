@@ -14,13 +14,14 @@ type Enginer interface {
 	GetName() engines.Name
 	GetOrigins() []engines.Name
 	Init(context.Context, config.CategoryTimings)
-	ReInit(context.Context)
 }
 
 // Interface that each search engine must implement to support searching.
 type Searcher interface {
 	Enginer
 
+	InitSearcher(context.Context, config.CategoryTimings)
+	ReInitSearcher(context.Context)
 	Search(string, options.Options, chan result.ResultScraped) ([]error, bool)
 }
 
@@ -28,6 +29,7 @@ type Searcher interface {
 type Suggester interface {
 	Enginer
 
-	InitSuggest(ctx context.Context, timings config.CategoryTimings)
-	Suggest(string, options.Locale, chan result.SuggestionScraped) ([]error, bool)
+	InitSuggester(context.Context, config.CategoryTimings)
+	ReInitSuggester(context.Context)
+	Suggest(string, options.Options, chan result.SuggestionScraped) ([]error, bool)
 }

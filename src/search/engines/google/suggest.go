@@ -14,7 +14,7 @@ import (
 	"github.com/hearchco/agent/src/utils/morestrings"
 )
 
-func (se Engine) Suggest(query string, locale options.Locale, sugChan chan result.SuggestionScraped) ([]error, bool) {
+func (se Engine) Suggest(query string, options options.Options, sugChan chan result.SuggestionScraped) ([]error, bool) {
 	foundResults := atomic.Bool{}
 	retErrors := make([]error, 0, 1)
 

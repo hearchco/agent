@@ -30,24 +30,30 @@ func (e EngineBase) GetOrigins() []engines.Name {
 // Used to initialize the EngineBase collector.
 func (e *EngineBase) Init(ctx context.Context, timings config.CategoryTimings) {
 	e.timings = timings
-	e.initCollectorSearcher(ctx)
 	e.initLimitRule(timings)
 	e.initCollectorOnRequest(ctx)
 	e.initCollectorOnResponse()
 	e.initCollectorOnError()
+}
+
+// Used to initialize the EngineBase collector for searching.
+func (e *EngineBase) InitSearcher(ctx context.Context, timings config.CategoryTimings) {
+	e.initCollectorSearcher(ctx)
+	e.Init(ctx, timings)
 }
 
 // Used to initialize the EngineBase collector for suggesting.
-func (e *EngineBase) InitSuggest(ctx context.Context, timings config.CategoryTimings) {
-	e.timings = timings
+func (e *EngineBase) InitSuggester(ctx context.Context, timings config.CategoryTimings) {
 	e.initCollectorSuggester(ctx)
-	e.initLimitRule(timings)
-	e.initCollectorOnRequest(ctx)
-	e.initCollectorOnResponse()
-	e.initCollectorOnError()
+	e.Init(ctx, timings)
 }
 
 // Used to allow re-running the Search method.
-func (e *EngineBase) ReInit(ctx context.Context) {
-	e.Init(ctx, e.timings)
+func (e *EngineBase) ReInitSearcher(ctx context.Context) {
+	e.InitSearcher(ctx, e.timings)
+}
+
+// Used to allow re-running the Suggest method.
+func (e *EngineBase) ReInitSuggester(ctx context.Context) {
+	e.InitSuggester(ctx, e.timings)
 }
