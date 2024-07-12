@@ -62,12 +62,18 @@ type Cache struct {
 type ReaderTTL struct {
 	// How long to store the results in cache.
 	// Setting this to 0 caches the results forever.
-	Time string `koanf:"time"`
+	Results string `koanf:"time"`
+	// How long to store the currencies in cache.
+	// Setting this to 0 caches the currencies forever.
+	Currencies string `koanf:"currencies"`
 }
 type TTL struct {
 	// How long to store the results in cache.
 	// Setting this to 0 caches the results forever.
-	Time time.Duration
+	Results time.Duration
+	// How long to store the currencies in cache.
+	// Setting this to 0 caches the currencies forever.
+	Currencies time.Duration
 }
 
 type Redis struct {

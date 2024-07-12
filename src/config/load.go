@@ -12,6 +12,8 @@ import (
 	"github.com/knadh/koanf/v2"
 	"github.com/rs/zerolog/log"
 
+	"github.com/hearchco/agent/src/exchange/currency"
+	exchengines "github.com/hearchco/agent/src/exchange/engines"
 	"github.com/hearchco/agent/src/search/category"
 	"github.com/hearchco/agent/src/search/engines"
 	"github.com/hearchco/agent/src/utils/moretime"
@@ -80,7 +82,8 @@ func (c Config) getReader() ReaderConfig {
 			Cache: ReaderCache{
 				Type: c.Server.Cache.Type,
 				TTL: ReaderTTL{
-					Time: moretime.ConvertToFancyTime(c.Server.Cache.TTL.Time),
+					Results:    moretime.ConvertToFancyTime(c.Server.Cache.TTL.Results),
+					Currencies: moretime.ConvertToFancyTime(c.Server.Cache.TTL.Currencies),
 				},
 				Redis: c.Server.Cache.Redis,
 			},
@@ -91,6 +94,14 @@ func (c Config) getReader() ReaderConfig {
 		},
 		// Initialize the categories map.
 		RCategories: map[category.Name]ReaderCategory{},
+		// Exchange config.
+		RExchange: ReaderExchange{
+			BaseCurrency: c.Exchange.BaseCurrency.String(),
+			REngines:     map[string]ReaderExchangeEngine{},
+			RTimings: ReaderExchangeTimings{
+				HardTimeout: moretime.ConvertToFancyTime(c.Exchange.Timings.HardTimeout),
+			},
+		},
 	}
 
 	// Set the categories map config.
@@ -124,6 +135,13 @@ func (c Config) getReader() ReaderConfig {
 		}
 	}
 
+	// Set the exchange engines.
+	for _, eng := range c.Exchange.Engines {
+		rc.RExchange.REngines[eng.ToLower()] = ReaderExchangeEngine{
+			Enabled: true,
+		}
+	}
+
 	return rc
 }
 
@@ -144,7 +162,8 @@ func (c *Config) fromReader(rc ReaderConfig) {
 			Cache: Cache{
 				Type: rc.Server.Cache.Type,
 				TTL: TTL{
-					Time: moretime.ConvertFromFancyTime(rc.Server.Cache.TTL.Time),
+					Results:    moretime.ConvertFromFancyTime(rc.Server.Cache.TTL.Results),
+					Currencies: moretime.ConvertFromFancyTime(rc.Server.Cache.TTL.Currencies),
 				},
 				Redis: rc.Server.Cache.Redis,
 			},
@@ -155,6 +174,14 @@ func (c *Config) fromReader(rc ReaderConfig) {
 		},
 		// Initialize the categories map.
 		Categories: map[category.Name]Category{},
+		// Exchange config.
+		Exchange: Exchange{
+			BaseCurrency: currency.ConvertBase(rc.RExchange.BaseCurrency),
+			Engines:      []exchengines.Name{},
+			Timings: ExchangeTimings{
+				HardTimeout: moretime.ConvertFromFancyTime(rc.RExchange.RTimings.HardTimeout),
+			},
+		},
 	}
 
 	// Set the categories map config.
@@ -210,6 +237,22 @@ func (c *Config) fromReader(rc ReaderConfig) {
 			PreferredByOriginEngines: engPreferredByOrigin,
 			Ranking:                  catRConf.Ranking,
 			Timings:                  timingsConf,
+		}
+	}
+
+	// Set the exchange engines.
+	for engS, engRConf := range rc.RExchange.REngines {
+		engName, err := exchengines.NameString(engS)
+		if err != nil {
+			log.Panic().
+				Caller().
+				Err(err).
+				Str("engine", engS).
+				Msg("Failed converting string to engine name")
+			// ^PANIC
+		}
+		if engRConf.Enabled {
+			nc.Exchange.Engines = append(nc.Exchange.Engines, engName)
 		}
 	}
 

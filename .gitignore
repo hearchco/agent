@@ -39,6 +39,7 @@ profiling/
 *_stringer.go
 *_enumer.go
 *_enginer.go
+*_exchanger.go
 
 # test dump
 testdump*

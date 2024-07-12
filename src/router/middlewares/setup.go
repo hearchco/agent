@@ -13,7 +13,6 @@ import (
 
 func Setup(mux *chi.Mux, lgr zerolog.Logger, frontendUrls []string, serveProfiler bool) {
 	// Use custom zerolog middleware.
-	// TODO: Make skipped paths configurable.
 	skipPaths := []string{"/healthz", "/versionz"}
 	mux.Use(zerologMiddleware(lgr, skipPaths)...)
 
