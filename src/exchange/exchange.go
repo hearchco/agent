@@ -15,11 +15,11 @@ type Exchange struct {
 	currencies currency.Currencies
 }
 
-func NewExchange(base currency.Currency, conf config.Exchange, currencies ...currency.Currencies) Exchange {
+func NewExchange(conf config.Exchange, currencies ...currency.Currencies) Exchange {
 	// If currencies are provided, use them.
 	if len(currencies) > 0 {
 		return Exchange{
-			base,
+			conf.BaseCurrency,
 			currencies[0],
 		}
 	}
@@ -48,7 +48,7 @@ func NewExchange(base currency.Currency, conf config.Exchange, currencies ...cur
 		exch := exchangers[eng]
 		go func() {
 			defer wg.Done()
-			currs, err := exch.Exchange(base)
+			currs, err := exch.Exchange(conf.BaseCurrency)
 			if err != nil {
 				log.Error().
 					Err(err).
@@ -75,7 +75,7 @@ func NewExchange(base currency.Currency, conf config.Exchange, currencies ...cur
 	}
 
 	return Exchange{
-		base,
+		conf.BaseCurrency,
 		currencyMap.Extract(),
 	}
 }

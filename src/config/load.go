@@ -12,6 +12,7 @@ import (
 	"github.com/knadh/koanf/v2"
 	"github.com/rs/zerolog/log"
 
+	"github.com/hearchco/agent/src/exchange/currency"
 	exchengines "github.com/hearchco/agent/src/exchange/engines"
 	"github.com/hearchco/agent/src/search/category"
 	"github.com/hearchco/agent/src/search/engines"
@@ -95,7 +96,8 @@ func (c Config) getReader() ReaderConfig {
 		RCategories: map[category.Name]ReaderCategory{},
 		// Exchange config.
 		RExchange: ReaderExchange{
-			REngines: map[string]ReaderExchangeEngine{},
+			BaseCurrency: c.Exchange.BaseCurrency.String(),
+			REngines:     map[string]ReaderExchangeEngine{},
 			RTimings: ReaderExchangeTimings{
 				HardTimeout: moretime.ConvertToFancyTime(c.Exchange.Timings.HardTimeout),
 			},
@@ -174,7 +176,8 @@ func (c *Config) fromReader(rc ReaderConfig) {
 		Categories: map[category.Name]Category{},
 		// Exchange config.
 		Exchange: Exchange{
-			Engines: []exchengines.Name{},
+			BaseCurrency: currency.ConvertBase(rc.RExchange.BaseCurrency),
+			Engines:      []exchengines.Name{},
 			Timings: ExchangeTimings{
 				HardTimeout: moretime.ConvertFromFancyTime(rc.RExchange.RTimings.HardTimeout),
 			},

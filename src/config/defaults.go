@@ -80,8 +80,9 @@ func New() Config {
 			},
 		},
 		Exchange: Exchange{
-			Engines: exchangeEngines,
-			Timings: exchangeTimings,
+			BaseCurrency: "EUR",
+			Engines:      exchangeEngines,
+			Timings:      exchangeTimings,
 		},
 	}
 }

@@ -2,14 +2,14 @@ package currency
 
 import (
 	"fmt"
+	"slices"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
 
-// Format: ISO 4217 (3-letter code) e.g. USD, EUR, GBP.
+// Format: ISO 4217 (3-letter code) e.g. CHF, EUR, GBP, USD.
 type Currency string
-
-// TODO: Make base currency configurable.
-const Base Currency = "EUR"
 
 func (c Currency) String() string {
 	return string(c)
@@ -26,4 +26,19 @@ func Convert(curr string) (Currency, error) {
 
 	upperCurr := strings.ToUpper(curr)
 	return Currency(upperCurr), nil
+}
+
+func ConvertBase(curr string) Currency {
+	// Hardcoded to ensure all APIs include these currencies and therefore work as expected.
+	supportedBaseCurrencies := [...]string{"CHF", "EUR", "GBP", "USD"}
+
+	upperCurr := strings.ToUpper(curr)
+	if !slices.Contains(supportedBaseCurrencies[:], upperCurr) {
+		log.Panic().
+			Str("currency", upperCurr).
+			Msg("unsupported base currency")
+		// ^PANIC
+	}
+
+	return Currency(upperCurr)
 }

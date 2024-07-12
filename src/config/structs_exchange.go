@@ -3,17 +3,20 @@ package config
 import (
 	"time"
 
+	"github.com/hearchco/agent/src/exchange/currency"
 	"github.com/hearchco/agent/src/exchange/engines"
 )
 
 // ReaderCategory is format in which the config is read from the config file and environment variables.
 type ReaderExchange struct {
-	REngines map[string]ReaderExchangeEngine `koanf:"engines"`
-	RTimings ReaderExchangeTimings           `koanf:"timings"`
+	BaseCurrency string                          `koanf:"basecurrency"`
+	REngines     map[string]ReaderExchangeEngine `koanf:"engines"`
+	RTimings     ReaderExchangeTimings           `koanf:"timings"`
 }
 type Exchange struct {
-	Engines []engines.Name
-	Timings ExchangeTimings
+	BaseCurrency currency.Currency
+	Engines      []engines.Name
+	Timings      ExchangeTimings
 }
 
 // ReaderEngine is format in which the config is read from the config file and environment variables.

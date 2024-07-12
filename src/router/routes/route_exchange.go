@@ -92,11 +92,11 @@ func routeExchange(w http.ResponseWriter, r *http.Request, ver string, conf conf
 	}
 
 	// Get the cached currencies.
-	currencies, err := db.GetCurrencies(currency.Base, conf.Engines)
+	currencies, err := db.GetCurrencies(conf.BaseCurrency, conf.Engines)
 	if err != nil {
 		log.Error().
 			Err(err).
-			Str("base", currency.Base.String()).
+			Str("base", conf.BaseCurrency.String()).
 			Str("engines", fmt.Sprintf("%v", conf.Engines)).
 			Msg("Error while getting currencies from cache")
 	}
@@ -105,35 +105,35 @@ func routeExchange(w http.ResponseWriter, r *http.Request, ver string, conf conf
 	var exch exchange.Exchange
 	if currencies == nil {
 		// Fetch the currencies from the enabled engines.
-		exch = exchange.NewExchange(currency.Base, conf)
+		exch = exchange.NewExchange(conf)
 		// Cache the currencies if any have been fetched.
 		if len(exch.Currencies()) > 0 {
-			err := db.SetCurrencies(currency.Base, conf.Engines, exch.Currencies(), ttl)
+			err := db.SetCurrencies(conf.BaseCurrency, conf.Engines, exch.Currencies(), ttl)
 			if err != nil {
 				log.Error().
 					Err(err).
-					Str("base", currency.Base.String()).
+					Str("base", conf.BaseCurrency.String()).
 					Str("engines", fmt.Sprintf("%v", conf.Engines)).
 					Msg("Error while setting currencies in cache")
 			}
 		}
 	} else {
 		// Use the cached currencies.
-		exch = exchange.NewExchange(currency.Base, conf, currencies)
+		exch = exchange.NewExchange(conf, currencies)
 	}
 
 	// Check if FROM and TO are supported currencies.
 	if !exch.SupportsCurrency(from) {
 		// User error.
 		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
-			Message: "unsupported from currency",
+			Message: "unsupported FROM currency",
 			Value:   from.String(),
 		})
 	}
 	if !exch.SupportsCurrency(to) {
 		// User error.
 		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
-			Message: "unsupported to currency",
+			Message: "unsupported TO currency",
 			Value:   to.String(),
 		})
 	}
@@ -146,7 +146,7 @@ func routeExchange(w http.ResponseWriter, r *http.Request, ver string, conf conf
 			ver,
 			time.Since(startTime).Milliseconds(),
 		},
-		currency.Base,
+		conf.BaseCurrency,
 		from,
 		to,
 		amount,

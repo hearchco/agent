@@ -1,7 +1,6 @@
 package currencyapi
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -26,22 +25,23 @@ func (e Exchange) Exchange(base currency.Currency) (currency.Currencies, error) 
 	}
 
 	// Unmarshal the response.
-	var data response
-	if err := json.Unmarshal(body, &data); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	dataRates, err := extractRatesFromResp(string(body), base)
+	if err != nil {
+		return nil, fmt.Errorf("failed to extract rates from response: %w", err)
 	}
 
 	// Check if no rates were found.
-	if len(data.Rates) == 0 {
+	if len(dataRates) == 0 {
 		return nil, fmt.Errorf("no rates found for %s", base)
 	}
 
 	// Convert the rates to proper currency types with their rates.
-	rates := make(currency.Currencies, len(data.Rates))
-	for currS, rate := range data.Rates {
+	rates := make(currency.Currencies, len(dataRates))
+	for currS, rate := range dataRates {
 		curr, err := currency.Convert(currS)
 		if err != nil {
-			log.Error().
+			// Non-ISO currencies are expected from this engine.
+			log.Trace().
 				Err(err).
 				Str("currency", currS).
 				Msg("failed to convert currency")
