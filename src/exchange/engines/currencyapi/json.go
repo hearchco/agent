@@ -10,7 +10,7 @@ import (
 )
 
 // Rates field is named the same as base currency.
-func extractRatesFromResp(resp string, base currency.Currency) (map[string]float64, error) {
+func (e Exchange) extractRates(resp string, base currency.Currency) (map[string]float64, error) {
 	pattern := `"` + base.Lower() + `":\s*{[^}]*}`
 	regexp := regexp.MustCompile(pattern)
 	match := regexp.FindString(resp)

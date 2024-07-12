@@ -4,14 +4,12 @@ import (
 	"github.com/hearchco/agent/src/exchange/currency"
 )
 
-type Exchange struct {
-	apiUrl string
-}
+type Exchange struct{}
 
 func New() Exchange {
-	return Exchange{apiUrl}
+	return Exchange{}
 }
 
 func (e Exchange) apiUrlWithBaseCurrency(base currency.Currency) string {
-	return e.apiUrl + "/" + base.Lower() + ".json"
+	return apiUrl + "/" + base.Lower() + ".json"
 }

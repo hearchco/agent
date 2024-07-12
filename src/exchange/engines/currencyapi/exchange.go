@@ -25,7 +25,7 @@ func (e Exchange) Exchange(base currency.Currency) (currency.Currencies, error) 
 	}
 
 	// Unmarshal the response.
-	dataRates, err := extractRatesFromResp(string(body), base)
+	dataRates, err := e.extractRates(string(body), base)
 	if err != nil {
 		return nil, fmt.Errorf("failed to extract rates from response: %w", err)
 	}
