@@ -36,3 +36,10 @@ type ExchangeResponse struct {
 	Amount float64           `json:"amount"`
 	Result float64           `json:"result"`
 }
+
+type CurrenciesResponse struct {
+	responseBase
+
+	Base       currency.Currency   `json:"base"`
+	Currencies currency.Currencies `json:"currencies"`
+}

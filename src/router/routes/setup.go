@@ -102,6 +102,28 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 
+	// /currencies
+	mux.Get("/currencies", func(w http.ResponseWriter, r *http.Request) {
+		err := routeCurrencies(w, ver, conf.Exchange, db, conf.Server.Cache.TTL.Currencies)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("path", r.URL.Path).
+				Str("method", r.Method).
+				Msg("Failed to send response")
+		}
+	})
+	mux.Post("/currencies", func(w http.ResponseWriter, r *http.Request) {
+		err := routeCurrencies(w, ver, conf.Exchange, db, conf.Server.Cache.TTL.Currencies)
+		if err != nil {
+			log.Error().
+				Err(err).
+				Str("path", r.URL.Path).
+				Str("method", r.Method).
+				Msg("Failed to send response")
+		}
+	})
+
 	// /proxy
 	mux.Get("/proxy", func(w http.ResponseWriter, r *http.Request) {
 		err := routeProxy(w, r, conf.Server.ImageProxy.Salt, conf.Server.ImageProxy.Timeout)
