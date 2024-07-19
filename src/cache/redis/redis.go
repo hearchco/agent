@@ -60,7 +60,7 @@ func (drv DRV) Set(k string, v any, ttl ...time.Duration) error {
 		setTtl = ttl[0]
 	}
 
-	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
+	key := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 	if val, err := json.Marshal(v); err != nil {
 		return fmt.Errorf("redis.Set(): error marshaling value: %w", err)
 	} else if err := drv.client.Set(drv.ctx, key, val, setTtl).Err(); err != nil {
@@ -75,7 +75,7 @@ func (drv DRV) Set(k string, v any, ttl ...time.Duration) error {
 }
 
 func (drv DRV) Get(k string, o any) error {
-	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
+	key := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
 	val, err := drv.client.Get(drv.ctx, key).Result()
 	if err == redis.Nil {
@@ -94,7 +94,7 @@ func (drv DRV) Get(k string, o any) error {
 
 // Returns time until the key expires, not the time it will be considered expired.
 func (drv DRV) GetTTL(k string) (time.Duration, error) {
-	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
+	key := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
 	// Returns time with time.Second precision.
 	expiresIn, err := drv.client.TTL(drv.ctx, key).Result()
