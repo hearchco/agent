@@ -3,7 +3,7 @@ server:
   cache:
     type: none
   imageproxy:
-    secret_key: changemepls
+    secretkey: changemepls
 # categories:
 #   science:
 #     engines:
