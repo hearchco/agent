@@ -40,7 +40,7 @@ func generateNonce(length int) string {
 func generateSignature(params string, nonce string) (string, error) {
 	rot13Nonce := rot13Switch(nonce)
 	data := "/web/search" + params + rot13Nonce
-	encData := anonymize.HashToSHA256B64(data)
+	encData := anonymize.CalculateHashBase64(data)
 	encData = strings.ReplaceAll(encData, "=", "")
 	encData = strings.ReplaceAll(encData, "+", "-")
 	encData = strings.ReplaceAll(encData, "/", "_")

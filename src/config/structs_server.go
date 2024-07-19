@@ -95,8 +95,8 @@ type DynamoDB struct {
 // Example: 1s, 1m, 1h, 1d, 1w, 1M, 1y.
 // If unit is not specified, it is assumed to be milliseconds.
 type ReaderImageProxy struct {
-	Salt    string `koanf:"salt"`
-	Timeout string `koanf:"timeout"`
+	SecretKey string `koanf:"secretkey"`
+	Timeout   string `koanf:"timeout"`
 }
 type ImageProxy struct {
 	Salt    string

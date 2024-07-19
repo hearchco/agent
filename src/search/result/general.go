@@ -109,7 +109,7 @@ func (r General) ConvertToOutput(salt string) ResultOutput {
 	return GeneralOutput{
 		generalOutputJSON{
 			r,
-			anonymize.HashToSHA256B64Salted(urlToVerify, salt),
+			anonymize.CalculateMACBase64(urlToVerify, salt),
 		},
 	}
 }

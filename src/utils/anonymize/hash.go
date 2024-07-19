@@ -1,22 +1,27 @@
 package anonymize
 
 import (
-	"crypto/sha256"
+	"crypto/hmac"
 	"encoding/base64"
+	"crypto/sha256"
 )
 
-func HashToSHA256B64(orig string) string {
+func CalculateHashBase64(message string) string {
 	hasher := sha256.New()
-	hasher.Write([]byte(orig))
+	hasher.Write([]byte(message))
 	hashedBinary := hasher.Sum(nil)
 	hashedString := base64.URLEncoding.EncodeToString(hashedBinary)
 	return hashedString
 }
 
-func HashToSHA256B64Salted(orig string, salt string) string {
-	return HashToSHA256B64(orig + salt)
+func CalculateMACBase64(message string, key string) string {
+	hasher := hmac.New(sha256.New, []byte(key)) 
+	hasher.Write([]byte(message))
+	hashedBinary := hasher.Sum(nil)
+	hashedString := base64.URLEncoding.EncodeToString(hashedBinary)
+	return hashedString
 }
 
-func VerifyHash(hash string, orig string, salt string) bool {
-	return hash == HashToSHA256B64Salted(orig, salt)
+func VerifyMACBase64(tag string, orig string, key string) bool {
+	return tag == CalculateMACBase64(orig, key)
 }

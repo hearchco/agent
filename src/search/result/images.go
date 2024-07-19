@@ -70,8 +70,8 @@ func (r Images) ConvertToOutput(salt string) ResultOutput {
 	return ImagesOutput{
 		imagesOutputJSON{
 			r,
-			anonymize.HashToSHA256B64Salted(r.URL(), salt),
-			anonymize.HashToSHA256B64Salted(r.ThumbnailURL(), salt),
+			anonymize.CalculateMACBase64(r.URL(), salt),
+			anonymize.CalculateMACBase64(r.ThumbnailURL(), salt),
 		},
 	}
 }

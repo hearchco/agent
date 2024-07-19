@@ -88,7 +88,7 @@ func (c Config) getReader() ReaderConfig {
 				Redis: c.Server.Cache.Redis,
 			},
 			ImageProxy: ReaderImageProxy{
-				Salt:    c.Server.ImageProxy.Salt,
+				SecretKey:    c.Server.ImageProxy.Salt,
 				Timeout: moretime.ConvertToFancyTime(c.Server.ImageProxy.Timeout),
 			},
 		},
@@ -147,7 +147,7 @@ func (c Config) getReader() ReaderConfig {
 
 // Passed as pointer since config is modified.
 func (c *Config) fromReader(rc ReaderConfig) {
-	if rc.Server.ImageProxy.Salt == "" {
+	if rc.Server.ImageProxy.SecretKey == "" {
 		log.Fatal().
 			Caller().
 			Msg("Image proxy salt is empty")
@@ -168,7 +168,7 @@ func (c *Config) fromReader(rc ReaderConfig) {
 				Redis: rc.Server.Cache.Redis,
 			},
 			ImageProxy: ImageProxy{
-				Salt:    rc.Server.ImageProxy.Salt,
+				Salt:    rc.Server.ImageProxy.SecretKey,
 				Timeout: moretime.ConvertFromFancyTime(rc.Server.ImageProxy.Timeout),
 			},
 		},

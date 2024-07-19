@@ -62,7 +62,7 @@ func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeout tim
 	}
 
 	// Check if hash is valid.
-	if !anonymize.VerifyHash(hashParam, urlToVerify, salt) {
+	if !anonymize.VerifyMACBase64(hashParam, urlToVerify, salt) {
 		// User error.
 		log.Debug().
 			Str("url", urlParam).

@@ -87,7 +87,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 			nextCtx.Put("isAPI", "true")
 
 			urll := fmt.Sprintf("https://presearch.com/results?id=%v", searchId)
-			anonUrll := fmt.Sprintf("https://presearch.com/results?id=%v", anonymize.HashToSHA256B64(searchId))
+			anonUrll := fmt.Sprintf("https://presearch.com/results?id=%v", anonymize.CalculateHashBase64(searchId))
 
 			if err := se.Get(nextCtx, urll, anonUrll); err != nil {
 				retErrors = append(retErrors, err)

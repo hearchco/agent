@@ -53,7 +53,7 @@ func (drv DRV) Set(k string, v any, ttl ...time.Duration) error {
 	log.Debug().Msg("Caching...")
 	cacheTimer := time.Now()
 
-	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
+	key := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 	item, err := json.Marshal(v)
 	if err != nil {
 		return fmt.Errorf("dynamodb.Set(): error marshaling value: %w", err)
@@ -82,7 +82,7 @@ func (drv DRV) Set(k string, v any, ttl ...time.Duration) error {
 }
 
 func (drv DRV) Get(k string, o any) error {
-	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
+	key := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
 	result, err := drv.client.GetItem(drv.ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(drv.tableName),
@@ -126,7 +126,7 @@ func (drv DRV) Get(k string, o any) error {
 }
 
 func (drv DRV) GetTTL(k string) (time.Duration, error) {
-	key := anonymize.HashToSHA256B64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
+	key := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
 	result, err := drv.client.GetItem(drv.ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(drv.tableName),

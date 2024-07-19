@@ -14,7 +14,7 @@ func TestHashToSHA256B64(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		hash := HashToSHA256B64(test.orig)
+		hash := CalculateHashBase64(test.orig)
 		if hash != test.expected {
 			t.Errorf("HashToSHA256B64(%q) = %q, want %q", test.orig, hash, test.expected)
 		}
