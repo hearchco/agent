@@ -145,8 +145,17 @@ func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf ma
 		// Convert the results to include the hashes (output format).
 		outpusRes := result.ConvertToOutput(cachedRes, salt)
 
+		// Create the response.
+		res := ResultsResponse{
+			responseBase{
+				ver,
+				time.Since(startTime).Milliseconds(),
+			},
+			outpusRes,
+		}
+
 		// If writing response failes, return the error.
-		return writeResponseJSON(w, http.StatusOK, outpusRes)
+		return writeResponseJSON(w, http.StatusOK, res)
 	} else {
 		log.Debug().
 			Str("query", anonymize.String(query)).

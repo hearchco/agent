@@ -25,7 +25,20 @@ type DRV struct {
 }
 
 func New(ctx context.Context, keyPrefix string, conf config.DynamoDB) (DRV, error) {
-	cfg, err := awsconfig.LoadDefaultConfig(ctx, awsconfig.WithRegion(conf.Region))
+	var cfg aws.Config
+	var err error
+
+	if conf.Region == "" || conf.Region == "global" {
+		log.Info().
+			Msg("Using a global DynamoDB table")
+		cfg, err = awsconfig.LoadDefaultConfig(ctx)
+	} else {
+		log.Info().
+			Str("region", conf.Region).
+			Msg("Using a regional DynamoDB table")
+		cfg, err = awsconfig.LoadDefaultConfig(ctx, awsconfig.WithRegion(conf.Region))
+	}
+
 	if err != nil {
 		log.Error().Err(err).Msg("Error loading AWS config")
 		return DRV{}, err
