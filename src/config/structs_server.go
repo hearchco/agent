@@ -33,7 +33,7 @@ type Server struct {
 
 // ReaderCache is format in which the config is read from the config file and environment variables.
 type ReaderCache struct {
-	// Can be "none" or "redis".
+	// Can be "none", "redis" or "dynamodb".
 	Type string `koanf:"type"`
 	// Prefix to use for cache keys.
 	KeyPrefix string `koanf:"keyprefix"`
@@ -41,9 +41,11 @@ type ReaderCache struct {
 	TTL ReaderTTL `koanf:"ttl"`
 	// Redis specific settings.
 	Redis Redis `koanf:"redis"`
+	// DynamoDB specific settings.
+	DynamoDB DynamoDB `koanf:"dynamodb"`
 }
 type Cache struct {
-	// Can be "none" or "redis".
+	// Can be "none", "redis" or "dynamodb".
 	Type string
 	// Prefix to use for cache keys.
 	KeyPrefix string
@@ -84,6 +86,7 @@ type Redis struct {
 }
 
 type DynamoDB struct {
+	// Set to "global" or leave empty for a DynamoDB global table.
 	Region string `koanf:"region"`
 	Table  string `koanf:"table"`
 	// Endpoint is used for local testing.

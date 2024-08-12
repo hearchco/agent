@@ -85,11 +85,12 @@ func (c Config) getReader() ReaderConfig {
 					Results:    moretime.ConvertToFancyTime(c.Server.Cache.TTL.Results),
 					Currencies: moretime.ConvertToFancyTime(c.Server.Cache.TTL.Currencies),
 				},
-				Redis: c.Server.Cache.Redis,
+				Redis:    c.Server.Cache.Redis,
+				DynamoDB: c.Server.Cache.DynamoDB,
 			},
 			ImageProxy: ReaderImageProxy{
-				SecretKey:    c.Server.ImageProxy.Salt,
-				Timeout: moretime.ConvertToFancyTime(c.Server.ImageProxy.Timeout),
+				SecretKey: c.Server.ImageProxy.Salt,
+				Timeout:   moretime.ConvertToFancyTime(c.Server.ImageProxy.Timeout),
 			},
 		},
 		// Initialize the categories map.
@@ -165,7 +166,8 @@ func (c *Config) fromReader(rc ReaderConfig) {
 					Results:    moretime.ConvertFromFancyTime(rc.Server.Cache.TTL.Results),
 					Currencies: moretime.ConvertFromFancyTime(rc.Server.Cache.TTL.Currencies),
 				},
-				Redis: rc.Server.Cache.Redis,
+				Redis:    rc.Server.Cache.Redis,
+				DynamoDB: rc.Server.Cache.DynamoDB,
 			},
 			ImageProxy: ImageProxy{
 				Salt:    rc.Server.ImageProxy.SecretKey,
