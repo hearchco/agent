@@ -1,13 +1,8 @@
 FROM cgr.dev/chainguard/static:latest
 
-ENV HEARCHCO_DATA_DIR="/data"
-ENV HEARCHCO_LOG_DIR="/data/log"
-
 COPY hearchco .
 
 CMD [ "./hearchco" ]
-
-VOLUME [ "/data" ]
 
 EXPOSE 3030
 
