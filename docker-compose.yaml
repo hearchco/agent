@@ -24,7 +24,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`search.example.org`)"
       - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.services.frontend.loadbalancer.server.port=8080" # This is the port defined in the Dockerfile for frontend
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000" # This is the port defined in the Dockerfile for frontend
   # Go agent, used for scraping search engines and other data sources and serving a JSON REST API for frontend
   agent:
     image: ghcr.io/hearchco/agent:latest # NOTE: Don't use the latest tag in production
