@@ -6,9 +6,6 @@ builds:
   - env: [CGO_ENABLED=0]
     goos:
       - linux
-      - darwin
-      - freebsd
-      - windows
     main: ./src
     goarch:
       - amd64
@@ -20,20 +17,16 @@ builds:
       - -X "main.Timestamp={{ .Timestamp }}"
     flags:
       - -trimpath
-    ignore:
-      - goos: freebsd
-        goarch: arm64
-      - goos: windows
-        goarch: arm64
-
-# MacOS Universal Binaries
-universal_binaries:
-  - replace: true
 
 # Archive
 archives:
   - name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
     format: "binary"
+  - id: "aws"
+    name_template: "{{ .ProjectName }}_bootstrap_aws_{{ .Arch }}"
+    format: "zip"
+    files:
+      - none*
 
 # Checksum
 checksum:
