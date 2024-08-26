@@ -38,7 +38,7 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 
 	// /search
 	mux.Get("/search", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSearch(w, r, ver, conf.Categories, db, conf.Server.Cache.TTL.Results, conf.Server.ImageProxy.Salt)
+		err := routeSearch(w, r, ver, conf.Categories, conf.Server.ImageProxy.Salt)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -48,7 +48,7 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 	mux.Post("/search", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSearch(w, r, ver, conf.Categories, db, conf.Server.Cache.TTL.Results, conf.Server.ImageProxy.Salt)
+		err := routeSearch(w, r, ver, conf.Categories, conf.Server.ImageProxy.Salt)
 		if err != nil {
 			log.Error().
 				Err(err).
