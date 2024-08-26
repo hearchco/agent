@@ -8,20 +8,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rs/zerolog/log"
-
-	"github.com/hearchco/agent/src/cache"
 	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search"
 	"github.com/hearchco/agent/src/search/category"
 	"github.com/hearchco/agent/src/search/engines/options"
 	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/search/result/rank"
-	"github.com/hearchco/agent/src/utils/anonymize"
 	"github.com/hearchco/agent/src/utils/gotypelimits"
 )
 
-func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf map[category.Name]config.Category, db cache.DB, ttl time.Duration, salt string) error {
+func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf map[category.Name]config.Category, salt string) error {
 	// Capture start time.
 	startTime := time.Now()
 
@@ -128,41 +124,6 @@ func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf ma
 		SafeSearch: safeSearch,
 	}
 
-	// Check cache for results.
-	cachedRes, err := db.GetResults(query, categoryName, opts)
-	if err != nil {
-		log.Error().
-			Err(err).
-			Str("query", anonymize.String(query)).
-			Str("category", categoryName.String()).
-			Msg("Failed to get results from cache")
-	} else if len(cachedRes) > 0 {
-		log.Debug().
-			Str("query", anonymize.String(query)).
-			Str("category", categoryName.String()).
-			Msg("Results found in cache")
-
-		// Convert the results to include the hashes (output format).
-		outpusRes := result.ConvertToOutput(cachedRes, salt)
-
-		// Create the response.
-		res := ResultsResponse{
-			responseBase{
-				ver,
-				time.Since(startTime).Milliseconds(),
-			},
-			outpusRes,
-		}
-
-		// If writing response failes, return the error.
-		return writeResponseJSON(w, http.StatusOK, res)
-	} else {
-		log.Debug().
-			Str("query", anonymize.String(query)).
-			Str("category", categoryName.String()).
-			Msg("No results found in cache")
-	}
-
 	// Search for results.
 	scrapedRes, err := search.Search(query, categoryName, opts, catsConf[categoryName])
 	if err != nil {
@@ -180,15 +141,6 @@ func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf ma
 	// Rank the results.
 	var rankedRes rank.Results = slices.Clone(scrapedRes)
 	rankedRes.Rank(catsConf[categoryName].Ranking)
-
-	// Store the results in cache.
-	if err := db.SetResults(query, categoryName, opts, rankedRes, ttl); err != nil {
-		log.Error().
-			Err(err).
-			Str("query", anonymize.String(query)).
-			Str("category", categoryName.String()).
-			Msg("failed to set results in cache")
-	}
 
 	// Convert the results to include the hashes (output format).
 	outpusRes := result.ConvertToOutput(rankedRes, salt)
