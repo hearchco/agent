@@ -1,30 +1,30 @@
-version: '3.9'
+version: "3.9"
 services:
   # Traefik can be replaced with any reverse proxy, this is just an example
   traefik:
     image: docker.io/library/traefik:latest # NOTE: Don't use the latest tag in production
     command:
-      - '--providers.docker=true'
-      - '--providers.docker.exposedbydefault=false'
-      - '--entryPoints.web.address=:80'
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.web.address=:80"
     ports:
-      - '80:80'
+      - "80:80"
     volumes:
-      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
     restart: unless-stopped
   # SvelteKit frontend, used for server-side rendering and serving web browser clients
   frontend:
     image: ghcr.io/hearchco/frontend:latest # NOTE: Don't use the latest tag in production
     environment:
       - PUBLIC_URI=https://search.example.org # Public accessible URI of the frontend, used to generate opensearch.xml
-      - API_URI=http://agent:3030 # Frontend reachable URI of the agent, used for fetching data when server-side rendering
+      - API_URI=http://agent:8000 # Frontend reachable URI of the agent, used for fetching data when server-side rendering
       - PUBLIC_API_URI=https://api.search.example.org # Public accessible URI of the agent, used for fetching data from the browser (using JS)
     restart: unless-stopped
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.frontend.rule=Host(`search.example.org`)'
-      - 'traefik.http.routers.frontend.entrypoints=web'
-      - 'traefik.http.services.frontend.loadbalancer.server.port=3000' # This is the port defined in the Dockerfile for frontend
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`search.example.org`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=8080" # This is the port defined in the Dockerfile for frontend
   # Go agent, used for scraping search engines and other data sources and serving a JSON REST API for frontend
   agent:
     image: ghcr.io/hearchco/agent:latest # NOTE: Don't use the latest tag in production
@@ -38,16 +38,16 @@ services:
       - HEARCHCO_SERVER_IMAGEPROXY_SECRETKEY=super_secret_key_that_is_at_least_32_chars_long # Used by image proxy for hashing image URLs, set to something long and secure
     restart: unless-stopped
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.agent.rule=Host(`api.search.example.org`)'
-      - 'traefik.http.routers.agent.entrypoints=web'
-      - 'traefik.http.services.agent.loadbalancer.server.port=3030' # This is the port defined in the Dockerfile for agent
+      - "traefik.enable=true"
+      - "traefik.http.routers.agent.rule=Host(`api.search.example.org`)"
+      - "traefik.http.routers.agent.entrypoints=web"
+      - "traefik.http.services.agent.loadbalancer.server.port=8000" # This is the port defined in the Dockerfile for agent
   redis:
     image: docker.io/library/redis:latest # NOTE: Don't use the latest tag in production
     command:
-      - '--requirepass=redispassword'
+      - "--requirepass=redispassword"
     volumes:
-      - 'redis-vol-0:/data:Z'
+      - "redis-vol-0:/data:Z"
     restart: unless-stopped
 volumes:
   redis-vol-0:

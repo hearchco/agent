@@ -11,7 +11,7 @@ func New() Config {
 	return Config{
 		Server: Server{
 			Environment:  "normal",
-			Port:         3030,
+			Port:         8000,
 			FrontendUrls: []string{"http://localhost:5173"},
 			Cache: Cache{
 				Type:      "none",
