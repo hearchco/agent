@@ -41,7 +41,7 @@ jobs:
 
     services:
       redis:
-        image: redis
+        image: docker.io/library/redis:latest
         ports:
           - 6379:6379
         options: >-
@@ -50,7 +50,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
       dynamodb:
-        image: amazon/dynamodb-local
+        image: docker.io/amazon/dynamodb-local:latest
         ports:
           - 8000:8000
         options: >-
