@@ -17,7 +17,7 @@ services:
     image: ghcr.io/hearchco/frontend:latest # NOTE: Don't use the latest tag in production
     environment:
       - PUBLIC_URI=https://search.example.org # Public accessible URI of the frontend, used to generate opensearch.xml
-      - API_URI=http://agent:8000 # Frontend reachable URI of the agent, used for fetching data when server-side rendering
+      - API_URI=http://agent:8000 # Frontend reachable URI of the agent (private network), used for fetching data when server-side rendering occurs. It can be the same as PUBLIC_API_URI.
       - PUBLIC_API_URI=https://api.search.example.org # Public accessible URI of the agent, used for fetching data from the browser (using JS)
     restart: unless-stopped
     labels:
@@ -42,6 +42,7 @@ services:
       - "traefik.http.routers.agent.rule=Host(`api.search.example.org`)"
       - "traefik.http.routers.agent.entrypoints=web"
       - "traefik.http.services.agent.loadbalancer.server.port=8000" # This is the port defined in the Dockerfile for agent
+  # Redis cache, used by the agent for caching certain non-user related data (like exchange currencies)
   redis:
     image: docker.io/library/redis:latest # NOTE: Don't use the latest tag in production
     command:
