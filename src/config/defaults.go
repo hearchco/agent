@@ -17,7 +17,6 @@ func New() Config {
 				Type:      "none",
 				KeyPrefix: "HEARCHCO_",
 				TTL: TTL{
-					Results:    moretime.Week,
 					Currencies: moretime.Day,
 				},
 				Redis: Redis{

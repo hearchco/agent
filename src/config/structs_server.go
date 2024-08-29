@@ -62,17 +62,11 @@ type Cache struct {
 // Example: 1s, 1m, 1h, 1d, 1w, 1M, 1y.
 // If unit is not specified, it is assumed to be milliseconds.
 type ReaderTTL struct {
-	// How long to store the results in cache.
-	// Setting this to 0 caches the results forever.
-	Results string `koanf:"time"`
 	// How long to store the currencies in cache.
 	// Setting this to 0 caches the currencies forever.
 	Currencies string `koanf:"currencies"`
 }
 type TTL struct {
-	// How long to store the results in cache.
-	// Setting this to 0 caches the results forever.
-	Results time.Duration
 	// How long to store the currencies in cache.
 	// Setting this to 0 caches the currencies forever.
 	Currencies time.Duration
