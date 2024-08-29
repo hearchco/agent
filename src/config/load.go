@@ -82,7 +82,6 @@ func (c Config) getReader() ReaderConfig {
 			Cache: ReaderCache{
 				Type: c.Server.Cache.Type,
 				TTL: ReaderTTL{
-					Results:    moretime.ConvertToFancyTime(c.Server.Cache.TTL.Results),
 					Currencies: moretime.ConvertToFancyTime(c.Server.Cache.TTL.Currencies),
 				},
 				Redis:    c.Server.Cache.Redis,
@@ -163,7 +162,6 @@ func (c *Config) fromReader(rc ReaderConfig) {
 			Cache: Cache{
 				Type: rc.Server.Cache.Type,
 				TTL: TTL{
-					Results:    moretime.ConvertFromFancyTime(rc.Server.Cache.TTL.Results),
 					Currencies: moretime.ConvertFromFancyTime(rc.Server.Cache.TTL.Currencies),
 				},
 				Redis:    rc.Server.Cache.Redis,
