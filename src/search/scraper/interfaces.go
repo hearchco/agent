@@ -16,13 +16,22 @@ type Enginer interface {
 	Init(context.Context, config.CategoryTimings)
 }
 
-// Interface that each search engine must implement to support searching.
+// Interface that each search engine must implement to support searching general results.
 type Searcher interface {
 	Enginer
 
 	InitSearcher(context.Context, config.CategoryTimings)
 	ReInitSearcher(context.Context)
 	Search(string, options.Options, chan result.ResultScraped) ([]error, bool)
+}
+
+// Interface that each search engine must implement to support searching image results.
+type ImageSearcher interface {
+	Enginer
+
+	InitSearcher(context.Context, config.CategoryTimings)
+	ReInitSearcher(context.Context)
+	ImageSearch(string, options.Options, chan result.ResultScraped) ([]error, bool)
 }
 
 // Interface that each search engine must implement to support suggesting.

@@ -1,4 +1,4 @@
-package bingimages
+package bing
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"github.com/hearchco/agent/src/search/engines/_engines_test"
 )
 
-func TestSearch(t *testing.T) {
+func TestImageSearch(t *testing.T) {
 	// Testing options.
 	conf := _engines_test.NewConfig(seName)
 	opt := _engines_test.NewOpts()
@@ -34,5 +34,5 @@ func TestSearch(t *testing.T) {
 	se := New()
 	se.InitSearcher(context.Background(), conf.Categories[category.GENERAL].Timings)
 
-	_engines_test.CheckTestCases(t, se, tchar[:], tccr[:], tcrr[:])
+	_engines_test.CheckImageSearch(t, se, tchar[:], tccr[:], tcrr[:])
 }

@@ -14,24 +14,31 @@ type userAgentWithHeaders struct {
 
 // UserAgents used when making requests and their corresponding Sec-Ch-Ua headers.
 var userAgentArray = [...]userAgentWithHeaders{
-	// Chrome 119.0.0, Windows
+	// Chrome 127.0.0, Mac OS X
 	{
-		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-		`"Google Chrome";v="119", "Chromium";v="119", "Not=A?Brand";v="24"`,
+		"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.3",
+		`"Google Chrome";v="127", "Chromium";v="127", "Not=A?Brand";v="24"`,
+		"?0",
+		`"Macintosh"`,
+	},
+	// Chrome 128.0.0, Windows
+	{
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.3",
+		`"Google Chrome";v="128", "Chromium";v="128", "Not=A?Brand";v="24"`,
 		"?0",
 		`"Windows"`,
 	},
-	// Chrome 118.0.0, Windows
+	// Chrome 127.0.0, Windows
 	{
-		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
-		`"Google Chrome";v="118", "Chromium";v="118", "Not=A?Brand";v="24"`,
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.3",
+		`"Google Chrome";v="127", "Chromium";v="127", "Not=A?Brand";v="24"`,
 		"?0",
 		`"Windows"`,
 	},
-	// Chrome 117.0.0, Windows
+	// Edge 128.0.0, Windows
 	{
-		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
-		`"Google Chrome";v="117", "Chromium";v="117", "Not=A?Brand";v="24"`,
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 Edg/128.0.0.",
+		`"Microsoft Edge";v="128", "Edg";v="128"`,
 		"?0",
 		`"Windows"`,
 	},

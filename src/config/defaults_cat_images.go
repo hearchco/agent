@@ -7,15 +7,15 @@ import (
 )
 
 var imagesEngines = []engines.Name{
-	engines.BINGIMAGES,
-	engines.GOOGLEIMAGES,
+	engines.BING,
+	engines.GOOGLE,
 }
 
 var imagesRequiredEngines = []engines.Name{}
 
 var imagesRequiredByOriginEngines = []engines.Name{
-	engines.BINGIMAGES,
-	engines.GOOGLEIMAGES,
+	engines.BING,
+	engines.GOOGLE,
 }
 
 var imagesPreferredEngines = []engines.Name{}

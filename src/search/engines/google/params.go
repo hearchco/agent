@@ -15,6 +15,11 @@ const (
 
 	paramFilter = "filter=0"
 
+	// Image search params.
+	imgParamKeyPage = "async=_fmt:json,p:1,ijn"
+	imgParamTbm     = "tbm=isch"
+	imgParamAsearch = "asearch=isch"
+
 	// Suggestions API params.
 	sugParamClient = "client=firefox"
 )

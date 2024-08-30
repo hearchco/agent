@@ -8,13 +8,11 @@ type Name int
 //go:generate go run github.com/hearchco/agent/generate/enginer -type=Name -packagename search -output ../engine_enginer.go
 const (
 	UNDEFINED     Name = iota
-	BING               // enginer,searcher
-	BINGIMAGES         // enginer,searcher
+	BING               // enginer,searcher,imagesearcher
 	BRAVE              // enginer,searcher
 	DUCKDUCKGO         // enginer,searcher,suggester
 	ETOOLS             // enginer,searcher
-	GOOGLE             // enginer,searcher,suggester
-	GOOGLEIMAGES       // enginer,searcher
+	GOOGLE             // enginer,searcher,imagesearcher,suggester
 	GOOGLESCHOLAR      // enginer,searcher
 	MOJEEK             // enginer,searcher
 	PRESEARCH          // enginer,searcher
