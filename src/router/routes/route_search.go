@@ -125,7 +125,14 @@ func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf ma
 	}
 
 	// Search for results.
-	scrapedRes, err := search.Search(query, categoryName, opts, catsConf[categoryName])
+	var scrapedRes []result.Result
+	switch categoryName {
+	case category.IMAGES:
+		scrapedRes, err = search.ImageSearch(query, opts, catsConf[categoryName])
+	default:
+		scrapedRes, err = search.Search(query, categoryName, opts, catsConf[categoryName])
+	}
+
 	if err != nil {
 		// Server error.
 		werr := writeResponseJSON(w, http.StatusInternalServerError, ErrorResponse{

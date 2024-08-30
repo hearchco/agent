@@ -1,6 +1,6 @@
-package googleimages
+package google
 
-type jsonResponse struct {
+type imgJsonResponse struct {
 	ISCHJ ischj `json:"ischj"`
 }
 

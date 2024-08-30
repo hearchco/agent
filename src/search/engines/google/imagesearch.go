@@ -1,4 +1,4 @@
-package googleimages
+package google
 
 import (
 	"encoding/json"
@@ -17,7 +17,7 @@ import (
 	"github.com/hearchco/agent/src/utils/morestrings"
 )
 
-func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
+func (se Engine) ImageSearch(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
 	foundResults := atomic.Bool{}
 	retErrors := make([]error, 0, opts.Pages.Max)
 	pageRankCounter := scraper.NewPageRankCounter(opts.Pages.Max)
@@ -36,7 +36,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		}
 
 		body = body[index:]
-		var jsonResponse jsonResponse
+		var jsonResponse imgJsonResponse
 		if err := json.Unmarshal([]byte(body), &jsonResponse); err != nil {
 			log.Error().
 				Caller().
@@ -105,15 +105,15 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		ctx.Put("page", strconv.Itoa(i))
 
 		// Dynamic params.
-		paramPage := fmt.Sprintf("%v:1", paramKeyPage)
+		paramPage := fmt.Sprintf("%v:1", imgParamKeyPage)
 		if pageNum0 > 0 {
-			paramPage = fmt.Sprintf("%v:%v", paramKeyPage, pageNum0*10)
+			paramPage = fmt.Sprintf("%v:%v", imgParamKeyPage, pageNum0*10)
 		}
 
-		combinedParams := morestrings.JoinNonEmpty("&", "&", paramTbm, paramAsearch, paramFilter, paramPage, paramLocale, paramSafeSearch)
+		combinedParams := morestrings.JoinNonEmpty("&", "&", imgParamTbm, imgParamAsearch, paramFilter, paramPage, paramLocale, paramSafeSearch)
 
-		urll := fmt.Sprintf("%v?q=%v%v", searchURL, query, combinedParams)
-		anonUrll := fmt.Sprintf("%v?q=%v%v", searchURL, anonymize.String(query), combinedParams)
+		urll := fmt.Sprintf("%v?q=%v%v", imageSearchURL, query, combinedParams)
+		anonUrll := fmt.Sprintf("%v?q=%v%v", imageSearchURL, anonymize.String(query), combinedParams)
 
 		if err := se.Get(ctx, urll, anonUrll); err != nil {
 			retErrors = append(retErrors, err)

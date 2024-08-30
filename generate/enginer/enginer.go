@@ -17,17 +17,18 @@ import (
 )
 
 var (
-	typeName           = flag.String("type", "", "type name; must be set")
-	output             = flag.String("output", "", "output file name; default srcdir/<type>_enginer.go")
-	trimprefix         = flag.String("trimprefix", "", "trim the `prefix` from the generated constant names")
-	buildTags          = flag.String("tags", "", "comma-separated list of build tags to apply")
-	packageName        = flag.String("packagename", "", "name of the package for generated code; default current package")
-	interfacesImport   = flag.String("interfacesimport", "github.com/hearchco/agent/src/search/scraper", "source of the interface import, which is prefixed to interfaces; default github.com/hearchco/agent/src/search/scraper")
-	interfacesPackage  = flag.String("interfacespackage", "scraper", "name of the package for the interfaces; default scraper")
-	interfaceEnginer   = flag.String("interfaceenginer", "Enginer", "name of the nginer interface; default scraper.Enginer")
-	interfaceSearcher  = flag.String("interfacesearcher", "Searcher", "name of the searcher interface; default scraper.Searcher")
-	interfaceSuggester = flag.String("interfacesuggester", "Suggester", "name of the suggester interface; default scraper.Suggester")
-	enginesImport      = flag.String("enginesimport", "github.com/hearchco/agent/src/search/engines", "source of the engines import, which is prefixed to imports for engines; default github.com/hearchco/agent/src/search/engines")
+	typeName               = flag.String("type", "", "type name; must be set")
+	output                 = flag.String("output", "", "output file name; default srcdir/<type>_enginer.go")
+	trimprefix             = flag.String("trimprefix", "", "trim the `prefix` from the generated constant names")
+	buildTags              = flag.String("tags", "", "comma-separated list of build tags to apply")
+	packageName            = flag.String("packagename", "", "name of the package for generated code; default current package")
+	interfacesImport       = flag.String("interfacesimport", "github.com/hearchco/agent/src/search/scraper", "source of the interface import, which is prefixed to interfaces; default github.com/hearchco/agent/src/search/scraper")
+	interfacesPackage      = flag.String("interfacespackage", "scraper", "name of the package for the interfaces; default scraper")
+	interfaceEnginer       = flag.String("interfaceenginer", "Enginer", "name of the nginer interface; default scraper.Enginer")
+	interfaceSearcher      = flag.String("interfacesearcher", "Searcher", "name of the searcher interface; default scraper.Searcher")
+	interfaceImageSearcher = flag.String("interfaceimagesearcher", "ImageSearcher", "name of the searcher interface; default scraper.ImageSearcher")
+	interfaceSuggester     = flag.String("interfacesuggester", "Suggester", "name of the suggester interface; default scraper.Suggester")
+	enginesImport          = flag.String("enginesimport", "github.com/hearchco/agent/src/search/engines", "source of the engines import, which is prefixed to imports for engines; default github.com/hearchco/agent/src/search/engines")
 )
 
 // Usage is a replacement usage function for the flags package.
@@ -201,6 +202,7 @@ func (g *Generator) generate(typeName string) {
 	g.printEnginerLen(values)
 	g.printInterfaces(values, *interfaceEnginer)
 	g.printInterfaces(values, *interfaceSearcher)
+	g.printInterfaces(values, *interfaceImageSearcher)
 	g.printInterfaces(values, *interfaceSuggester)
 }
 
@@ -327,7 +329,7 @@ func (g *Generator) printEnginerLen(values []Value) {
 
 func (g *Generator) printInterfaces(values []Value, interfaceName string) {
 	g.Printf("\n")
-	g.Printf("\nfunc %sArray() [enginerLen]%s.%s {", strings.ToLower(interfaceName), *interfacesPackage, interfaceName)
+	g.Printf("\nfunc %sArray() [enginerLen]%s.%s {", toLowerFirstChar(interfaceName), *interfacesPackage, interfaceName)
 	g.Printf("\n\tvar engineArray [enginerLen]%s.%s", *interfacesPackage, interfaceName)
 	for _, v := range values {
 		if validConst(v) && validInterfacer(v, interfaceName) {
@@ -336,4 +338,11 @@ func (g *Generator) printInterfaces(values []Value, interfaceName string) {
 	}
 	g.Printf("\n\treturn engineArray")
 	g.Printf("\n}")
+}
+
+func toLowerFirstChar(s string) string {
+	if len(s) == 0 {
+		return s
+	}
+	return strings.ToLower(s[:1]) + s[1:]
 }

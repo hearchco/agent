@@ -1,8 +1,9 @@
-package bingimages
+package bing
 
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -17,16 +18,21 @@ import (
 	"github.com/hearchco/agent/src/utils/morestrings"
 )
 
-func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
+func (se Engine) ImageSearch(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
 	foundResults := atomic.Bool{}
 	retErrors := make([]error, 0, opts.Pages.Max)
 	pageRankCounter := scraper.NewPageRankCounter(opts.Pages.Max)
 
-	se.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
+	se.OnRequest(func(r *colly.Request) {
+		r.Headers.Add("Cookie", fmt.Sprintf("_EDGE_CD=%s", localeCookieString(opts.Locale)))
+		r.Headers.Add("Cookie", fmt.Sprintf("_EDGE_S=%s", localeAltCookieString(opts.Locale)))
+	})
+
+	se.OnHTML(imgDompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
 
-		var jsonMetadata jsonMetadata
-		metadataS, metadataExists := dom.Find(dompaths.Metadata.Path).Attr(dompaths.Metadata.Attr)
+		var jsonMetadata imgJsonMetadata
+		metadataS, metadataExists := dom.Find(imgDompaths.Metadata.Path).Attr(imgDompaths.Metadata.Attr)
 		if !metadataExists {
 			log.Error().
 				Str("engine", se.Name.String()).
@@ -55,7 +61,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 			return
 		}
 
-		titleText := strings.TrimSpace(dom.Find(dompaths.Title).Text())
+		titleText := strings.TrimSpace(dom.Find(imgDompaths.Title).Text())
 		if titleText == "" {
 			// Could also use the json data ("t" field), it seems to include weird/erroneous characters though (particularly '\ue000' and '\ue001').
 			log.Error().
@@ -67,7 +73,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		}
 
 		// This returns "2000 x 1500 · jpeg".
-		imgFormatS := strings.TrimSpace(dom.Find(dompaths.ImgFormatStr).Text())
+		imgFormatS := strings.TrimSpace(dom.Find(imgDompaths.ImgFormatStr).Text())
 		if imgFormatS == "" {
 			log.Trace().
 				Caller().
@@ -78,20 +84,36 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 			return
 		}
 
-		// Convert to "2000x1500·jpeg".
-		imgFormatS = strings.ReplaceAll(imgFormatS, " ", "")
-		// Remove everything after 2000x1500.
-		imgFormatS = strings.Split(imgFormatS, "·")[0]
-		// Create height and width.
-		imgFormat := strings.Split(imgFormatS, "x")
+		// Extract only the resolution using regex (<digit><char><digit>).
+		regex := regexp.MustCompile(`(\d+)[^\d]*(\d+)`)
+		match := regex.FindStringSubmatch(imgFormatS)
+		if len(match) != 3 {
+			log.Error().
+				Caller().
+				Str("engine", se.Name.String()).
+				Strs("match", match).
+				Str("imgFormatS", imgFormatS).
+				Str("jsonMetadata", metadataS).
+				Msg("Failed to extract image format")
+			return
+		}
+		origHS, origWS := match[1], match[2]
+		log.Trace().
+			Caller().
+			Str("engine", se.Name.String()).
+			Str("imgFormatS", imgFormatS).
+			Str("height", origHS).
+			Str("width", origWS).
+			Msg("Extracted image format")
 
-		origH, err := strconv.Atoi(imgFormat[0])
+		// Convert the height to integer.
+		origH, err := strconv.Atoi(origHS)
 		if err != nil {
 			log.Error().
 				Caller().
 				Err(err).
 				Str("engine", se.Name.String()).
-				Str("height", imgFormat[0]).
+				Str("height", origHS).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Str("imgFormatS", imgFormatS).
@@ -99,13 +121,14 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 			return
 		}
 
-		origW, err := strconv.Atoi(imgFormat[1])
+		// Convert the width to integer.
+		origW, err := strconv.Atoi(origWS)
 		if err != nil {
 			log.Error().
 				Caller().
 				Err(err).
 				Str("engine", se.Name.String()).
-				Str("width", imgFormat[1]).
+				Str("width", origWS).
 				Str("jsonMetadata", metadataS).
 				Str("title", titleText).
 				Str("imgFormatS", imgFormatS).
@@ -115,7 +138,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 
 		found := false
 		var thmbHS, thmbWS string
-		for _, thmb := range dompaths.Thumbnail {
+		for _, thmb := range imgDompaths.Thumbnail {
 			var thmbHExists, thmbWExists bool
 			thmbHS, thmbHExists = dom.Find(thmb.Path).Attr(thmb.Height)
 			thmbWS, thmbWExists = dom.Find(thmb.Path).Attr(thmb.Width)
@@ -163,7 +186,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 			return
 		}
 
-		source := strings.TrimSpace(dom.Find(dompaths.Source).Text())
+		source := strings.TrimSpace(dom.Find(imgDompaths.Source).Text())
 		if source == "" {
 			log.Error().
 				Caller().
@@ -210,9 +233,6 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		}
 	})
 
-	// Static params.
-	paramLocale := localeParamString(opts.Locale)
-
 	for i := range opts.Pages.Max {
 		pageNum0 := i + opts.Pages.Start
 		ctx := colly.NewContext()
@@ -221,10 +241,10 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		// Dynamic params.
 		paramPage := fmt.Sprintf("%v=%v", paramKeyPage, pageNum0*35+1)
 
-		combinedParams := morestrings.JoinNonEmpty("&", "&", paramAsync, paramPage, paramCount, paramLocale)
+		combinedParams := morestrings.JoinNonEmpty("&", "&", imgParamAsync, paramPage, imgParamCount)
 
-		urll := fmt.Sprintf("%v?q=%v%v", searchURL, query, combinedParams)
-		anonUrll := fmt.Sprintf("%v?q=%v%v", searchURL, anonymize.String(query), combinedParams)
+		urll := fmt.Sprintf("%v?q=%v%v", imageSearchURL, query, combinedParams)
+		anonUrll := fmt.Sprintf("%v?q=%v%v", imageSearchURL, anonymize.String(query), combinedParams)
 
 		if err := se.Get(ctx, urll, anonUrll); err != nil {
 			retErrors = append(retErrors, err)

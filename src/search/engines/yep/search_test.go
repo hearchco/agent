@@ -34,5 +34,5 @@ package yep
 // 	se := New()
 // 	se.Init(context.Background(), conf.Categories[category.GENERAL].Timings)
 
-// 	_engines_test.CheckTestCases(t, se, tchar, tccr, tcrr)
+// 	_engines_test.CheckSearch(t, se, tchar, tccr, tcrr)
 // }
