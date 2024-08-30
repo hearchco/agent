@@ -126,9 +126,10 @@ func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf ma
 
 	// Search for results.
 	var scrapedRes []result.Result
-	if categoryName == category.IMAGES {
+	switch categoryName {
+	case category.IMAGES:
 		scrapedRes, err = search.ImageSearch(query, opts, catsConf[categoryName])
-	} else {
+	default:
 		scrapedRes, err = search.Search(query, categoryName, opts, catsConf[categoryName])
 	}
 

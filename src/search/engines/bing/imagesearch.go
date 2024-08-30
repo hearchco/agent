@@ -28,11 +28,11 @@ func (se Engine) ImageSearch(query string, opts options.Options, resChan chan re
 		r.Headers.Add("Cookie", fmt.Sprintf("_EDGE_S=%s", localeAltCookieString(opts.Locale)))
 	})
 
-	se.OnHTML(imageDompaths.Result, func(e *colly.HTMLElement) {
+	se.OnHTML(imgDompaths.Result, func(e *colly.HTMLElement) {
 		dom := e.DOM
 
 		var jsonMetadata imgJsonMetadata
-		metadataS, metadataExists := dom.Find(imageDompaths.Metadata.Path).Attr(imageDompaths.Metadata.Attr)
+		metadataS, metadataExists := dom.Find(imgDompaths.Metadata.Path).Attr(imgDompaths.Metadata.Attr)
 		if !metadataExists {
 			log.Error().
 				Str("engine", se.Name.String()).
@@ -61,7 +61,7 @@ func (se Engine) ImageSearch(query string, opts options.Options, resChan chan re
 			return
 		}
 
-		titleText := strings.TrimSpace(dom.Find(imageDompaths.Title).Text())
+		titleText := strings.TrimSpace(dom.Find(imgDompaths.Title).Text())
 		if titleText == "" {
 			// Could also use the json data ("t" field), it seems to include weird/erroneous characters though (particularly '\ue000' and '\ue001').
 			log.Error().
@@ -73,7 +73,7 @@ func (se Engine) ImageSearch(query string, opts options.Options, resChan chan re
 		}
 
 		// This returns "2000 x 1500 · jpeg".
-		imgFormatS := strings.TrimSpace(dom.Find(imageDompaths.ImgFormatStr).Text())
+		imgFormatS := strings.TrimSpace(dom.Find(imgDompaths.ImgFormatStr).Text())
 		if imgFormatS == "" {
 			log.Trace().
 				Caller().
@@ -138,7 +138,7 @@ func (se Engine) ImageSearch(query string, opts options.Options, resChan chan re
 
 		found := false
 		var thmbHS, thmbWS string
-		for _, thmb := range imageDompaths.Thumbnail {
+		for _, thmb := range imgDompaths.Thumbnail {
 			var thmbHExists, thmbWExists bool
 			thmbHS, thmbHExists = dom.Find(thmb.Path).Attr(thmb.Height)
 			thmbWS, thmbWExists = dom.Find(thmb.Path).Attr(thmb.Width)
@@ -186,7 +186,7 @@ func (se Engine) ImageSearch(query string, opts options.Options, resChan chan re
 			return
 		}
 
-		source := strings.TrimSpace(dom.Find(imageDompaths.Source).Text())
+		source := strings.TrimSpace(dom.Find(imgDompaths.Source).Text())
 		if source == "" {
 			log.Error().
 				Caller().
