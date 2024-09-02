@@ -1,6 +1,8 @@
 package result
 
 import (
+	"time"
+
 	"github.com/hearchco/agent/src/utils/anonymize"
 	"github.com/hearchco/agent/src/utils/moreurls"
 	"github.com/rs/zerolog/log"
@@ -106,10 +108,13 @@ func (r General) ConvertToOutput(salt string) ResultOutput {
 			Msg("Failed to get URI to verify")
 		// ^PANIC - This should never happen.
 	}
+
+	hash, timestamp := anonymize.CalculateHMACBase64(urlToVerify, salt, time.Now())
 	return GeneralOutput{
 		generalOutputJSON{
 			r,
-			anonymize.CalculateHMACBase64(urlToVerify, salt),
+			hash,
+			timestamp,
 		},
 	}
 }

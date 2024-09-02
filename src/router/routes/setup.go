@@ -38,7 +38,7 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 
 	// /search
 	mux.Get("/search", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSearch(w, r, ver, conf.Categories, conf.Server.ImageProxy.Salt)
+		err := routeSearch(w, r, ver, conf.Categories, conf.Server.ImageProxy.SecretKey)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -48,7 +48,7 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 	mux.Post("/search", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSearch(w, r, ver, conf.Categories, conf.Server.ImageProxy.Salt)
+		err := routeSearch(w, r, ver, conf.Categories, conf.Server.ImageProxy.SecretKey)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -126,7 +126,7 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 
 	// /proxy
 	mux.Get("/proxy", func(w http.ResponseWriter, r *http.Request) {
-		err := routeProxy(w, r, conf.Server.ImageProxy.Salt, conf.Server.ImageProxy.Timeout)
+		err := routeProxy(w, r, conf.Server.ImageProxy.SecretKey, conf.Server.ImageProxy.Timeout)
 		if err != nil {
 			log.Error().
 				Err(err).

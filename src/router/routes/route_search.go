@@ -17,7 +17,7 @@ import (
 	"github.com/hearchco/agent/src/utils/gotypelimits"
 )
 
-func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf map[category.Name]config.Category, salt string) error {
+func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf map[category.Name]config.Category, secret string) error {
 	// Capture start time.
 	startTime := time.Now()
 
@@ -150,7 +150,7 @@ func routeSearch(w http.ResponseWriter, r *http.Request, ver string, catsConf ma
 	rankedRes.Rank(catsConf[categoryName].Ranking)
 
 	// Convert the results to include the hashes (output format).
-	outpusRes := result.ConvertToOutput(rankedRes, salt)
+	outpusRes := result.ConvertToOutput(rankedRes, secret)
 
 	// Create the response.
 	res := ResultsResponse{

@@ -7,6 +7,8 @@ type ImagesOutput struct {
 type imagesOutputJSON struct {
 	Images
 
-	URLHash          string `json:"url_hash,omitempty"`
-	ThumbnailURLHash string `json:"thumbnail_url_hash,omitempty"`
+	URLHash                   string `json:"url_hash,omitempty"`
+	URLHashTimestamp          string `json:"url_hash_timestamp,omitempty"`
+	ThumbnailURLHash          string `json:"thumbnail_url_hash,omitempty"`
+	ThumbnailURLHashTimestamp string `json:"thumbnail_url_hash_timestamp,omitempty"`
 }

@@ -96,6 +96,6 @@ type ReaderImageProxy struct {
 	Timeout   string `koanf:"timeout"`
 }
 type ImageProxy struct {
-	Salt    string
-	Timeout time.Duration
+	SecretKey string
+	Timeout   time.Duration
 }

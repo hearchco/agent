@@ -88,7 +88,7 @@ func (c Config) getReader() ReaderConfig {
 				DynamoDB: c.Server.Cache.DynamoDB,
 			},
 			ImageProxy: ReaderImageProxy{
-				SecretKey: c.Server.ImageProxy.Salt,
+				SecretKey: c.Server.ImageProxy.SecretKey,
 				Timeout:   moretime.ConvertToFancyTime(c.Server.ImageProxy.Timeout),
 			},
 		},
@@ -168,8 +168,8 @@ func (c *Config) fromReader(rc ReaderConfig) {
 				DynamoDB: rc.Server.Cache.DynamoDB,
 			},
 			ImageProxy: ImageProxy{
-				Salt:    rc.Server.ImageProxy.SecretKey,
-				Timeout: moretime.ConvertFromFancyTime(rc.Server.ImageProxy.Timeout),
+				SecretKey: rc.Server.ImageProxy.SecretKey,
+				Timeout:   moretime.ConvertFromFancyTime(rc.Server.ImageProxy.Timeout),
 			},
 		},
 		// Initialize the categories map.
