@@ -68,9 +68,9 @@ func (r Images) SourceURL() string {
 	return r.imagesJSON.SourceURL
 }
 
-func (r Images) ConvertToOutput(salt string) ResultOutput {
-	urlHash, urlTimestamp := anonymize.CalculateHMACBase64(r.URL(), salt, time.Now())
-	thmbHash, thmbTimestamp := anonymize.CalculateHMACBase64(r.ThumbnailURL(), salt, time.Now())
+func (r Images) ConvertToOutput(secret string) ResultOutput {
+	urlHash, urlTimestamp := anonymize.CalculateHMACBase64(r.URL(), secret, time.Now())
+	thmbHash, thmbTimestamp := anonymize.CalculateHMACBase64(r.ThumbnailURL(), secret, time.Now())
 
 	return ImagesOutput{
 		imagesOutputJSON{

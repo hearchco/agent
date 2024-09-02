@@ -99,7 +99,7 @@ func (r *General) AppendEngineRanks(rank Rank) {
 	r.generalJSON.EngineRanks = append(r.generalJSON.EngineRanks, rank)
 }
 
-func (r General) ConvertToOutput(salt string) ResultOutput {
+func (r General) ConvertToOutput(secret string) ResultOutput {
 	urlToVerify, err := moreurls.GetURIToVerify(r.URL())
 	if err != nil {
 		log.Panic().
@@ -109,7 +109,7 @@ func (r General) ConvertToOutput(salt string) ResultOutput {
 		// ^PANIC - This should never happen.
 	}
 
-	hash, timestamp := anonymize.CalculateHMACBase64(urlToVerify, salt, time.Now())
+	hash, timestamp := anonymize.CalculateHMACBase64(urlToVerify, secret, time.Now())
 	return GeneralOutput{
 		generalOutputJSON{
 			r,

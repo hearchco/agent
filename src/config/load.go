@@ -150,7 +150,7 @@ func (c *Config) fromReader(rc ReaderConfig) {
 	if rc.Server.ImageProxy.SecretKey == "" {
 		log.Fatal().
 			Caller().
-			Msg("Image proxy salt is empty")
+			Msg("Image proxy secret key is empty")
 	}
 
 	nc := Config{
