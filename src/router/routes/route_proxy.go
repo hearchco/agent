@@ -15,7 +15,7 @@ import (
 	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
-func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeout time.Duration) error {
+func routeProxy(w http.ResponseWriter, r *http.Request, secret string, timeout time.Duration) error {
 	// Parse the form.
 	err := r.ParseForm()
 	if err != nil {
@@ -31,12 +31,13 @@ func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeout tim
 	params := r.Form
 	urlParam := getParamOrDefault(params, "url")
 	hashParam := getParamOrDefault(params, "hash")
+	timestampParam := getParamOrDefault(params, "timestamp")
 	faviconParam := getParamOrDefault(params, "favicon", strconv.FormatBool(false))
 
 	// Check the required parameters.
-	if urlParam == "" || hashParam == "" {
+	if urlParam == "" || hashParam == "" || timestampParam == "" {
 		// User error.
-		return writeResponse(w, http.StatusBadRequest, "url and hash are required")
+		return writeResponse(w, http.StatusBadRequest, "url, hash and timestamp are required")
 	}
 
 	// Check if only favicon is requested.
@@ -62,12 +63,14 @@ func routeProxy(w http.ResponseWriter, r *http.Request, salt string, timeout tim
 	}
 
 	// Check if hash is valid.
-	if !anonymize.VerifyHMACBase64(hashParam, urlToVerify, salt) {
+	if ok, err := anonymize.VerifyHMACBase64(hashParam, urlToVerify, secret, timestampParam); !ok || err != nil {
 		// User error.
 		log.Debug().
+			Err(err).
 			Str("url", urlParam).
 			Str("url_to_verify", urlToVerify).
 			Str("hash", hashParam).
+			Str("timestamp", timestampParam).
 			Str("favicon", faviconParam).
 			Msg("Invalid hash")
 		return writeResponse(w, http.StatusUnauthorized, "invalid hash")

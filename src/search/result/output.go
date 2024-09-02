@@ -2,10 +2,10 @@ package result
 
 type ResultOutput any
 
-func ConvertToOutput(results []Result, salt string) []ResultOutput {
+func ConvertToOutput(results []Result, secret string) []ResultOutput {
 	var output = make([]ResultOutput, 0, len(results))
 	for _, r := range results {
-		output = append(output, r.ConvertToOutput(salt))
+		output = append(output, r.ConvertToOutput(secret))
 	}
 	return output
 }

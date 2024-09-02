@@ -1,6 +1,8 @@
 package result
 
 import (
+	"time"
+
 	"github.com/rs/zerolog/log"
 
 	"github.com/hearchco/agent/src/utils/anonymize"
@@ -66,12 +68,17 @@ func (r Images) SourceURL() string {
 	return r.imagesJSON.SourceURL
 }
 
-func (r Images) ConvertToOutput(salt string) ResultOutput {
+func (r Images) ConvertToOutput(secret string) ResultOutput {
+	urlHash, urlTimestamp := anonymize.CalculateHMACBase64(r.URL(), secret, time.Now())
+	thmbHash, thmbTimestamp := anonymize.CalculateHMACBase64(r.ThumbnailURL(), secret, time.Now())
+
 	return ImagesOutput{
 		imagesOutputJSON{
 			r,
-			anonymize.CalculateHMACBase64(r.URL(), salt),
-			anonymize.CalculateHMACBase64(r.ThumbnailURL(), salt),
+			urlHash,
+			urlTimestamp,
+			thmbHash,
+			thmbTimestamp,
 		},
 	}
 }
