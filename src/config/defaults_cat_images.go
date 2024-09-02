@@ -23,7 +23,7 @@ var imagesPreferredEngines = []engines.Name{}
 var imagesPreferredByOriginEngines = []engines.Name{}
 
 func imagesRanking() CategoryRanking {
-	return EmptyRanking(imagesEngines)
+	return ReqPrefOthRanking(imagesRequiredEngines, imagesPreferredEngines, imagesEngines)
 }
 
 var imagesTimings = CategoryTimings{

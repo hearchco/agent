@@ -28,18 +28,14 @@ var generalRequiredByOriginEngines = []engines.Name{
 	engines.GOOGLE,
 }
 
-var generalPreferredEngines = []engines.Name{
-	engines.ETOOLS, // Not in ByOrigin because it only gives 10 results across a lot of engines that it scrapes from.
-}
+var generalPreferredEngines = []engines.Name{}
 
 var generalPreferredByOriginEngines = []engines.Name{
 	engines.BRAVE,
-	engines.MOJEEK,
-	// engines.YEP,
 }
 
 func generalRanking() CategoryRanking {
-	return EmptyRanking(generalEngines)
+	return ReqPrefOthRanking(generalRequiredEngines, generalPreferredEngines, generalEngines)
 }
 
 var generalTimings = CategoryTimings{
