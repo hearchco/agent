@@ -109,7 +109,7 @@ func (r General) ConvertToOutput(salt string) ResultOutput {
 	return GeneralOutput{
 		generalOutputJSON{
 			r,
-			anonymize.CalculateMACBase64(urlToVerify, salt),
+			anonymize.CalculateHMACBase64(urlToVerify, salt),
 		},
 	}
 }

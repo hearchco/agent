@@ -47,6 +47,7 @@ func main() {
 			Msg("Failed creating a new cache database")
 		// ^FATAL
 	}
+	defer db.Close()
 
 	// Start profiler if enabled.
 	_, stopProfiler := profiler.Run(cliFlags)
@@ -60,9 +61,6 @@ func main() {
 	default:
 		rw.Start(ctx)
 	}
-
-	// Program cleanup.
-	db.Close()
 
 	log.Info().Msg("Program finished")
 }

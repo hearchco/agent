@@ -5,17 +5,15 @@ server:
   imageproxy:
     secretkey: changemepls
 # categories:
-#   science:
+#   general:
 #     engines:
-#       startpage:
-#         enabled: true
 #       duckduckgo:
 #         enabled: false
 #     ranking:
 #       engines:
-#         mojeek:
-#           mul: 1
-#   general:
+#         google:
+#           mul: 2
+#   images:
 #     engines:
-#       google:
-#         enabled: true
+#       bing:
+#         enabled: false
