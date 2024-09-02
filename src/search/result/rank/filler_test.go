@@ -20,20 +20,20 @@ func TestFillEngineRankRank(t *testing.T) {
 			[]result.RankScraped{
 				result.NewRankScraped(engines.GOOGLE, 0, 1, 1),
 				result.NewRankScraped(engines.BING, 0, 1, 1),
-				result.NewRankScraped(engines.MOJEEK, 0, 1, 3),
+				result.NewRankScraped(engines.DUCKDUCKGO, 0, 1, 3),
 			},
 			[]result.RankScraped{
 				result.NewRankScraped(engines.GOOGLE, 1, 1, 1),
 				result.NewRankScraped(engines.BING, 1, 1, 1),
-				result.NewRankScraped(engines.MOJEEK, 2, 1, 3),
+				result.NewRankScraped(engines.DUCKDUCKGO, 2, 1, 3),
 			},
 		},
 		{
 			[]result.RankScraped{
-				result.NewRankScraped(engines.MOJEEK, 0, 1, 1),
+				result.NewRankScraped(engines.DUCKDUCKGO, 0, 1, 1),
 			},
 			[]result.RankScraped{
-				result.NewRankScraped(engines.MOJEEK, 1, 1, 1),
+				result.NewRankScraped(engines.DUCKDUCKGO, 1, 1, 1),
 			},
 		},
 		{

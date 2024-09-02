@@ -24,7 +24,7 @@ func (se Engine) ImageSearch(query string, opts options.Options, resChan chan re
 
 	se.OnResponse(func(e *colly.Response) {
 		body := string(e.Body)
-		index := strings.Index(body, "{\"ischj\":")
+		index := strings.Index(body, `{"ischj":`)
 
 		if index == -1 {
 			log.Error().

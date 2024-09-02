@@ -70,8 +70,8 @@ func (r Images) ConvertToOutput(salt string) ResultOutput {
 	return ImagesOutput{
 		imagesOutputJSON{
 			r,
-			anonymize.CalculateMACBase64(r.URL(), salt),
-			anonymize.CalculateMACBase64(r.ThumbnailURL(), salt),
+			anonymize.CalculateHMACBase64(r.URL(), salt),
+			anonymize.CalculateHMACBase64(r.ThumbnailURL(), salt),
 		},
 	}
 }
