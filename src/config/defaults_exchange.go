@@ -13,5 +13,5 @@ var exchangeEngines = []engines.Name{
 }
 
 var exchangeTimings = ExchangeTimings{
-	HardTimeout: 500 * time.Millisecond,
+	HardTimeout: 1 * time.Second,
 }

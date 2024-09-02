@@ -23,7 +23,7 @@ var suggestionsPreferredEngines = []engines.Name{}
 var suggestionsPreferredByOriginEngines = []engines.Name{}
 
 func suggestionsRanking() CategoryRanking {
-	return EmptyRanking(suggestionsEngines)
+	return ReqPrefOthRanking(suggestionsRequiredEngines, suggestionsPreferredEngines, suggestionsEngines)
 }
 
 var suggestionsTimings = CategoryTimings{
