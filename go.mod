@@ -6,7 +6,7 @@ toolchain go1.22.0
 
 require (
 	github.com/PuerkitoBio/goquery v1.9.2
-	github.com/alecthomas/kong v0.9.0
+	github.com/alecthomas/kong v1.2.1
 	github.com/andybalholm/brotli v1.1.0
 	github.com/aws/aws-lambda-go v1.47.0
 	github.com/awslabs/aws-lambda-go-api-proxy v0.16.2
