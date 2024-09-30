@@ -16,7 +16,7 @@ require (
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-chi/cors v1.2.1
 	github.com/gocolly/colly/v2 v2.1.1-0.20231020184023-3c987f1982ed // Hearchco's PR
-	github.com/klauspost/compress v1.17.9
+	github.com/klauspost/compress v1.17.10
 	github.com/knadh/koanf/parsers/yaml v0.1.0
 	github.com/knadh/koanf/providers/env v0.1.0
 	github.com/knadh/koanf/providers/file v1.1.0
