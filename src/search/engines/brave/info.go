@@ -9,4 +9,4 @@ const (
 	searchURL = "https://search.brave.com/search"
 )
 
-var origins = [...]engines.Name{seName, engines.GOOGLE}
+var origins = [...]engines.Name{seName}
