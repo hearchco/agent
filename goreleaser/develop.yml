@@ -1,3 +1,5 @@
+version: 2
+
 # .goreleaser.yml
 project_name: hearchco
 
