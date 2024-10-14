@@ -9,7 +9,7 @@ require (
 	github.com/alecthomas/kong v1.2.1
 	github.com/andybalholm/brotli v1.1.0
 	github.com/aws/aws-lambda-go v1.47.0
-	github.com/aws/aws-sdk-go-v2 v1.32.0
+	github.com/aws/aws-sdk-go-v2 v1.32.2
 	github.com/aws/aws-sdk-go-v2/config v1.27.41
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.36.0
 	github.com/awslabs/aws-lambda-go-api-proxy v0.16.2
