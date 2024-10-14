@@ -1,7 +1,7 @@
 FROM scratch
 
-COPY --from=alpine:3 /etc/ssl/certs/ /etc/ssl/certs/
-COPY --from=alpine:3 /usr/share/zoneinfo/ /usr/share/zoneinfo/
+COPY --from=alpine /etc/ssl/certs/ /etc/ssl/certs/
+COPY --from=alpine /usr/share/zoneinfo/ /usr/share/zoneinfo/
 
 COPY bootstrap ./hearchco
 
