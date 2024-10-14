@@ -31,7 +31,7 @@ jobs:
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
         with:
-          platforms: arm64
+          platforms: arm64,arm
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -46,7 +46,7 @@ jobs:
       - name: Release
         uses: goreleaser/goreleaser-action@v6
         with:
-          version: latest
+          version: "~> v2"
           args: release --clean --config goreleaser/release.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
