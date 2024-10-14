@@ -1,8 +1,16 @@
-FROM cgr.dev/chainguard/static:latest
+FROM scratch
+
+COPY --from=alpine:3 /etc/ssl/certs/ /etc/ssl/certs/
+COPY --from=alpine:3 /usr/share/zoneinfo/ /usr/share/zoneinfo/
 
 COPY bootstrap ./hearchco
 
-CMD [ "./hearchco" ]
+ENV TZ="UTC"
+
+# "nobody" user
+USER 65534
+
+ENTRYPOINT ["./hearchco"]
 
 EXPOSE 8000
 
