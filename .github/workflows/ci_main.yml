@@ -35,6 +35,11 @@ jobs:
         with:
           go-version: stable
 
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64,arm
+
       - name: Generate go code from go:generate comments
         run: make install
 
