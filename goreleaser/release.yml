@@ -1,3 +1,5 @@
+version: 2
+
 # .goreleaser.yml
 project_name: hearchco
 
@@ -74,8 +76,7 @@ dockers:
       - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:v{{ .Version }}-armv7"
     use: buildx
     goarch: arm
-    goarm:
-      - 7
+    goarm: 7
     dockerfile: ./docker/Dockerfile
     build_flag_templates:
       - --platform=linux/arm/v7
