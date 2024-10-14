@@ -11,6 +11,9 @@ builds:
     goarch:
       - amd64
       - arm64
+      - arm
+    goarm:
+      - 7
     ldflags:
       - -s -w
       - -X "main.Version=v{{ .Version }}"
@@ -23,6 +26,7 @@ builds:
 archives:
   - name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
     format: "binary"
+
   - id: "aws"
     name_template: "{{ .ProjectName }}_bootstrap_aws_{{ .Arch }}"
     format: "zip"
@@ -55,6 +59,7 @@ dockers:
       - --platform=linux/amd64
     extra_files:
       - docker
+
   - image_templates:
       - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:v{{ .Version }}-arm64"
     use: buildx
@@ -62,6 +67,18 @@ dockers:
     dockerfile: ./docker/Dockerfile
     build_flag_templates:
       - --platform=linux/arm64
+    extra_files:
+      - docker
+
+  - image_templates:
+      - "{{ .Env.REGISTRY }}/{{ .Env.IMAGE_NAME }}:v{{ .Version }}-armv7"
+    use: buildx
+    goarch: arm
+    goarm:
+      - 7
+    dockerfile: ./docker/Dockerfile
+    build_flag_templates:
+      - --platform=linux/arm/v7
     extra_files:
       - docker
 
