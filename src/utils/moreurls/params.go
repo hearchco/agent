@@ -79,6 +79,7 @@ func (p Params) Copy() Params {
 	for _, param := range p.params {
 		n = append(n, param.Copy())
 	}
+
 	return Params{n}
 }
 
@@ -88,6 +89,7 @@ func (p Params) String() string {
 	for _, param := range p.params {
 		paramsArray = append(paramsArray, param.String())
 	}
+
 	return morestrings.JoinNonEmpty("", "&", paramsArray...)
 }
 
@@ -97,5 +99,6 @@ func (p Params) QueryEscape() string {
 	for _, param := range p.params {
 		paramsArray = append(paramsArray, param.QueryEscape())
 	}
+
 	return morestrings.JoinNonEmpty("", "&", paramsArray...)
 }
