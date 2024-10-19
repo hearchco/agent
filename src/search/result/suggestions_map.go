@@ -32,6 +32,7 @@ func (m *SuggestionConcMap) AddOrUpgrade(val SuggestionScraped) {
 
 	// Lock the map due to modifications.
 	m.Mutex.Lock()
+	defer m.Mutex.Unlock()
 
 	mapVal, exists := m.Map[val.Key()]
 	if !exists {
@@ -55,13 +56,11 @@ func (m *SuggestionConcMap) AddOrUpgrade(val SuggestionScraped) {
 			alreadyIn.UpgradeIfBetter(val.Rank().Convert())
 		}
 	}
-
-	// Unlock the map.
-	m.Mutex.Unlock()
 }
 
 func (m *SuggestionConcMap) ExtractWithResponders() ([]Suggestion, []engines.Name) {
 	m.Mutex.RLock()
+	defer m.Mutex.RUnlock()
 
 	suggestions := make([]Suggestion, 0, len(m.Map))
 	responders := make([]engines.Name, 0, m.enabledEnginesLen)
@@ -75,8 +74,6 @@ func (m *SuggestionConcMap) ExtractWithResponders() ([]Suggestion, []engines.Nam
 			}
 		}
 	}
-
-	m.Mutex.RUnlock()
 
 	return suggestions, responders
 }

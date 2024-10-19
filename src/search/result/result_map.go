@@ -35,6 +35,7 @@ func (m *ResultConcMap) AddOrUpgrade(val ResultScraped) {
 
 	// Lock the map due to modifications.
 	m.Mutex.Lock()
+	defer m.Mutex.Unlock()
 
 	mapVal, exists := m.Map[val.Key()]
 	if !exists {
@@ -63,13 +64,11 @@ func (m *ResultConcMap) AddOrUpgrade(val ResultScraped) {
 			mapVal.SetDescription(val.Description())
 		}
 	}
-
-	// Unlock the map.
-	m.Mutex.Unlock()
 }
 
 func (m *ResultConcMap) ExtractWithResponders() ([]Result, []engines.Name) {
 	m.Mutex.RLock()
+	defer m.Mutex.RUnlock()
 
 	results := make([]Result, 0, len(m.Map))
 	responders := make([]engines.Name, 0, m.enabledEnginesLen)
@@ -84,8 +83,6 @@ func (m *ResultConcMap) ExtractWithResponders() ([]Result, []engines.Name) {
 			}
 		}
 	}
-
-	m.Mutex.RUnlock()
 
 	return results, responders
 }
