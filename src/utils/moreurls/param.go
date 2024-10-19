@@ -18,28 +18,8 @@ func NewParam(k, v string) Param {
 	return Param{k, v}
 }
 
-// Returns the key of the param.
-func (p Param) Key() string {
-	return p.key
-}
-
-// Return the value of the param.
-func (p Param) Value() string {
-	return p.value
-}
-
-// Sets the value of the param.
-func (p *Param) SetValue(v string) {
-	p.value = v
-}
-
-// Returns a copy of the param.
-func (p Param) Copy() Param {
-	return Param{p.key, p.value}
-}
-
-// Returns raw param in format "foo=bar".
-func (p Param) String() string {
+// Private assert function to ensure key and value are not empty.
+func (p Param) assert() {
 	if p.key == "" || p.value == "" {
 		log.Panic().
 			Str("key", p.key).
@@ -47,11 +27,41 @@ func (p Param) String() string {
 			Msg("Empty key or value in parameter")
 		// ^PANIC - Assert proper KV pair in Param.
 	}
+}
+
+// Returns the key of the param.
+func (p Param) Key() string {
+	p.assert()
+	return p.key
+}
+
+// Return the value of the param.
+func (p Param) Value() string {
+	p.assert()
+	return p.value
+}
+
+// Sets the value of the param.
+func (p *Param) SetValue(v string) {
+	p.assert()
+	p.value = v
+}
+
+// Returns a copy of the param.
+func (p Param) Copy() Param {
+	p.assert()
+	return Param{p.key, p.value}
+}
+
+// Returns raw param in format "foo=bar".
+func (p Param) String() string {
+	p.assert()
 	return fmt.Sprintf("%s=%s", p.key, p.value)
 }
 
 // Returns URL encoded param in format "foo=bar".
 func (p Param) QueryEscape() string {
+	p.assert()
 	if p.key == "" || p.value == "" {
 		log.Panic().
 			Str("key", p.key).
