@@ -8,31 +8,35 @@ import (
 )
 
 const (
-	paramKeyPage       = "first"
-	paramKeyLocale     = "setlang" // Should be first 2 characters of Locale.
-	paramKeyLocaleSec  = "cc"      // Should be last 2 characters of Locale.
-	paramKeySafeSearch = ""        // Always enabled.
+	// Variables params.
+	paramQueryK     = "q"
+	paramPageK      = "first"
+	paramLocaleK    = "setlang" // Should be first 2 characters of Locale.
+	paramLocaleSecK = "cc"      // Should be last 2 characters of Locale.
+	// paramSafeSearchK = ""        // Always enabled.
 
-	// Image search params.
-	imgParamKeyLocale       = "m"
-	imgParamKeyLocaleAlt    = "mkt"
-	imgParamKeyLocaleSec    = "u"
-	imgParamKeyLocaleSecAlt = "ui"
-	imgParamAsync           = "async=1"
-	imgParamCount           = "count=35"
+	// Image variable params.
+	imgCookieLocaleK       = "m"
+	imgCookieLocaleSecK    = "u"
+	imgCookieLocaleAltK    = "mkt"
+	imgCookieLocaleAltSecK = "ui"
+
+	// Image constant params.
+	imgParamAsyncK, imgParamAsyncV = "async", "1"
+	imgParamCountK, imgParamCountV = "count", "35"
 )
 
-func localeParamString(locale options.Locale) string {
+func localeParamValues(locale options.Locale) (string, string) {
 	spl := strings.SplitN(strings.ToLower(locale.String()), "_", 2)
-	return fmt.Sprintf("%v=%v&%v=%v", paramKeyLocale, spl[0], paramKeyLocaleSec, spl[1])
+	return spl[0], spl[1]
 }
 
 func localeCookieString(locale options.Locale) string {
 	spl := strings.SplitN(strings.ToLower(locale.String()), "_", 2)
-	return fmt.Sprintf("%v=%v&%v=%v", imgParamKeyLocale, spl[1], imgParamKeyLocaleSec, spl[0])
+	return fmt.Sprintf("%v=%v&%v=%v", imgCookieLocaleK, spl[1], imgCookieLocaleSecK, spl[0])
 }
 
 func localeAltCookieString(locale options.Locale) string {
 	spl := strings.SplitN(strings.ToLower(locale.String()), "_", 2)
-	return fmt.Sprintf("%v=%v&%v=%v", imgParamKeyLocaleAlt, spl[1], imgParamKeyLocaleSecAlt, spl[0])
+	return fmt.Sprintf("%v=%v&%v=%v", imgCookieLocaleAltK, spl[1], imgCookieLocaleAltSecK, spl[0])
 }

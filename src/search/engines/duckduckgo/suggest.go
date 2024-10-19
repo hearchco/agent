@@ -1,7 +1,6 @@
 package duckduckgo
 
 import (
-	"fmt"
 	"sync/atomic"
 
 	"github.com/gocolly/colly/v2"
@@ -11,7 +10,7 @@ import (
 	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/search/scraper"
 	"github.com/hearchco/agent/src/utils/anonymize"
-	"github.com/hearchco/agent/src/utils/morestrings"
+	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
 func (se Engine) Suggest(query string, options options.Options, sugChan chan result.SuggestionScraped) ([]error, bool) {
@@ -47,12 +46,22 @@ func (se Engine) Suggest(query string, options options.Options, sugChan chan res
 	})
 
 	ctx := colly.NewContext()
-	combinedParams := morestrings.JoinNonEmpty("&", "&", sugParamType)
 
-	urll := fmt.Sprintf("%v?q=%v%v", suggestURL, query, combinedParams)
-	anonUrll := fmt.Sprintf("%v?q=%v%v", suggestURL, anonymize.String(query), combinedParams)
-	err := se.Get(ctx, urll, anonUrll)
-	if err != nil {
+	// Build the parameters.
+	params := moreurls.NewParams(
+		paramQueryK, query,
+		sugParamTypeK, sugParamTypeV,
+	)
+
+	// Build the url.
+	urll := moreurls.Build(suggestURL, params)
+
+	// Build anonymous url, by anonymizing the query.
+	params.Set(paramQueryK, anonymize.String(query))
+	anonUrll := moreurls.Build(suggestURL, params)
+
+	// Send the request.
+	if err := se.Get(ctx, urll, anonUrll); err != nil {
 		retErrors = append(retErrors, err)
 	}
 

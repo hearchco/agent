@@ -1,18 +1,10 @@
 package startpage
 
-import (
-	"fmt"
-)
-
 const (
-	paramKeyPage       = "page"
-	paramKeySafeSearch = "qadf" // Can be "none" or empty param (empty means it's enabled).
-)
+	// Variable params.
+	paramQueryK = "q"
+	paramPageK  = "page"
 
-func safeSearchParamString(safesearch bool) string {
-	if safesearch {
-		return ""
-	} else {
-		return fmt.Sprintf("%v=%v", paramKeySafeSearch, "none")
-	}
-}
+	// Constant params.
+	paramSafeSearchK, paramSafeSearchV = "qadf", "none" // Can be "none" or empty param (empty means it's enabled).
+)

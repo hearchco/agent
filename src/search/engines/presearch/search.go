@@ -14,7 +14,7 @@ import (
 	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/search/scraper/parse"
 	"github.com/hearchco/agent/src/utils/anonymize"
-	"github.com/hearchco/agent/src/utils/morestrings"
+	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
 func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
@@ -100,17 +100,25 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		ctx := colly.NewContext()
 		ctx.Put("page", strconv.Itoa(i))
 
-		// Dynamic params.
-		paramPage := ""
+		// Build the parameters.
+		params := moreurls.NewParams(
+			paramQueryK, query,
+		)
 		if pageNum0 > 0 {
-			paramPage = fmt.Sprintf("%v=%v", paramKeyPage, pageNum0+1)
+			params = moreurls.NewParams(
+				paramQueryK, query,
+				paramPageK, strconv.Itoa(pageNum0+1),
+			)
 		}
 
-		combinedParams := morestrings.JoinNonEmpty("&", "&", paramPage)
+		// Build the url.
+		urll := moreurls.Build(searchURL, params)
 
-		urll := fmt.Sprintf("%v?q=%v%v", searchURL, query, combinedParams)
-		anonUrll := fmt.Sprintf("%v?q=%v%v", searchURL, anonymize.String(query), combinedParams)
+		// Build anonymous url, by anonymizing the query.
+		params.Set(paramQueryK, anonymize.String(query))
+		anonUrll := moreurls.Build(searchURL, params)
 
+		// Send the request.
 		if err := se.Get(ctx, urll, anonUrll); err != nil {
 			retErrors = append(retErrors, err)
 		}

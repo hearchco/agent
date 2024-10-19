@@ -14,7 +14,7 @@ import (
 	"github.com/hearchco/agent/src/search/scraper"
 	"github.com/hearchco/agent/src/search/scraper/parse"
 	"github.com/hearchco/agent/src/utils/anonymize"
-	"github.com/hearchco/agent/src/utils/morestrings"
+	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
 func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
@@ -83,44 +83,59 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 
 	firstRequest := true
 
-	// Static params.
-	paramSafeSearch := safeSearchParamString(opts.SafeSearch)
+	// Constant params.
+	paramSafeSearchV := safeSearchValue(opts.SafeSearch)
 
 	for i := range opts.Pages.Max {
 		pageNum0 := i + opts.Pages.Start
 		ctx := colly.NewContext()
 		ctx.Put("page", strconv.Itoa(i))
 
-		var err error
 		// eTools requires a request for the first page.
-		if pageNum0 == 0 || firstRequest {
-			combinedParams := morestrings.JoinNonEmpty("&", "&", paramCountry, paramLanguage, paramSafeSearch)
+		if firstRequest {
+			// Build the parameters.
+			params := moreurls.NewParams(
+				paramQueryK, query,
+				paramCountryK, paramCountryV,
+				paramLanguageK, paramLanguageV,
+				paramSafeSearchK, paramSafeSearchV,
+			)
 
-			body := strings.NewReader(fmt.Sprintf("query=%v%v", query, combinedParams))
-			anonBody := fmt.Sprintf("query=%v%v", anonymize.String(query), combinedParams)
+			// Build the POST body query params Reader.
+			body := strings.NewReader(params.QueryEscape())
 
-			if firstRequest {
-				firstCtx := colly.NewContext()
-				firstCtx.Put("ignore", strconv.FormatBool(true))
-				err = se.Post(firstCtx, searchURL, body, anonBody)
-			} else {
-				err = se.Post(ctx, searchURL, body, anonBody)
+			// Build anonymous POST body query params.
+			params.Set(paramQueryK, anonymize.String(query))
+			anonBody := params.QueryEscape()
+
+			// Send the POST request.
+			firstCtx := colly.NewContext()
+			firstCtx.Put("ignore", strconv.FormatBool(true))
+			if err := se.Post(firstCtx, searchURL, body, anonBody); err != nil {
+				retErrors = append(retErrors, err)
 			}
 
 			firstRequest = false
 			se.Wait() // Needed to save the JSESSION cookie.
 		}
 
-		// Since the above can happen for the first request and then we need to request the wanted page.
+		// Since the above will happen for the first request and then we need to request the wanted page.
 		if pageNum0 > 0 {
-			// Query isn't needed as it's saved in the JSESSION cookie.
-			paramPage := fmt.Sprintf("%v=%v", paramKeyPage, pageNum0+1)
-			urll := fmt.Sprintf("%v?%v", pageURL, paramPage)
-			err = se.Get(ctx, urll, urll)
-		}
+			// Build the parameters.
+			params := moreurls.NewParams(
+				// Query isn't needed as it's saved in the JSESSION cookie.
+				paramPageK, strconv.Itoa(pageNum0+1),
+			)
 
-		if err != nil {
-			retErrors = append(retErrors, err)
+			// Build the url.
+			urll := moreurls.Build(pageURL, params)
+
+			// Since the query is saved in JSESSION cookie, no anonUrll is needed
+
+			// Send the request.
+			if err := se.Get(ctx, urll, urll); err != nil {
+				retErrors = append(retErrors, err)
+			}
 		}
 	}
 

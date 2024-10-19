@@ -1,38 +1,42 @@
 package google
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/hearchco/agent/src/search/engines/options"
 )
 
 const (
-	paramKeyPage       = "start"
-	paramKeyLocale     = "hl"   // Should be first 2 characters of Locale.
-	paramKeyLocaleSec  = "lr"   // Should be first 2 characters of Locale with prefixed "lang_".
-	paramKeySafeSearch = "safe" // Can be "off", "medium or "high".
+	// Variable params.
+	paramQueryK      = "q"
+	paramPageK       = "start"
+	paramLocaleK     = "hl"   // Should be first 2 characters of Locale.
+	paramLocaleSecK  = "lr"   // Should be first 2 characters of Locale with prefixed "lang_".
+	paramSafeSearchK = "safe" // Can be "off", "medium or "high".
 
-	paramFilter = "filter=0"
+	// Constant params.
+	paramFilterK, paramFilterV = "filter", "0"
 
-	// Image search params.
-	imgParamKeyPage = "async=_fmt:json,p:1,ijn"
-	imgParamTbm     = "tbm=isch"
-	imgParamAsearch = "asearch=isch"
+	// Image search variable params.
+	imgParamPageK, imgParamPageVPrefix = "async", "_fmt:json,p:1,ijn:"
 
-	// Suggestions API params.
-	sugParamClient = "client=firefox"
+	// Image search constant params.
+	imgParamTbmK, imgParamTbmV         = "tbm", "isch"
+	imgParamAsearchK, imgParamAsearchV = "asearch", "isch"
+
+	// Suggestions constant params.
+	sugParamClientK, sugParamClientV = "client", "firefox"
 )
 
-func localeParamString(locale options.Locale) string {
+func localeParamValues(locale options.Locale) (string, string) {
 	lang := strings.SplitN(strings.ToLower(locale.String()), "_", 2)[0]
-	return fmt.Sprintf("%v=%v&%v=lang_%v", paramKeyLocale, lang, paramKeyLocaleSec, lang)
+	return lang, "lang_" + lang
 }
 
-func safeSearchParamString(safesearch bool) string {
+func safeSearchParamValue(safesearch bool) string {
 	if safesearch {
-		return fmt.Sprintf("%v=%v", paramKeySafeSearch, "high")
+		return "high"
 	} else {
-		return fmt.Sprintf("%v=%v", paramKeySafeSearch, "off")
+		return "off"
 	}
 }

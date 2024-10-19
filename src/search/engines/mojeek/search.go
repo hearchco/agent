@@ -13,7 +13,7 @@ import (
 	"github.com/hearchco/agent/src/search/scraper"
 	"github.com/hearchco/agent/src/search/scraper/parse"
 	"github.com/hearchco/agent/src/utils/anonymize"
-	"github.com/hearchco/agent/src/utils/morestrings"
+	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
 func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
@@ -49,26 +49,40 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		}
 	})
 
-	// Static params.
-	paramLocale := localeParamString(opts.Locale)
-	paramSafeSearch := safeSearchParamString(opts.SafeSearch)
+	// Constant params.
+	paramLocaleV, paramLocaleSecV := localeParamValues(opts.Locale)
+	paramSafeSearchV := safeSearchParamValue(opts.SafeSearch)
 
 	for i := range opts.Pages.Max {
 		pageNum0 := i + opts.Pages.Start
 		ctx := colly.NewContext()
 		ctx.Put("page", strconv.Itoa(i))
 
-		// Dynamic params.
-		paramPage := ""
+		// Build the parameters.
+		params := moreurls.NewParams(
+			paramQueryK, query,
+			paramLocaleK, paramLocaleV,
+			paramLocaleSecK, paramLocaleSecV,
+			paramSafeSearchK, paramSafeSearchV,
+		)
 		if pageNum0 > 0 {
-			paramPage = fmt.Sprintf("%v=%v", paramKeyPage, pageNum0*10+1)
+			params = moreurls.NewParams(
+				paramQueryK, query,
+				paramPageK, strconv.Itoa(pageNum0*10+1),
+				paramLocaleK, paramLocaleV,
+				paramLocaleSecK, paramLocaleSecV,
+				paramSafeSearchK, paramSafeSearchV,
+			)
 		}
 
-		combinedParams := morestrings.JoinNonEmpty("&", "&", paramPage, paramLocale, paramSafeSearch)
+		// Build the url.
+		urll := moreurls.Build(searchURL, params)
 
-		urll := fmt.Sprintf("%v?q=%v%v", searchURL, query, combinedParams)
-		anonUrll := fmt.Sprintf("%v?q=%v%v", searchURL, anonymize.String(query), combinedParams)
+		// Build anonymous url, by anonymizing the query.
+		params.Set(paramQueryK, anonymize.String(query))
+		anonUrll := moreurls.Build(searchURL, params)
 
+		// Send the request.
 		if err := se.Get(ctx, urll, anonUrll); err != nil {
 			retErrors = append(retErrors, err)
 		}
