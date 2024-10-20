@@ -116,7 +116,8 @@ func (se Engine) ImageSearch(query string, opts options.Options, resChan chan re
 			paramSafeSearchK, paramSafeSearchV,
 		)
 		if pageNum0 > 0 {
-			params.Set(imgParamPageK, fmt.Sprintf(imgParamPageVPrefix+"%v", pageNum0*10))
+			// Since the order and values of other params are the same, we can just change the value for page param.
+			params.Set(imgParamPageK, imgParamPageVPrefix+strconv.Itoa(pageNum0*10))
 		}
 
 		// Build the url.
