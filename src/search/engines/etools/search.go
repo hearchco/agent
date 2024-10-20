@@ -130,10 +130,11 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 			// Build the url.
 			urll := moreurls.Build(pageURL, params)
 
-			// Since the query is saved in JSESSION cookie, no anonUrll is needed
+			// Since the query is saved in JSESSION cookie, this is the same as above.
+			anonUrll := urll
 
 			// Send the request.
-			if err := se.Get(ctx, urll, urll); err != nil {
+			if err := se.Get(ctx, urll, anonUrll); err != nil {
 				retErrors = append(retErrors, err)
 			}
 		}
