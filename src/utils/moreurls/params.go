@@ -3,13 +3,13 @@ package moreurls
 import (
 	"github.com/rs/zerolog/log"
 
+	"github.com/hearchco/agent/src/utils/kvpair"
 	"github.com/hearchco/agent/src/utils/morestrings"
-	"github.com/hearchco/agent/src/utils/moreurls/parameter"
 )
 
 // Params struct, slice of Param struct.
 type Params struct {
-	params []parameter.Param
+	params []kvpair.KVPair
 }
 
 // Constructs a new slice of params with provided keys and values.
@@ -36,9 +36,9 @@ func NewParams(elem ...string) Params {
 	}
 
 	// Create parameters slice.
-	p := make([]parameter.Param, 0, length)
+	p := make([]kvpair.KVPair, 0, length)
 	for i := range length {
-		p = append(p, parameter.NewParam(keys[i], values[i]))
+		p = append(p, kvpair.NewKVPair(keys[i], values[i]))
 	}
 
 	return Params{p}
@@ -70,13 +70,13 @@ func (p *Params) Set(k, v string) bool {
 		return true
 	}
 
-	p.params = append(p.params, parameter.NewParam(k, v))
+	p.params = append(p.params, kvpair.NewKVPair(k, v))
 	return false
 }
 
 // Returns a copy of the slice of params.
 func (p Params) Copy() Params {
-	n := make([]parameter.Param, 0, len(p.params))
+	n := make([]kvpair.KVPair, 0, len(p.params))
 	for _, param := range p.params {
 		n = append(n, param.Copy())
 	}
