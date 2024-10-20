@@ -7,12 +7,12 @@ import (
 	"github.com/hearchco/agent/src/utils/morestrings"
 )
 
-// Params struct, slice of Param struct.
+// Params struct, containing a slice of KVPairs.
 type Params struct {
 	params []kvpair.KVPair
 }
 
-// Constructs a new slice of params with provided keys and values.
+// Constructs a new slice of KVPairs with provided keys and values.
 // Input should be in pairs: "key1, value1, key2, value2, key3, value3, ..."
 // Number of elements must be even, otherwise this function panics.
 func NewParams(elem ...string) Params {
@@ -27,15 +27,17 @@ func NewParams(elem ...string) Params {
 	length := len(elem) / 2
 	keys := make([]string, 0, length)
 	values := make([]string, 0, length)
-	for i, e := range elem {
-		if i%2 == 0 {
+	isKey := true // Used to keep track of even/odd elements.
+	for _, e := range elem {
+		if isKey {
 			keys = append(keys, e)
 		} else {
 			values = append(values, e)
 		}
+		isKey = !isKey
 	}
 
-	// Create parameters slice.
+	// Create KVPair slice.
 	p := make([]kvpair.KVPair, 0, length)
 	for i := range length {
 		p = append(p, kvpair.NewKVPair(keys[i], values[i]))
@@ -58,8 +60,8 @@ func (p Params) Get(k string) (string, bool) {
 	return "", false
 }
 
-// Sets the value to the first occurence of the provided key.
-// If not found, appends new Param KV pair and returns false.
+// Sets the value to the first occurence of the provided key and returns true.
+// If not found, appends new KVPair and returns false.
 func (p *Params) Set(k, v string) bool {
 	for i, param := range p.params {
 		if param.Key() != k {
@@ -74,7 +76,7 @@ func (p *Params) Set(k, v string) bool {
 	return false
 }
 
-// Returns a copy of the slice of params.
+// Returns a copy (including the slice of KVPairs).
 func (p Params) Copy() Params {
 	n := make([]kvpair.KVPair, 0, len(p.params))
 	for _, param := range p.params {
