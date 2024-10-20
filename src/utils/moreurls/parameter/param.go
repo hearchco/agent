@@ -1,4 +1,4 @@
-package moreurls
+package parameter
 
 import (
 	"fmt"
@@ -15,7 +15,9 @@ type Param struct {
 
 // Constructs a new param with provided key and value.
 func NewParam(k, v string) Param {
-	return Param{k, v}
+	p := Param{k, v}
+	p.assert()
+	return p
 }
 
 // Private assert function to ensure key and value are not empty.

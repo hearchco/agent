@@ -16,6 +16,7 @@ import (
 	"github.com/hearchco/agent/src/search/scraper"
 	"github.com/hearchco/agent/src/utils/anonymize"
 	"github.com/hearchco/agent/src/utils/moreurls"
+	"github.com/hearchco/agent/src/utils/moreurls/parameters"
 )
 
 func (se Engine) ImageSearch(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
@@ -239,7 +240,7 @@ func (se Engine) ImageSearch(query string, opts options.Options, resChan chan re
 		ctx.Put("page", strconv.Itoa(i))
 
 		// Build the parameters.
-		params := moreurls.NewParams(
+		params := parameters.NewParams(
 			paramQueryK, query,
 			imgParamAsyncK, imgParamAsyncV,
 			paramPageK, strconv.Itoa(pageNum0*35+1),

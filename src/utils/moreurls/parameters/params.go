@@ -1,14 +1,15 @@
-package moreurls
+package parameters
 
 import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/hearchco/agent/src/utils/morestrings"
+	"github.com/hearchco/agent/src/utils/moreurls/parameter"
 )
 
 // Params struct, slice of Param struct.
 type Params struct {
-	params []Param
+	params []parameter.Param
 }
 
 // Constructs a new slice of params with provided keys and values.
@@ -35,9 +36,9 @@ func NewParams(elem ...string) Params {
 	}
 
 	// Create parameters slice.
-	p := make([]Param, 0, length)
+	p := make([]parameter.Param, 0, length)
 	for i := range length {
-		p = append(p, Param{keys[i], values[i]})
+		p = append(p, parameter.NewParam(keys[i], values[i]))
 	}
 
 	return Params{p}
@@ -61,7 +62,7 @@ func (p Params) Get(k string) (string, bool) {
 // If not found, appends new Param KV pair and returns false.
 func (p *Params) Set(k, v string) bool {
 	for i, param := range p.params {
-		if param.key != k {
+		if param.Key() != k {
 			continue
 		}
 
@@ -69,13 +70,13 @@ func (p *Params) Set(k, v string) bool {
 		return true
 	}
 
-	p.params = append(p.params, Param{k, v})
+	p.params = append(p.params, parameter.NewParam(k, v))
 	return false
 }
 
 // Returns a copy of the slice of params.
 func (p Params) Copy() Params {
-	n := make([]Param, 0, len(p.params))
+	n := make([]parameter.Param, 0, len(p.params))
 	for _, param := range p.params {
 		n = append(n, param.Copy())
 	}
