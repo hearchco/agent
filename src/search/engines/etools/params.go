@@ -1,21 +1,20 @@
 package etools
 
-import (
-	"fmt"
-)
-
 const (
-	paramKeyPage       = "page"
-	paramKeySafeSearch = "safeSearch" // Can be "true" or "false".
+	// Variable params.
+	paramQueryK      = "query"
+	paramPageK       = "page"
+	paramSafeSearchK = "safeSearch" // Can be "true" or "false".
 
-	paramCountry  = "country=web"
-	paramLanguage = "language=all"
+	// Constant params.
+	paramCountryK, paramCountryV   = "country", "web"
+	paramLanguageK, paramLanguageV = "language", "all"
 )
 
-func safeSearchParamString(safesearch bool) string {
+func safeSearchValue(safesearch bool) string {
 	if safesearch {
-		return fmt.Sprintf("%v=%v", paramKeySafeSearch, "true")
+		return "true"
 	} else {
-		return fmt.Sprintf("%v=%v", paramKeySafeSearch, "false")
+		return "false"
 	}
 }

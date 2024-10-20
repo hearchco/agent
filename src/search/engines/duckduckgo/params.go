@@ -8,15 +8,17 @@ import (
 )
 
 const (
-	paramKeyPage       = "dc"
-	paramKeyLocale     = "kl" // Should be Locale with _ replaced by - and first 2 letters as last and vice versa.
-	paramKeySafeSearch = ""   // Always enabled.
+	// Variable params.
+	paramQueryK   = "q"
+	paramPageK    = "dc"
+	cookieLocaleK = "kl" // Should be Locale with _ replaced by - and first 2 letters as last and vice versa.
+	// paramSafeSearchK = ""   // Always enabled.
 
-	// Suggestions API params.
-	sugParamType = "type=list"
+	// Suggestions variable params.
+	sugParamTypeK, sugParamTypeV = "type", "list"
 )
 
 func localeCookieString(locale options.Locale) string {
 	spl := strings.SplitN(strings.ToLower(locale.String()), "_", 2)
-	return fmt.Sprintf("%v=%v-%v", paramKeyLocale, spl[1], spl[0])
+	return fmt.Sprintf("%v=%v-%v", cookieLocaleK, spl[1], spl[0])
 }

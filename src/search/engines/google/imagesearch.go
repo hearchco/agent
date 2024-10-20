@@ -14,7 +14,7 @@ import (
 	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/search/scraper"
 	"github.com/hearchco/agent/src/utils/anonymize"
-	"github.com/hearchco/agent/src/utils/morestrings"
+	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
 func (se Engine) ImageSearch(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
@@ -95,26 +95,39 @@ func (se Engine) ImageSearch(query string, opts options.Options, resChan chan re
 		}
 	})
 
-	// Static params.
-	paramLocale := localeParamString(opts.Locale)
-	paramSafeSearch := safeSearchParamString(opts.SafeSearch)
+	// Constant params.
+	paramLocaleV, paramLocaleSecV := localeParamValues(opts.Locale)
+	paramSafeSearchV := safeSearchParamValue(opts.SafeSearch)
 
 	for i := range opts.Pages.Max {
 		pageNum0 := i + opts.Pages.Start
 		ctx := colly.NewContext()
 		ctx.Put("page", strconv.Itoa(i))
 
-		// Dynamic params.
-		paramPage := fmt.Sprintf("%v:1", imgParamKeyPage)
+		// Build the parameters.
+		params := moreurls.NewParams(
+			paramQueryK, query,
+			imgParamTbmK, imgParamTbmV,
+			imgParamAsearchK, imgParamAsearchV,
+			paramFilterK, paramFilterV,
+			imgParamPageK, imgParamPageVPrefix+"1",
+			paramLocaleK, paramLocaleV,
+			paramLocaleSecK, paramLocaleSecV,
+			paramSafeSearchK, paramSafeSearchV,
+		)
 		if pageNum0 > 0 {
-			paramPage = fmt.Sprintf("%v:%v", imgParamKeyPage, pageNum0*10)
+			// Since the order and values of other params are the same, we can just change the value for page param.
+			params.Set(imgParamPageK, imgParamPageVPrefix+strconv.Itoa(pageNum0*10))
 		}
 
-		combinedParams := morestrings.JoinNonEmpty("&", "&", imgParamTbm, imgParamAsearch, paramFilter, paramPage, paramLocale, paramSafeSearch)
+		// Build the url.
+		urll := moreurls.Build(imageSearchURL, params)
 
-		urll := fmt.Sprintf("%v?q=%v%v", imageSearchURL, query, combinedParams)
-		anonUrll := fmt.Sprintf("%v?q=%v%v", imageSearchURL, anonymize.String(query), combinedParams)
+		// Build anonymous url, by anonymizing the query.
+		params.Set(paramQueryK, anonymize.String(query))
+		anonUrll := moreurls.Build(imageSearchURL, params)
 
+		// Send the request.
 		if err := se.Get(ctx, urll, anonUrll); err != nil {
 			retErrors = append(retErrors, err)
 		}

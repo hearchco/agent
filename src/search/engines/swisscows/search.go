@@ -13,7 +13,7 @@ import (
 	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/search/scraper/parse"
 	"github.com/hearchco/agent/src/utils/anonymize"
-	"github.com/hearchco/agent/src/utils/morestrings"
+	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
 func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
@@ -88,24 +88,31 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		}
 	})
 
-	// Static params.
-	paramLocale := localeParamString(opts.Locale)
+	// Constant params.
+	paramLocaleV := localeParamValue(opts.Locale)
 
 	for i := range opts.Pages.Max {
 		pageNum0 := i + opts.Pages.Start
 		ctx := colly.NewContext()
 		ctx.Put("page", strconv.Itoa(i))
 
-		// Dynamic params.
-		paramPage := fmt.Sprintf("%v=%v", paramKeyPage, pageNum0*10)
+		// Build the parameters.
+		params := moreurls.NewParams(
+			paramFreshnessK, paramFreshnessV,
+			paramItemsK, paramItemsV,
+			paramPageK, strconv.Itoa(pageNum0*10),
+			paramQueryK, query,
+			paramLocaleK, paramLocaleV,
+		)
 
-		combinedParamsLeft := morestrings.JoinNonEmpty("?", "&", paramFreshness, paramItems, paramPage)
-		combinedParamsRight := morestrings.JoinNonEmpty("&", "&", paramLocale)
+		// Build the url.
+		urll := moreurls.Build(searchURL, params)
 
-		// Non standard order of parameters required
-		urll := fmt.Sprintf("%v%v&query=%v%v", searchURL, combinedParamsLeft, query, combinedParamsRight)
-		anonUrll := fmt.Sprintf("%v%v&query=%v%v", searchURL, combinedParamsLeft, anonymize.String(query), combinedParamsRight)
+		// Build anonymous url, by anonymizing the query.
+		params.Set(paramQueryK, anonymize.String(query))
+		anonUrll := moreurls.Build(searchURL, params)
 
+		// Send the request.
 		if err := se.Get(ctx, urll, anonUrll); err != nil {
 			retErrors = append(retErrors, err)
 		}

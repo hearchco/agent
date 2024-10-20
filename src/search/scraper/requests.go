@@ -9,15 +9,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (e EngineBase) Get(ctx *colly.Context, urll string, anonurll string) error {
+func (e EngineBase) Get(ctx *colly.Context, urll string, anonUrll string) error {
 	log.Trace().
 		Str("engine", e.Name.String()).
-		Str("url", anonurll).
+		Str("url", anonUrll).
 		Str("method", http.MethodGet).
 		Msg("Making a new request")
 
 	if err := e.collector.Request(http.MethodGet, urll, nil, ctx, nil); err != nil {
-		return fmt.Errorf("%v: failed GET request to %v with %w", e.Name.String(), anonurll, err)
+		return fmt.Errorf("%v: failed GET request to %v with %w", e.Name.String(), anonUrll, err)
 	}
 
 	return nil

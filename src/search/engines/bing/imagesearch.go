@@ -15,7 +15,7 @@ import (
 	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/search/scraper"
 	"github.com/hearchco/agent/src/utils/anonymize"
-	"github.com/hearchco/agent/src/utils/morestrings"
+	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
 func (se Engine) ImageSearch(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
@@ -238,14 +238,22 @@ func (se Engine) ImageSearch(query string, opts options.Options, resChan chan re
 		ctx := colly.NewContext()
 		ctx.Put("page", strconv.Itoa(i))
 
-		// Dynamic params.
-		paramPage := fmt.Sprintf("%v=%v", paramKeyPage, pageNum0*35+1)
+		// Build the parameters.
+		params := moreurls.NewParams(
+			paramQueryK, query,
+			imgParamAsyncK, imgParamAsyncV,
+			paramPageK, strconv.Itoa(pageNum0*35+1),
+			imgParamCountK, imgParamCountV,
+		)
 
-		combinedParams := morestrings.JoinNonEmpty("&", "&", imgParamAsync, paramPage, imgParamCount)
+		// Build the url.
+		urll := moreurls.Build(imageSearchURL, params)
 
-		urll := fmt.Sprintf("%v?q=%v%v", imageSearchURL, query, combinedParams)
-		anonUrll := fmt.Sprintf("%v?q=%v%v", imageSearchURL, anonymize.String(query), combinedParams)
+		// Build anonymous url, by anonymizing the query.
+		params.Set(paramQueryK, anonymize.String(query))
+		anonUrll := moreurls.Build(imageSearchURL, params)
 
+		// Send the request.
 		if err := se.Get(ctx, urll, anonUrll); err != nil {
 			retErrors = append(retErrors, err)
 		}

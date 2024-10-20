@@ -8,23 +8,26 @@ import (
 )
 
 const (
-	paramKeyPage       = "offset"
-	paramKeyLocale     = "country"    // Should be last 2 characters of Locale.
-	paramKeySafeSearch = "safesearch" // Can be "off" or "strict".
+	// Variable params.
+	paramQueryK       = "q"
+	paramPageK        = "offset"
+	cookieLocaleK     = "country"    // Should be last 2 characters of Locale.
+	cookieSafeSearchK = "safesearch" // Can be "off" or "strict".
 
-	paramSource     = "source=web"
-	paramSpellcheck = "spellcheck=0"
+	// Constant params.
+	paramSourceK, paramSourceV         = "source", "web"
+	paramSpellcheckK, paramSpellcheckV = "spellcheck", "0"
 )
 
 func localeCookieString(locale options.Locale) string {
 	region := strings.SplitN(strings.ToLower(locale.String()), "_", 2)[1]
-	return fmt.Sprintf("%v=%v", paramKeyLocale, region)
+	return fmt.Sprintf("%v=%v", cookieLocaleK, region)
 }
 
 func safeSearchCookieString(safesearch bool) string {
 	if safesearch {
-		return fmt.Sprintf("%v=%v", paramKeySafeSearch, "strict")
+		return fmt.Sprintf("%v=%v", cookieSafeSearchK, "strict")
 	} else {
-		return fmt.Sprintf("%v=%v", paramKeySafeSearch, "off")
+		return fmt.Sprintf("%v=%v", cookieSafeSearchK, "off")
 	}
 }

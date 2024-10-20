@@ -14,6 +14,7 @@ import (
 	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/search/scraper/parse"
 	"github.com/hearchco/agent/src/utils/anonymize"
+	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
 func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
@@ -91,21 +92,42 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		ctx := colly.NewContext()
 		ctx.Put("page", strconv.Itoa(i))
 
-		var err error
 		if pageNum0 == 0 {
-			urll := fmt.Sprintf("%v?q=%v", searchURL, query)
-			anonUrll := fmt.Sprintf("%v?q=%v", searchURL, anonymize.String(query))
-			err = se.Get(ctx, urll, anonUrll)
-		} else {
-			// This value changes depending on how many results were returned on the first page, so it's set to the lowest seen value.
-			paramPage := fmt.Sprintf("%v=%v", paramKeyPage, pageNum0*20)
-			body := strings.NewReader(fmt.Sprintf("q=%v&%v", query, paramPage))
-			anonBody := fmt.Sprintf("q=%v&%v", anonymize.String(query), paramPage)
-			err = se.Post(ctx, searchURL, body, anonBody)
-		}
+			// Build the parameters.
+			params := moreurls.NewParams(
+				paramQueryK, query,
+			)
 
-		if err != nil {
-			retErrors = append(retErrors, err)
+			// Build the url.
+			urll := moreurls.Build(searchURL, params)
+
+			// Build anonymous url, by anonymizing the query.
+			params.Set(paramQueryK, anonymize.String(query))
+			anonUrll := moreurls.Build(searchURL, params)
+
+			// Send the request.
+			if err := se.Get(ctx, urll, anonUrll); err != nil {
+				retErrors = append(retErrors, err)
+			}
+		} else {
+			// Build the parameters.
+			params := moreurls.NewParams(
+				paramQueryK, query,
+				// This value changes depending on how many results were returned on the first page, so it's set to the lowest seen value.
+				paramPageK, strconv.Itoa(pageNum0*20),
+			)
+
+			// Build the POST body query params Reader.
+			body := strings.NewReader(params.QueryEscape())
+
+			// Build anonymous POST body query params.
+			params.Set(paramQueryK, anonymize.String(query))
+			anonBody := params.QueryEscape()
+
+			// Send the POST request.
+			if err := se.Post(ctx, searchURL, body, anonBody); err != nil {
+				retErrors = append(retErrors, err)
+			}
 		}
 	}
 
