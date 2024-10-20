@@ -75,7 +75,6 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 			params = moreurls.NewParams(
 				paramQueryK, query,
 				paramPageK, strconv.Itoa(pageNum0+1),
-				paramSafeSearchK, paramSafeSearchV,
 			)
 		}
 
