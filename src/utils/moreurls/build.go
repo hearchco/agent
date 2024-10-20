@@ -4,12 +4,10 @@ import (
 	"net/url"
 
 	"github.com/rs/zerolog/log"
-
-	"github.com/hearchco/agent/src/utils/moreurls/parameters"
 )
 
 // Constructs a URL with the given parameters.
-func Build(urll string, params parameters.Params) string {
+func Build(urll string, params Params) string {
 	// Parse the URL.
 	u, err := url.Parse(urll)
 	if err != nil {

@@ -1,4 +1,4 @@
-package parameters
+package moreurls
 
 import (
 	"github.com/rs/zerolog/log"

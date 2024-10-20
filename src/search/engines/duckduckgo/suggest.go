@@ -11,7 +11,6 @@ import (
 	"github.com/hearchco/agent/src/search/scraper"
 	"github.com/hearchco/agent/src/utils/anonymize"
 	"github.com/hearchco/agent/src/utils/moreurls"
-	"github.com/hearchco/agent/src/utils/moreurls/parameters"
 )
 
 func (se Engine) Suggest(query string, options options.Options, sugChan chan result.SuggestionScraped) ([]error, bool) {
@@ -49,7 +48,7 @@ func (se Engine) Suggest(query string, options options.Options, sugChan chan res
 	ctx := colly.NewContext()
 
 	// Build the parameters.
-	params := parameters.NewParams(
+	params := moreurls.NewParams(
 		paramQueryK, query,
 		sugParamTypeK, sugParamTypeV,
 	)

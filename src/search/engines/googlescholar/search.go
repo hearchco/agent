@@ -14,7 +14,6 @@ import (
 	"github.com/hearchco/agent/src/search/scraper/parse"
 	"github.com/hearchco/agent/src/utils/anonymize"
 	"github.com/hearchco/agent/src/utils/moreurls"
-	"github.com/hearchco/agent/src/utils/moreurls/parameters"
 )
 
 func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
@@ -73,7 +72,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		ctx.Put("page", strconv.Itoa(i))
 
 		// Build the parameters.
-		params := parameters.NewParams(
+		params := moreurls.NewParams(
 			paramQueryK, query,
 			paramFilterK, paramFilterV,
 			paramLocaleK, paramLocaleV,
@@ -81,7 +80,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 			paramSafeSearchK, paramSafeSearchV,
 		)
 		if pageNum0 > 0 {
-			params = parameters.NewParams(
+			params = moreurls.NewParams(
 				paramQueryK, query,
 				paramFilterK, paramFilterV,
 				paramPageK, strconv.Itoa(pageNum0*10),

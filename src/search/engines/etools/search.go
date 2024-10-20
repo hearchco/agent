@@ -15,7 +15,6 @@ import (
 	"github.com/hearchco/agent/src/search/scraper/parse"
 	"github.com/hearchco/agent/src/utils/anonymize"
 	"github.com/hearchco/agent/src/utils/moreurls"
-	"github.com/hearchco/agent/src/utils/moreurls/parameters"
 )
 
 func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
@@ -95,7 +94,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		// eTools requires a request for the first page.
 		if firstRequest {
 			// Build the parameters.
-			params := parameters.NewParams(
+			params := moreurls.NewParams(
 				paramQueryK, query,
 				paramCountryK, paramCountryV,
 				paramLanguageK, paramLanguageV,
@@ -123,7 +122,7 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		// Since the above will happen for the first request and then we need to request the wanted page.
 		if pageNum0 > 0 {
 			// Build the parameters.
-			params := parameters.NewParams(
+			params := moreurls.NewParams(
 				// Query isn't needed as it's saved in the JSESSION cookie.
 				paramPageK, strconv.Itoa(pageNum0+1),
 			)
