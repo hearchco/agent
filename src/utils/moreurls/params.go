@@ -46,7 +46,7 @@ func NewParams(elem ...string) Params {
 	return Params{p}
 }
 
-// Returns the value of the first occurence with the provided key.
+// Returns the value of the first occurence with the provided key and returns true.
 // If not found, returns empty string and false.
 func (p Params) Get(k string) (string, bool) {
 	for _, param := range p.params {
