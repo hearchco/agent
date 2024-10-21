@@ -63,18 +63,25 @@ func New(ctx context.Context, keyPrefix string, conf config.DynamoDB) (DRV, erro
 func (drv DRV) Close() {}
 
 func (drv DRV) Set(k string, v any, ttl ...time.Duration) error {
-	log.Debug().Msg("Caching...")
-	cacheTimer := time.Now()
+	// Create a hash of the key to store in dynamodb.
+	keyHash := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
-	key := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
-	item, err := json.Marshal(v)
+	// Serialize the value to JSON.
+	valJSON, err := json.Marshal(v)
 	if err != nil {
 		return fmt.Errorf("dynamodb.Set(): error marshaling value: %w", err)
 	}
 
+	// Encrypt the value using the original key (not the hash).
+	val, err := anonymize.Encrypt(valJSON, k)
+	if err != nil {
+		return fmt.Errorf("dynamodb.Set(): error encrypting value: %w", err)
+	}
+
+	// Set the key-value pair in dynamodb.
 	attributes := map[string]types.AttributeValue{
-		"Key":   &types.AttributeValueMemberS{Value: key},
-		"Value": &types.AttributeValueMemberS{Value: string(item)},
+		"Key":   &types.AttributeValueMemberS{Value: keyHash},
+		"Value": &types.AttributeValueMemberS{Value: val},
 	}
 
 	if len(ttl) > 0 {
@@ -90,26 +97,27 @@ func (drv DRV) Set(k string, v any, ttl ...time.Duration) error {
 		return fmt.Errorf("dynamodb.Set(): error setting KV in dynamodb: %w", err)
 	}
 
-	log.Trace().Dur("duration", time.Since(cacheTimer)).Msg("Cached results")
 	return nil
 }
 
 func (drv DRV) Get(k string, o any) error {
-	key := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
+	// Create a hash of the key to retrieve from dynamodb.
+	keyHash := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
+	// Get the value from dynamodb.
 	result, err := drv.client.GetItem(drv.ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(drv.tableName),
 		Key: map[string]types.AttributeValue{
-			"Key": &types.AttributeValueMemberS{Value: key},
+			"Key": &types.AttributeValueMemberS{Value: keyHash},
 		},
 	})
 	if err != nil {
-		return fmt.Errorf("dynamodb.Get(): error getting value from dynamodb for key %v: %w", key, err)
+		return fmt.Errorf("dynamodb.Get(): error getting value from dynamodb for key %v: %w", keyHash, err)
 	}
 
 	if result.Item == nil {
 		log.Trace().
-			Str("key", key).
+			Str("key_hash", keyHash).
 			Msg("Found no value in dynamodb")
 		return nil
 	}
@@ -118,41 +126,53 @@ func (drv DRV) Get(k string, o any) error {
 	if result.Item["TTL"] != nil {
 		expirationTime, err := strconv.ParseInt(result.Item["TTL"].(*types.AttributeValueMemberN).Value, 10, 64)
 		if err != nil {
-			return fmt.Errorf("dynamodb.Get(): error parsing TTL value for key %v: %w", key, err)
+			return fmt.Errorf("dynamodb.Get(): error parsing TTL value for key hash %v: %w", keyHash, err)
 		}
 
 		expiresIn := time.Until(time.Unix(expirationTime, 0))
 		if expiresIn < 0 {
 			log.Trace().
-				Str("key", key).
+				Str("key_hash", keyHash).
 				Msg("Value has expired")
 			return nil
 		}
 	}
 
-	value := result.Item["Value"].(*types.AttributeValueMemberS).Value
-	if err := json.Unmarshal([]byte(value), o); err != nil {
-		return fmt.Errorf("dynamodb.Get(): error unmarshaling value from dynamodb for key %v: %w", key, err)
+	val := result.Item["Value"].(*types.AttributeValueMemberS).Value
+
+	// Decrypt the value using the original key (not the hash).
+	valJSON, err := anonymize.Decrypt(val, k)
+	if err != nil {
+		return fmt.Errorf("dynamodb.Get(): error decrypting value: %w", err)
+	}
+
+	// Deserialize the value from JSON.
+	if err := json.Unmarshal(valJSON, o); err != nil {
+		return fmt.Errorf("dynamodb.Get(): error unmarshaling value from dynamodb for key %v: %w", keyHash, err)
 	}
 
 	return nil
 }
 
 func (drv DRV) GetTTL(k string) (time.Duration, error) {
-	key := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
+	// Create a hash of the key to retrieve from dynamodb.
+	keyHash := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
+	// Get the value from dynamodb.
 	result, err := drv.client.GetItem(drv.ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(drv.tableName),
 		Key: map[string]types.AttributeValue{
-			"Key": &types.AttributeValueMemberS{Value: key},
+			"Key": &types.AttributeValueMemberS{Value: keyHash},
 		},
 	})
 	if err != nil {
-		return 0, fmt.Errorf("dynamodb.GetTTL(): error getting value from dynamodb for key %v: %w", key, err)
+		return 0, fmt.Errorf("dynamodb.GetTTL(): error getting value from dynamodb for key hash %v: %w", keyHash, err)
 	}
 
 	if result.Item == nil {
-		log.Trace().Str("key", key).Msg("Found no value in dynamodb")
+		log.Trace().
+			Str("key_hash", keyHash).
+			Msg("Found no value in dynamodb")
 		return 0, nil
 	}
 
@@ -163,7 +183,7 @@ func (drv DRV) GetTTL(k string) (time.Duration, error) {
 
 	expirationTime, err := strconv.ParseInt(ttlAttribute.(*types.AttributeValueMemberN).Value, 10, 64)
 	if err != nil {
-		return 0, fmt.Errorf("dynamodb.GetTTL(): error parsing TTL value for key %v: %w", key, err)
+		return 0, fmt.Errorf("dynamodb.GetTTL(): error parsing TTL value for key hash %v: %w", keyHash, err)
 	}
 
 	expiresIn := time.Until(time.Unix(expirationTime, 0))
