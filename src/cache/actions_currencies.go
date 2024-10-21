@@ -5,6 +5,7 @@ import (
 
 	"github.com/hearchco/agent/src/exchange/currency"
 	"github.com/hearchco/agent/src/exchange/engines"
+	"github.com/hearchco/agent/src/utils/morestrings"
 )
 
 func (db DB) SetCurrencies(base currency.Currency, engs []engines.Name, currencies currency.Currencies, ttl ...time.Duration) error {
@@ -31,5 +32,5 @@ func combineBaseWithExchangeEnginesNames(base currency.Currency, engs []engines.
 	}
 
 	baseWithEnginesNamesStrings := append(enginesNamesStrings, base.String())
-	return combineIntoKey(baseWithEnginesNamesStrings...)
+	return morestrings.JoinNonEmpty("", "_", baseWithEnginesNamesStrings...)
 }

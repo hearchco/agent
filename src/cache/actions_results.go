@@ -7,6 +7,7 @@ import (
 	"github.com/hearchco/agent/src/search/category"
 	"github.com/hearchco/agent/src/search/engines/options"
 	"github.com/hearchco/agent/src/search/result"
+	"github.com/hearchco/agent/src/utils/morestrings"
 )
 
 func (db DB) SetResults(q string, cat category.Name, opts options.Options, results []result.Result, ttl ...time.Duration) error {
@@ -44,7 +45,7 @@ func (db DB) GetResultsTTL(q string, cat category.Name, opts options.Options) (t
 }
 
 func combineQueryWithOptions(q string, cat category.Name, opts options.Options) string {
-	return combineIntoKey(
+	return morestrings.JoinNonEmpty("", "_",
 		q, cat.String(),
 		strconv.Itoa(opts.Pages.Start), strconv.Itoa(opts.Pages.Max),
 		opts.Locale.String(), strconv.FormatBool(opts.SafeSearch),
