@@ -23,7 +23,7 @@ require (
 	github.com/knadh/koanf/providers/structs v0.1.0
 	github.com/knadh/koanf/v2 v2.1.1
 	github.com/pkg/profile v1.7.0
-	github.com/redis/go-redis/v9 v9.6.2
+	github.com/redis/go-redis/v9 v9.7.0
 	github.com/rs/zerolog v1.33.0
 	golang.org/x/net v0.30.0
 	golang.org/x/tools v0.26.0
