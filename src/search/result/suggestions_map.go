@@ -10,15 +10,15 @@ import (
 
 type SuggestionConcMap struct {
 	enabledEnginesLen int
-	Mutex             sync.RWMutex
-	Map               map[string]Suggestion
+	mutex             sync.RWMutex
+	mapp              map[string]Suggestion
 }
 
 func NewSuggestionMap(enabledEnginesLen int) SuggestionConcMap {
 	return SuggestionConcMap{
 		enabledEnginesLen: enabledEnginesLen,
-		Mutex:             sync.RWMutex{},
-		Map:               make(map[string]Suggestion),
+		mutex:             sync.RWMutex{},
+		mapp:              make(map[string]Suggestion),
 	}
 }
 
@@ -31,13 +31,13 @@ func (m *SuggestionConcMap) AddOrUpgrade(val SuggestionScraped) {
 	}
 
 	// Lock the map due to modifications.
-	m.Mutex.Lock()
-	defer m.Mutex.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 
-	mapVal, exists := m.Map[val.Key()]
+	mapVal, exists := m.mapp[val.Key()]
 	if !exists {
 		// Add the result to the map.
-		m.Map[val.Key()] = val.Convert(m.enabledEnginesLen)
+		m.mapp[val.Key()] = val.Convert(m.enabledEnginesLen)
 	} else {
 		var alreadyIn *RankSimple
 
@@ -59,13 +59,13 @@ func (m *SuggestionConcMap) AddOrUpgrade(val SuggestionScraped) {
 }
 
 func (m *SuggestionConcMap) ExtractWithResponders() ([]Suggestion, []engines.Name) {
-	m.Mutex.RLock()
-	defer m.Mutex.RUnlock()
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
 
-	suggestions := make([]Suggestion, 0, len(m.Map))
+	suggestions := make([]Suggestion, 0, len(m.mapp))
 	responders := make([]engines.Name, 0, m.enabledEnginesLen)
 
-	for _, sug := range m.Map {
+	for _, sug := range m.mapp {
 		sug.ShrinkEngineRanks()
 		suggestions = append(suggestions, sug)
 		for _, rank := range sug.EngineRanks() {

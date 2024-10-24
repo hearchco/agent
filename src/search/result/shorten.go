@@ -2,38 +2,17 @@ package result
 
 // Changes the title and description of the result to be at most N and M characters long respectively.
 func (r General) Shorten(maxTitleLength int, maxDescriptionLength int) Result {
-	return &General{
-		generalJSON{
-			URL:         r.URL(),
-			Title:       shortString(r.Title(), maxTitleLength),
-			Description: shortString(r.Description(), maxDescriptionLength),
-			Rank:        r.Rank(),
-			Score:       r.Score(),
-			EngineRanks: r.EngineRanks(),
-		},
-	}
+	short := r
+	short.generalJSON.Title = shortString(r.Title(), maxTitleLength)
+	short.generalJSON.Description = shortString(r.Description(), maxDescriptionLength)
+	return &short
 }
 
 func (r Images) Shorten(maxTitleLength int, maxDescriptionLength int) Result {
-	return &Images{
-		imagesJSON{
-			General{
-				generalJSON{
-					URL:         r.URL(),
-					Title:       shortString(r.Title(), maxTitleLength),
-					Description: shortString(r.Description(), maxDescriptionLength),
-					Rank:        r.Rank(),
-					Score:       r.Score(),
-					EngineRanks: r.EngineRanks(),
-				},
-			},
-			r.OriginalSize(),
-			r.ThumbnailSize(),
-			r.ThumbnailURL(),
-			r.SourceName(),
-			r.SourceURL(),
-		},
-	}
+	short := r
+	short.generalJSON.Title = shortString(r.Title(), maxTitleLength)
+	short.generalJSON.Description = shortString(r.Description(), maxDescriptionLength)
+	return &short
 }
 
 func shortString(s string, n int) string {

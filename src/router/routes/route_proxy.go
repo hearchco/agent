@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
@@ -12,7 +11,6 @@ import (
 
 	"github.com/hearchco/agent/src/search/useragent"
 	"github.com/hearchco/agent/src/utils/anonymize"
-	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
 func routeProxy(w http.ResponseWriter, r *http.Request, secret string, timeout time.Duration) error {
@@ -20,71 +18,82 @@ func routeProxy(w http.ResponseWriter, r *http.Request, secret string, timeout t
 	err := r.ParseForm()
 	if err != nil {
 		// Server error.
-		werr := writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("failed to parse form: %v", err))
-		if werr != nil {
-			return fmt.Errorf("%w: %w", werr, err)
-		}
-		return err
+		log.Error().
+			Caller().
+			Err(err).
+			Msg("Failed to parse form")
+		return writeResponse(w, http.StatusInternalServerError, fmt.Sprintf("failed to parse form: %v", err))
 	}
 
 	// Get the parameters.
 	params := r.Form
 	urlParam := getParamOrDefault(params, "url")
+	fqdnParam := getParamOrDefault(params, "fqdn")
 	hashParam := getParamOrDefault(params, "hash")
 	timestampParam := getParamOrDefault(params, "timestamp")
-	faviconParam := getParamOrDefault(params, "favicon", strconv.FormatBool(false))
 
 	// Check the required parameters.
-	if urlParam == "" || hashParam == "" || timestampParam == "" {
+	if (urlParam == "" && fqdnParam == "") || hashParam == "" || timestampParam == "" {
 		// User error.
-		return writeResponse(w, http.StatusBadRequest, "url, hash and timestamp are required")
+		return writeResponse(w, http.StatusBadRequest, "url/fqdn, hash and timestamp are required")
 	}
 
-	// Check if only favicon is requested.
-	favicon, err := strconv.ParseBool(faviconParam)
-	if err != nil {
+	// Check if both url and fqdn are provided.
+	if urlParam != "" && fqdnParam != "" {
 		// User error.
-		return writeResponse(w, http.StatusBadRequest, "favicon must be a boolean")
+		return writeResponse(w, http.StatusBadRequest, "only one of url or fqdn is allowed")
+	}
+
+	// Check wether to use url or fqdn.
+	var favicon bool
+	if fqdnParam != "" {
+		favicon = true
 	}
 
 	// Get url to verify and to proxy.
-	urlToVerify, urlToProxy, err := getUrlToVerifyAndToProxy(urlParam, favicon)
-	if err != nil {
-		// User error.
-		log.Debug().
-			Err(err).
-			Str("url", urlParam).
-			Str("url_to_verify", urlToVerify).
-			Str("url_to_proxy", urlToProxy).
-			Str("hash", hashParam).
-			Str("favicon", faviconParam).
-			Msg("Failed to get URL to verify and to proxy")
-		return writeResponse(w, http.StatusBadRequest, fmt.Sprintf("failed to get URL to verify and to proxy: %v", err))
+	var verificator string
+	if !favicon {
+		verificator = urlParam
+	} else {
+		verificator = fqdnParam
 	}
 
 	// Check if hash is valid.
-	if ok, err := anonymize.VerifyHMACBase64(hashParam, urlToVerify, secret, timestampParam); !ok || err != nil {
+	if ok, err := anonymize.VerifyHMACBase64(hashParam, verificator, secret, timestampParam); !ok || err != nil {
 		// User error.
 		log.Debug().
 			Err(err).
-			Str("url", urlParam).
-			Str("url_to_verify", urlToVerify).
+			Str("verificator", verificator).
 			Str("hash", hashParam).
 			Str("timestamp", timestampParam).
-			Str("favicon", faviconParam).
 			Msg("Invalid hash")
 		return writeResponse(w, http.StatusUnauthorized, "invalid hash")
 	}
 
 	// Parse the url.
-	target, err := url.Parse(urlToProxy)
-	if err != nil {
-		// User error.
-		log.Debug().
-			Str("url", urlParam).
-			Str("url_to_proxy", urlToProxy).
-			Msg("Invalid url")
-		return writeResponse(w, http.StatusBadRequest, "invalid url")
+	var target *url.URL
+	if !favicon {
+		urll, err := url.Parse(urlParam)
+		if err != nil {
+			// User error.
+			log.Debug().
+				Str("url", urlParam).
+				Msg("Invalid url")
+			return writeResponse(w, http.StatusBadRequest, "invalid url")
+		}
+		target = urll
+	} else {
+		faviconUrll := getFaviconURL(fqdnParam)
+		urll, err := url.Parse(faviconUrll)
+		if err != nil {
+			// Server error.
+			log.Error().
+				Err(err).
+				Str("fqdn", fqdnParam).
+				Msg("Failed to get favicon url")
+			return writeResponse(w, http.StatusInternalServerError, "failed to get favicon url")
+		}
+		target = urll
 	}
 
 	// Create a new request.
@@ -103,7 +112,7 @@ func routeProxy(w http.ResponseWriter, r *http.Request, secret string, timeout t
 	resp, err := requestResponse(&nr, timeout)
 	if err != nil {
 		// Server error.
-		log.Debug().
+		log.Error().
 			Err(err).
 			Str("url", target.String()).
 			Msg("Failed to proxy request")
@@ -119,41 +128,11 @@ func routeProxy(w http.ResponseWriter, r *http.Request, secret string, timeout t
 	return writeResponseImageProxy(w, resp)
 }
 
-func getUrlToVerifyAndToProxy(urlParam string, favicon bool) (string, string, error) {
-	urlToVerify := urlParam
-	urlToProxy := urlParam
-
-	if favicon {
-		// Get the URI to verify.
-		urlUri, err := moreurls.GetURIToVerify(urlParam)
-		if err != nil {
-			return "", "", fmt.Errorf("failed to extract URI from URL: %w", err)
-		}
-
-		// Get the favicon URL.
-		faviconUrl, err := getFaviconURL(urlParam)
-		if err != nil {
-			return "", "", fmt.Errorf("failed to extract favicon URL: %w", err)
-		}
-
-		// Set the URLs.
-		urlToVerify = urlUri
-		urlToProxy = faviconUrl
-	}
-
-	return urlToVerify, urlToProxy, nil
-}
-
-// Appends the path to favicon to the URI of the URL.
-func getFaviconURL(urll string) (string, error) {
-	// TODO: Impl getting the favicon path from the html head.
-	const faviconPath = "/favicon.ico"
-	uri, err := moreurls.GetURI(urll)
-	if err != nil {
-		return "", err
-	} else {
-		return uri + faviconPath, nil
-	}
+// Returns the url of the favicon for the provided FQDN.
+func getFaviconURL(fqdn string) string {
+	// TODO: Impl getting the favicon from favicon providers.
+	const faviconPath = "favicon.ico"
+	return fmt.Sprintf("https://%s/%s", fqdn, faviconPath)
 }
 
 func createAnonRequest(r *http.Request, target *url.URL) http.Request {

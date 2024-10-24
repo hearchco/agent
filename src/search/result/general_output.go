@@ -7,6 +7,6 @@ type GeneralOutput struct {
 type generalOutputJSON struct {
 	General
 
-	FaviconHash          string `json:"favicon_hash,omitempty"`
-	FaviconHashTimestamp string `json:"favicon_hash_timestamp,omitempty"`
+	FqdnHash          string `json:"fqdn_hash,omitempty"`
+	FqdnHashTimestamp string `json:"fqdn_hash_timestamp,omitempty"`
 }

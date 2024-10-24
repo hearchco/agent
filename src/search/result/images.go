@@ -69,12 +69,16 @@ func (r Images) SourceURL() string {
 }
 
 func (r Images) ConvertToOutput(secret string) ResultOutput {
-	urlHash, urlTimestamp := anonymize.CalculateHMACBase64(r.URL(), secret, time.Now())
-	thmbHash, thmbTimestamp := anonymize.CalculateHMACBase64(r.ThumbnailURL(), secret, time.Now())
+	nowT := time.Now()
+	fqdnHash, fqdnTimestamp := anonymize.CalculateHMACBase64(r.FQDN(), secret, nowT)
+	urlHash, urlTimestamp := anonymize.CalculateHMACBase64(r.URL(), secret, nowT)
+	thmbHash, thmbTimestamp := anonymize.CalculateHMACBase64(r.ThumbnailURL(), secret, nowT)
 
 	return ImagesOutput{
 		imagesOutputJSON{
 			r,
+			fqdnHash,
+			fqdnTimestamp,
 			urlHash,
 			urlTimestamp,
 			thmbHash,
