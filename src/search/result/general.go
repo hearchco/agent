@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/hearchco/agent/src/utils/anonymize"
-	"github.com/hearchco/agent/src/utils/moreurls"
 	"github.com/rs/zerolog/log"
 )
 
@@ -14,6 +13,7 @@ type General struct {
 
 type generalJSON struct {
 	URL         string  `json:"url"`
+	FQDN        string  `json:"fqdn"`
 	Title       string  `json:"title"`
 	Description string  `json:"description"`
 	Rank        int     `json:"rank"`
@@ -32,6 +32,15 @@ func (r General) URL() string {
 	}
 
 	return r.generalJSON.URL
+}
+
+func (r General) FQDN() string {
+	if r.generalJSON.FQDN == "" {
+		log.Panic().Msg("FQDN is empty")
+		// ^PANIC - Assert because the FQDN should never be empty.
+	}
+
+	return r.generalJSON.FQDN
 }
 
 func (r General) Title() string {
@@ -100,21 +109,13 @@ func (r *General) AppendEngineRanks(rank Rank) {
 }
 
 func (r General) ConvertToOutput(secret string) ResultOutput {
-	urlToVerify, err := moreurls.GetURIToVerify(r.URL())
-	if err != nil {
-		log.Panic().
-			Err(err).
-			Str("url", r.URL()).
-			Msg("Failed to get URI to verify")
-		// ^PANIC - This should never happen.
-	}
+	fqdnHash, fqdnTimestamp := anonymize.CalculateHMACBase64(r.FQDN(), secret, time.Now())
 
-	hash, timestamp := anonymize.CalculateHMACBase64(urlToVerify, secret, time.Now())
 	return GeneralOutput{
 		generalOutputJSON{
 			r,
-			hash,
-			timestamp,
+			fqdnHash,
+			fqdnTimestamp,
 		},
 	}
 }

@@ -11,8 +11,8 @@ import (
 type ResultConcMap struct {
 	enabledEnginesLen int
 	titleLen, descLen int
-	Mutex             sync.RWMutex
-	Map               map[string]Result
+	mutex             sync.RWMutex
+	mapp              map[string]Result
 }
 
 func NewResultMap(enabledEnginesLen, titleLen, descLen int) ResultConcMap {
@@ -20,11 +20,12 @@ func NewResultMap(enabledEnginesLen, titleLen, descLen int) ResultConcMap {
 		enabledEnginesLen: enabledEnginesLen,
 		titleLen:          titleLen,
 		descLen:           descLen,
-		Mutex:             sync.RWMutex{},
-		Map:               make(map[string]Result),
+		mutex:             sync.RWMutex{},
+		mapp:              make(map[string]Result),
 	}
 }
 
+// Passed as pointer because of the mutex.
 func (m *ResultConcMap) AddOrUpgrade(val ResultScraped) {
 	if val.Rank().SearchEngine().String() == "" || val.Rank().SearchEngine() == engines.UNDEFINED {
 		log.Panic().
@@ -34,13 +35,13 @@ func (m *ResultConcMap) AddOrUpgrade(val ResultScraped) {
 	}
 
 	// Lock the map due to modifications.
-	m.Mutex.Lock()
-	defer m.Mutex.Unlock()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 
-	mapVal, exists := m.Map[val.Key()]
+	mapVal, exists := m.mapp[val.Key()]
 	if !exists {
 		// Add the result to the map.
-		m.Map[val.Key()] = val.Convert(m.enabledEnginesLen)
+		m.mapp[val.Key()] = val.Convert(m.enabledEnginesLen)
 	} else {
 		var alreadyIn *Rank
 
@@ -66,14 +67,15 @@ func (m *ResultConcMap) AddOrUpgrade(val ResultScraped) {
 	}
 }
 
+// Passed as pointer because of the mutex.
 func (m *ResultConcMap) ExtractWithResponders() ([]Result, []engines.Name) {
-	m.Mutex.RLock()
-	defer m.Mutex.RUnlock()
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
 
-	results := make([]Result, 0, len(m.Map))
+	results := make([]Result, 0, len(m.mapp))
 	responders := make([]engines.Name, 0, m.enabledEnginesLen)
 
-	for _, res := range m.Map {
+	for _, res := range m.mapp {
 		newRes := res.Shorten(m.titleLen, m.descLen)
 		newRes.ShrinkEngineRanks()
 		results = append(results, newRes)

@@ -1,6 +1,7 @@
 package result
 
 import (
+	"github.com/hearchco/agent/src/utils/moreurls"
 	"github.com/rs/zerolog/log"
 )
 
@@ -47,6 +48,7 @@ func (r GeneralScraped) Convert(erCap int) Result {
 	return &General{
 		generalJSON{
 			URL:         r.URL(),
+			FQDN:        moreurls.FQDN(r.URL()),
 			Title:       r.Title(),
 			Description: r.Description(),
 			EngineRanks: engineRanks,

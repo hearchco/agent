@@ -3,6 +3,7 @@ package result
 type Result interface {
 	Key() string
 	URL() string
+	FQDN() string
 	Title() string
 	Description() string
 	SetDescription(string)
