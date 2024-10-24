@@ -52,41 +52,58 @@ func (drv DRV) Close() {
 }
 
 func (drv DRV) Set(k string, v any, ttl ...time.Duration) error {
-	log.Debug().Msg("Caching...")
-	cacheTimer := time.Now()
-
-	var setTtl time.Duration = 0
+	var setTtl time.Duration
 	if len(ttl) > 0 {
 		setTtl = ttl[0]
 	}
 
-	key := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
-	if val, err := json.Marshal(v); err != nil {
+	// Create a hash of the key to store in redis.
+	keyHash := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
+
+	// Serialize the value to JSON.
+	valJSON, err := json.Marshal(v)
+	if err != nil {
 		return fmt.Errorf("redis.Set(): error marshaling value: %w", err)
-	} else if err := drv.client.Set(drv.ctx, key, val, setTtl).Err(); err != nil {
+	}
+
+	// Encrypt the value using the original key (not the hash).
+	val, err := anonymize.Encrypt(valJSON, k)
+	if err != nil {
+		return fmt.Errorf("redis.Set(): error encrypting value: %w", err)
+	}
+
+	// Set the key-value pair in redis.
+	if err := drv.client.Set(drv.ctx, keyHash, val, setTtl).Err(); err != nil {
 		return fmt.Errorf("redis.Set(): error setting KV to redis: %w", err)
-	} else {
-		log.Trace().
-			Dur("duration", time.Since(cacheTimer)).
-			Msg("Cached results")
 	}
 
 	return nil
 }
 
 func (drv DRV) Get(k string, o any) error {
-	key := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
+	// Create a hash of the key to retrieve from redis.
+	keyHash := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
-	val, err := drv.client.Get(drv.ctx, key).Result()
+	// Get the value from redis.
+	val, err := drv.client.Get(drv.ctx, keyHash).Result()
 	if err == redis.Nil {
 		log.Trace().
-			Str("key", key).
+			Str("key_hash", keyHash).
 			Msg("Found no value in redis")
 		return nil
 	} else if err != nil {
-		return fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", key, err)
-	} else if err := json.Unmarshal([]byte(val), o); err != nil {
-		return fmt.Errorf("redis.Get(): failed unmarshaling value from redis for key %v: %w", key, err)
+		return fmt.Errorf("redis.Get(): error getting value from redis for key hash %v: %w", keyHash, err)
+	}
+
+	// Decrypt the value using the original key (not the hash).
+	valJSON, err := anonymize.Decrypt(val, k)
+	if err != nil {
+		return fmt.Errorf("redis.Get(): error decrypting value: %w", err)
+	}
+
+	// Deserialize the value from JSON.
+	if err := json.Unmarshal(valJSON, o); err != nil {
+		return fmt.Errorf("redis.Get(): failed unmarshaling value from redis for key hash %v: %w", keyHash, err)
 	}
 
 	return nil
@@ -94,16 +111,17 @@ func (drv DRV) Get(k string, o any) error {
 
 // Returns time until the key expires, not the time it will be considered expired.
 func (drv DRV) GetTTL(k string) (time.Duration, error) {
-	key := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
+	// Create a hash of the key to retrieve from redis.
+	keyHash := anonymize.CalculateHashBase64(fmt.Sprintf("%v%v", drv.keyPrefix, k))
 
 	// Returns time with time.Second precision.
-	expiresIn, err := drv.client.TTL(drv.ctx, key).Result()
+	expiresIn, err := drv.client.TTL(drv.ctx, keyHash).Result()
 	if err == redis.Nil {
 		log.Trace().
-			Str("key", key).
+			Str("key_hash", keyHash).
 			Msg("Found no value in redis")
 	} else if err != nil {
-		return expiresIn, fmt.Errorf("redis.Get(): error getting value from redis for key %v: %w", key, err)
+		return expiresIn, fmt.Errorf("redis.Get(): error getting value from redis for key hash %v: %w", keyHash, err)
 	}
 
 	/*
