@@ -1,0 +1,42 @@
+[Unit]
+Description=Agent for Hearchco Metasearch engine built using Go
+After=network.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+# Find & Replace User/Group/Path with your own
+User=hearchco
+Group=hearchco
+Type=simple
+ExecStart=/opt/hearchco --verbosity --config-path="hearchco.yaml"
+WorkingDirectory=/opt/hearchco
+TimeoutStopSec=20
+KillMode=process
+Restart=on-failure
+
+# See https://www.freedesktop.org/software/systemd/man/systemd.exec.html
+DevicePolicy=closed
+NoNewPrivileges=yes
+PrivateTmp=yes
+#PrivateUsers=yes
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+SystemCallFilter=~@clock @debug @module @mount @obsolete @reboot @setuid @swap
+#ReadWritePaths=/opt/hearchco
+
+# Prevent from accessing any real (physical) devices
+PrivateDevices=yes
+
+# You can change the following line to `strict` instead of `full` if you don't
+# want it to be able to write anything on your filesystem outside of $ReadWritePaths.
+ProtectSystem=strict
+
+# You can uncomment the following line if you don't have any media in /home/*.
+# This will prevent hearchco from ever reading/writing anything there.
+ProtectHome=true
