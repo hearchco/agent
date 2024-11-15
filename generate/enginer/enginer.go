@@ -25,8 +25,8 @@ var (
 	interfacesImport       = flag.String("interfacesimport", "github.com/hearchco/agent/src/search/scraper", "source of the interface import, which is prefixed to interfaces; default github.com/hearchco/agent/src/search/scraper")
 	interfacesPackage      = flag.String("interfacespackage", "scraper", "name of the package for the interfaces; default scraper")
 	interfaceEnginer       = flag.String("interfaceenginer", "Enginer", "name of the nginer interface; default scraper.Enginer")
-	interfaceSearcher      = flag.String("interfacesearcher", "Searcher", "name of the searcher interface; default scraper.Searcher")
-	interfaceImageSearcher = flag.String("interfaceimagesearcher", "ImageSearcher", "name of the searcher interface; default scraper.ImageSearcher")
+	interfaceWebSearcher   = flag.String("interfacewebsearcher", "WebSearcher", "name of the web searcher interface; default scraper.WebSearcher")
+	interfaceImageSearcher = flag.String("interfaceimagesearcher", "ImageSearcher", "name of the image searcher interface; default scraper.ImageSearcher")
 	interfaceSuggester     = flag.String("interfacesuggester", "Suggester", "name of the suggester interface; default scraper.Suggester")
 	enginesImport          = flag.String("enginesimport", "github.com/hearchco/agent/src/search/engines", "source of the engines import, which is prefixed to imports for engines; default github.com/hearchco/agent/src/search/engines")
 )
@@ -201,7 +201,7 @@ func (g *Generator) generate(typeName string) {
 
 	g.printEnginerLen(values)
 	g.printInterfaces(values, *interfaceEnginer)
-	g.printInterfaces(values, *interfaceSearcher)
+	g.printInterfaces(values, *interfaceWebSearcher)
 	g.printInterfaces(values, *interfaceImageSearcher)
 	g.printInterfaces(values, *interfaceSuggester)
 }

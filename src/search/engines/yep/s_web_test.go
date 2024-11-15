@@ -8,7 +8,7 @@ package yep
 // 	"github.com/hearchco/agent/src/search/engines/_engines_test"
 // )
 
-// func TestSearch(t *testing.T) {
+// func TestWebSearch(t *testing.T) {
 // 	// Testing options.
 // 	conf := _engines_test.NewConfig(seName)
 // 	opt := _engines_test.NewOpts()

@@ -7,16 +7,16 @@ import (
 	"github.com/hearchco/agent/src/search/scraper"
 )
 
-// Searchers.
-func initializeSearchers(ctx context.Context, engs []engines.Name) []scraper.Searcher {
-	searchers := searcherArray()
+// Initialize web searchers.
+func initializeWebSearchers(ctx context.Context, engs []engines.Name) []scraper.WebSearcher {
+	searchers := webSearcherArray()
 	for _, engName := range engs {
 		searchers[engName].InitSearcher(ctx)
 	}
 	return searchers[:]
 }
 
-// Image searchers.
+// Initialize image searchers.
 func initializeImageSearchers(ctx context.Context, engs []engines.Name) []scraper.ImageSearcher {
 	searchers := imageSearcherArray()
 	for _, engName := range engs {
@@ -25,7 +25,7 @@ func initializeImageSearchers(ctx context.Context, engs []engines.Name) []scrape
 	return searchers[:]
 }
 
-// Suggesters.
+// Initialize suggesters.
 func initializeSuggesters(ctx context.Context, engs []engines.Name) []scraper.Suggester {
 	suggesters := suggesterArray()
 	for _, engName := range engs {

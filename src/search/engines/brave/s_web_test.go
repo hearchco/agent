@@ -1,4 +1,4 @@
-package startpage
+package brave
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/hearchco/agent/src/search/engines/_engines_test"
 )
 
-func TestSearch(t *testing.T) {
+func TestWebSearch(t *testing.T) {
 	// Testing options.
 	opt := _engines_test.NewOpts()
 

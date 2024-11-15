@@ -1,9 +1,8 @@
-package startpage
+package brave
 
 import (
 	"fmt"
 	"strconv"
-	"strings"
 	"sync/atomic"
 
 	"github.com/gocolly/colly/v2"
@@ -17,13 +16,27 @@ import (
 	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
-func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
+func (se Engine) WebSearch(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
 	foundResults := atomic.Bool{}
 	retErrors := make([]error, 0, opts.Pages.Max)
 	pageRankCounter := scraper.NewPageRankCounter(opts.Pages.Max)
 
+	se.OnRequest(func(r *colly.Request) {
+		r.Headers.Set("Accept-Encoding", "gzip, deflate") // Brotli lib used has some issues with Brave's brotli compression.
+		r.Headers.Add("Cookie", localeCookieString(opts.Locale))
+		r.Headers.Add("Cookie", safeSearchCookieString(opts.SafeSearch))
+	})
+
 	se.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
 		urlText, titleText, descText := parse.FieldsFromDOM(e.DOM, dompaths, se.Name)
+
+		if descText == "" {
+			descText = e.DOM.Find("div.product > div.flex-hcenter > div > div[class=\"text-sm text-gray\"]").Text()
+		}
+		if descText == "" {
+			descText = e.DOM.Find("p.snippet-description").Text()
+		}
+		descText = parse.SanitizeDescription(descText)
 
 		pageIndex := se.PageFromContext(e.Request.Ctx)
 		page := pageIndex + opts.Pages.Start + 1
@@ -50,18 +63,6 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		}
 	})
 
-	se.OnResponse(func(r *colly.Response) {
-		if strings.Contains(string(r.Body), "to prevent possible abuse of our service") {
-			log.Error().
-				Str("engine", se.Name.String()).
-				Msg("Request blocked due to scraping")
-		} else if strings.Contains(string(r.Body), "This page cannot function without javascript") {
-			log.Error().
-				Str("engine", se.Name.String()).
-				Msg("Couldn't load requests, needs javascript")
-		}
-	})
-
 	for i := range opts.Pages.Max {
 		pageNum0 := i + opts.Pages.Start
 		ctx := colly.NewContext()
@@ -70,17 +71,14 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		// Build the parameters.
 		params := moreurls.NewParams(
 			paramQueryK, query,
+			paramSourceK, paramSourceV,
 		)
 		if pageNum0 > 0 {
 			params = moreurls.NewParams(
 				paramQueryK, query,
-				paramPageK, strconv.Itoa(pageNum0+1),
+				paramPageK, strconv.Itoa(pageNum0),
+				paramSpellcheckK, paramSpellcheckV,
 			)
-		}
-
-		// SafeSearch param is meant to be at the end.
-		if opts.SafeSearch {
-			params.Set(paramSafeSearchK, paramSafeSearchV)
 		}
 
 		// Build the url.

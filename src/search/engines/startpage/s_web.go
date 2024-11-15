@@ -1,8 +1,9 @@
-package mojeek
+package startpage
 
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"sync/atomic"
 
 	"github.com/gocolly/colly/v2"
@@ -16,7 +17,7 @@ import (
 	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
-func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
+func (se Engine) WebSearch(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
 	foundResults := atomic.Bool{}
 	retErrors := make([]error, 0, opts.Pages.Max)
 	pageRankCounter := scraper.NewPageRankCounter(opts.Pages.Max)
@@ -49,9 +50,17 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		}
 	})
 
-	// Constant params.
-	paramLocaleV, paramLocaleSecV := localeParamValues(opts.Locale)
-	paramSafeSearchV := safeSearchParamValue(opts.SafeSearch)
+	se.OnResponse(func(r *colly.Response) {
+		if strings.Contains(string(r.Body), "to prevent possible abuse of our service") {
+			log.Error().
+				Str("engine", se.Name.String()).
+				Msg("Request blocked due to scraping")
+		} else if strings.Contains(string(r.Body), "This page cannot function without javascript") {
+			log.Error().
+				Str("engine", se.Name.String()).
+				Msg("Couldn't load requests, needs javascript")
+		}
+	})
 
 	for i := range opts.Pages.Max {
 		pageNum0 := i + opts.Pages.Start
@@ -61,18 +70,17 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		// Build the parameters.
 		params := moreurls.NewParams(
 			paramQueryK, query,
-			paramLocaleK, paramLocaleV,
-			paramLocaleSecK, paramLocaleSecV,
-			paramSafeSearchK, paramSafeSearchV,
 		)
 		if pageNum0 > 0 {
 			params = moreurls.NewParams(
 				paramQueryK, query,
-				paramPageK, strconv.Itoa(pageNum0*10+1),
-				paramLocaleK, paramLocaleV,
-				paramLocaleSecK, paramLocaleSecV,
-				paramSafeSearchK, paramSafeSearchV,
+				paramPageK, strconv.Itoa(pageNum0+1),
 			)
+		}
+
+		// SafeSearch param is meant to be at the end.
+		if opts.SafeSearch {
+			params.Set(paramSafeSearchK, paramSafeSearchV)
 		}
 
 		// Build the url.

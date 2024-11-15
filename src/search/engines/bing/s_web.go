@@ -1,8 +1,9 @@
-package googlescholar
+package bing
 
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"sync/atomic"
 
 	"github.com/gocolly/colly/v2"
@@ -16,15 +17,20 @@ import (
 	"github.com/hearchco/agent/src/utils/moreurls"
 )
 
-func (se Engine) Search(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
+func (se Engine) WebSearch(query string, opts options.Options, resChan chan result.ResultScraped) ([]error, bool) {
 	foundResults := atomic.Bool{}
 	retErrors := make([]error, 0, opts.Pages.Max)
 	pageRankCounter := scraper.NewPageRankCounter(opts.Pages.Max)
 
 	se.OnHTML(dompaths.Result, func(e *colly.HTMLElement) {
+		log.Trace().
+			Caller().
+			Msg("Matched result")
+
+		// The telemetry link is a valid link so it can be sanitized.
 		urlText, titleText, descText := parse.FieldsFromDOM(e.DOM, dompaths, se.Name)
 
-		urlText, err := removeTelemetry(urlText)
+		urlWOTelemetry, err := removeTelemetry(urlText)
 		if err != nil {
 			log.Error().
 				Caller().
@@ -33,9 +39,13 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 				Msg("Failed to remove telemetry")
 			return
 		}
+		urlText = parse.SanitizeURL(urlWOTelemetry)
 
-		citeInfo := parse.SanitizeDescription(e.DOM.Find("div.gs_a").Text()) // Sanitize citeInfo with description sanitization.
-		descText = citeInfo + " || " + descText
+		if descText == "" {
+			descText = e.DOM.Find("p.b_algoSlug").Text()
+		}
+		descText = strings.TrimPrefix(descText, "<span class=\"algoSlug_icon\" data-priority=\"2\">WEB</span>")
+		descText = parse.SanitizeDescription(descText)
 
 		pageIndex := se.PageFromContext(e.Request.Ctx)
 		page := pageIndex + opts.Pages.Start + 1
@@ -64,7 +74,6 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 
 	// Constant params.
 	paramLocaleV, paramLocaleSecV := localeParamValues(opts.Locale)
-	paramSafeSearchV := safeSearchParamValue(opts.SafeSearch)
 
 	for i := range opts.Pages.Max {
 		pageNum0 := i + opts.Pages.Start
@@ -74,19 +83,15 @@ func (se Engine) Search(query string, opts options.Options, resChan chan result.
 		// Build the parameters.
 		params := moreurls.NewParams(
 			paramQueryK, query,
-			paramFilterK, paramFilterV,
 			paramLocaleK, paramLocaleV,
 			paramLocaleSecK, paramLocaleSecV,
-			paramSafeSearchK, paramSafeSearchV,
 		)
 		if pageNum0 > 0 {
 			params = moreurls.NewParams(
 				paramQueryK, query,
-				paramFilterK, paramFilterV,
-				paramPageK, strconv.Itoa(pageNum0*10),
+				paramPageK, strconv.Itoa(pageNum0*10+1),
 				paramLocaleK, paramLocaleV,
 				paramLocaleSecK, paramLocaleSecV,
-				paramSafeSearchK, paramSafeSearchV,
 			)
 		}
 

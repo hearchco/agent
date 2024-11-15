@@ -9,16 +9,16 @@ import (
 	"github.com/hearchco/agent/src/search/scraper"
 )
 
-// Searchers.
-func runRequiredSearchers(engs []engines.Name, searchers []scraper.Searcher, wgRequiredEngines *sync.WaitGroup, concMap *result.ResultConcMap, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
+// Web searchers.
+func runRequiredSearchers(engs []engines.Name, searchers []scraper.WebSearcher, wgRequiredEngines *sync.WaitGroup, concMap *result.ResultConcMap, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
 	runSearchers(groupRequired, engs, searchers, wgRequiredEngines, concMap, query, opts, onceWrapMap)
 }
 
-func runPreferredSearchers(engs []engines.Name, searchers []scraper.Searcher, wgPreferredEngines *sync.WaitGroup, concMap *result.ResultConcMap, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
+func runPreferredSearchers(engs []engines.Name, searchers []scraper.WebSearcher, wgPreferredEngines *sync.WaitGroup, concMap *result.ResultConcMap, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
 	runSearchers(groupPreferred, engs, searchers, wgPreferredEngines, concMap, query, opts, onceWrapMap)
 }
 
-func runSearchers(groupName string, engs []engines.Name, searchers []scraper.Searcher, wgRequiredEngines *sync.WaitGroup, concMap *result.ResultConcMap, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
+func runSearchers(groupName string, engs []engines.Name, searchers []scraper.WebSearcher, wgRequiredEngines *sync.WaitGroup, concMap *result.ResultConcMap, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
 	wgRequiredEngines.Add(len(engs))
 	for _, engName := range engs {
 		searcher := searchers[engName]
@@ -27,7 +27,7 @@ func runSearchers(groupName string, engs []engines.Name, searchers []scraper.Sea
 			defer wgRequiredEngines.Done()
 
 			// Run the engine.
-			runEngine(groupName, onceWrapMap[engName], concMap, engName, searcher.Search, query, opts)
+			runEngine(groupName, onceWrapMap[engName], concMap, engName, searcher.WebSearch, query, opts)
 		}()
 	}
 }

@@ -4,23 +4,23 @@ import "strings"
 
 type Name int
 
-//go:generate enumer -type=Name -json -text -sql
+//go:generate enumer -type=Name -json -text
 //go:generate go run github.com/hearchco/agent/generate/enginer -type=Name -packagename search -output ../engine_enginer.go
 const (
 	UNDEFINED     Name = iota
-	BING               // enginer,searcher,imagesearcher
-	BRAVE              // enginer,searcher
-	DUCKDUCKGO         // enginer,searcher,suggester
-	ETOOLS             // enginer,searcher
-	GOOGLE             // enginer,searcher,imagesearcher,suggester
-	GOOGLESCHOLAR      // enginer,searcher
-	MOJEEK             // enginer,searcher
-	PRESEARCH          // enginer,searcher
-	QWANT              // enginer,searcher
-	STARTPAGE          // enginer,searcher
-	SWISSCOWS          // enginer,searcher
-	YAHOO              // enginer,searcher
-	YEP
+	BING               // enginer,websearcher,imagesearcher
+	BRAVE              // enginer,websearcher
+	DUCKDUCKGO         // enginer,websearcher,suggester
+	ETOOLS             // enginer,websearcher
+	GOOGLE             // enginer,websearcher,imagesearcher,suggester
+	GOOGLESCHOLAR      // enginer,websearcher
+	MOJEEK             // enginer,websearcher
+	PRESEARCH          // enginer,websearcher
+	QWANT              // enginer,websearcher
+	STARTPAGE          // enginer,websearcher
+	SWISSCOWS          // enginer,websearcher
+	YAHOO              // enginer,websearcher
+	YEP                // disabled
 )
 
 // Returns engine names without UNDEFINED.

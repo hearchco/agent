@@ -54,7 +54,7 @@ func Web(query string, opts options.Options, catConf category.Category) ([]resul
 	}()
 
 	// Initialize each engine.
-	searchers := initializeSearchers(searchCtx, catConf.Engines)
+	searchers := initializeWebSearchers(searchCtx, catConf.Engines)
 
 	// Create a map for the results with RWMutex.
 	// TODO: Make title and desc length configurable.

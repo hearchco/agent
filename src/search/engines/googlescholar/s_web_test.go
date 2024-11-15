@@ -1,4 +1,4 @@
-package duckduckgo
+package googlescholar
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/hearchco/agent/src/search/engines/_engines_test"
 )
 
-func TestSearch(t *testing.T) {
+func TestWebSearch(t *testing.T) {
 	// Testing options.
 	opt := _engines_test.NewOpts()
 
@@ -18,14 +18,14 @@ func TestSearch(t *testing.T) {
 	}}
 
 	tccr := []_engines_test.TestCaseContainsResults{{
-		Query:      "facebook",
-		ResultURLs: []string{"facebook.com"},
+		Query:      "interaction nets",
+		ResultURLs: []string{"https://dl.acm.org/doi/pdf/10.1145/96709.96718"},
 		Options:    opt,
 	}}
 
 	tcrr := []_engines_test.TestCaseRankedResults{{
-		Query:      "wikipedia",
-		ResultURLs: []string{"wikipedia."},
+		Query:      "On building fast kd-trees for ray tracing, and on doing that in O (N log N)",
+		ResultURLs: []string{"https://ieeexplore.ieee.org/abstract/document/4061547/"},
 		Options:    opt,
 	}}
 

@@ -32,13 +32,13 @@ func (e *EngineBase) Init(ctx context.Context) {
 	e.initCollectorOnError()
 }
 
-// Used to initialize the EngineBase collector for searching.
+// Used to initialize the EngineBase collector for searching web/images.
 func (e *EngineBase) InitSearcher(ctx context.Context) {
 	e.initCollectorSearcher(ctx)
 	e.Init(ctx)
 }
 
-// Used to initialize the EngineBase collector for suggesting.
+// Used to initialize the EngineBase collector for searching suggestions.
 func (e *EngineBase) InitSuggester(ctx context.Context) {
 	e.initCollectorSuggester(ctx)
 	e.Init(ctx)

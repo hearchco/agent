@@ -15,12 +15,12 @@ type Enginer interface {
 	Init(context.Context)
 }
 
-// Interface that each search engine must implement to support searching general results.
-type Searcher interface {
+// Interface that each search engine must implement to support searching web results.
+type WebSearcher interface {
 	Enginer
 
 	InitSearcher(context.Context)
-	Search(string, options.Options, chan result.ResultScraped) ([]error, bool)
+	WebSearch(string, options.Options, chan result.ResultScraped) ([]error, bool)
 }
 
 // Interface that each search engine must implement to support searching image results.
