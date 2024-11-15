@@ -3,18 +3,18 @@ package rank
 import (
 	"math"
 
-	"github.com/hearchco/agent/src/config"
+	"github.com/hearchco/agent/src/search/category"
 )
 
 // Calculates and sets scores for all results.
-func (r Results) calculateScores(rconf config.CategoryRanking) {
+func (r Results) calculateScores(rconf category.Ranking) {
 	for _, res := range r {
 		res.SetScore(calculateScore(res, rconf))
 	}
 }
 
 // Calculates and sets scores for all results.
-func (s Suggestions) calculateScores(rconf config.CategoryRanking) {
+func (s Suggestions) calculateScores(rconf category.Ranking) {
 	for i := range s {
 		sug := &s[i]
 		sug.SetScore(calculateScore(sug, rconf))
@@ -22,7 +22,7 @@ func (s Suggestions) calculateScores(rconf config.CategoryRanking) {
 }
 
 // Calculates the score for one result.
-func calculateScore[T ranker](val scoreEngineRanker[T], rconf config.CategoryRanking) float64 {
+func calculateScore[T ranker](val scoreEngineRanker[T], rconf category.Ranking) float64 {
 	var retRankScore float64 = 0
 	for _, er := range val.EngineRanks() {
 		eng := rconf.Engines[er.SearchEngine().String()]

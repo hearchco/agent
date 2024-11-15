@@ -8,12 +8,22 @@ import (
 
 	"github.com/hearchco/agent/src/cache"
 	"github.com/hearchco/agent/src/config"
-	"github.com/hearchco/agent/src/search/category"
+)
+
+const (
+	healthzRoute            = "/healthz"
+	versionzRoute           = "/versionz"
+	searchWebRoute          = "/search/web"
+	searchImagesRoute       = "/search/images"
+	searchSuggestionsRoute  = "/search/suggestions"
+	exchangeRoute           = "/exchange"
+	exchangeCurrenciesRoute = "/exchange/currencies"
+	imageProxyRoute         = "/imageproxy"
 )
 
 func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
-	// /healthz
-	mux.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
+	// Health check
+	mux.Get(healthzRoute, func(w http.ResponseWriter, r *http.Request) {
 		err := writeResponse(w, http.StatusOK, "OK")
 		if err != nil {
 			log.Error().
@@ -24,8 +34,8 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 
-	// /versionz
-	mux.Get("/versionz", func(w http.ResponseWriter, r *http.Request) {
+	// Version
+	mux.Get(versionzRoute, func(w http.ResponseWriter, r *http.Request) {
 		err := writeResponse(w, http.StatusOK, ver)
 		if err != nil {
 			log.Error().
@@ -36,19 +46,9 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 
-	// /search
-	mux.Get("/search", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSearch(w, r, ver, conf.Categories, conf.Server.ImageProxy.SecretKey)
-		if err != nil {
-			log.Error().
-				Err(err).
-				Str("path", r.URL.Path).
-				Str("method", r.Method).
-				Msg("Failed to send response")
-		}
-	})
-	mux.Post("/search", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSearch(w, r, ver, conf.Categories, conf.Server.ImageProxy.SecretKey)
+	// Web search
+	muxGetPost(mux, searchWebRoute, func(w http.ResponseWriter, r *http.Request) {
+		err := routeSearchWeb(w, r, ver, conf.Engines.NoWeb, conf.Server.ImageProxy.SecretKey)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -58,19 +58,9 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 
-	// /suggestions
-	mux.Get("/suggestions", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSuggest(w, r, ver, conf.Categories[category.SUGGESTIONS])
-		if err != nil {
-			log.Error().
-				Err(err).
-				Str("path", r.URL.Path).
-				Str("method", r.Method).
-				Msg("Failed to send response")
-		}
-	})
-	mux.Post("/suggestions", func(w http.ResponseWriter, r *http.Request) {
-		err := routeSuggest(w, r, ver, conf.Categories[category.SUGGESTIONS])
+	// Images search
+	muxGetPost(mux, searchImagesRoute, func(w http.ResponseWriter, r *http.Request) {
+		err := routeSearchImages(w, r, ver, conf.Engines.NoImages, conf.Server.ImageProxy.SecretKey)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -80,9 +70,9 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 
-	// /exchange
-	mux.Get("/exchange", func(w http.ResponseWriter, r *http.Request) {
-		err := routeExchange(w, r, ver, conf.Exchange, db, conf.Server.Cache.TTL.Currencies)
+	// Suggestions search
+	muxGetPost(mux, searchSuggestionsRoute, func(w http.ResponseWriter, r *http.Request) {
+		err := routeSearchSuggestions(w, r, ver, conf.Engines.NoSuggestions)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -91,7 +81,9 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 				Msg("Failed to send response")
 		}
 	})
-	mux.Post("/exchange", func(w http.ResponseWriter, r *http.Request) {
+
+	// Exchange
+	muxGetPost(mux, exchangeRoute, func(w http.ResponseWriter, r *http.Request) {
 		err := routeExchange(w, r, ver, conf.Exchange, db, conf.Server.Cache.TTL.Currencies)
 		if err != nil {
 			log.Error().
@@ -102,18 +94,8 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 
-	// /currencies
-	mux.Get("/currencies", func(w http.ResponseWriter, r *http.Request) {
-		err := routeCurrencies(w, ver, conf.Exchange, db, conf.Server.Cache.TTL.Currencies)
-		if err != nil {
-			log.Error().
-				Err(err).
-				Str("path", r.URL.Path).
-				Str("method", r.Method).
-				Msg("Failed to send response")
-		}
-	})
-	mux.Post("/currencies", func(w http.ResponseWriter, r *http.Request) {
+	// Exchange currencies
+	muxGetPost(mux, exchangeCurrenciesRoute, func(w http.ResponseWriter, r *http.Request) {
 		err := routeCurrencies(w, ver, conf.Exchange, db, conf.Server.Cache.TTL.Currencies)
 		if err != nil {
 			log.Error().
@@ -124,9 +106,9 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 		}
 	})
 
-	// /proxy
-	mux.Get("/proxy", func(w http.ResponseWriter, r *http.Request) {
-		err := routeProxy(w, r, conf.Server.ImageProxy.SecretKey, conf.Server.ImageProxy.Timeout)
+	// Image proxy
+	mux.Get(imageProxyRoute, func(w http.ResponseWriter, r *http.Request) {
+		err := routeImageProxy(w, r, conf.Server.ImageProxy.SecretKey, conf.Server.ImageProxy.Timeout)
 		if err != nil {
 			log.Error().
 				Err(err).
@@ -135,4 +117,9 @@ func Setup(mux *chi.Mux, ver string, db cache.DB, conf config.Config) {
 				Msg("Failed to send response")
 		}
 	})
+}
+
+func muxGetPost(mux *chi.Mux, pattern string, handler http.HandlerFunc) {
+	mux.Get(pattern, handler)
+	mux.Post(pattern, handler)
 }

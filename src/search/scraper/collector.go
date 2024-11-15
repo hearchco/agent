@@ -3,7 +3,6 @@ package scraper
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"strings"
 
@@ -12,7 +11,6 @@ import (
 	"github.com/klauspost/compress/zstd"
 	"github.com/rs/zerolog/log"
 
-	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search/useragent"
 )
 
@@ -50,23 +48,6 @@ func (e *EngineBase) initCollector(ctx context.Context, acceptS string) {
 			"Sec-Fetch-Site":     "none",
 		}),
 	)
-}
-
-func (e *EngineBase) initLimitRule(timings config.CategoryTimings) {
-	limitRule := colly.LimitRule{
-		DomainGlob:  "*",
-		Delay:       timings.Delay,
-		RandomDelay: timings.RandomDelay,
-		Parallelism: timings.Parallelism,
-	}
-	if err := e.collector.Limit(&limitRule); err != nil {
-		log.Panic().
-			Caller().
-			Err(err).
-			Str("limitRule", fmt.Sprintf("%v", limitRule)).
-			Msg("Failed adding new limit rule")
-		// ^PANIC
-	}
 }
 
 func (e *EngineBase) initCollectorOnRequest(ctx context.Context) {

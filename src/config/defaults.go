@@ -3,7 +3,8 @@ package config
 import (
 	"time"
 
-	"github.com/hearchco/agent/src/search/category"
+	exchengines "github.com/hearchco/agent/src/exchange/engines"
+	"github.com/hearchco/agent/src/search/engines"
 	"github.com/hearchco/agent/src/utils/moretime"
 )
 
@@ -31,57 +32,21 @@ func New() Config {
 				Timeout: 3 * time.Second,
 			},
 		},
-		Categories: map[category.Name]Category{
-			category.SUGGESTIONS: {
-				Engines:                  suggestionsEngines,
-				RequiredEngines:          suggestionsRequiredEngines,
-				RequiredByOriginEngines:  suggestionsRequiredByOriginEngines,
-				PreferredEngines:         suggestionsPreferredEngines,
-				PreferredByOriginEngines: suggestionsPreferredByOriginEngines,
-				Ranking:                  suggestionsRanking(),
-				Timings:                  suggestionsTimings,
-			},
-			category.GENERAL: {
-				Engines:                  generalEngines,
-				RequiredEngines:          generalRequiredEngines,
-				RequiredByOriginEngines:  generalRequiredByOriginEngines,
-				PreferredEngines:         generalPreferredEngines,
-				PreferredByOriginEngines: generalPreferredByOriginEngines,
-				Ranking:                  generalRanking(),
-				Timings:                  generalTimings,
-			},
-			category.IMAGES: {
-				Engines:                  imagesEngines,
-				RequiredEngines:          imagesRequiredEngines,
-				RequiredByOriginEngines:  imagesRequiredByOriginEngines,
-				PreferredEngines:         imagesPreferredEngines,
-				PreferredByOriginEngines: imagesPreferredByOriginEngines,
-				Ranking:                  imagesRanking(),
-				Timings:                  imagesTimings,
-			},
-			category.SCIENCE: {
-				Engines:                  scienceEngines,
-				RequiredEngines:          scienceRequiredEngines,
-				RequiredByOriginEngines:  scienceRequiredByOriginEngines,
-				PreferredEngines:         sciencePreferredEngines,
-				PreferredByOriginEngines: sciencePreferredByOriginEngines,
-				Ranking:                  scienceRanking(),
-				Timings:                  scienceTimings,
-			},
-			category.THOROUGH: {
-				Engines:                  thoroughEngines,
-				RequiredEngines:          thoroughRequiredEngines,
-				RequiredByOriginEngines:  thoroughRequiredByOriginEngines,
-				PreferredEngines:         thoroughPreferredEngines,
-				PreferredByOriginEngines: thoroughPreferredByOriginEngines,
-				Ranking:                  thoroughRanking(),
-				Timings:                  thoroughTimings,
-			},
+		Engines: EngineConfig{
+			NoWeb:         []engines.Name{},
+			NoImages:      []engines.Name{},
+			NoSuggestions: []engines.Name{},
 		},
 		Exchange: Exchange{
 			BaseCurrency: "EUR",
-			Engines:      exchangeEngines,
-			Timings:      exchangeTimings,
+			Engines: []exchengines.Name{
+				exchengines.CURRENCYAPI,
+				exchengines.EXCHANGERATEAPI,
+				exchengines.FRANKFURTER,
+			},
+			Timings: ExchangeTimings{
+				HardTimeout: 1 * time.Second,
+			},
 		},
 	}
 }

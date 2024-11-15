@@ -2,7 +2,6 @@ package config
 
 import (
 	"os"
-	"slices"
 	"strings"
 
 	"github.com/knadh/koanf/parsers/yaml"
@@ -14,7 +13,6 @@ import (
 
 	"github.com/hearchco/agent/src/exchange/currency"
 	exchengines "github.com/hearchco/agent/src/exchange/engines"
-	"github.com/hearchco/agent/src/search/category"
 	"github.com/hearchco/agent/src/search/engines"
 	"github.com/hearchco/agent/src/utils/moretime"
 )
@@ -92,8 +90,8 @@ func (c Config) getReader() ReaderConfig {
 				Timeout:   moretime.ConvertToFancyTime(c.Server.ImageProxy.Timeout),
 			},
 		},
-		// Initialize the categories map.
-		RCategories: map[category.Name]ReaderCategory{},
+		// Initialize the engines config map.
+		REngines: map[string]ReaderEngineConfig{},
 		// Exchange config.
 		RExchange: ReaderExchange{
 			BaseCurrency: c.Exchange.BaseCurrency.String(),
@@ -104,35 +102,21 @@ func (c Config) getReader() ReaderConfig {
 		},
 	}
 
-	// Set the categories map config.
-	for catName, catConf := range c.Categories {
-		// Timings config.
-		timingsConf := ReaderCategoryTimings{
-			PreferredTimeout: moretime.ConvertToFancyTime(catConf.Timings.PreferredTimeout),
-			HardTimeout:      moretime.ConvertToFancyTime(catConf.Timings.HardTimeout),
-			Delay:            moretime.ConvertToFancyTime(catConf.Timings.Delay),
-			RandomDelay:      moretime.ConvertToFancyTime(catConf.Timings.RandomDelay),
-			Parallelism:      catConf.Timings.Parallelism,
-		}
-
-		// Set the category config.
-		rc.RCategories[catName] = ReaderCategory{
-			// Initialize the engines map.
-			REngines: map[string]ReaderCategoryEngine{},
-			Ranking:  catConf.Ranking,
-			RTimings: timingsConf,
-		}
-
-		// Set the engines map config.
-		for _, eng := range catConf.Engines {
-			rc.RCategories[catName].REngines[eng.ToLower()] = ReaderCategoryEngine{
-				Enabled:           true,
-				Required:          slices.Contains(catConf.RequiredEngines, eng),
-				RequiredByOrigin:  slices.Contains(catConf.RequiredByOriginEngines, eng),
-				Preferred:         slices.Contains(catConf.PreferredEngines, eng),
-				PreferredByOrigin: slices.Contains(catConf.PreferredByOriginEngines, eng),
-			}
-		}
+	// Set the engines config map.
+	for _, engName := range c.Engines.NoWeb {
+		eng := rc.REngines[engName.String()]
+		eng.NoWeb = true
+		rc.REngines[engName.String()] = eng
+	}
+	for _, engName := range c.Engines.NoImages {
+		eng := rc.REngines[engName.String()]
+		eng.NoImages = true
+		rc.REngines[engName.String()] = eng
+	}
+	for _, engName := range c.Engines.NoSuggestions {
+		eng := rc.REngines[engName.String()]
+		eng.NoSuggestions = true
+		rc.REngines[engName.String()] = eng
 	}
 
 	// Set the exchange engines.
@@ -172,8 +156,12 @@ func (c *Config) fromReader(rc ReaderConfig) {
 				Timeout:   moretime.ConvertFromFancyTime(rc.Server.ImageProxy.Timeout),
 			},
 		},
-		// Initialize the categories map.
-		Categories: map[category.Name]Category{},
+		// Initialize the disabled engines slices.
+		Engines: EngineConfig{
+			NoWeb:         make([]engines.Name, 0),
+			NoImages:      make([]engines.Name, 0),
+			NoSuggestions: make([]engines.Name, 0),
+		},
 		// Exchange config.
 		Exchange: Exchange{
 			BaseCurrency: currency.ConvertBase(rc.RExchange.BaseCurrency),
@@ -184,59 +172,24 @@ func (c *Config) fromReader(rc ReaderConfig) {
 		},
 	}
 
-	// Set the categories map config.
-	for catName, catRConf := range rc.RCategories {
-		// Initialize the engines slices.
-		engEnabled := make([]engines.Name, 0)
-		engRequired := make([]engines.Name, 0)
-		engRequiredByOrigin := make([]engines.Name, 0)
-		engPreferred := make([]engines.Name, 0)
-		engPreferredByOrigin := make([]engines.Name, 0)
-
-		// Set the engines slices according to the reader config.
-		for engS, engRConf := range catRConf.REngines {
-			engName, err := engines.NameString(engS)
-			if err != nil {
-				log.Panic().
-					Caller().
-					Err(err).
-					Msg("Failed converting string to engine name")
-				// ^PANIC
-			}
-
-			if engRConf.Enabled {
-				engEnabled = append(engEnabled, engName)
-
-				if engRConf.Required {
-					engRequired = append(engRequired, engName)
-				} else if engRConf.RequiredByOrigin {
-					engRequiredByOrigin = append(engRequiredByOrigin, engName)
-				} else if engRConf.Preferred {
-					engPreferred = append(engPreferred, engName)
-				} else if engRConf.PreferredByOrigin {
-					engPreferredByOrigin = append(engPreferredByOrigin, engName)
-				}
-			}
+	// Set the disabled engines slices.
+	for engNameS, engConf := range rc.REngines {
+		engName, err := engines.NameString(engNameS)
+		if err != nil {
+			log.Panic().
+				Err(err).
+				Str("name", engNameS).
+				Msg("Couldn't convert engine name string to type")
 		}
 
-		// Timings config.
-		timingsConf := CategoryTimings{
-			PreferredTimeout: moretime.ConvertFromFancyTime(catRConf.RTimings.PreferredTimeout),
-			HardTimeout:      moretime.ConvertFromFancyTime(catRConf.RTimings.HardTimeout),
-			Delay:            moretime.ConvertFromFancyTime(catRConf.RTimings.Delay),
-			RandomDelay:      moretime.ConvertFromFancyTime(catRConf.RTimings.RandomDelay),
-			Parallelism:      catRConf.RTimings.Parallelism,
+		if engConf.NoWeb {
+			nc.Engines.NoWeb = append(nc.Engines.NoWeb, engName)
 		}
-
-		// Set the category config.
-		nc.Categories[catName] = Category{
-			Engines:                  engEnabled,
-			RequiredEngines:          engRequired,
-			RequiredByOriginEngines:  engRequiredByOrigin,
-			PreferredEngines:         engPreferred,
-			PreferredByOriginEngines: engPreferredByOrigin,
-			Ranking:                  catRConf.Ranking,
-			Timings:                  timingsConf,
+		if engConf.NoImages {
+			nc.Engines.NoImages = append(nc.Engines.NoImages, engName)
+		}
+		if engConf.NoSuggestions {
+			nc.Engines.NoSuggestions = append(nc.Engines.NoSuggestions, engName)
 		}
 	}
 

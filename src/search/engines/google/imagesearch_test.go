@@ -4,13 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/hearchco/agent/src/search/category"
 	"github.com/hearchco/agent/src/search/engines/_engines_test"
 )
 
 func TestImageSearch(t *testing.T) {
 	// Testing options.
-	conf := _engines_test.NewConfig(seName)
 	opt := _engines_test.NewOpts()
 
 	// Test cases.
@@ -32,7 +30,7 @@ func TestImageSearch(t *testing.T) {
 	}}
 
 	se := New()
-	se.InitSearcher(context.Background(), conf.Categories[category.GENERAL].Timings)
+	se.InitSearcher(context.Background())
 
 	_engines_test.CheckImageSearch(t, se, tchar[:], tccr[:], tcrr[:])
 }

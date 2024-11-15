@@ -8,14 +8,14 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search/category"
 	"github.com/hearchco/agent/src/search/engines/options"
 	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/utils/anonymize"
 )
 
-func Search(query string, category category.Name, opts options.Options, catConf config.Category) ([]result.Result, error) {
+// Searches for web using the provided category config.
+func Web(query string, opts options.Options, catConf category.Category) ([]result.Result, error) {
 	// Capture start time.
 	startTime := time.Now()
 
@@ -24,7 +24,6 @@ func Search(query string, category category.Name, opts options.Options, catConf 
 	}
 
 	log.Debug().
-		Str("category", category.String()).
 		Str("query", anonymize.String(query)).
 		Int("pages_start", opts.Pages.Start).
 		Int("pages_max", opts.Pages.Max).
@@ -55,7 +54,7 @@ func Search(query string, category category.Name, opts options.Options, catConf 
 	}()
 
 	// Initialize each engine.
-	searchers := initializeSearchers(searchCtx, catConf.Engines, catConf.Timings)
+	searchers := initializeSearchers(searchCtx, catConf.Engines)
 
 	// Create a map for the results with RWMutex.
 	// TODO: Make title and desc length configurable.

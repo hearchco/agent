@@ -13,7 +13,7 @@ import (
 	"github.com/hearchco/agent/src/utils/anonymize"
 )
 
-func routeProxy(w http.ResponseWriter, r *http.Request, secret string, timeout time.Duration) error {
+func routeImageProxy(w http.ResponseWriter, r *http.Request, secret string, timeout time.Duration) error {
 	// Parse the form.
 	err := r.ParseForm()
 	if err != nil {

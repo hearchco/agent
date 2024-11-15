@@ -8,13 +8,14 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/hearchco/agent/src/config"
+	"github.com/hearchco/agent/src/search/category"
 	"github.com/hearchco/agent/src/search/engines/options"
 	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/utils/anonymize"
 )
 
-func Suggest(query string, opts options.Options, catConf config.Category) ([]result.Suggestion, error) {
+// Searches for images using the provided category config.
+func Images(query string, opts options.Options, catConf category.Category) ([]result.Result, error) {
 	// Capture start time.
 	startTime := time.Now()
 
@@ -24,8 +25,18 @@ func Suggest(query string, opts options.Options, catConf config.Category) ([]res
 
 	log.Debug().
 		Str("query", anonymize.String(query)).
+		Int("pages_start", opts.Pages.Start).
+		Int("pages_max", opts.Pages.Max).
 		Str("locale", opts.Locale.String()).
-		Msg("Suggesting")
+		Bool("safesearch", opts.SafeSearch).
+		Str("engines", fmt.Sprintf("%v", catConf.Engines)).
+		Str("required_engines", fmt.Sprintf("%v", catConf.RequiredEngines)).
+		Str("required_by_origin_engines", fmt.Sprintf("%v", catConf.RequiredByOriginEngines)).
+		Str("preferred_engines", fmt.Sprintf("%v", catConf.PreferredEngines)).
+		Str("preferred_by_origin_engines", fmt.Sprintf("%v", catConf.PreferredByOriginEngines)).
+		Dur("preferred_timeout", catConf.Timings.PreferredTimeout).
+		Dur("hard_timeout", catConf.Timings.HardTimeout).
+		Msg("Searching images")
 
 	// Create contexts with timeout for HardTimeout and PreferredTimeout.
 	ctxHardTimeout, cancelHardTimeoutFunc := context.WithTimeout(context.Background(), catConf.Timings.HardTimeout)
@@ -34,38 +45,39 @@ func Suggest(query string, opts options.Options, catConf config.Category) ([]res
 	defer cancelPreferredTimeoutFunc()
 
 	// Create a context that cancels when both HardTimeout and PreferredTimeout are done.
-	suggestCtx, cancelSuggest := context.WithCancel(context.Background())
-	defer cancelSuggest()
+	searchCtx, cancelSearch := context.WithCancel(context.Background())
+	defer cancelSearch()
 	go func() {
 		<-ctxHardTimeout.Done()
 		<-ctxPreferredTimeout.Done()
-		cancelSuggest()
+		cancelSearch()
 	}()
 
 	// Initialize each engine.
-	suggesters := initializeSuggesters(suggestCtx, catConf.Engines, catConf.Timings)
+	searchers := initializeImageSearchers(searchCtx, catConf.Engines)
 
-	// Create a map for the suggestions with RWMutex.
-	concMap := result.NewSuggestionMap(len(catConf.Engines))
+	// Create a map for the results with RWMutex.
+	// TODO: Make title and desc length configurable.
+	concMap := result.NewResultMap(len(catConf.Engines), 100, 1000)
 
-	// Create a sync.Once wrapper for each suggester.Suggest() to ensure that the engine is only run once.
+	// Create a sync.Once wrapper for each searcher.Search() to ensure that the engine is only run once.
 	onceWrapMap := initOnceWrapper(catConf.Engines)
 
 	// Run all required engines. WaitGroup should be awaited unless the hard timeout is reached.
 	var wgRequiredEngines sync.WaitGroup
-	runRequiredSuggesters(catConf.RequiredEngines, suggesters, &wgRequiredEngines, &concMap, query, opts, onceWrapMap)
+	runRequiredImageSearchers(catConf.RequiredEngines, searchers, &wgRequiredEngines, &concMap, query, opts, onceWrapMap)
 
 	// Run all required by origin engines. Cond should be awaited unless the hard timeout is reached.
 	var wgRequiredByOriginEngines sync.WaitGroup
-	runRequiredByOriginSuggesters(catConf.RequiredByOriginEngines, suggesters, &wgRequiredByOriginEngines, &concMap, catConf.Engines, query, opts, onceWrapMap)
+	runRequiredByOriginImageSearchers(catConf.RequiredByOriginEngines, searchers, &wgRequiredByOriginEngines, &concMap, catConf.Engines, query, opts, onceWrapMap)
 
 	// Run all preferred engines. WaitGroup should be awaited unless the preferred timeout is reached.
 	var wgPreferredEngines sync.WaitGroup
-	runPreferredSuggesters(catConf.PreferredEngines, suggesters, &wgPreferredEngines, &concMap, query, opts, onceWrapMap)
+	runPreferredImageSearchers(catConf.PreferredEngines, searchers, &wgPreferredEngines, &concMap, query, opts, onceWrapMap)
 
 	// Run all preferred by origin engines. Cond should be awaited unless the preferred timeout is reached.
 	var wgPreferredByOriginEngines sync.WaitGroup
-	runPreferredByOriginSuggesters(catConf.PreferredByOriginEngines, suggesters, &wgPreferredByOriginEngines, &concMap, catConf.Engines, query, opts, onceWrapMap)
+	runPreferredByOriginImageSearchers(catConf.PreferredByOriginEngines, searchers, &wgPreferredByOriginEngines, &concMap, catConf.Engines, query, opts, onceWrapMap)
 
 	// Cancel the hard timeout after all required engines have finished and all required by origin engines have finished.
 	go cancelHardTimeout(startTime, cancelHardTimeoutFunc, query, &wgRequiredEngines, catConf.RequiredEngines, &wgRequiredByOriginEngines, catConf.RequiredByOriginEngines)
@@ -74,18 +86,18 @@ func Suggest(query string, opts options.Options, catConf config.Category) ([]res
 	go cancelPreferredTimeout(startTime, cancelPreferredTimeoutFunc, query, &wgPreferredEngines, catConf.PreferredEngines, &wgPreferredByOriginEngines, catConf.PreferredByOriginEngines)
 
 	// Wait for both hard timeout and preferred timeout to finish.
-	<-suggestCtx.Done()
+	<-searchCtx.Done()
 
-	// Extract the suggestions and responders from the map.
-	suggestions, responders := concMap.ExtractWithResponders()
+	// Extract the results and responders from the map.
+	results, responders := concMap.ExtractWithResponders()
 
 	log.Debug().
-		Int("suggestions", len(suggestions)).
+		Int("results", len(results)).
 		Str("query", anonymize.String(query)).
 		Str("responders", fmt.Sprintf("%v", responders)).
 		Dur("duration", time.Since(startTime)).
 		Msg("Scraping finished")
 
-	// Return the suggestions.
-	return suggestions, nil
+	// Return the results.
+	return results, nil
 }

@@ -7,14 +7,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search"
+	"github.com/hearchco/agent/src/search/category"
+	"github.com/hearchco/agent/src/search/engines"
 	"github.com/hearchco/agent/src/search/engines/options"
 	"github.com/hearchco/agent/src/search/result"
 	"github.com/hearchco/agent/src/search/result/rank"
 )
 
-func routeSuggest(w http.ResponseWriter, r *http.Request, ver string, catConf config.Category) error {
+func routeSearchSuggestions(w http.ResponseWriter, r *http.Request, ver string, disabledEngines []engines.Name) error {
 	// Capture start time.
 	startTime := time.Now()
 
@@ -60,6 +61,25 @@ func routeSuggest(w http.ResponseWriter, r *http.Request, ver string, catConf co
 		})
 	}
 
+	categoryS := getParamOrDefault(r.Form, "category")
+	if categoryS == "" {
+		// User error.
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: "category cannot be empty or whitespace",
+			Value:   "empty category",
+		})
+	}
+
+	catConf, err := category.Base64ToCategoryType(categoryS)
+	if err != nil {
+		// User error.
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: "invalid category value",
+			Value:   fmt.Sprintf("%v", err),
+		})
+	}
+	catConf.DisableEngines(disabledEngines)
+
 	// All of these have default values set and validated.
 	opts := options.Options{
 		Pages: options.Pages{
@@ -71,7 +91,7 @@ func routeSuggest(w http.ResponseWriter, r *http.Request, ver string, catConf co
 	}
 
 	// Search for suggestions.
-	scrapedSugs, err := search.Suggest(query, opts, catConf)
+	scrapedSugs, err := search.Suggestions(query, opts, catConf)
 	if err != nil {
 		// Server error.
 		werr := writeResponseJSON(w, http.StatusInternalServerError, ErrorResponse{

@@ -32,7 +32,7 @@ package yep
 // 	}}
 
 // 	se := New()
-// 	se.Init(context.Background(), conf.Categories[category.GENERAL].Timings)
+// 	se.Init(context.Background())
 
 // 	_engines_test.CheckSearch(t, se, tchar, tccr, tcrr)
 // }
