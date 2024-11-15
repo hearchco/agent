@@ -121,7 +121,14 @@ func routeSearchWeb(w http.ResponseWriter, r *http.Request, ver string, disabled
 			Value:   fmt.Sprintf("%v", err),
 		})
 	}
-	catConf.DisableEngines(disabledEngines)
+
+	if catConf.ContainsDisabledEngines(disabledEngines) {
+		// User error.
+		return writeResponseJSON(w, http.StatusBadRequest, ErrorResponse{
+			Message: "category contains disabled engines",
+			Value:   "disabled engines",
+		})
+	}
 
 	// All of these have default values set and validated.
 	opts := options.Options{
