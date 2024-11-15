@@ -9,13 +9,13 @@ import (
 	"github.com/hearchco/agent/src/search/scraper"
 )
 
-func CheckWebSearch(t *testing.T, e scraper.Searcher, tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResults, tcrr []TestCaseRankedResults) {
+func CheckWebSearch(t *testing.T, e scraper.WebSearcher, tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResults, tcrr []TestCaseRankedResults) {
 	// TestCaseHasAnyResults
 	for _, tc := range tchar {
 		e.InitSearcher(context.Background())
 
 		resChan := make(chan result.ResultScraped, 100)
-		go e.Search(tc.Query, tc.Options, resChan)
+		go e.WebSearch(tc.Query, tc.Options, resChan)
 
 		results := make([]result.ResultScraped, 0)
 		for r := range resChan {
@@ -32,7 +32,7 @@ func CheckWebSearch(t *testing.T, e scraper.Searcher, tchar []TestCaseHasAnyResu
 		e.InitSearcher(context.Background())
 
 		resChan := make(chan result.ResultScraped, 100)
-		go e.Search(tc.Query, tc.Options, resChan)
+		go e.WebSearch(tc.Query, tc.Options, resChan)
 
 		results := make([]result.ResultScraped, 0)
 		for r := range resChan {
@@ -64,7 +64,7 @@ func CheckWebSearch(t *testing.T, e scraper.Searcher, tchar []TestCaseHasAnyResu
 		e.InitSearcher(context.Background())
 
 		resChan := make(chan result.ResultScraped, 100)
-		go e.Search(tc.Query, tc.Options, resChan)
+		go e.WebSearch(tc.Query, tc.Options, resChan)
 
 		results := make([]result.ResultScraped, 0)
 		for r := range resChan {
