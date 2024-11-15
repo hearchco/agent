@@ -37,7 +37,7 @@ func calculateScore[T ranker](val scoreEngineRanker[T], rconf category.Ranking) 
 
 	// Calculate a second score based on the number of times the result was returned.
 	// Log is used to make the score less sensitive to the number of times returned.
-	timesReturnedScore := math.Log(float64(len(val.EngineRanks()))*rconf.TimesReturnedMul+rconf.TimesReturnedAdd)*rconf.TimesReturnedScoreMul + rconf.TimesReturnedScoreAdd
+	timesReturnedScore := math.Log(float64(len(val.EngineRanks()))*rconf.TimesReturnedMul+rconf.TimesReturnedAdd)*100*rconf.TimesReturnedScoreMul + rconf.TimesReturnedScoreAdd
 
 	return rankScoreAvg + timesReturnedScore
 }
