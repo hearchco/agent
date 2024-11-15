@@ -23,27 +23,27 @@
     }
   },
   "ranking": {
-    "rexp": 0.5,
-    "a": 1,
-    "b": 0,
-    "c": 1,
-    "d": 0,
-    "tra": 1,
-    "trb": 0,
-    "trc": 1,
-    "trd": 0,
+    "rankexp": 0.5,
+    "rankmul": 1,
+    "rankconst": 0,
+    "rankscoremul": 1,
+    "rankscoreadd": 0,
+    "timesreturnedmul": 1,
+    "timesreturnedadd": 0,
+    "timesreturnedscoremul": 1,
+    "timesreturnedscoreadd": 0,
     "engines": {
       "google": {
         "mul": 1,
-        "const": 0
+        "add": 0
       },
       "bing": {
         "mul": 1,
-        "const": 0
+        "add": 0
       },
       "brave": {
         "mul": 1,
-        "const": 0
+        "add": 0
       }
     }
   },

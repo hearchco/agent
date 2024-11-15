@@ -3,7 +3,7 @@ package category
 // CategoryJSON is format in which the config is passed from the user.
 type CategoryJSON struct {
 	Engines map[string]EngineJSON `koanf:"engines"`
-	Ranking Ranking               `koanf:"ranking"`
+	Ranking RankingJSON           `koanf:"ranking"`
 	Timings TimingsJSON           `koanf:"timings"`
 }
 
@@ -26,6 +26,30 @@ type EngineJSON struct {
 	// This means that we want to get results from this engine or any engine that has this engine in "Origins", whichever responds the fastest.
 	// This adds the engine to preferred by origin slice during conversion.
 	PreferredByOrigin bool `koanf:"preferredbyorigin"`
+}
+
+// RankingJSON is format in which the config is passed from the user.
+type RankingJSON struct {
+	// The exponent, multiplier and addition used on the rank itself.
+	RankExp float64 `koanf:"rankexp"`
+	RankMul float64 `koanf:"rankmul"`
+	RankAdd float64 `koanf:"rankconst"`
+	// The multiplier and addition used on the rank score (number calculated from dividing 100 with the rank + above variables applied).
+	RankScoreMul float64 `koanf:"rankscoremul"`
+	RankScoreAdd float64 `koanf:"rankscoreadd"`
+	// The multiplier and addition used on the number of times the result was returned.
+	TimesReturnedMul float64 `koanf:"timesreturnedmul"`
+	TimesReturnedAdd float64 `koanf:"timesreturnedadd"`
+	// The multiplier and addition used on the times returned score (number calculated from doing log(timesReturnedNum + above variables applied)).
+	TimesReturnedScoreMul float64 `koanf:"timesreturnedscoremul"`
+	TimesReturnedScoreAdd float64 `koanf:"timesreturnedscoreadd"`
+	// Multipliers and additions for each engine, applied to the rank score.
+	Engines map[string]EngineRankingJSON `koanf:"engines"`
+}
+
+type EngineRankingJSON struct {
+	Mul float64 `koanf:"mul"`
+	Add float64 `koanf:"add"`
 }
 
 // TimingsJSON is format in which the config is passed from the user.

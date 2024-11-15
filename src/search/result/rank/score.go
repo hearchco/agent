@@ -23,15 +23,21 @@ func (s Suggestions) calculateScores(rconf category.Ranking) {
 
 // Calculates the score for one result.
 func calculateScore[T ranker](val scoreEngineRanker[T], rconf category.Ranking) float64 {
-	var retRankScore float64 = 0
+	var rankScoreSum float64 = 0
+
+	// Calculate the sum of the rank scores of all engines.
+	// The rank score is dividing 100 to invert the priority (the lower the rank, the higher the score).
 	for _, er := range val.EngineRanks() {
-		eng := rconf.Engines[er.SearchEngine().String()]
-		retRankScore += (100.0/math.Pow(float64(er.Rank())*rconf.A+rconf.B, rconf.REXP)*rconf.C+rconf.D)*eng.Mul + eng.Const
+		eng := rconf.Engines[er.SearchEngine()]
+		rankScoreSum += (100.0/math.Pow(float64(er.Rank())*rconf.RankMul+rconf.RankAdd, rconf.RankExp)*rconf.RankScoreMul+rconf.RankScoreAdd)*eng.Mul + eng.Add
 	}
 
-	retRankScore /= float64(len(val.EngineRanks()))
-	timesReturnedScore := math.Log(float64(len(val.EngineRanks()))*rconf.TRA+rconf.TRB)*10*rconf.TRC + rconf.TRD
-	score := retRankScore + timesReturnedScore
+	// Calculate the average rank score from the sum.
+	rankScoreAvg := rankScoreSum / float64(len(val.EngineRanks()))
 
-	return score
+	// Calculate a second score based on the number of times the result was returned.
+	// Log is used to make the score less sensitive to the number of times returned.
+	timesReturnedScore := math.Log(float64(len(val.EngineRanks()))*rconf.TimesReturnedMul+rconf.TimesReturnedAdd)*rconf.TimesReturnedScoreMul + rconf.TimesReturnedScoreAdd
+
+	return rankScoreAvg + timesReturnedScore
 }

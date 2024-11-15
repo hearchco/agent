@@ -64,6 +64,32 @@ func (cj CategoryJSON) ToCategoryType() (Category, error) {
 		}
 	}
 
+	// Ranking config.
+	ranking := Ranking{
+		RankExp:               cj.Ranking.RankExp,
+		RankMul:               cj.Ranking.RankMul,
+		RankAdd:               cj.Ranking.RankAdd,
+		RankScoreMul:          cj.Ranking.RankScoreMul,
+		RankScoreAdd:          cj.Ranking.RankScoreAdd,
+		TimesReturnedMul:      cj.Ranking.TimesReturnedMul,
+		TimesReturnedAdd:      cj.Ranking.TimesReturnedAdd,
+		TimesReturnedScoreMul: cj.Ranking.TimesReturnedScoreMul,
+		TimesReturnedScoreAdd: cj.Ranking.TimesReturnedScoreAdd,
+		Engines:               make(map[engines.Name]EngineRanking),
+	}
+
+	// Set the engine ranking config.
+	for nameS, er := range cj.Ranking.Engines {
+		name, err := engines.NameString(nameS)
+		if err != nil {
+			return Category{}, fmt.Errorf("failed converting string to engine name: %w", err)
+		}
+		ranking.Engines[name] = EngineRanking{
+			Mul: er.Mul,
+			Add: er.Add,
+		}
+	}
+
 	// Timings config.
 	timings := Timings{
 		PreferredTimeout: moretime.ConvertFromFancyTime(cj.Timings.PreferredTimeout),
@@ -77,7 +103,7 @@ func (cj CategoryJSON) ToCategoryType() (Category, error) {
 		RequiredByOriginEngines:  engRequiredByOrigin,
 		PreferredEngines:         engPreferred,
 		PreferredByOriginEngines: engPreferredByOrigin,
-		Ranking:                  cj.Ranking, // Stays the same.
+		Ranking:                  ranking,
 		Timings:                  timings,
 	}, nil
 }

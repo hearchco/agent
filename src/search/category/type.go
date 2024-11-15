@@ -17,21 +17,26 @@ type Category struct {
 }
 
 type Ranking struct {
-	REXP    float64                  `koanf:"rexp"`
-	A       float64                  `koanf:"a"`
-	B       float64                  `koanf:"b"`
-	C       float64                  `koanf:"c"`
-	D       float64                  `koanf:"d"`
-	TRA     float64                  `koanf:"tra"`
-	TRB     float64                  `koanf:"trb"`
-	TRC     float64                  `koanf:"trc"`
-	TRD     float64                  `koanf:"trd"`
-	Engines map[string]EngineRanking `koanf:"engines"`
+	// The exponent, multiplier and addition used on the rank itself.
+	RankExp float64
+	RankMul float64
+	RankAdd float64
+	// The multiplier and addition used on the rank score (number calculated from dividing 100 with the rank + above variables applied).
+	RankScoreMul float64
+	RankScoreAdd float64
+	// The multiplier and addition used on the number of times the result was returned.
+	TimesReturnedMul float64
+	TimesReturnedAdd float64
+	// The multiplier and addition used on the times returned score (number calculated from doing log(timesReturnedNum + above variables applied)).
+	TimesReturnedScoreMul float64
+	TimesReturnedScoreAdd float64
+	// Multipliers and additions for each engine, applied to the rank score.
+	Engines map[engines.Name]EngineRanking
 }
 
 type EngineRanking struct {
-	Mul   float64 `koanf:"mul"`
-	Const float64 `koanf:"const"`
+	Mul float64
+	Add float64
 }
 
 type Timings struct {
