@@ -6,7 +6,7 @@ import (
 )
 
 type ImagesScraped struct {
-	GeneralScraped
+	WebScraped
 
 	originalSize  scrapedImageFormat
 	thumbnailSize scrapedImageFormat
@@ -61,8 +61,8 @@ func (r ImagesScraped) Convert(erCap int) Result {
 	engineRanks = append(engineRanks, r.Rank().Convert())
 	return &Images{
 		imagesJSON{
-			General{
-				generalJSON{
+			Web{
+				webJSON{
 					URL:         r.URL(),
 					FQDN:        moreurls.FQDN(r.URL()),
 					Title:       r.Title(),

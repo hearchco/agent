@@ -13,7 +13,7 @@ type Images struct {
 }
 
 type imagesJSON struct {
-	General
+	Web
 
 	OriginalSize  ImageFormat `json:"original"`
 	ThumbnailSize ImageFormat `json:"thumbnail"`

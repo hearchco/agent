@@ -5,18 +5,18 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type GeneralScraped struct {
+type WebScraped struct {
 	url         string
 	title       string
 	description string
 	rank        RankScraped
 }
 
-func (r GeneralScraped) Key() string {
+func (r WebScraped) Key() string {
 	return r.URL()
 }
 
-func (r GeneralScraped) URL() string {
+func (r WebScraped) URL() string {
 	if r.url == "" {
 		log.Panic().Msg("url is empty")
 		// ^PANIC - Assert because the url should never be empty.
@@ -25,7 +25,7 @@ func (r GeneralScraped) URL() string {
 	return r.url
 }
 
-func (r GeneralScraped) Title() string {
+func (r WebScraped) Title() string {
 	if r.title == "" {
 		log.Panic().Msg("title is empty")
 		// ^PANIC - Assert because the title should never be empty.
@@ -34,19 +34,19 @@ func (r GeneralScraped) Title() string {
 	return r.title
 }
 
-func (r GeneralScraped) Description() string {
+func (r WebScraped) Description() string {
 	return r.description
 }
 
-func (r GeneralScraped) Rank() RankScraped {
+func (r WebScraped) Rank() RankScraped {
 	return r.rank
 }
 
-func (r GeneralScraped) Convert(erCap int) Result {
+func (r WebScraped) Convert(erCap int) Result {
 	engineRanks := make([]Rank, 0, erCap)
 	engineRanks = append(engineRanks, r.Rank().Convert())
-	return &General{
-		generalJSON{
+	return &Web{
+		webJSON{
 			URL:         r.URL(),
 			FQDN:        moreurls.FQDN(r.URL()),
 			Title:       r.Title(),
