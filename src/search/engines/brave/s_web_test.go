@@ -32,5 +32,5 @@ func TestWebSearch(t *testing.T) {
 	se := New()
 	se.InitSearcher(context.Background())
 
-	_engines_test.CheckSearch(t, se, tchar, tccr, tcrr)
+	_engines_test.CheckWebSearch(t, se, tchar, tccr, tcrr)
 }

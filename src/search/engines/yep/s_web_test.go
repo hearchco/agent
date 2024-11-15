@@ -34,5 +34,5 @@ package yep
 // 	se := New()
 // 	se.Init(context.Background())
 
-// 	_engines_test.CheckSearch(t, se, tchar, tccr, tcrr)
+// 	_engines_test.CheckWebSearch(t, se, tchar, tccr, tcrr)
 // }

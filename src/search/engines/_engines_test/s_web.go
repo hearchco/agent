@@ -9,13 +9,13 @@ import (
 	"github.com/hearchco/agent/src/search/scraper"
 )
 
-func CheckImageSearch(t *testing.T, e scraper.ImageSearcher, tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResults, tcrr []TestCaseRankedResults) {
+func CheckWebSearch(t *testing.T, e scraper.Searcher, tchar []TestCaseHasAnyResults, tccr []TestCaseContainsResults, tcrr []TestCaseRankedResults) {
 	// TestCaseHasAnyResults
 	for _, tc := range tchar {
-		e.ReInitSearcher(context.Background())
+		e.InitSearcher(context.Background())
 
 		resChan := make(chan result.ResultScraped, 100)
-		go e.ImageSearch(tc.Query, tc.Options, resChan)
+		go e.Search(tc.Query, tc.Options, resChan)
 
 		results := make([]result.ResultScraped, 0)
 		for r := range resChan {
@@ -29,10 +29,10 @@ func CheckImageSearch(t *testing.T, e scraper.ImageSearcher, tchar []TestCaseHas
 
 	// TestCaseContainsResults
 	for _, tc := range tccr {
-		e.ReInitSearcher(context.Background())
+		e.InitSearcher(context.Background())
 
 		resChan := make(chan result.ResultScraped, 100)
-		go e.ImageSearch(tc.Query, tc.Options, resChan)
+		go e.Search(tc.Query, tc.Options, resChan)
 
 		results := make([]result.ResultScraped, 0)
 		for r := range resChan {
@@ -61,10 +61,10 @@ func CheckImageSearch(t *testing.T, e scraper.ImageSearcher, tchar []TestCaseHas
 
 	// TestCaseRankedResults
 	for _, tc := range tcrr {
-		e.ReInitSearcher(context.Background())
+		e.InitSearcher(context.Background())
 
 		resChan := make(chan result.ResultScraped, 100)
-		go e.ImageSearch(tc.Query, tc.Options, resChan)
+		go e.Search(tc.Query, tc.Options, resChan)
 
 		results := make([]result.ResultScraped, 0)
 		for r := range resChan {
