@@ -5,21 +5,21 @@
       "required": false,
       "requiredbyorigin": true,
       "preferred": false,
-      "prefferedbyorigin": false
+      "preferredbyorigin": false
     },
     "bing": {
       "enabled": true,
       "required": false,
       "requiredbyorigin": true,
       "preferred": false,
-      "prefferedbyorigin": false
+      "preferredbyorigin": false
     },
     "brave": {
       "enabled": true,
       "required": false,
       "requiredbyorigin": false,
       "preferred": true,
-      "prefferedbyorigin": false
+      "preferredbyorigin": false
     }
   },
   "ranking": {
@@ -49,6 +49,6 @@
   },
   "timings": {
     "preferredtimeout": "500",
-    "HardTimeout": "1500"
+    "hardtimeout": "1500"
   }
 }
