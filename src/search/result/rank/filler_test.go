@@ -52,8 +52,8 @@ func TestFillEngineRankRank(t *testing.T) {
 	resultsOrig := make(Results, 0, len(ranksTests))
 	resultsExpected := make(Results, 0, len(ranksTests))
 	for _, rankPair := range ranksTests {
-		var resOrig result.Result = &result.General{}
-		var resExpected result.Result = &result.General{}
+		var resOrig result.Result = &result.Web{}
+		var resExpected result.Result = &result.Web{}
 		resOrig.InitEngineRanks()
 		resExpected.InitEngineRanks()
 

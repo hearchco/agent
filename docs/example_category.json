@@ -1,0 +1,54 @@
+{
+  "engines": {
+    "google": {
+      "enabled": true,
+      "required": false,
+      "requiredbyorigin": true,
+      "preferred": false,
+      "preferredbyorigin": false
+    },
+    "bing": {
+      "enabled": true,
+      "required": false,
+      "requiredbyorigin": true,
+      "preferred": false,
+      "preferredbyorigin": false
+    },
+    "brave": {
+      "enabled": true,
+      "required": false,
+      "requiredbyorigin": false,
+      "preferred": true,
+      "preferredbyorigin": false
+    }
+  },
+  "ranking": {
+    "rankexp": 0.5,
+    "rankmul": 1,
+    "rankconst": 0,
+    "rankscoremul": 1,
+    "rankscoreadd": 0,
+    "timesreturnedmul": 1,
+    "timesreturnedadd": 0,
+    "timesreturnedscoremul": 1,
+    "timesreturnedscoreadd": 0,
+    "engines": {
+      "google": {
+        "mul": 1,
+        "add": 0
+      },
+      "bing": {
+        "mul": 1,
+        "add": 0
+      },
+      "brave": {
+        "mul": 1,
+        "add": 0
+      }
+    }
+  },
+  "timings": {
+    "preferredtimeout": "500",
+    "hardtimeout": "1500"
+  }
+}

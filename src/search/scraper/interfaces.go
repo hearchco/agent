@@ -3,7 +3,6 @@ package scraper
 import (
 	"context"
 
-	"github.com/hearchco/agent/src/config"
 	"github.com/hearchco/agent/src/search/engines"
 	"github.com/hearchco/agent/src/search/engines/options"
 	"github.com/hearchco/agent/src/search/result"
@@ -13,24 +12,22 @@ import (
 type Enginer interface {
 	GetName() engines.Name
 	GetOrigins() []engines.Name
-	Init(context.Context, config.CategoryTimings)
+	Init(context.Context)
 }
 
-// Interface that each search engine must implement to support searching general results.
-type Searcher interface {
+// Interface that each search engine must implement to support searching web results.
+type WebSearcher interface {
 	Enginer
 
-	InitSearcher(context.Context, config.CategoryTimings)
-	ReInitSearcher(context.Context)
-	Search(string, options.Options, chan result.ResultScraped) ([]error, bool)
+	InitSearcher(context.Context)
+	WebSearch(string, options.Options, chan result.ResultScraped) ([]error, bool)
 }
 
 // Interface that each search engine must implement to support searching image results.
 type ImageSearcher interface {
 	Enginer
 
-	InitSearcher(context.Context, config.CategoryTimings)
-	ReInitSearcher(context.Context)
+	InitSearcher(context.Context)
 	ImageSearch(string, options.Options, chan result.ResultScraped) ([]error, bool)
 }
 
@@ -38,7 +35,6 @@ type ImageSearcher interface {
 type Suggester interface {
 	Enginer
 
-	InitSuggester(context.Context, config.CategoryTimings)
-	ReInitSuggester(context.Context)
+	InitSuggester(context.Context)
 	Suggest(string, options.Options, chan result.SuggestionScraped) ([]error, bool)
 }

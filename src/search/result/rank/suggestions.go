@@ -3,14 +3,14 @@ package rank
 import (
 	"sort"
 
-	"github.com/hearchco/agent/src/config"
+	"github.com/hearchco/agent/src/search/category"
 	"github.com/hearchco/agent/src/search/result"
 )
 
 type Suggestions []result.Suggestion
 
 // Calculates the Score, sorts by it and then populates the Rank field of every result.
-func (s Suggestions) Rank(rconf config.CategoryRanking) {
+func (s Suggestions) Rank(rconf category.Ranking) {
 	// Calculate and set scores.
 	s.calculateScores(rconf)
 

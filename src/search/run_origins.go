@@ -11,15 +11,15 @@ import (
 )
 
 // Searchers.
-func runRequiredByOriginSearchers(engs []engines.Name, searchers []scraper.Searcher, wgByOriginEngines *sync.WaitGroup, concMap *result.ResultConcMap, enabledEngines []engines.Name, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
+func runRequiredByOriginSearchers(engs []engines.Name, searchers []scraper.WebSearcher, wgByOriginEngines *sync.WaitGroup, concMap *result.ResultConcMap, enabledEngines []engines.Name, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
 	runByOriginSearchers(groupRequiredByOrigin, engs, searchers, wgByOriginEngines, concMap, enabledEngines, query, opts, onceWrapMap)
 }
 
-func runPreferredByOriginSearchers(engs []engines.Name, searchers []scraper.Searcher, wgByOriginEngines *sync.WaitGroup, concMap *result.ResultConcMap, enabledEngines []engines.Name, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
+func runPreferredByOriginSearchers(engs []engines.Name, searchers []scraper.WebSearcher, wgByOriginEngines *sync.WaitGroup, concMap *result.ResultConcMap, enabledEngines []engines.Name, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
 	runByOriginSearchers(groupPreferredByOrigin, engs, searchers, wgByOriginEngines, concMap, enabledEngines, query, opts, onceWrapMap)
 }
 
-func runByOriginSearchers(groupName string, engs []engines.Name, searchers []scraper.Searcher, wg *sync.WaitGroup, concMap *result.ResultConcMap, enabledEngines []engines.Name, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
+func runByOriginSearchers(groupName string, engs []engines.Name, searchers []scraper.WebSearcher, wg *sync.WaitGroup, concMap *result.ResultConcMap, enabledEngines []engines.Name, query string, opts options.Options, onceWrapMap map[engines.Name]*onceWrapper) {
 	// Create a map of slices of all the engines that contain origins from the engines by origin.
 	engsMap := make(map[engines.Name][]engines.Name, len(engs))
 	for _, originName := range engs {
@@ -55,7 +55,7 @@ func runByOriginSearchers(groupName string, engs []engines.Name, searchers []scr
 				defer wgWorkers.Done()
 
 				// Run the engine.
-				runEngine(groupName, onceWrapMap[engName], concMap, engName, searcher.Search, query, opts)
+				runEngine(groupName, onceWrapMap[engName], concMap, engName, searcher.WebSearch, query, opts)
 
 				// Indicate that the engine was successful.
 				if onceWrapMap[engName].Success() {

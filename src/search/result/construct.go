@@ -6,8 +6,8 @@ import (
 	"github.com/hearchco/agent/src/search/engines"
 )
 
-func ConstructResult(seName engines.Name, urll string, title string, description string, page int, onPageRank int) (GeneralScraped, error) {
-	res := GeneralScraped{
+func ConstructResult(seName engines.Name, urll string, title string, description string, page int, onPageRank int) (WebScraped, error) {
+	res := WebScraped{
 		url:         urll,
 		title:       title,
 		description: description,
@@ -47,7 +47,7 @@ func ConstructImagesResult(
 ) (ImagesScraped, error) {
 	res, err := ConstructResult(seName, urll, title, description, page, onPageRank)
 	imgres := ImagesScraped{
-		GeneralScraped: res,
+		WebScraped: res,
 
 		originalSize: scrapedImageFormat{
 			height: originalHeight,

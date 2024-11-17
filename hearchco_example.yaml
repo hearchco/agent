@@ -4,16 +4,8 @@ server:
     type: none
   imageproxy:
     secretkey: changemepls
-# categories:
-#   general:
-#     engines:
-#       duckduckgo:
-#         enabled: false
-#     ranking:
-#       engines:
-#         google:
-#           mul: 2
-#   images:
-#     engines:
-#       bing:
-#         enabled: false
+# engines:
+#   google:
+#     noweb: true # Disables web search for this engine
+#     noimages: true # Disables image search for this engine
+#     nosuggestions: true # Disables suggestions for this engine
