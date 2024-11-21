@@ -74,7 +74,6 @@ package yep
 // 				log.Error().
 // 					Caller().
 // 					Err(err).
-// 					Str("result", fmt.Sprintf("%v", r)).
 // 					Msg("Failed to construct result")
 // 			} else {
 // 				log.Trace().

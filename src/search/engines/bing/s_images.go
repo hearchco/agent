@@ -208,7 +208,6 @@ func (se Engine) ImageSearch(query string, opts options.Options, resChan chan re
 			log.Error().
 				Caller().
 				Err(err).
-				Str("result", fmt.Sprintf("%v", r)).
 				Msg("Failed to construct result")
 		} else {
 			log.Trace().
