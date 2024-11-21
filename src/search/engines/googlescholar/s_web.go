@@ -45,6 +45,11 @@ func (se Engine) WebSearch(query string, opts options.Options, resChan chan resu
 			log.Error().
 				Caller().
 				Err(err).
+				Str("url", urlText).
+				Str("title", titleText).
+				Str("desc", descText).
+				Int("page", page).
+				Int("rank", pageRankCounter.GetPlusOne(pageIndex)).
 				Msg("Failed to construct result")
 		} else {
 			log.Trace().

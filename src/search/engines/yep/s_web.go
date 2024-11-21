@@ -74,6 +74,11 @@ package yep
 // 				log.Error().
 // 					Caller().
 // 					Err(err).
+// 					Str("url", goodURL).
+// 					Str("title", goodTitle).
+// 					Str("desc", goodDesc).
+// 					Int("page", page).
+// 					Int("rank", pageRankCounter.GetPlusOne(pageIndex)).
 // 					Msg("Failed to construct result")
 // 			} else {
 // 				log.Trace().

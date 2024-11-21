@@ -208,6 +208,11 @@ func (se Engine) ImageSearch(query string, opts options.Options, resChan chan re
 			log.Error().
 				Caller().
 				Err(err).
+				Str("url", jsonMetadata.ImageURL).
+				Str("title", titleText).
+				Str("desc", jsonMetadata.Desc).
+				Int("page", page).
+				Int("rank", pageRankCounter.GetPlusOne(pageIndex)).
 				Msg("Failed to construct result")
 		} else {
 			log.Trace().
