@@ -7,7 +7,23 @@ import (
 )
 
 func ConstructResult(seName engines.Name, urll string, title string, description string, page int, onPageRank int) (WebScraped, error) {
-	res := WebScraped{
+	if urll == "" {
+		return WebScraped{}, fmt.Errorf("invalid URL: empty")
+	}
+
+	if title == "" {
+		return WebScraped{}, fmt.Errorf("invalid title: empty")
+	}
+
+	if page <= 0 {
+		return WebScraped{}, fmt.Errorf("invalid page: %d", page)
+	}
+
+	if onPageRank <= 0 {
+		return WebScraped{}, fmt.Errorf("invalid onPageRank: %d", onPageRank)
+	}
+
+	return WebScraped{
 		url:         urll,
 		title:       title,
 		description: description,
@@ -19,25 +35,7 @@ func ConstructResult(seName engines.Name, urll string, title string, description
 			page,
 			onPageRank,
 		},
-	}
-
-	if urll == "" {
-		return res, fmt.Errorf("invalid URL: empty")
-	}
-
-	if title == "" {
-		return res, fmt.Errorf("invalid title: empty")
-	}
-
-	if page <= 0 {
-		return res, fmt.Errorf("invalid page: %d", page)
-	}
-
-	if onPageRank <= 0 {
-		return res, fmt.Errorf("invalid onPageRank: %d", onPageRank)
-	}
-
-	return res, nil
+	}, nil
 }
 
 func ConstructImagesResult(
@@ -46,7 +44,35 @@ func ConstructImagesResult(
 	thumbnailUrl string, sourceName string, sourceUrl string,
 ) (ImagesScraped, error) {
 	res, err := ConstructResult(seName, urll, title, description, page, onPageRank)
-	imgres := ImagesScraped{
+	if err != nil {
+		return ImagesScraped{}, err
+	}
+
+	if originalHeight <= 0 {
+		return ImagesScraped{}, fmt.Errorf("invalid originalHeight: %d", originalHeight)
+	}
+
+	if originalWidth <= 0 {
+		return ImagesScraped{}, fmt.Errorf("invalid originalWidth: %d", originalWidth)
+	}
+
+	if thumbnailHeight <= 0 {
+		return ImagesScraped{}, fmt.Errorf("invalid thumbnailHeight: %d", thumbnailHeight)
+	}
+
+	if thumbnailWidth <= 0 {
+		return ImagesScraped{}, fmt.Errorf("invalid thumbnailWidth: %d", thumbnailWidth)
+	}
+
+	if thumbnailUrl == "" {
+		return ImagesScraped{}, fmt.Errorf("invalid thumbnailUrl: empty")
+	}
+
+	if sourceUrl == "" {
+		return ImagesScraped{}, fmt.Errorf("invalid sourceUrl: empty")
+	}
+
+	return ImagesScraped{
 		WebScraped: res,
 
 		originalSize: scrapedImageFormat{
@@ -60,34 +86,5 @@ func ConstructImagesResult(
 		thumbnailURL: thumbnailUrl,
 		sourceName:   sourceName,
 		sourceURL:    sourceUrl,
-	}
-	if err != nil {
-		return imgres, err
-	}
-
-	if originalHeight <= 0 {
-		return imgres, fmt.Errorf("invalid originalHeight: %d", originalHeight)
-	}
-
-	if originalWidth <= 0 {
-		return imgres, fmt.Errorf("invalid originalWidth: %d", originalWidth)
-	}
-
-	if thumbnailHeight <= 0 {
-		return imgres, fmt.Errorf("invalid thumbnailHeight: %d", thumbnailHeight)
-	}
-
-	if thumbnailWidth <= 0 {
-		return imgres, fmt.Errorf("invalid thumbnailWidth: %d", thumbnailWidth)
-	}
-
-	if thumbnailUrl == "" {
-		return imgres, fmt.Errorf("invalid thumbnailUrl: empty")
-	}
-
-	if sourceUrl == "" {
-		return imgres, fmt.Errorf("invalid sourceUrl: empty")
-	}
-
-	return imgres, nil
+	}, nil
 }

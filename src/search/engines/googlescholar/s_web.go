@@ -45,7 +45,6 @@ func (se Engine) WebSearch(query string, opts options.Options, resChan chan resu
 			log.Error().
 				Caller().
 				Err(err).
-				Str("result", fmt.Sprintf("%v", r)).
 				Msg("Failed to construct result")
 		} else {
 			log.Trace().
