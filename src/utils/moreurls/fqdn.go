@@ -18,5 +18,13 @@ func FQDN(urll string) string {
 		// ^PANIC - Assert correct URL.
 	}
 
+	// Check if the hostname is empty.
+	if u.Hostname() == "" {
+		log.Panic().
+			Str("url", urll).
+			Msg("Hostname is empty")
+		// ^PANIC - Assert non-empty URL.
+	}
+
 	return u.Hostname()
 }
