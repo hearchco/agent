@@ -8,6 +8,13 @@ import (
 
 // Returns the fully qualified domain name of the URL.
 func FQDN(urll string) string {
+	// Check if the url is empty.
+	if urll == "" {
+		log.Panic().
+			Str("url", urll).
+			Msg("URL is empty")
+	}
+
 	// Parse the URL.
 	u, err := url.Parse(urll)
 	if err != nil {
