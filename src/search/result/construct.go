@@ -2,6 +2,7 @@ package result
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/hearchco/agent/src/search/engines"
 )
@@ -9,6 +10,15 @@ import (
 func ConstructResult(seName engines.Name, urll string, title string, description string, page int, onPageRank int) (WebScraped, error) {
 	if urll == "" {
 		return WebScraped{}, fmt.Errorf("invalid URL: empty")
+	}
+
+	u, err := url.Parse(urll)
+	if err != nil {
+		return WebScraped{}, fmt.Errorf("invalid URL: %s", err)
+	}
+
+	if u.Hostname() == "" {
+		return WebScraped{}, fmt.Errorf("invalid URL: no hostname")
 	}
 
 	if title == "" {
@@ -24,7 +34,7 @@ func ConstructResult(seName engines.Name, urll string, title string, description
 	}
 
 	return WebScraped{
-		url:         urll,
+		url:         u.String(),
 		title:       title,
 		description: description,
 		rank: RankScraped{
