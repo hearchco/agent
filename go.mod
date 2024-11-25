@@ -9,7 +9,7 @@ require (
 	github.com/alecthomas/kong v1.4.0
 	github.com/andybalholm/brotli v1.1.1
 	github.com/aws/aws-lambda-go v1.47.0
-	github.com/aws/aws-sdk-go-v2 v1.32.4
+	github.com/aws/aws-sdk-go-v2 v1.32.5
 	github.com/aws/aws-sdk-go-v2/config v1.28.4
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.37.0
 	github.com/awslabs/aws-lambda-go-api-proxy v0.16.2
@@ -45,7 +45,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sso v1.24.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.28.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.33.0 // indirect
-	github.com/aws/smithy-go v1.22.0 // indirect
+	github.com/aws/smithy-go v1.22.1 // indirect
 	github.com/bits-and-blooms/bitset v1.14.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
